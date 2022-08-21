@@ -1,0 +1,6 @@
+D:\GitHub\TimeIsLife\TeatWindow\obj\Debug\TestWindow.csproj.AssemblyReference.cache
+D:\GitHub\TimeIsLife\TeatWindow\obj\Debug\TestWindow.csproj.SuggestedBindingRedirects.cache
+D:\GitHub\TimeIsLife\TeatWindow\obj\Debug\MainWindow.g.cs
+D:\GitHub\TimeIsLife\TeatWindow\obj\Debug\App.g.cs
+D:\GitHub\TimeIsLife\TeatWindow\obj\Debug\TeatWindow_MarkupCompile.cache
+D:\GitHub\TimeIsLife\TeatWindow\obj\Debug\TeatWindow_MarkupCompile.lref

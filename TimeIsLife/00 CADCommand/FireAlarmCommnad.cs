@@ -754,71 +754,7 @@ namespace TimeIsLife.CADCommand
         #endregion
 
         #region 读取YDB文件
-        public class Floor
-        {
-            public int ID { get; set; }
-            public double LevelB { get; set; }
-            public double Height { get; set; }
-        }
-
-        public class BeamSect
-        {
-            public int ID { get; set; }
-            public int Kind { get; set; }
-            public string ShapeVal { get; set; }
-            public string ShapeVal1 { get; set; }
-
-        }
-        public class Grid
-        {
-            public int ID { get; set; }
-            public Joint Joint1 { get; set; }
-            public Joint Joint2 { get; set; }
-        }
-
-        public class Joint
-        {
-            public int ID { get; set; }
-            public double X { get; set; }
-            public double Y { get; set; }
-        }
-
-        public class Beam
-        {
-            public int ID { get; set; }
-            public Floor Floor { get; set; }
-            public BeamSect BeamSect { get; set; }
-            public Grid Grid { get; set; }
-
-        }
-
-        public class Slab
-        {
-            public int ID { get; set; }
-            public string GridsID { get; set; }
-            public string VertexX { get; set; }
-            public string VertexY { get; set; }
-            public string VertexZ { get; set; }
-            public int Thickness { get; set; }
-            public Floor Floor { get; set; }
-        }
-
-        public class WallSect
-        {
-            public int ID { get; set; }
-            public int Kind { get; set; }
-            public int B { get; set; }
-        }
-
-        public class Wall
-        {
-            public int ID { get; set; }
-            public Floor Floor { get; set; }
-            public WallSect WallSect { get; set; }
-            public Grid Grid { get; set; }
-        }
-
-
+        
         [CommandMethod("FFF_LoadFile")]
         public void FFF_LoadFile()
         {
@@ -1067,7 +1003,6 @@ namespace TimeIsLife.CADCommand
             editor.WriteMessage("\n结束");
         }
 
-
         private void SetLayer(Database db, string layerName, int colorIndex)
         {
             db.AddLayer(layerName);
@@ -1144,6 +1079,72 @@ namespace TimeIsLife.CADCommand
             }
             return name;
         }
+
+        #region 结构类
+        public class Floor
+        {
+            public int ID { get; set; }
+            public double LevelB { get; set; }
+            public double Height { get; set; }
+        }
+
+        public class BeamSect
+        {
+            public int ID { get; set; }
+            public int Kind { get; set; }
+            public string ShapeVal { get; set; }
+            public string ShapeVal1 { get; set; }
+
+        }
+        public class Grid
+        {
+            public int ID { get; set; }
+            public Joint Joint1 { get; set; }
+            public Joint Joint2 { get; set; }
+        }
+
+        public class Joint
+        {
+            public int ID { get; set; }
+            public double X { get; set; }
+            public double Y { get; set; }
+        }
+
+        public class Beam
+        {
+            public int ID { get; set; }
+            public Floor Floor { get; set; }
+            public BeamSect BeamSect { get; set; }
+            public Grid Grid { get; set; }
+
+        }
+
+        public class Slab
+        {
+            public int ID { get; set; }
+            public string GridsID { get; set; }
+            public string VertexX { get; set; }
+            public string VertexY { get; set; }
+            public string VertexZ { get; set; }
+            public int Thickness { get; set; }
+            public Floor Floor { get; set; }
+        }
+
+        public class WallSect
+        {
+            public int ID { get; set; }
+            public int Kind { get; set; }
+            public int B { get; set; }
+        }
+
+        public class Wall
+        {
+            public int ID { get; set; }
+            public Floor Floor { get; set; }
+            public WallSect WallSect { get; set; }
+            public Grid Grid { get; set; }
+        }
+        #endregion
 
         #endregion
     }

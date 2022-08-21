@@ -61,23 +61,31 @@
     <!--ACA Refences End-->
     <!--AME Referebces Begin-->
     <!--AME Reference End-->
-    <Reference Include="DotNetARX">
-      <HintPath>E:\OneDrive\TimeIsLife\ref\DotNetARX.dll</HintPath>
+    <Reference Include="DotNetARX, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>Ref\DotNetARX.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.ComponentModel.DataAnnotations" />
     <Reference Include="System.Data" />
     <Reference Include="System.Numerics" />
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xaml" />
     <Reference Include="System.Xml" />
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="00 CADCommand\ElectricalCommand.cs" />
     <Compile Include="00 CADCommand\FireAlarmCommnad.cs" />
     <Compile Include="00 CADCommand\ToolCommand.cs" />
     <Compile Include="00 CADCommand\UcsSelectJig.cs" />
+    <Compile Include="01 View\Electrical.xaml.cs">
+      <DependentUpon>Electrical.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="02 ViewModel\ElectricalViewModel.cs" />
+    <Compile Include="Calendar.cs" />
     <Compile Include="myCommands.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -258,6 +266,20 @@
     <Resource Include="FA\操作说明.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Ref\DotNetARX.dll">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="03 Model\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Page Include="01 View\Electrical.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
