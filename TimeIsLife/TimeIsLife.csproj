@@ -1,4 +1,4 @@
-ï»¿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="Current" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -44,6 +44,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+	<LangVersion>8.0</LangVersion>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <PlatformTarget>x64</PlatformTarget>
   </PropertyGroup>
@@ -54,6 +55,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+<LangVersion>8.0</LangVersion>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
   </PropertyGroup>
   <ItemGroup>
@@ -127,124 +129,124 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <None Include="Block\FA-08-æ™ºèƒ½åž‹ç‚¹åž‹æ„ŸçƒŸæŽ¢æµ‹å™¨.dwg">
+    <None Include="Block\FA-08-ÖÇÄÜÐÍµãÐÍ¸ÐÑÌÌ½²âÆ÷.dwg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="FA\FA-01-æŽ¥çº¿ç«¯å­ç®±.dwg">
+    <None Include="FA\FA-01-½ÓÏß¶Ë×ÓÏä.dwg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="FA\FA-02-å¸¦æ¶ˆé˜²ç”µè¯æ’å­”çš„æ‰‹åŠ¨æŠ¥è­¦æŒ‰é’®.dwg">
+    <None Include="FA\FA-02-´øÏû·Àµç»°²å¿×µÄÊÖ¶¯±¨¾¯°´Å¥.dwg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="FA\FA-03-ç«ç¾æŠ¥è­¦ç”µè¯æœº.dwg">
+    <None Include="FA\FA-03-»ðÔÖ±¨¾¯µç»°»ú.dwg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="FA\FA-04-å£°å…‰è­¦æŠ¥å™¨.dwg">
+    <None Include="FA\FA-04-Éù¹â¾¯±¨Æ÷.dwg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="FA\FA-05-3Wç«ç¾è­¦æŠ¥æ‰¬å£°å™¨%28æŒ‚å¢™æ˜Žè£…è·åœ°2.4m%29.dwg">
+    <None Include="FA\FA-05-3W»ðÔÖ¾¯±¨ÑïÉùÆ÷%28¹ÒÇ½Ã÷×°¾àµØ2.4m%29.dwg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="FA\FA-06-3Wç«ç¾è­¦æŠ¥æ‰¬å£°å™¨%28å¸é¡¶å®‰è£…%29.dwg">
+    <None Include="FA\FA-06-3W»ðÔÖ¾¯±¨ÑïÉùÆ÷%28Îü¶¥°²×°%29.dwg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="FA\FA-07-æ¶ˆç«æ “èµ·æ³µæŒ‰é’®.dwg">
+    <None Include="FA\FA-07-Ïû»ðË¨Æð±Ã°´Å¥.dwg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="FA\FA-08-æ™ºèƒ½åž‹ç‚¹åž‹æ„ŸçƒŸæŽ¢æµ‹å™¨.dwg">
+    <None Include="FA\FA-08-ÖÇÄÜÐÍµãÐÍ¸ÐÑÌÌ½²âÆ÷.dwg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="FA\FA-09-æ™ºèƒ½åž‹ç‚¹åž‹æ„Ÿæ¸©æŽ¢æµ‹å™¨.dwg">
+    <None Include="FA\FA-09-ÖÇÄÜÐÍµãÐÍ¸ÐÎÂÌ½²âÆ÷.dwg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="FA\FA-10-é˜²ç«é˜€%2870Â°Cç†”æ–­å…³é—­%29.dwg">
+    <None Include="FA\FA-10-·À»ð·§%2870¡ãCÈÛ¶Ï¹Ø±Õ%29.dwg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="FA\FA-11-é˜²ç«é˜€%28280Â°Cç†”æ–­å…³é—­%29.dwg">
+    <None Include="FA\FA-11-·À»ð·§%28280¡ãCÈÛ¶Ï¹Ø±Õ%29.dwg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="FA\FA-12-ç”µåŠ¨æŽ’çƒŸé˜€%28å¸¸é—­%29.dwg">
+    <None Include="FA\FA-12-µç¶¯ÅÅÑÌ·§%28³£±Õ%29.dwg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="FA\FA-13-ç”µåŠ¨æŽ’çƒŸé˜€%28å¸¸å¼€%29.dwg">
+    <None Include="FA\FA-13-µç¶¯ÅÅÑÌ·§%28³£¿ª%29.dwg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="FA\FA-14-å¸¸é—­æ­£åŽ‹é€é£Žå£.dwg">
+    <None Include="FA\FA-14-³£±ÕÕýÑ¹ËÍ·ç¿Ú.dwg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="FA\FA-15-é˜²ç«å·å¸˜æŽ§åˆ¶ç®±.dwg">
+    <None Include="FA\FA-15-·À»ð¾íÁ±¿ØÖÆÏä.dwg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="FA\FA-16-ç”µåŠ¨æŒ¡çƒŸåž‚å£æŽ§åˆ¶ç®±.dwg">
+    <None Include="FA\FA-16-µç¶¯µ²ÑÌ´¹±Ú¿ØÖÆÏä.dwg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="FA\FA-17-æ°´æµæŒ‡ç¤ºå™¨.dwg">
+    <None Include="FA\FA-17-Ë®Á÷Ö¸Ê¾Æ÷.dwg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="FA\FA-18-ä¿¡å·é˜€.dwg">
+    <None Include="FA\FA-18-ÐÅºÅ·§.dwg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="FA\FA-19-æ™ºèƒ½çº¿åž‹çº¢å¤–å…‰æŸæ„ŸçƒŸæŽ¢æµ‹å™¨ï¼ˆå‘å°„ç«¯ï¼‰.dwg">
+    <None Include="FA\FA-19-ÖÇÄÜÏßÐÍºìÍâ¹âÊø¸ÐÑÌÌ½²âÆ÷£¨·¢Éä¶Ë£©.dwg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="FA\FA-20-æ™ºèƒ½çº¿åž‹çº¢å¤–å…‰æŸæ„ŸçƒŸæŽ¢æµ‹å™¨ï¼ˆæŽ¥æ”¶ç«¯ï¼‰.dwg">
+    <None Include="FA\FA-20-ÖÇÄÜÏßÐÍºìÍâ¹âÊø¸ÐÑÌÌ½²âÆ÷£¨½ÓÊÕ¶Ë£©.dwg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="FA\FA-21-ç”µåŠ¨æŽ’çƒŸçª—æŽ§åˆ¶ç®±.dwg">
+    <None Include="FA\FA-21-µç¶¯ÅÅÑÌ´°¿ØÖÆÏä.dwg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="FA\FA-22-æ¶ˆé˜²ç”µæ¢¯æŽ§åˆ¶ç®±.dwg">
+    <None Include="FA\FA-22-Ïû·ÀµçÌÝ¿ØÖÆÏä.dwg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="FA\FA-23-ç”µæ¢¯æŽ§åˆ¶ç®±.dwg">
+    <None Include="FA\FA-23-µçÌÝ¿ØÖÆÏä.dwg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="FA\FA-24-æ¹¿å¼æŠ¥è­¦é˜€ç»„.dwg">
+    <None Include="FA\FA-24-ÊªÊ½±¨¾¯·§×é.dwg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="FA\FA-25-é¢„ä½œç”¨æŠ¥è­¦é˜€ç»„.dwg">
+    <None Include="FA\FA-25-Ô¤×÷ÓÃ±¨¾¯·§×é.dwg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="FA\FA-26-å¯ç‡ƒæ°”ä½“æŽ¢æµ‹æŽ§åˆ¶å™¨.dwg">
+    <None Include="FA\FA-26-¿ÉÈ¼ÆøÌåÌ½²â¿ØÖÆÆ÷.dwg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="FA\FA-27-æµé‡å¼€å…³.dwg">
+    <None Include="FA\FA-27-Á÷Á¿¿ª¹Ø.dwg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="FA\FA-28-éžæ¶ˆé˜²é…ç”µç®±.dwg">
+    <None Include="FA\FA-28-·ÇÏû·ÀÅäµçÏä.dwg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="FA\FA-29-æ¶ˆé˜²æ³µæŽ§åˆ¶ç®±.dwg">
+    <None Include="FA\FA-29-Ïû·À±Ã¿ØÖÆÏä.dwg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="FA\FA-30-å–·æ·‹æ³µæŽ§åˆ¶ç®±.dwg">
+    <None Include="FA\FA-30-ÅçÁÜ±Ã¿ØÖÆÏä.dwg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="FA\FA-31-æ¶ˆé˜²ç¨³åŽ‹æ³µæŽ§åˆ¶ç®±.dwg">
+    <None Include="FA\FA-31-Ïû·ÀÎÈÑ¹±Ã¿ØÖÆÏä.dwg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="FA\FA-32-é›¨æ·‹æ³µæŽ§åˆ¶ç®±.dwg">
+    <None Include="FA\FA-32-ÓêÁÜ±Ã¿ØÖÆÏä.dwg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="FA\FA-33-æ°´å¹•æ³µæŽ§åˆ¶ç®±.dwg">
+    <None Include="FA\FA-33-Ë®Ä»±Ã¿ØÖÆÏä.dwg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="FA\FA-34-æ¶ˆé˜²é£ŽæœºæŽ§åˆ¶ç®±.dwg">
+    <None Include="FA\FA-34-Ïû·À·ç»ú¿ØÖÆÏä.dwg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="FA\FA-35-å°±åœ°æ¶²ä½æ˜¾ç¤ºç›˜.dwg">
+    <None Include="FA\FA-35-¾ÍµØÒºÎ»ÏÔÊ¾ÅÌ.dwg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="FA\FA-37-åŒºåŸŸæ˜¾ç¤ºå™¨.dwg">
+    <None Include="FA\FA-37-ÇøÓòÏÔÊ¾Æ÷.dwg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="FA\FA-38-é˜²ç«é—¨æŽ§åˆ¶ç®±.dwg">
+    <None Include="FA\FA-38-·À»ðÃÅ¿ØÖÆÏä.dwg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="FA\TEST.dwg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="FA\ç«ç¾è‡ªåŠ¨æŠ¥è­¦å›¾ä¾‹åŠç¤ºä¾‹.dwg">
+    <None Include="FA\»ðÔÖ×Ô¶¯±¨¾¯Í¼Àý¼°Ê¾Àý.dwg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>
@@ -263,7 +265,7 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <Resource Include="FA\æ“ä½œè¯´æ˜Ž.txt">
+    <Resource Include="FA\²Ù×÷ËµÃ÷.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Resource>
   </ItemGroup>

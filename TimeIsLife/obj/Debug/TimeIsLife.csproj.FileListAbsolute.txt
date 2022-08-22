@@ -79,3 +79,6 @@ D:\GitHub\TimeIsLife\TimeIsLife\obj\Debug\TimeIsLife.csproj.CoreCompileInputs.ca
 D:\GitHub\TimeIsLife\TimeIsLife\obj\Debug\TimeIsLife.csproj.CopyComplete
 D:\GitHub\TimeIsLife\TimeIsLife\obj\Debug\TimeIsLife.dll
 D:\GitHub\TimeIsLife\TimeIsLife\obj\Debug\TimeIsLife.pdb
+D:\github\TimeIsLife\TimeIsLife\obj\Debug\01 View\Electrical.g.cs
+D:\github\TimeIsLife\TimeIsLife\obj\Debug\TimeIsLife_MarkupCompile.cache
+D:\github\TimeIsLife\TimeIsLife\obj\Debug\TimeIsLife_MarkupCompile.lref
