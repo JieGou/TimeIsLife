@@ -43,8 +43,8 @@ namespace TestApp
         }
 
         //计算电流
-        private string ic;
-        public string Ic
+        private double ic;
+        public double Ic
         {
             get => ic;
             set => SetProperty(ref ic, value);
@@ -57,7 +57,7 @@ namespace TestApp
         {
             if (string.IsNullOrEmpty(pe) || string.IsNullOrEmpty(kx) || string.IsNullOrEmpty(cosø)) return;
 
-            Ic = Math.Round((double.Parse(pe) * double.Parse(kx)) / (Math.Sqrt(3) * double.Parse(cosø)), 2).ToString();
+            Ic = Math.Round((double.Parse(pe) * double.Parse(kx)) / (Math.Sqrt(3) * double.Parse(cosø)), 2);
         }
 
         #endregion
