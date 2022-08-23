@@ -13,6 +13,9 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
+using Microsoft.Xaml.Behaviors;
+using TimeIsLife.ViewModel;
+
 namespace TimeIsLife.View
 {
     /// <summary>
@@ -23,6 +26,7 @@ namespace TimeIsLife.View
         public ElectricalView()
         {
             InitializeComponent();
+            DataContext = new ElectricalViewModel();
         }
     }
 }

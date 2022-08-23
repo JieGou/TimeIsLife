@@ -21,8 +21,8 @@ namespace TimeIsLife.ViewModel
         {
             CalculateCurrentCommand = new RelayCommand(CalculateCurrent);
             SumPowerCommand = new RelayCommand(SumPower);
-            Mothed1Command = new RelayCommand(Mothed1);
-            Mothed2Command = new RelayCommand(Mothed2);
+            AddCalculateCurrentCommand = new RelayCommand(AddCalculateCurrent);
+            AddSumPowerCommand = new RelayCommand(AddSumPower);
         }
 
         #region 计算电流
@@ -95,16 +95,16 @@ namespace TimeIsLife.ViewModel
             Application.DocumentManager.MdiActiveDocument.SendStringToExecute("FF_SumPower\n", true, false, false);
         }
 
-        public IRelayCommand Mothed1Command { get; }
-        void Mothed1()
+        public IRelayCommand AddCalculateCurrentCommand { get; }
+        void AddCalculateCurrent()
         {
-
+            Application.DocumentManager.MdiActiveDocument.SendStringToExecute("FF_AddCalculateCurrent\n", true, false, false);
         }
 
-        public IRelayCommand Mothed2Command { get; }
-        void Mothed2()
+        public IRelayCommand AddSumPowerCommand { get; }
+        void AddSumPower()
         {
-
+            Application.DocumentManager.MdiActiveDocument.SendStringToExecute("FF_AddSumPower\n", true, false, false);
         }
         #endregion
     }

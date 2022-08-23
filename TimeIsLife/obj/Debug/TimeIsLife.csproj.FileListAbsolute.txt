@@ -32,10 +32,8 @@ D:\github\TimeIsLife\TimeIsLife\bin\Debug\System.Runtime.CompilerServices.Unsafe
 D:\github\TimeIsLife\TimeIsLife\bin\Debug\System.Threading.Tasks.Extensions.dll
 D:\github\TimeIsLife\TimeIsLife\bin\Debug\DotNetARX.dll
 D:\github\TimeIsLife\TimeIsLife\obj\Debug\Shared.baml
-D:\github\TimeIsLife\TimeIsLife\obj\Debug\01 View\ElectricaViewl.g.cs
 D:\github\TimeIsLife\TimeIsLife\obj\Debug\TimeIsLife_MarkupCompile.cache
 D:\github\TimeIsLife\TimeIsLife\obj\Debug\TimeIsLife_MarkupCompile.lref
-D:\github\TimeIsLife\TimeIsLife\obj\Debug\01 View\ElectricaViewl.baml
 D:\github\TimeIsLife\TimeIsLife\obj\Debug\TimeIsLife.g.resources
 D:\github\TimeIsLife\TimeIsLife\obj\Debug\TimeIsLife.MyCommands.resources
 D:\github\TimeIsLife\TimeIsLife\obj\Debug\TimeIsLife.csproj.GenerateResource.cache
@@ -86,3 +84,5 @@ D:\github\TimeIsLife\TimeIsLife\bin\Debug\FA\FA-38-防火门控制箱.dwg
 D:\github\TimeIsLife\TimeIsLife\bin\Debug\FA\TEST.dwg
 D:\github\TimeIsLife\TimeIsLife\bin\Debug\FA\火灾自动报警图例及示例.dwg
 D:\github\TimeIsLife\TimeIsLife\obj\Debug\TimeIsLife.csproj.AssemblyReference.cache
+D:\GitHub\TimeIsLife\TimeIsLife\obj\Debug\01 View\ElectricaView.g.cs
+D:\GitHub\TimeIsLife\TimeIsLife\obj\Debug\01 View\ElectricaView.baml

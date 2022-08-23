@@ -45,7 +45,7 @@ namespace TimeIsLife.CADCommand
 
                 paletteSet = new PaletteSet("时间就是生命");
                 paletteSet.Dock = DockSides.Left;
-                
+
                 paletteSet.AddVisual("电气", electrical = new ElectricalView());
             }
             paletteSet.Visible = true;//面板可见            
@@ -64,9 +64,9 @@ namespace TimeIsLife.CADCommand
             Database database = document.Database;
             Editor editor = document.Editor;
             ElectricalViewModel electricalViewModel = new ElectricalViewModel();
-
-            using (Transaction transaction = document.TransactionManager.StartTransaction())
+            try
             {
+                using Transaction transaction = document.TransactionManager.StartTransaction();
                 PromptSelectionOptions options = new PromptSelectionOptions { MessageForAdding = "\n请选择要统计的功率:" };
                 TypedValueList values = new TypedValueList { typeof(DBText) };
                 PromptSelectionResult result = editor.GetSelection(options, values);
@@ -89,17 +89,40 @@ namespace TimeIsLife.CADCommand
                     double a = 0;
                     //消防
                     double b = 0;
-
+                    //是否平时兼消防
+                    bool isFire = false;
+                    //是否有消防兼平时两用风机
+                    //没有，平时负荷和消防负荷都由a表示功率和
+                    //有，平时负荷和消防负荷都由a表示功率和，b表示消防负荷平时运行的负荷
                     foreach (var item in list)
                     {
-                        a = a+item[0];
-                        b = b+item[1];
+                        if (item[1] == 0)
+                        {
+                            a = a + item[0];
+                        }
+                        else
+                        {
+                            isFire = true;
+                            a = a + item[0];
+                            b = b + item[1];
+                        }
                     }
 
-                    electricalViewModel.NFirePower = a;
-                    electricalViewModel.FirePower = b;
-                    electricalViewModel.Pe = Math.Max(a, b);
+                    //
+                    if (isFire)
+                    {
+                        electricalViewModel.NFirePower = b;
+                        electricalViewModel.FirePower = a;
+                        electricalViewModel.Pe = Math.Max(a, b);
+                    }
+                    else
+                    {
+                        electricalViewModel.NFirePower = a;
+                        electricalViewModel.FirePower = b;
+                        electricalViewModel.Pe = Math.Max(a, b);
+                    }                    
 
+                    transaction.Commit();
 
 
                     //PromptSelectionOptions options1 = new PromptSelectionOptions { MessageForAdding = "\n请选择要修改的功率:", SingleOnly = true };
@@ -111,9 +134,10 @@ namespace TimeIsLife.CADCommand
                     //    dBText.TextString = $"{d.ToString()}kW";
                     //    dBText.DowngradeOpen();
                     //}
-                    transaction.Commit();
                 }
-
+            }
+            catch
+            {
             }
         }
 
@@ -124,7 +148,7 @@ namespace TimeIsLife.CADCommand
         /// <returns>数字</returns>
         public double[] GetPower(string str)
         {
-            double[] arr = new double[] {0,0};
+            double[] arr = new double[] { 0, 0 };
             if (str != null && str != string.Empty)
             {
                 // 正则表达式剔除非数字字符（不包含小数点.）
@@ -146,11 +170,19 @@ namespace TimeIsLife.CADCommand
         #endregion
 
         #region 1.2 生成电流计算
-
+        [CommandMethod("FF_AddCalculateCurrent")]
+        public void FF_AddCalculateCurrent()
+        {
+            MessageBox.Show("还未实现");
+        }
         #endregion
 
         #region 1.3 生成功率和
-
+        [CommandMethod("FF_AddSumPower")]
+        public void FF_AddSumPower()
+        {
+            MessageBox.Show("还未实现");
+        }
         #endregion
 
         //#region 1.2 计算电流

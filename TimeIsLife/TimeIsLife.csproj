@@ -79,14 +79,14 @@
     <Reference Include="PresentationFramework" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="00 CADCommand\ElectricalCommand.cs" />
-    <Compile Include="00 CADCommand\FireAlarmCommnad.cs" />
-    <Compile Include="00 CADCommand\ToolCommand.cs" />
-    <Compile Include="00 CADCommand\UcsSelectJig.cs" />
-    <Compile Include="01 View\ElectricaViewl.xaml.cs">
-      <DependentUpon>ElectricaViewl.xaml</DependentUpon>
+    <Compile Include="CADCommand\ElectricalCommand.cs" />
+    <Compile Include="CADCommand\FireAlarmCommnad.cs" />
+    <Compile Include="CADCommand\ToolCommand.cs" />
+    <Compile Include="CADCommand\UcsSelectJig.cs" />
+    <Compile Include="View\ElectricaView.xaml.cs">
+      <DependentUpon>ElectricaView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="02 ViewModel\ElectricalViewModel.cs" />
+    <Compile Include="ViewModel\ElectricalViewModel.cs" />
     <Compile Include="Calendar.cs" />
     <Compile Include="myCommands.Designer.cs">
       <AutoGen>True</AutoGen>
@@ -265,10 +265,10 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="03 Model\" />
+    <Folder Include="Model\" />
   </ItemGroup>
   <ItemGroup>
-    <Page Include="01 View\ElectricaViewl.xaml">
+    <Page Include="View\ElectricaView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
