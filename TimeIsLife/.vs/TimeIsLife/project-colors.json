@@ -30,7 +30,12 @@
       "ProjectGuid": "7fceb4da-1ec9-45b0-a55b-2f0618f499dc",
       "DisplayName": "TestApp",
       "ColorIndex": 4
+    },
+    "48c2bd5e-2c46-4338-9e1e-b6ceb601a2c6": {
+      "ProjectGuid": "48c2bd5e-2c46-4338-9e1e-b6ceb601a2c6",
+      "DisplayName": "Names",
+      "ColorIndex": 5
     }
   },
-  "NextColorIndex": 5
+  "NextColorIndex": 6
 }

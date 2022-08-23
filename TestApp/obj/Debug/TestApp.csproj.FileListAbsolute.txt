@@ -23,7 +23,7 @@ D:\github\TimeIsLife\TestApp\obj\Debug\TestApp.csproj.CoreCompileInputs.cache
 D:\github\TimeIsLife\TestApp\obj\Debug\TestApp.csproj.CopyComplete
 D:\github\TimeIsLife\TestApp\obj\Debug\TestApp.exe
 D:\github\TimeIsLife\TestApp\obj\Debug\TestApp.pdb
-D:\github\TimeIsLife\TestApp\obj\Debug\TestApp.csproj.AssemblyReference.cache
 D:\GitHub\TimeIsLife\TestApp\obj\Debug\Shared.baml
 D:\GitHub\TimeIsLife\TestApp\bin\Debug\Microsoft.Xaml.Behaviors.dll
 D:\GitHub\TimeIsLife\TestApp\bin\Debug\Microsoft.Xaml.Behaviors.pdb
+D:\github\TimeIsLife\TestApp\obj\Debug\TestApp.csproj.AssemblyReference.cache

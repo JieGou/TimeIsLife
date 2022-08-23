@@ -1,0 +1,96 @@
+﻿<UserControl
+    x:Class="TimeIsLife.View.ElectricalView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:Behaviors="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:TimeIsLife.View"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    d:DesignHeight="450"
+    d:DesignWidth="400"
+    mc:Ignorable="d">
+    <UserControl.Resources>
+        <ResourceDictionary Source="/TimeIsLife;component/Shared.xaml" />
+    </UserControl.Resources>
+    <StackPanel>
+        <Expander
+            Grid.Row="0"
+            Padding="3"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            BorderBrush="YellowGreen"
+            BorderThickness="1"
+            Header="电流计算">
+            <StackPanel HorizontalAlignment="Left">
+                <Button
+                    Command="{Binding SumPowerCommand}"
+                    Content="统计功率"
+                    Template="{StaticResource buttonTemplate}" />
+                <StackPanel Orientation="Horizontal">
+                    <Label Content="额定功率Pe：" />
+                    <TextBox Text="{Binding Pe, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                        <Behaviors:Interaction.Triggers>
+                            <Behaviors:EventTrigger EventName="TextChanged">
+                                <Behaviors:InvokeCommandAction Command="{Binding CalculateCurrentCommand}" />
+                            </Behaviors:EventTrigger>
+                        </Behaviors:Interaction.Triggers>
+                    </TextBox>
+                </StackPanel>
+                <GroupBox
+                    BorderBrush="Red"
+                    Header="明细">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <Label Content="消防时：" />
+                            <Label Content="{Binding FirePower, Mode=OneWay}" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <Label Content="非消防时：" />
+                            <Label Content="{Binding NFirePower, Mode=OneWay}" />
+                        </StackPanel>
+                        <Label
+                            Width="auto"
+                            HorizontalAlignment="Left"
+                            Content="注:非消防/消防(1.0kW/1.0kW)" />
+                    </StackPanel>
+                </GroupBox>
+                <StackPanel Orientation="Horizontal">
+                    <Label Content="需要系数Kx" />
+                    <TextBox Text="{Binding Kx, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                        <Behaviors:Interaction.Triggers>
+                            <Behaviors:EventTrigger EventName="TextChanged">
+                                <Behaviors:InvokeCommandAction Command="{Binding CalculateCurrentCommand}" />
+                            </Behaviors:EventTrigger>
+                        </Behaviors:Interaction.Triggers>
+                    </TextBox>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Label Content="功率因数Cosø" />
+                    <TextBox Text="{Binding Cosø, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                        <Behaviors:Interaction.Triggers>
+                            <Behaviors:EventTrigger EventName="TextChanged">
+                                <Behaviors:InvokeCommandAction Command="{Binding CalculateCurrentCommand}" />
+                            </Behaviors:EventTrigger>
+                        </Behaviors:Interaction.Triggers>
+                    </TextBox>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Label Content="计算电流Ic" />
+                    <Label Content="{Binding Ic, Mode=OneWay}" />
+                </StackPanel>
+                <Button
+                    Command="{Binding CalculateCurrentCommand}"
+                    Content="计算电流"
+                    Template="{StaticResource buttonTemplate}" />
+                <Button
+                    Command="{Binding Mothed1Command}"
+                    Content="添加功率和"
+                    Template="{StaticResource buttonTemplate}" />
+                <Button
+                    Command="{Binding Mothed2Command}"
+                    Content="添加电流计算"
+                    Template="{StaticResource buttonTemplate}" />
+            </StackPanel>
+        </Expander>
+    </StackPanel>
+</UserControl>

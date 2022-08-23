@@ -7,7 +7,7 @@
     xmlns:local="clr-namespace:TestApp"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     Title="MainWindow"
-    Width="400"
+    Width="250"
     Height="450"
     mc:Ignorable="d">
     <Window.Resources>
@@ -15,7 +15,9 @@
     </Window.Resources>
     <Grid>
         <StackPanel>
-            <Button Content="统计功率" />
+            <Button
+                Command="{Binding SumPowerCommand}"
+                Content="统计功率" />
             <StackPanel Orientation="Horizontal">
                 <Label Content="额定功率Pe：" />
                 <TextBox Text="{Binding Pe, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
@@ -26,6 +28,20 @@
                     </Behaviors:Interaction.Triggers>
                 </TextBox>
             </StackPanel>
+            <GroupBox
+                BorderBrush="Red"
+                Header="明细">
+                <StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <Label Content="消防时：" />
+                        <Label Content="{Binding FirePower, Mode=OneWay}" />
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <Label Content="非消防时：" />
+                        <Label Content="{Binding NFirePower, Mode=OneWay}" />
+                    </StackPanel>
+                </StackPanel>
+            </GroupBox>
             <StackPanel Orientation="Horizontal">
                 <Label Content="需要系数Kx" />
                 <TextBox Text="{Binding Kx, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
@@ -48,9 +64,11 @@
             </StackPanel>
             <StackPanel Orientation="Horizontal">
                 <Label Content="计算电流Ic" />
-                <TextBlock Text="{Binding Ic, Mode=OneWay}" />
+                <Label Content="{Binding Ic, Mode=OneWay}" />
             </StackPanel>
-            <Button Command="{Binding CalculateCurrentCommand}" Content="计算" />
+            <Button
+                Command="{Binding CalculateCurrentCommand}"
+                Content="计算电流" />
         </StackPanel>
     </Grid>
 </Window>
