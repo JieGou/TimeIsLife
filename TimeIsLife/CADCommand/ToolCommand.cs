@@ -48,50 +48,48 @@ namespace TimeIsLife.CADCommand
             editor.WriteMessage(s1 + s2 + s3);
             while (true)
             {
-                using (Transaction transaction = database.TransactionManager.StartOpenCloseTransaction())
+                using Transaction transaction = database.TransactionManager.StartOpenCloseTransaction();
+                try
                 {
-                    try
+                    BlockTable blockTable = transaction.GetObject(database.BlockTableId, OpenMode.ForRead) as BlockTable;
+                    BlockTableRecord btr = transaction.GetObject(blockTable[BlockTableRecord.ModelSpace], OpenMode.ForRead) as BlockTableRecord;
+
+                    List<List<Point3d>> point3Ds1 = new List<List<Point3d>>();
+                    Dictionary<List<Point3d>, double> keyValuePairs = new Dictionary<List<Point3d>, double>();
+                    Point3dCollection point3DCollection1 = GetPoint3DCollection();
+                    if (point3DCollection1.Count == 0) break;
+                    Point3dCollection point3DCollection2 = GetPoint3DCollection();
+                    if (point3DCollection2.Count == 0) break;
+
+                    foreach (Point3d item1 in point3DCollection1)
                     {
-                        BlockTable blockTable = transaction.GetObject(database.BlockTableId, OpenMode.ForRead) as BlockTable;
-                        BlockTableRecord btr = transaction.GetObject(blockTable[BlockTableRecord.ModelSpace], OpenMode.ForRead) as BlockTableRecord;
-
-                        List<List<Point3d>> point3Ds1 = new List<List<Point3d>>();
-                        Dictionary<List<Point3d>, double> keyValuePairs = new Dictionary<List<Point3d>, double>();
-                        Point3dCollection point3DCollection1 = GetPoint3DCollection();
-                        if (point3DCollection1.Count == 0) break;
-                        Point3dCollection point3DCollection2 = GetPoint3DCollection();
-                        if (point3DCollection2.Count == 0) break;
-
-                        foreach (Point3d item1 in point3DCollection1)
+                        foreach (Point3d item2 in point3DCollection2)
                         {
-                            foreach (Point3d item2 in point3DCollection2)
-                            {
-                                List<Point3d> point3Ds = new List<Point3d>();
-                                point3Ds.Add(item1);
-                                point3Ds.Add(item2);
-                                keyValuePairs.Add(point3Ds, item1.DistanceTo(item2));
-                            }
+                            List<Point3d> point3Ds = new List<Point3d>();
+                            point3Ds.Add(item1);
+                            point3Ds.Add(item2);
+                            keyValuePairs.Add(point3Ds, item1.DistanceTo(item2));
                         }
-                        Line line = null;
-                        double d = keyValuePairs.Min(p => p.Value);
-                        foreach (var item in keyValuePairs)
-                        {
-                            if (item.Value.Equals(d))
-                            {
-                                line = new Line(item.Key[0], item.Key[1]);
-                            }
-                        }
-                        if (line == null) continue;
-                        btr.UpgradeOpen();
-                        btr.AppendEntity(line);
-                        transaction.AddNewlyCreatedDBObject(line, true);
-                        btr.DowngradeOpen();
-                        transaction.Commit();
                     }
-                    catch (System.Exception)
+                    Line line = null;
+                    double d = keyValuePairs.Min(p => p.Value);
+                    foreach (var item in keyValuePairs)
                     {
-
+                        if (item.Value.Equals(d))
+                        {
+                            line = new Line(item.Key[0], item.Key[1]);
+                        }
                     }
+                    if (line == null) continue;
+                    btr.UpgradeOpen();
+                    btr.AppendEntity(line);
+                    transaction.AddNewlyCreatedDBObject(line, true);
+                    btr.DowngradeOpen();
+                    transaction.Commit();
+                }
+                catch (System.Exception)
+                {
+
                 }
             }
         }
@@ -936,6 +934,48 @@ namespace TimeIsLife.CADCommand
 
         #endregion
 
+        #region FF_ExplodeMInsertBlock
+        [CommandMethod("FF_ExplodeMInsertBlock")]
+        public void FF_ExplodeMInsertBlock()
+        {
+            Document document = Application.DocumentManager.CurrentDocument;
+            Database database = document.Database;
+            Editor editor = document.Editor;
 
+            using Transaction transaction = database.TransactionManager.StartOpenCloseTransaction();
+            try
+            {
+
+                PromptSelectionOptions promptSelectionOptions = new PromptSelectionOptions()
+                {
+                    SingleOnly = true,
+                    RejectObjectsOnLockedLayers = true,
+                };
+
+                TypedValueList typedValues = new TypedValueList();
+                typedValues.Add(typeof(BlockReference));
+                SelectionFilter selectionFilter = new SelectionFilter(typedValues);
+                PromptSelectionResult promptSelectionResult = editor.GetSelection(promptSelectionOptions, selectionFilter);
+
+                if (promptSelectionResult.Status == PromptStatus.OK)
+                {
+                    SelectionSet selectionSet = promptSelectionResult.Value;
+                    foreach (var id in selectionSet.GetObjectIds())
+                    {
+                        MInsertBlock mInsertBlock = transaction.GetObject(id, OpenMode.ForWrite) as MInsertBlock;
+                        if (mInsertBlock == null) continue;
+                        mInsertBlock.ExplodeToOwnerSpace();
+                        mInsertBlock.Erase();
+                    }
+                }
+
+                transaction.Commit();
+            }
+            catch
+            {
+            }
+
+        }
+        #endregion
     }
 }

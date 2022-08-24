@@ -39,6 +39,7 @@ namespace TimeIsLife.ViewModel
             AlignUcsCommand = new RelayCommand(AlignUcs);
             EquipmentAngleCommand = new RelayCommand(EquipmentAngle);
             PlineEquallyDividedCommand = new RelayCommand(PlineEquallyDivided);
+            ExplodeMInsertBlockCommand = new RelayCommand(ExplodeMInsertBlock);
 
 
             
@@ -190,6 +191,12 @@ namespace TimeIsLife.ViewModel
         void PlineEquallyDivided()
         {
             Application.DocumentManager.MdiActiveDocument.SendStringToExecute("FF_PlineEquallyDivided\n", true, false, false);
+        }
+
+        public IRelayCommand ExplodeMInsertBlockCommand { get; }
+        void ExplodeMInsertBlock()
+        {
+            Application.DocumentManager.MdiActiveDocument.SendStringToExecute("FF_ExplodeMInsertBlock\n", true, false, false);
         }
         #endregion
     }

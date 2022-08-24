@@ -24,35 +24,25 @@
                     <TextBox Text="{Binding Pe, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                         <Behaviors:Interaction.Triggers>
                             <Behaviors:EventTrigger EventName="TextChanged">
-                                <Behaviors:InvokeCommandAction
-                                    x:Name="CalculateCurrentCommand1"
-                                    Command="{Binding CalculateCurrentCommand}" />
+                                <Behaviors:InvokeCommandAction x:Name="CalculateCurrentCommand1" Command="{Binding CalculateCurrentCommand}" />
                             </Behaviors:EventTrigger>
                         </Behaviors:Interaction.Triggers>
                     </TextBox>
                 </StackPanel>
-                <GroupBox
-                    HorizontalAlignment="Left"
-                    Header="明细">
+                <GroupBox HorizontalAlignment="Left" Header="明细">
                     <GroupBox.BorderBrush>
                         <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.HotTrackColorKey}}" />
                     </GroupBox.BorderBrush>
                     <StackPanel>
                         <StackPanel Orientation="Horizontal">
                             <Label Content="平时\消防功率：" />
-                            <TextBox
-                                IsReadOnly="True"
-                                Text="{Binding NormalOrFirePower}" />
+                            <TextBox IsReadOnly="True" Text="{Binding NormalOrFirePower}" />
                         </StackPanel>
                         <StackPanel Orientation="Horizontal">
                             <Label Content="消防平时功率：" />
-                            <TextBox
-                                IsReadOnly="True"
-                                Text="{Binding NormalInFirePower}" />
+                            <TextBox IsReadOnly="True" Text="{Binding NormalInFirePower}" />
                         </StackPanel>
-                        <Label
-                            Width="auto"
-                            Content="注:消防/平时功率(1.0kW/1.0kW)" />
+                        <Label Width="auto" Content="注:消防/平时功率(1.0kW/1.0kW)" />
                     </StackPanel>
                 </GroupBox>
                 <StackPanel Orientation="Horizontal">
@@ -60,9 +50,7 @@
                     <TextBox Text="{Binding Kx, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                         <Behaviors:Interaction.Triggers>
                             <Behaviors:EventTrigger EventName="TextChanged">
-                                <Behaviors:InvokeCommandAction
-                                    x:Name="CalculateCurrentCommand2"
-                                    Command="{Binding CalculateCurrentCommand}" />
+                                <Behaviors:InvokeCommandAction x:Name="CalculateCurrentCommand2" Command="{Binding CalculateCurrentCommand}" />
                             </Behaviors:EventTrigger>
                         </Behaviors:Interaction.Triggers>
                     </TextBox>
@@ -73,9 +61,7 @@
                     <TextBox Text="{Binding Cosø, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                         <Behaviors:Interaction.Triggers>
                             <Behaviors:EventTrigger EventName="TextChanged">
-                                <Behaviors:InvokeCommandAction
-                                    x:Name="CalculateCurrentCommand3"
-                                    Command="{Binding CalculateCurrentCommand}" />
+                                <Behaviors:InvokeCommandAction x:Name="CalculateCurrentCommand3" Command="{Binding CalculateCurrentCommand}" />
                             </Behaviors:EventTrigger>
                         </Behaviors:Interaction.Triggers>
                     </TextBox>
@@ -83,9 +69,7 @@
                 </StackPanel>
                 <StackPanel Orientation="Horizontal">
                     <Label Content="计算电流Ic" />
-                    <TextBox
-                        IsReadOnly="True"
-                        Text="{Binding Ic}" />
+                    <TextBox IsReadOnly="True" Text="{Binding Ic}" />
                 </StackPanel>
                 <Button
                     Command="{Binding AddSumPowerCommand}"
@@ -138,6 +122,26 @@
                 <Button
                     Command="{Binding PlineEquallyDividedCommand}"
                     Content="多段线等间距布置设备"
+                    Template="{StaticResource buttonTemplate}" />
+                <Button
+                    Command="{Binding ExplodeMInsertBlockCommand}"
+                    Content="分解多重插入块"
+                    Template="{StaticResource buttonTemplate}" />
+            </StackPanel>
+        </Expander>
+        <Expander Header="布置灯具">
+            <StackPanel>
+                <Button
+                    Command="{Binding QuickUcsCommand}"
+                    Content="矩形布置"
+                    Template="{StaticResource buttonTemplate}" />
+                <Button
+                    Command="{Binding SetCurrentStatusCommand}"
+                    Content="弧形布置"
+                    Template="{StaticResource buttonTemplate}" />
+                <Button
+                    Command="{Binding SetCurrentStatusCommand}"
+                    Content="停车位布置"
                     Template="{StaticResource buttonTemplate}" />
             </StackPanel>
         </Expander>
