@@ -20,6 +20,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Windows.Forms.Integration;
 
 using TimeIsLife.View;
 using TimeIsLife.ViewModel;
@@ -35,7 +36,8 @@ namespace TimeIsLife.CADCommand
         #region 0.0 创建工具栏
         //创建面板
         static PaletteSet paletteSet;
-        static ElectricalView electrical;
+        static ElectricalView electricalView;
+        static ElectricalViewModel electricalViewModel;
 
         [CommandMethod("FF_Tools")]
         public static void FF_Tools()
@@ -44,11 +46,20 @@ namespace TimeIsLife.CADCommand
             {
 
                 paletteSet = new PaletteSet("时间就是生命");
+                paletteSet.DockEnabled = DockSides.Left;
+                paletteSet.TitleBarLocation = PaletteSetTitleBarLocation.Left;
                 paletteSet.Dock = DockSides.Left;
 
-                paletteSet.AddVisual("电气", electrical = new ElectricalView());
+                ElementHost host = new ElementHost();
+                host.AutoSize = true;
+                host.Dock = DockStyle.Fill;
+                host.Child = electricalView = new ElectricalView();
+                electricalViewModel = (ElectricalViewModel)electricalView.DataContext;
+                paletteSet.Add("电气", host);
             }
-            paletteSet.Visible = true;//面板可见            
+            paletteSet.Visible = true;//面板可见
+
+            
         }
         #endregion
 
@@ -63,7 +74,11 @@ namespace TimeIsLife.CADCommand
             Document document = Application.DocumentManager.MdiActiveDocument;
             Database database = document.Database;
             Editor editor = document.Editor;
-            ElectricalViewModel electricalViewModel = new ElectricalViewModel();
+
+            electricalViewModel.Pe = 0;
+            electricalViewModel.NormalOrFirePower = 0;
+            electricalViewModel.NormalInFirePower = 0;
+
             try
             {
                 using Transaction transaction = document.TransactionManager.StartTransaction();
@@ -85,42 +100,20 @@ namespace TimeIsLife.CADCommand
                         list.Add(GetPower(text));
                     }
 
-                    //非消防
+                    //消防/非消防
                     double a = 0;
-                    //消防
+                    //消防平时负荷
                     double b = 0;
-                    //是否平时兼消防
-                    bool isFire = false;
-                    //是否有消防兼平时两用风机
-                    //没有，平时负荷和消防负荷都由a表示功率和
-                    //有，平时负荷和消防负荷都由a表示功率和，b表示消防负荷平时运行的负荷
+                    
                     foreach (var item in list)
                     {
-                        if (item[1] == 0)
-                        {
-                            a = a + item[0];
-                        }
-                        else
-                        {
-                            isFire = true;
-                            a = a + item[0];
-                            b = b + item[1];
-                        }
+                        a += item[0];
+                        b += item[1];
                     }
 
-                    //
-                    if (isFire)
-                    {
-                        electricalViewModel.NFirePower = b;
-                        electricalViewModel.FirePower = a;
-                        electricalViewModel.Pe = Math.Max(a, b);
-                    }
-                    else
-                    {
-                        electricalViewModel.NFirePower = a;
-                        electricalViewModel.FirePower = b;
-                        electricalViewModel.Pe = Math.Max(a, b);
-                    }                    
+                    electricalViewModel.NormalOrFirePower = a;
+                    electricalViewModel.NormalInFirePower = b;
+                    electricalViewModel.Pe = Math.Max(a, b);
 
                     transaction.Commit();
 

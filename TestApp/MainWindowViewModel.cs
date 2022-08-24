@@ -16,6 +16,8 @@ namespace TestApp
         {
             CalculateCurrentCommand = new RelayCommand(CalculateCurrent);
             SumPowerCommand = new RelayCommand(SumPower);
+            kx = 0.8;
+            cosø = 0.85;
         }
         #region 计算电流
 

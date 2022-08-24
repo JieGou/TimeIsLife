@@ -15,17 +15,18 @@
     </Window.Resources>
     <Grid>
         <StackPanel>
+            <Behaviors:Interaction.Triggers>
+                <Behaviors:EventTrigger EventName="TextBoxBase.TextChanged">
+                    <Behaviors:InvokeCommandAction Command="{Binding CalculateCurrentCommand}" />
+                </Behaviors:EventTrigger>
+            </Behaviors:Interaction.Triggers>
             <Button
                 Command="{Binding SumPowerCommand}"
                 Content="统计功率" />
             <StackPanel Orientation="Horizontal">
                 <Label Content="额定功率Pe：" />
                 <TextBox Text="{Binding Pe, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
-                    <Behaviors:Interaction.Triggers>
-                        <Behaviors:EventTrigger EventName="TextChanged">
-                            <Behaviors:InvokeCommandAction Command="{Binding CalculateCurrentCommand}" />
-                        </Behaviors:EventTrigger>
-                    </Behaviors:Interaction.Triggers>
+                    
                 </TextBox>
             </StackPanel>
             <GroupBox
@@ -45,21 +46,13 @@
             <StackPanel Orientation="Horizontal">
                 <Label Content="需要系数Kx" />
                 <TextBox Text="{Binding Kx, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
-                    <Behaviors:Interaction.Triggers>
-                        <Behaviors:EventTrigger EventName="TextChanged">
-                            <Behaviors:InvokeCommandAction Command="{Binding CalculateCurrentCommand}" />
-                        </Behaviors:EventTrigger>
-                    </Behaviors:Interaction.Triggers>
+                    
                 </TextBox>
             </StackPanel>
             <StackPanel Orientation="Horizontal">
                 <Label Content="功率因数Cosø" />
                 <TextBox Text="{Binding Cosø, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
-                    <Behaviors:Interaction.Triggers>
-                        <Behaviors:EventTrigger EventName="TextChanged">
-                            <Behaviors:InvokeCommandAction Command="{Binding CalculateCurrentCommand}" />
-                        </Behaviors:EventTrigger>
-                    </Behaviors:Interaction.Triggers>
+                    
                 </TextBox>
             </StackPanel>
             <StackPanel Orientation="Horizontal">

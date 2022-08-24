@@ -13,7 +13,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-[assembly: CommandClass(typeof(TimeIsLife.CADCommand.FireAlarmCommnad))]
+[assembly: CommandClass(typeof(TimeIsLife.CADCommand.ToolCommand))]
 
 namespace TimeIsLife.CADCommand
 {
@@ -194,14 +194,14 @@ namespace TimeIsLife.CADCommand
 
         static bool bo = true;
 
-        #region F3_AutoConnectLine
+        #region F3_ConnectLines
 
         /// <summary>
         /// 作用：在F1的基础上，多个块之间连线。
         /// 操作方法：框选对象，设置连接方向（默认ucs的x轴）
         /// </summary>
-        [CommandMethod("F3_AutoConnectLine")]
-        public void F3_AutoConnectLine()
+        [CommandMethod("F3_ConnectLines")]
+        public void F3_ConnectLines()
         {
             Document document = Application.DocumentManager.CurrentDocument;
             Database database = document.Database;

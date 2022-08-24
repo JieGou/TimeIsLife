@@ -191,9 +191,9 @@ namespace TimeIsLife.CADCommand
         }
         #endregion
 
-        #region F7_FAS
-        [CommandMethod("F7_FAS")]
-        public void F7_FAS()
+        #region FF_FAS
+        [CommandMethod("FF_FAS")]
+        public void FF_FAS()
         {
             Document document = Application.DocumentManager.CurrentDocument;
             Database database = document.Database;
@@ -753,10 +753,10 @@ namespace TimeIsLife.CADCommand
 
         #endregion
 
-        #region 读取YDB文件
-        
-        [CommandMethod("FFF_LoadFile")]
-        public void FFF_LoadFile()
+        #region FF_LoadYdbFile
+
+        [CommandMethod("FF_LoadYdbFile")]
+        public void FF_LoadYdbFile()
         {
             Document document = Application.DocumentManager.CurrentDocument;
             Database database = document.Database;
