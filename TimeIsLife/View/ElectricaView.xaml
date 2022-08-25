@@ -28,35 +28,25 @@
                         <TextBox Text="{Binding Pe, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                             <Behaviors:Interaction.Triggers>
                                 <Behaviors:EventTrigger EventName="TextChanged">
-                                    <Behaviors:InvokeCommandAction
-                                        x:Name="CalculateCurrentCommand1"
-                                        Command="{Binding CalculateCurrentCommand}" />
+                                    <Behaviors:InvokeCommandAction x:Name="CalculateCurrentCommand1" Command="{Binding CalculateCurrentCommand}" />
                                 </Behaviors:EventTrigger>
                             </Behaviors:Interaction.Triggers>
                         </TextBox>
                     </StackPanel>
-                    <GroupBox
-                        HorizontalAlignment="Left"
-                        Header="明细">
+                    <GroupBox HorizontalAlignment="Left" Header="明细">
                         <GroupBox.BorderBrush>
                             <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.HotTrackColorKey}}" />
                         </GroupBox.BorderBrush>
                         <StackPanel>
                             <StackPanel Orientation="Horizontal">
                                 <Label Content="平时\消防功率：" />
-                                <TextBox
-                                    IsReadOnly="True"
-                                    Text="{Binding NormalOrFirePower}" />
+                                <TextBox IsReadOnly="True" Text="{Binding NormalOrFirePower}" />
                             </StackPanel>
                             <StackPanel Orientation="Horizontal">
                                 <Label Content="消防平时功率：" />
-                                <TextBox
-                                    IsReadOnly="True"
-                                    Text="{Binding NormalInFirePower}" />
+                                <TextBox IsReadOnly="True" Text="{Binding NormalInFirePower}" />
                             </StackPanel>
-                            <Label
-                                Width="auto"
-                                Content="注:消防/平时功率(1.0kW/1.0kW)" />
+                            <Label Width="auto" Content="注:消防/平时功率(1.0kW/1.0kW)" />
                         </StackPanel>
                     </GroupBox>
                     <StackPanel Orientation="Horizontal">
@@ -64,9 +54,7 @@
                         <TextBox Text="{Binding Kx, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                             <Behaviors:Interaction.Triggers>
                                 <Behaviors:EventTrigger EventName="TextChanged">
-                                    <Behaviors:InvokeCommandAction
-                                        x:Name="CalculateCurrentCommand2"
-                                        Command="{Binding CalculateCurrentCommand}" />
+                                    <Behaviors:InvokeCommandAction x:Name="CalculateCurrentCommand2" Command="{Binding CalculateCurrentCommand}" />
                                 </Behaviors:EventTrigger>
                             </Behaviors:Interaction.Triggers>
                         </TextBox>
@@ -77,9 +65,7 @@
                         <TextBox Text="{Binding Cosø, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                             <Behaviors:Interaction.Triggers>
                                 <Behaviors:EventTrigger EventName="TextChanged">
-                                    <Behaviors:InvokeCommandAction
-                                        x:Name="CalculateCurrentCommand3"
-                                        Command="{Binding CalculateCurrentCommand}" />
+                                    <Behaviors:InvokeCommandAction x:Name="CalculateCurrentCommand3" Command="{Binding CalculateCurrentCommand}" />
                                 </Behaviors:EventTrigger>
                             </Behaviors:Interaction.Triggers>
                         </TextBox>
@@ -87,9 +73,7 @@
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
                         <Label Content="计算电流Ic" />
-                        <TextBox
-                            IsReadOnly="True"
-                            Text="{Binding Ic}" />
+                        <TextBox IsReadOnly="True" Text="{Binding Ic}" />
                     </StackPanel>
                     <Button
                         Command="{Binding AddSumPowerCommand}"
@@ -159,14 +143,10 @@
                                 Template="{StaticResource buttonTemplate}" />
                             <StackPanel Orientation="Horizontal">
                                 <Label Content="房间面积(㎡)" />
-                                <TextBox
-                                    IsReadOnly="True"
-                                    Text="{Binding LightingArea}">
+                                <TextBox IsReadOnly="True" Text="{Binding LightingArea}">
                                     <Behaviors:Interaction.Triggers>
                                         <Behaviors:EventTrigger EventName="TextChanged">
-                                            <Behaviors:InvokeCommandAction
-                                                x:Name="LightingCountCalculate1"
-                                                Command="{Binding LightingCountCalculateCommand}" />
+                                            <Behaviors:InvokeCommandAction x:Name="LightingCountCalculate1" Command="{Binding LightingCountCalculateCommand}" />
                                         </Behaviors:EventTrigger>
                                     </Behaviors:Interaction.Triggers>
                                 </TextBox>
@@ -176,9 +156,7 @@
                                 <TextBox Text="{Binding LightingPowerDensity, UpdateSourceTrigger=PropertyChanged}">
                                     <Behaviors:Interaction.Triggers>
                                         <Behaviors:EventTrigger EventName="TextChanged">
-                                            <Behaviors:InvokeCommandAction
-                                                x:Name="LightingCountCalculate2"
-                                                Command="{Binding LightingCountCalculateCommand}" />
+                                            <Behaviors:InvokeCommandAction x:Name="LightingCountCalculate2" Command="{Binding LightingCountCalculateCommand}" />
                                         </Behaviors:EventTrigger>
                                     </Behaviors:Interaction.Triggers>
                                 </TextBox>
@@ -188,9 +166,7 @@
                                 <TextBox Text="{Binding LightingPower, UpdateSourceTrigger=PropertyChanged}">
                                     <Behaviors:Interaction.Triggers>
                                         <Behaviors:EventTrigger EventName="TextChanged">
-                                            <Behaviors:InvokeCommandAction
-                                                x:Name="LightingCountCalculate3"
-                                                Command="{Binding LightingCountCalculateCommand}" />
+                                            <Behaviors:InvokeCommandAction x:Name="LightingCountCalculate3" Command="{Binding LightingCountCalculateCommand}" />
                                         </Behaviors:EventTrigger>
                                     </Behaviors:Interaction.Triggers>
                                 </TextBox>
@@ -235,22 +211,15 @@
                         <StackPanel>
                             <StackPanel Orientation="Horizontal">
                                 <Label Content="块比例" />
-                                <ComboBox
-                                    ItemsSource="{Binding BlockScales}"
-                                    SelectedItem="{Binding BlockScale}" />
+                                <ComboBox ItemsSource="{Binding BlockScales}" SelectedItem="{Binding BlockScale}" />
                             </StackPanel>
                             <StackPanel Orientation="Horizontal">
                                 <Label Content="块角度" />
-                                <ComboBox
-                                    ItemsSource="{Binding BlockAngles}"
-                                    SelectedItem="{Binding BlockAngle}" />
+                                <ComboBox ItemsSource="{Binding BlockAngles}" SelectedItem="{Binding BlockAngle}" />
                             </StackPanel>
                             <StackPanel Orientation="Horizontal">
                                 <Label Content="首端距离" />
-                                <ComboBox
-                                    ItemsSource="{Binding Distances}"
-                                    SelectedItem="{Binding Distance}"  >
-                                </ComboBox>
+                                <ComboBox ItemsSource="{Binding Distances}" SelectedItem="{Binding Distance}" />
                             </StackPanel>
                         </StackPanel>
                     </GroupBox>

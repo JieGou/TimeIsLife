@@ -62,6 +62,11 @@
             <Button
                 Command="{Binding CalculateCurrentCommand}"
                 Content="计算电流" />
+            <ComboBox Height="30">
+                <ComboBoxItem Content="1"/>
+                <ComboBoxItem Content="1"/>
+                <ComboBoxItem Content="1"/>
+            </ComboBox>
         </StackPanel>
     </Grid>
 </Window>

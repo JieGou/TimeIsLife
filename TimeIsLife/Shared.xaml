@@ -46,16 +46,19 @@
     </Style>
 
     <Style TargetType="ComboBox">
-        <Setter Property="VerticalContentAlignment" Value="Center"/>
         <Setter Property="Width" Value="100" />
         <Setter Property="Height" Value="30" />
         <Setter Property="Margin" Value="1" />
+        <Setter Property="Padding" Value="1"/>
+        <!--<Setter Property="HorizontalContentAlignment" Value="Stretch"/>-->
+        <!--<Setter Property="VerticalContentAlignment" Value="Stretch"/>-->
     </Style>
 
+
     <Style TargetType="Expander">
-        <Setter Property="HorizontalAlignment" Value="Left" />
-        <Setter Property="MinWidth" Value="250" />
+        <Setter Property="HorizontalAlignment" Value="Stretch" />
         <Setter Property="Padding" Value="3" />
+        <Setter Property="Margin" Value="1"/>
         <Setter Property="VerticalAlignment" Value="Top" />
         <Setter Property="BorderBrush" Value="YellowGreen" />
         <Setter Property="BorderThickness" Value="1" />
@@ -67,16 +70,12 @@
         <Setter Property="Margin" Value="1" />
     </Style>
 
-    <ControlTemplate
-        x:Key="buttonTemplate"
-        TargetType="Button">
+    <ControlTemplate x:Key="buttonTemplate" TargetType="Button">
         <Border
             Background="{TemplateBinding Background}"
             BorderThickness="1"
             CornerRadius="5">
-            <ContentPresenter
-                HorizontalAlignment="Center"
-                VerticalAlignment="Center" />
+            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
         </Border>
         <!--<Grid >
                     <Ellipse Name="faceEllipse" Height="50" Width="100" Fill="{TemplateBinding Button.Background}"/>
@@ -92,6 +91,5 @@
             </Trigger>
         </ControlTemplate.Triggers>
     </ControlTemplate>
-   
 
 </ResourceDictionary>
