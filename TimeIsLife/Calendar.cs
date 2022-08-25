@@ -542,7 +542,6 @@ namespace TimeIsLife
 
                 int _hour, _minute, offset, i;
                 int indexGan;
-                string ganHour, zhiHour;
                 string tmpGan;
 
                 //计算时辰的地支

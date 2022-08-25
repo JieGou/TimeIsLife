@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 using Polyline = Autodesk.AutoCAD.DatabaseServices.Polyline;
 
-namespace TimeIsLife.CADCommand
+namespace TimeIsLife.Jig
 {
     class UcsSelectJig : DrawJig
     {

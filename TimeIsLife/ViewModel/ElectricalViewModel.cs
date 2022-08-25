@@ -17,6 +17,7 @@ namespace TimeIsLife.ViewModel
 {
     class ElectricalViewModel:ObservableObject
     {
+        public static ElectricalViewModel electricalViewModel;
         public ElectricalViewModel()
         {
             Initialize();
@@ -41,17 +42,27 @@ namespace TimeIsLife.ViewModel
             PlineEquallyDividedCommand = new RelayCommand(PlineEquallyDivided);
             ExplodeMInsertBlockCommand = new RelayCommand(ExplodeMInsertBlock);
 
+            //矩形布置
+            GetAreaCommand = new RelayCommand(GetArea);
+            RecLightingCommand = new RelayCommand(RecLighting);
+            LightingCountCalculateCommand = new RelayCommand(LightingCountCalculate);
 
-            
         }
 
         private void Initialize()
         {
+            electricalViewModel = this;
+
             kx = 0.8;
             cosø = 0.85;
-            normalOrFirePower = 50;
-            normalInFirePower = 30;
-            pe = 50;
+
+            BlockScales = new List<int>() { 1, 25, 50, 75, 100, 150, 200, 250 };
+            BlockAngles = new List<int> { 0, 90, 180, 270 };
+            Distances = new List<double> { 0.0, 0.5, 1.0 };
+
+            BlockScale = BlockScales[4];
+            BlockAngle = BlockAngles[0];
+            Distance = Distances[1];
         }
 
         #region 计算电流
@@ -198,6 +209,127 @@ namespace TimeIsLife.ViewModel
         {
             Application.DocumentManager.MdiActiveDocument.SendStringToExecute("FF_ExplodeMInsertBlock\n", true, false, false);
         }
+        #endregion
+
+        #region 矩形布置
+
+        #region 属性
+
+        //布灯的区域面积
+        private double lightingArea;
+        public double LightingArea
+        {
+            get => lightingArea;
+            set => SetProperty(ref lightingArea, value);
+        }
+
+        //功率密度
+        private double lightingPowerDensity;
+        public double LightingPowerDensity
+        {
+            get => lightingPowerDensity;
+            set => SetProperty(ref lightingPowerDensity, value);
+        }
+
+        //灯具功率
+        private double lightingPower;
+        public double LightingPower
+        {
+            get => lightingPower;
+            set => SetProperty(ref lightingPower, value);
+        }
+
+        //灯具数量
+        private double lightingCount;
+        public double LightingCount
+        {
+            get => lightingCount;
+            set => SetProperty(ref lightingCount, value);
+        }
+
+        //灯具行数
+        private int lightingRow;
+        public int LightingRow
+        {
+            get => lightingRow;
+            set => SetProperty(ref lightingRow, value);
+        }
+
+        //灯具列数
+        private int lightingColumn;
+        public int LightingColumn
+        {
+            get => lightingColumn;
+            set => SetProperty(ref lightingColumn, value);
+        }
+
+
+        public List<int> BlockScales { get; set; }
+        public List<int> BlockAngles { get; set; }
+        public List<double> Distances { get; set; }
+
+        //块比例
+
+        private int blockScale;
+        public int BlockScale
+        {
+            get => blockScale;
+            set => SetProperty(ref blockScale, value);
+        }
+        //块角度
+
+        private int blockAngle;
+        public int BlockAngle
+        {
+            get => blockAngle;
+            set => SetProperty(ref blockAngle, value);
+        }
+        //距墙距离
+
+        private double distance;
+        public double Distance
+        {
+            get => distance;
+            set => SetProperty(ref distance, value);
+        }
+
+        #endregion
+
+        #region 命令
+
+        public IRelayCommand GetAreaCommand { get; }
+        void GetArea()
+        {
+            Application.DocumentManager.MdiActiveDocument.SendStringToExecute("FF_GetArea\n", true, false, false);
+        }
+
+        public IRelayCommand RecLightingCommand { get; }
+        void RecLighting()
+        {
+            Application.DocumentManager.MdiActiveDocument.SendStringToExecute("FF_RecLighting\n", true, false, false);
+        }
+
+
+        public IRelayCommand LightingCountCalculateCommand { get; }
+        void LightingCountCalculate()
+        {
+            if (lightingPower > 0)
+            {
+                LightingCount = Math.Round(lightingArea * lightingPowerDensity / lightingPower, 2);
+            }
+        }
+
+        #endregion
+
+
+
+
+
+
+
+
+
+
         #endregion
     }
 }

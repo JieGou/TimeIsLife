@@ -13,6 +13,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using TimeIsLife.Jig;
+
 [assembly: CommandClass(typeof(TimeIsLife.CADCommand.ToolCommand))]
 
 namespace TimeIsLife.CADCommand

@@ -33,7 +33,7 @@ namespace TimeIsLife.CADCommand
 {
     class ElectricalCommand
     {
-        #region 0.0 创建工具栏
+        #region FF_Tools
         //创建面板
         static PaletteSet paletteSet;
         static ElectricalView electricalView;
@@ -63,9 +63,7 @@ namespace TimeIsLife.CADCommand
         }
         #endregion
 
-        #region 1.1 功率求和
-
-
+        #region FF_SumPower
         //求和功率，选择多个表示功率的单行文字，文字内容由数字+“kw”组成，去除“kw”后的数字求和
 
         [CommandMethod("FF_SumPower")]
@@ -162,7 +160,7 @@ namespace TimeIsLife.CADCommand
 
         #endregion
 
-        #region 1.2 生成电流计算
+        #region FF_AddCalculateCurrent
         [CommandMethod("FF_AddCalculateCurrent")]
         public void FF_AddCalculateCurrent()
         {
@@ -170,7 +168,7 @@ namespace TimeIsLife.CADCommand
         }
         #endregion
 
-        #region 1.3 生成功率和
+        #region FF_AddSumPower
         [CommandMethod("FF_AddSumPower")]
         public void FF_AddSumPower()
         {
