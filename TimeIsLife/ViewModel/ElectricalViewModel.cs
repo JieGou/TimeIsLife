@@ -47,6 +47,8 @@ namespace TimeIsLife.ViewModel
             RecLightingCommand = new RelayCommand(RecLighting);
             LightingCountCalculateCommand = new RelayCommand(LightingCountCalculate);
 
+            //灯具沿线布置
+            CurLightingCommand = new RelayCommand(CurLighting);
         }
 
         private void Initialize()
@@ -63,6 +65,8 @@ namespace TimeIsLife.ViewModel
             BlockScale = BlockScales[4];
             BlockAngle = BlockAngles[0];
             Distance = Distances[1];
+
+            IsLengthOrCount = true;
         }
 
         #region 计算电流
@@ -319,17 +323,52 @@ namespace TimeIsLife.ViewModel
             }
         }
 
+
+        #endregion
+
         #endregion
 
 
+        #region 灯具沿线布置
 
+        //灯具布置间距
+        private double lightingLineCount;
+        public double LightingLineCount
+        {
+            get => lightingLineCount;
+            set => SetProperty(ref lightingLineCount, value);
+        }
 
+        //灯具布置间距
+        private double lightingLength;
+        public double LightingLength
+        {
+            get => lightingLength;
+            set => SetProperty(ref lightingLength, value);
+        }
 
+        //灯具方向沿切线方向布置
+        private bool isLengthOrCount;
+        public bool IsLengthOrCount
+        {
+            get => isLengthOrCount;
+            set => SetProperty(ref isLengthOrCount, value);
+        }
 
+        //灯具方向沿切线方向布置
+        private bool isAlongTheLine;
+        public bool IsAlongTheLine
+        {
+            get => isAlongTheLine;
+            set => SetProperty(ref isAlongTheLine, value);
+        }
+        public IRelayCommand CurLightingCommand { get; }
 
-
-
-
+        void CurLighting()
+        {
+            Application.DocumentManager.MdiActiveDocument.SendStringToExecute("FF_CurLighting\n", true, false, false);
+        }
         #endregion
+
     }
 }

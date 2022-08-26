@@ -1,4 +1,3 @@
-D:\github\TimeIsLife\TimeIsLife\bin\Debug\EntityFramework.dll
 D:\github\TimeIsLife\TimeIsLife\bin\Debug\Block\FA-08-智能型点型感烟探测器.dwg
 D:\github\TimeIsLife\TimeIsLife\bin\Debug\FA\FA-01-接线端子箱.dwg
 D:\github\TimeIsLife\TimeIsLife\bin\Debug\FA\FA-02-带消防电话插孔的手动报警按钮.dwg
@@ -61,6 +60,7 @@ D:\github\TimeIsLife\TimeIsLife\bin\Debug\CommunityToolkit.Mvvm.dll
 D:\github\TimeIsLife\TimeIsLife\bin\Debug\CommunityToolkit.Mvvm.pdb
 D:\github\TimeIsLife\TimeIsLife\bin\Debug\Dapper.dll
 D:\github\TimeIsLife\TimeIsLife\bin\Debug\EntityFramework.SqlServer.dll
+D:\github\TimeIsLife\TimeIsLife\bin\Debug\EntityFramework.dll
 D:\github\TimeIsLife\TimeIsLife\bin\Debug\Microsoft.Bcl.AsyncInterfaces.dll
 D:\github\TimeIsLife\TimeIsLife\bin\Debug\Microsoft.Xaml.Behaviors.dll
 D:\github\TimeIsLife\TimeIsLife\bin\Debug\Microsoft.Xaml.Behaviors.pdb

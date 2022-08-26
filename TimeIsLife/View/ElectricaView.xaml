@@ -10,7 +10,11 @@
     d:DesignWidth="400"
     mc:Ignorable="d">
     <UserControl.Resources>
-        <ResourceDictionary Source="/TimeIsLife;component/Shared.xaml" />
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/TimeIsLife;component/Shared.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
     </UserControl.Resources>
     <ScrollViewer
         Padding="5"
@@ -23,58 +27,134 @@
                         Command="{Binding SumPowerCommand}"
                         Content="统计功率"
                         Template="{StaticResource buttonTemplate}" />
-                    <StackPanel Orientation="Horizontal">
-                        <Label Content="额定功率Pe：" />
-                        <TextBox Text="{Binding Pe, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <Label
+                            Grid.Row="0"
+                            Grid.Column="0"
+                            Content="额定功率Pe："
+                            Template="{DynamicResource LabelTemplate}" />
+                        <TextBox
+                            Grid.Row="0"
+                            Grid.Column="1"
+                            Template="{DynamicResource TextBoxTemplate}"
+                            Text="{Binding Pe, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                             <Behaviors:Interaction.Triggers>
                                 <Behaviors:EventTrigger EventName="TextChanged">
-                                    <Behaviors:InvokeCommandAction x:Name="CalculateCurrentCommand1" Command="{Binding CalculateCurrentCommand}" />
-                                </Behaviors:EventTrigger>
-                            </Behaviors:Interaction.Triggers>
-                        </TextBox>
-                    </StackPanel>
-                    <GroupBox HorizontalAlignment="Left" Header="明细">
-                        <GroupBox.BorderBrush>
-                            <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.HotTrackColorKey}}" />
-                        </GroupBox.BorderBrush>
-                        <StackPanel>
-                            <StackPanel Orientation="Horizontal">
-                                <Label Content="平时\消防功率：" />
-                                <TextBox IsReadOnly="True" Text="{Binding NormalOrFirePower}" />
-                            </StackPanel>
-                            <StackPanel Orientation="Horizontal">
-                                <Label Content="消防平时功率：" />
-                                <TextBox IsReadOnly="True" Text="{Binding NormalInFirePower}" />
-                            </StackPanel>
-                            <Label Width="auto" Content="注:消防/平时功率(1.0kW/1.0kW)" />
-                        </StackPanel>
-                    </GroupBox>
-                    <StackPanel Orientation="Horizontal">
-                        <Label Content="需要系数Kx" />
-                        <TextBox Text="{Binding Kx, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
-                            <Behaviors:Interaction.Triggers>
-                                <Behaviors:EventTrigger EventName="TextChanged">
-                                    <Behaviors:InvokeCommandAction x:Name="CalculateCurrentCommand2" Command="{Binding CalculateCurrentCommand}" />
+                                    <Behaviors:InvokeCommandAction
+                                        x:Name="CalculateCurrentCommand1"
+                                        Command="{Binding CalculateCurrentCommand}" />
                                 </Behaviors:EventTrigger>
                             </Behaviors:Interaction.Triggers>
                         </TextBox>
 
-                    </StackPanel>
-                    <StackPanel Orientation="Horizontal">
-                        <Label Content="功率因数Cosø" />
-                        <TextBox Text="{Binding Cosø, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                        <GroupBox
+                            Grid.Row="1"
+                            Grid.Column="0"
+                            Grid.ColumnSpan="2"
+                            Header="明细">
+                            <GroupBox.BorderBrush>
+                                <SolidColorBrush Color="{DynamicResource {x:Static SystemColors.HotTrackColorKey}}" />
+                            </GroupBox.BorderBrush>
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition />
+                                    <ColumnDefinition />
+                                </Grid.ColumnDefinitions>
+                                <Label
+                                    Grid.Row="0"
+                                    Grid.Column="0"
+                                    Content="平时\消防功率："
+                                    Template="{DynamicResource LabelTemplate}" />
+                                <TextBox
+                                    Grid.Row="0"
+                                    Grid.Column="1"
+                                    IsReadOnly="True"
+                                    Template="{DynamicResource TextBoxTemplate}"
+                                    Text="{Binding NormalOrFirePower}" />
+                                <Label
+                                    Grid.Row="1"
+                                    Grid.Column="0"
+                                    Content="消防平时功率："
+                                    Template="{DynamicResource LabelTemplate}" />
+                                <TextBox
+                                    Grid.Row="1"
+                                    Grid.Column="1"
+                                    IsReadOnly="True"
+                                    Template="{DynamicResource TextBoxTemplate}"
+                                    Text="{Binding NormalInFirePower}" />
+                                <Label
+                                    Grid.Row="2"
+                                    Grid.Column="0"
+                                    Grid.ColumnSpan="2"
+                                    Width="auto"
+                                    Content="注:消防/平时功率(1.0kW/1.0kW)"
+                                    Template="{DynamicResource LabelTemplate}" />
+                            </Grid>
+                        </GroupBox>
+                        <Label
+                            Grid.Row="2"
+                            Grid.Column="0"
+                            Content="需要系数Kx"
+                            Template="{DynamicResource LabelTemplate}" />
+                        <TextBox
+                            Grid.Row="2"
+                            Grid.Column="1"
+                            Template="{DynamicResource TextBoxTemplate}"
+                            Text="{Binding Kx, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
                             <Behaviors:Interaction.Triggers>
                                 <Behaviors:EventTrigger EventName="TextChanged">
-                                    <Behaviors:InvokeCommandAction x:Name="CalculateCurrentCommand3" Command="{Binding CalculateCurrentCommand}" />
+                                    <Behaviors:InvokeCommandAction
+                                        x:Name="CalculateCurrentCommand2"
+                                        Command="{Binding CalculateCurrentCommand}" />
                                 </Behaviors:EventTrigger>
                             </Behaviors:Interaction.Triggers>
                         </TextBox>
-
-                    </StackPanel>
-                    <StackPanel Orientation="Horizontal">
-                        <Label Content="计算电流Ic" />
-                        <TextBox IsReadOnly="True" Text="{Binding Ic}" />
-                    </StackPanel>
+                        <Label
+                            Grid.Row="3"
+                            Grid.Column="0"
+                            Content="功率因数Cosø"
+                            Template="{DynamicResource LabelTemplate}" />
+                        <TextBox
+                            Grid.Row="3"
+                            Grid.Column="1"
+                            Template="{DynamicResource TextBoxTemplate}"
+                            Text="{Binding Cosø, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                            <Behaviors:Interaction.Triggers>
+                                <Behaviors:EventTrigger EventName="TextChanged">
+                                    <Behaviors:InvokeCommandAction
+                                        x:Name="CalculateCurrentCommand3"
+                                        Command="{Binding CalculateCurrentCommand}" />
+                                </Behaviors:EventTrigger>
+                            </Behaviors:Interaction.Triggers>
+                        </TextBox>
+                        <Label
+                            Grid.Row="4"
+                            Grid.Column="0"
+                            Content="计算电流Ic"
+                            Template="{DynamicResource LabelTemplate}" />
+                        <TextBox
+                            Grid.Row="4"
+                            Grid.Column="1"
+                            IsReadOnly="True"
+                            Template="{DynamicResource TextBoxTemplate}"
+                            Text="{Binding Ic}" />
+                    </Grid>
                     <Button
                         Command="{Binding AddSumPowerCommand}"
                         Content="添加功率和"
@@ -133,67 +213,192 @@
                         Template="{StaticResource buttonTemplate}" />
                 </StackPanel>
             </Expander>
-            <Expander Header="布置灯具">
-                <StackPanel>
+            <Expander
+                Margin="1,1,1,1"
+                Header="布置灯具">
+                <StackPanel Margin="10,0,0,0">
                     <Expander Header="灯具矩形布置">
                         <StackPanel>
                             <Button
                                 Command="{Binding GetAreaCommand}"
                                 Content="区域选取"
                                 Template="{StaticResource buttonTemplate}" />
-                            <StackPanel Orientation="Horizontal">
-                                <Label Content="房间面积(㎡)" />
-                                <TextBox IsReadOnly="True" Text="{Binding LightingArea}">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition />
+                                    <ColumnDefinition />
+                                </Grid.ColumnDefinitions>
+                                <Label
+                                    Grid.Row=" 0"
+                                    Grid.Column="0"
+                                    Content="房间面积(㎡)"
+                                    Template="{DynamicResource LabelTemplate}" />
+                                <TextBox
+                                    Grid.Row="0"
+                                    Grid.Column="1"
+                                    IsEnabled="False"
+                                    IsReadOnly="True"
+                                    Template="{DynamicResource TextBoxTemplate}"
+                                    Text="{Binding LightingArea}">
                                     <Behaviors:Interaction.Triggers>
                                         <Behaviors:EventTrigger EventName="TextChanged">
-                                            <Behaviors:InvokeCommandAction x:Name="LightingCountCalculate1" Command="{Binding LightingCountCalculateCommand}" />
+                                            <Behaviors:InvokeCommandAction
+                                                x:Name="LightingCountCalculate1"
+                                                Command="{Binding LightingCountCalculateCommand}" />
                                         </Behaviors:EventTrigger>
                                     </Behaviors:Interaction.Triggers>
                                 </TextBox>
-                            </StackPanel>
-                            <StackPanel Orientation="Horizontal">
-                                <Label Content="功率密度(W/㎡)" />
-                                <TextBox Text="{Binding LightingPowerDensity, UpdateSourceTrigger=PropertyChanged}">
+                                <Label
+                                    Grid.Row="1"
+                                    Grid.Column="0"
+                                    Content="功率密度(W/㎡)"
+                                    Template="{DynamicResource LabelTemplate}" />
+                                <TextBox
+                                    Grid.Row="1"
+                                    Grid.Column="1"
+                                    Template="{DynamicResource TextBoxTemplate}"
+                                    Text="{Binding LightingPowerDensity, UpdateSourceTrigger=PropertyChanged}">
                                     <Behaviors:Interaction.Triggers>
                                         <Behaviors:EventTrigger EventName="TextChanged">
-                                            <Behaviors:InvokeCommandAction x:Name="LightingCountCalculate2" Command="{Binding LightingCountCalculateCommand}" />
+                                            <Behaviors:InvokeCommandAction
+                                                x:Name="LightingCountCalculate2"
+                                                Command="{Binding LightingCountCalculateCommand}" />
                                         </Behaviors:EventTrigger>
                                     </Behaviors:Interaction.Triggers>
                                 </TextBox>
-                            </StackPanel>
-                            <StackPanel Orientation="Horizontal">
-                                <Label Content="灯具功率(W)" />
-                                <TextBox Text="{Binding LightingPower, UpdateSourceTrigger=PropertyChanged}">
+                                <Label
+                                    Grid.Row="2"
+                                    Grid.Column=" 0"
+                                    Content="灯具功率(W)"
+                                    Template="{DynamicResource LabelTemplate}" />
+                                <TextBox
+                                    Grid.Row=" 2"
+                                    Grid.Column="1"
+                                    Template="{DynamicResource TextBoxTemplate}"
+                                    Text="{Binding LightingPower, UpdateSourceTrigger=PropertyChanged}">
                                     <Behaviors:Interaction.Triggers>
                                         <Behaviors:EventTrigger EventName="TextChanged">
-                                            <Behaviors:InvokeCommandAction x:Name="LightingCountCalculate3" Command="{Binding LightingCountCalculateCommand}" />
+                                            <Behaviors:InvokeCommandAction
+                                                x:Name="LightingCountCalculate3"
+                                                Command="{Binding LightingCountCalculateCommand}" />
                                         </Behaviors:EventTrigger>
                                     </Behaviors:Interaction.Triggers>
                                 </TextBox>
-                            </StackPanel>
-                            <StackPanel Orientation="Horizontal">
-                                <Label Content="灯具数量" />
-                                <TextBox Text="{Binding LightingCount}" />
-                            </StackPanel>
-                            <StackPanel Orientation="Horizontal">
-                                <Label Content="灯具行数" />
-                                <TextBox Text="{Binding LightingRow, UpdateSourceTrigger=PropertyChanged}" />
-                            </StackPanel>
-                            <StackPanel Orientation="Horizontal">
-                                <Label Content="灯具列数" />
-                                <TextBox Text="{Binding LightingColumn, UpdateSourceTrigger=PropertyChanged}" />
-                            </StackPanel>
+                                <Label
+                                    Grid.Row="3"
+                                    Grid.Column="0"
+                                    Content="灯具数量"
+                                    Template="{DynamicResource LabelTemplate}" />
+                                <TextBox
+                                    Grid.Row="3"
+                                    Grid.Column="1"
+                                    Template="{DynamicResource TextBoxTemplate}"
+                                    Text="{Binding LightingCount}" />
+                                <Label
+                                    Grid.Row=" 4"
+                                    Grid.Column="0"
+                                    Content="灯具行数"
+                                    Template="{DynamicResource LabelTemplate}" />
+                                <TextBox
+                                    Grid.Row="4"
+                                    Grid.Column="1"
+                                    Template="{DynamicResource TextBoxTemplate}"
+                                    Text="{Binding LightingRow, UpdateSourceTrigger=PropertyChanged}" />
+                                <Label
+                                    Grid.Row="5"
+                                    Grid.Column="0"
+                                    Content="灯具列数"
+                                    Template="{DynamicResource LabelTemplate}" />
+                                <TextBox
+                                    Grid.Row="5"
+                                    Grid.Column="1"
+                                    Template="{DynamicResource TextBoxTemplate}"
+                                    Text="{Binding LightingColumn, UpdateSourceTrigger=PropertyChanged}" />
+                                <Label
+                                    Grid.Row="6"
+                                    Grid.Column="0"
+                                    Content="灯具行数"
+                                    Template="{DynamicResource LabelTemplate}" />
+                                <TextBox
+                                    Grid.Row="6"
+                                    Grid.Column="1"
+                                    Template="{DynamicResource TextBoxTemplate}"
+                                    Text="{Binding LightingRow, UpdateSourceTrigger=PropertyChanged}" />
+                            </Grid>
                             <Button
                                 Command="{Binding RecLightingCommand}"
                                 Content="灯具布置"
                                 Template="{StaticResource buttonTemplate}" />
+                        </StackPanel>
+                    </Expander>
+                    <Expander Header="灯具沿线布置">
+                        <StackPanel>
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                    <RowDefinition />
+                                    <RowDefinition />
+
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition />
+                                    <ColumnDefinition />
+                                </Grid.ColumnDefinitions>
+                                <Label
+                                    Grid.Row="0"
+                                    Grid.Column="0"
+                                    Content="灯具数量："
+                                    Template="{DynamicResource LabelTemplate}" />
+                                <TextBox
+                                    Grid.Row="0"
+                                    Grid.Column="1"
+                                    Template="{DynamicResource TextBoxTemplate}"
+                                    Text="{Binding LightingLineCount, UpdateSourceTrigger=PropertyChanged}" />
+                                <Label
+                                    Grid.Row="1"
+                                    Grid.Column="0"
+                                    Content="灯具间距："
+                                    Template="{DynamicResource LabelTemplate}" />
+                                <TextBox
+                                    Grid.Row="1"
+                                    Grid.Column="1"
+                                    Template="{DynamicResource TextBoxTemplate}"
+                                    Text="{Binding LightingLength, UpdateSourceTrigger=PropertyChanged}" />
+                                <CheckBox
+                                    Grid.Row="2"
+                                    Grid.Column="0"
+                                    Grid.ColumnSpan="2"
+                                    Content="灯具方向沿切线方向布置"
+                                    IsChecked="{Binding IsAlongTheLine}" />
+                                <RadioButton
+                                    Grid.Row="3"
+                                    Grid.Column="0"
+                                    Content="固定间距布置"
+                                    GroupName="A" />
+                                <RadioButton
+                                    Grid.Row="3"
+                                    Grid.Column="1"
+                                    Content="固定数量布置"
+                                    GroupName="A"
+                                    IsChecked="{Binding IsLengthOrCount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+                            </Grid>
+                            <Button
+                                Command="{Binding CurLightingCommand}"
+                                Content="灯具沿线布置"
+                                Template="{DynamicResource buttonTemplate}" />
 
                         </StackPanel>
                     </Expander>
-                    <Button
-                        Command="{Binding RecLightingCommand}"
-                        Content="灯具沿线布置"
-                        Template="{StaticResource buttonTemplate}" />
                     <Expander Header="停车位灯具布置">
                         <StackPanel>
                             <Button
@@ -208,20 +413,50 @@
                     </Expander>
                     <Expander Header="车道灯具布置" />
                     <GroupBox Header="灯具块设置">
-                        <StackPanel>
-                            <StackPanel Orientation="Horizontal">
-                                <Label Content="块比例" />
-                                <ComboBox ItemsSource="{Binding BlockScales}" SelectedItem="{Binding BlockScale}" />
-                            </StackPanel>
-                            <StackPanel Orientation="Horizontal">
-                                <Label Content="块角度" />
-                                <ComboBox ItemsSource="{Binding BlockAngles}" SelectedItem="{Binding BlockAngle}" />
-                            </StackPanel>
-                            <StackPanel Orientation="Horizontal">
-                                <Label Content="首端距离" />
-                                <ComboBox ItemsSource="{Binding Distances}" SelectedItem="{Binding Distance}" />
-                            </StackPanel>
-                        </StackPanel>
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition />
+                                <RowDefinition />
+                                <RowDefinition />
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition />
+                                <ColumnDefinition />
+                            </Grid.ColumnDefinitions>
+                            <Label
+                                Grid.Row="0"
+                                Grid.Column="0"
+                                Content="块比例"
+                                Template="{DynamicResource LabelTemplate}" />
+                            <ComboBox
+                                Grid.Row="0"
+                                Grid.Column="1"
+                                ItemsSource="{Binding BlockScales}"
+                                SelectedItem="{Binding BlockScale}"
+                                Template="{DynamicResource ComboBoxTemplate}" />
+                            <Label
+                                Grid.Row="1"
+                                Grid.Column="0"
+                                Content="块角度"
+                                Template="{DynamicResource LabelTemplate}" />
+                            <ComboBox
+                                Grid.Row=" 1"
+                                Grid.Column="1"
+                                ItemsSource="{Binding BlockAngles}"
+                                SelectedItem="{Binding BlockAngle}"
+                                Template="{DynamicResource ComboBoxTemplate}" />
+                            <Label
+                                Grid.Row="2"
+                                Grid.Column="0"
+                                Content="首端距离"
+                                Template="{DynamicResource LabelTemplate}" />
+                            <ComboBox
+                                Grid.Row="2"
+                                Grid.Column="1"
+                                ItemsSource="{Binding Distances}"
+                                SelectedItem="{Binding Distance}"
+                                Template="{DynamicResource ComboBoxTemplate}" />
+                        </Grid>
                     </GroupBox>
                 </StackPanel>
             </Expander>

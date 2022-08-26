@@ -179,5 +179,132 @@ namespace TimeIsLife.CADCommand
                 }
             }
         }
+
+
+
+        [CommandMethod("FF_CurLighting")]
+        public void FF_CurLighting()
+        {
+            // Put your command code here
+            Document document = Application.DocumentManager.CurrentDocument;
+            Database database = document.Database;
+            Editor editor = document.Editor;
+
+            using Transaction transaction = database.TransactionManager.StartOpenCloseTransaction();
+
+            BlockTable blockTable = transaction.GetObject(database.BlockTableId, OpenMode.ForRead) as BlockTable;
+            BlockTableRecord space = transaction.GetObject(blockTable[BlockTableRecord.ModelSpace], OpenMode.ForWrite) as BlockTableRecord;
+
+            try
+            {
+                double curveLength;
+                Curve curve;
+                BlockReference blockReference;
+
+                //选择Curve，判断是否为Arc，Line，Polyline，
+                while (true)
+                {
+                    PromptEntityResult result = editor.GetEntity("\n 拾取圆弧或直线或多段线或样条曲线：");
+                    if (result.Status == PromptStatus.OK)
+                    {
+                        ObjectId id = result.ObjectId;
+                        curve = (Curve)transaction.GetObject(id, OpenMode.ForRead);
+                        if (curve is Arc arc)
+                        {
+                            curveLength = arc.Length;
+                        }
+                        else if (curve is Line line)
+                        {
+                            curveLength = line.Length;
+                        }
+                        else if (curve is Polyline polyline)
+                        {
+                            curveLength = polyline.Length;
+                        }
+                        else if (curve is Spline spline)
+                        {
+                            curveLength = ((Polyline)spline.ToPolylineWithPrecision(99)).Length;
+                        }
+                        else
+                        {
+                            editor.WriteMessage("\n请选择圆弧或直线或多段线或样条曲线！");
+                            continue;
+                        }
+                        break;
+                    }
+                    else if (result.Status == PromptStatus.Cancel)
+                    {
+                        return;
+                    }
+                }
+
+                //选择块
+                while (true)
+                {
+                    PromptEntityResult result = editor.GetEntity("\n 拾取块：");
+                    if (result.Status == PromptStatus.OK)
+                    {
+                        ObjectId id = result.ObjectId;
+                        blockReference = (BlockReference)transaction.GetObject(id, OpenMode.ForRead);
+                        if (blockReference == null)
+                        {
+                            editor.WriteMessage("\n请选择块！");
+                            continue;
+                        }
+                        break;
+                    }
+                    else if (result.Status == PromptStatus.Cancel)
+                    {
+                        return;
+                    }
+                }
+
+                var blockTableRecord = blockReference.BlockTableRecord;
+                if (blockTableRecord == null) return;
+                if (ElectricalViewModel.electricalViewModel.LightingLength <= 0) return;
+
+                int n = (int)Math.Ceiling(curveLength / ElectricalViewModel.electricalViewModel.LightingLength);
+
+                for (int i = 0; i < n; i++)
+                {
+                    Point3d point3D = curve.GetPointAtDist((i + 0.5) * curveLength / n);
+                    var vector3d = curve.GetFirstDerivative(point3D);
+                    BlockReference br = new BlockReference(point3D, blockTableRecord);
+                    br.ScaleFactors = blockReference.ScaleFactors;
+                    br.Layer = blockReference.Layer;
+                    br.Rotation = vector3d.GetAngleTo(new Vector3d(1, 0, 0), new Vector3d(0, 0, -1));
+                    space.AppendEntity(br);
+                    transaction.AddNewlyCreatedDBObject(br, true);
+                }
+                space.DowngradeOpen();
+                transaction.Commit();
+
+                //while (true)
+                //{
+                //    PromptIntegerOptions promptIntegerOptions = new PromptIntegerOptions(c);
+                //    promptIntegerOptions.DefaultValue = 3000;
+                //    promptIntegerOptions.UseDefaultValue = true;
+                //    var result = editor.GetInteger(promptIntegerOptions);
+                //    if (result.Status == PromptStatus.OK)
+                //    {
+                //        d = result.Value;
+                //        break;
+                //    }
+                //    else if (result.Status == PromptStatus.Cancel)
+                //    {
+                //        return;
+                //    }
+                //    else
+                //    {
+                //        editor.WriteMessage("\n 请输入正确的间距");
+                //    }
+                //}
+
+            }
+            catch
+            {
+                transaction.Abort();
+            }
+        }
     }
 }
