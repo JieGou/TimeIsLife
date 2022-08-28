@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 using TimeIsLife.Jig;
 using TimeIsLife.ViewModel;
@@ -193,7 +194,7 @@ namespace TimeIsLife.CADCommand
             using Transaction transaction = database.TransactionManager.StartOpenCloseTransaction();
 
             BlockTable blockTable = transaction.GetObject(database.BlockTableId, OpenMode.ForRead) as BlockTable;
-            BlockTableRecord space = transaction.GetObject(blockTable[BlockTableRecord.ModelSpace], OpenMode.ForWrite) as BlockTableRecord;
+            BlockTableRecord modelSpace = transaction.GetObject(blockTable[BlockTableRecord.ModelSpace], OpenMode.ForWrite) as BlockTableRecord;
 
             try
             {
@@ -201,10 +202,10 @@ namespace TimeIsLife.CADCommand
                 Curve curve;
                 BlockReference blockReference;
 
-                //选择Curve，判断是否为Arc，Line，Polyline，
+                //选择Curve，判断是否为Arc，Line，Polyline，获取长度
                 while (true)
                 {
-                    PromptEntityResult result = editor.GetEntity("\n 拾取圆弧或直线或多段线或样条曲线：");
+                    PromptEntityResult result = editor.GetEntity("\n 拾取圆弧或直线或多段线：");
                     if (result.Status == PromptStatus.OK)
                     {
                         ObjectId id = result.ObjectId;
@@ -221,13 +222,9 @@ namespace TimeIsLife.CADCommand
                         {
                             curveLength = polyline.Length;
                         }
-                        else if (curve is Spline spline)
-                        {
-                            curveLength = ((Polyline)spline.ToPolylineWithPrecision(99)).Length;
-                        }
                         else
                         {
-                            editor.WriteMessage("\n请选择圆弧或直线或多段线或样条曲线！");
+                            editor.WriteMessage("\n请选择圆弧或直线或多段线！");
                             continue;
                         }
                         break;
@@ -261,44 +258,96 @@ namespace TimeIsLife.CADCommand
 
                 var blockTableRecord = blockReference.BlockTableRecord;
                 if (blockTableRecord == null) return;
-                if (ElectricalViewModel.electricalViewModel.LightingLength <= 0) return;
 
-                int n = (int)Math.Ceiling(curveLength / ElectricalViewModel.electricalViewModel.LightingLength);
-
-                for (int i = 0; i < n; i++)
+                switch (ElectricalViewModel.electricalViewModel.IsLengthOrCount)
                 {
-                    Point3d point3D = curve.GetPointAtDist((i + 0.5) * curveLength / n);
-                    var vector3d = curve.GetFirstDerivative(point3D);
-                    BlockReference br = new BlockReference(point3D, blockTableRecord);
-                    br.ScaleFactors = blockReference.ScaleFactors;
-                    br.Layer = blockReference.Layer;
-                    br.Rotation = vector3d.GetAngleTo(new Vector3d(1, 0, 0), new Vector3d(0, 0, -1));
-                    space.AppendEntity(br);
-                    transaction.AddNewlyCreatedDBObject(br, true);
-                }
-                space.DowngradeOpen();
-                transaction.Commit();
+                    //固定数量
+                    case true:                        
+                        int m = ElectricalViewModel.electricalViewModel.LightingLineCount;
+                        while (m <= 0)
+                        {
+                            PromptIntegerOptions promptIntegerOptions = new PromptIntegerOptions("请输入灯具数量：");
+                            promptIntegerOptions.DefaultValue = m;
+                            promptIntegerOptions.UseDefaultValue = true;
+                            var result = editor.GetInteger(promptIntegerOptions);
+                            if (result.Status == PromptStatus.OK)
+                            {
+                                ElectricalViewModel.electricalViewModel.LightingLineCount = m = result.Value;
+                            }
+                            else
+                            {
+                                return;
+                            }
+                        }
+                        double unitLength = curveLength / m;
+                        for (int i = 0; i < m; i++)
+                        {
+                            Point3d point3D = curve.GetPointAtDist(unitLength * (i + 0.5));
+                            BlockReference br = new BlockReference(point3D, blockTableRecord);
+                            br.ScaleFactors = blockReference.ScaleFactors;
+                            br.Layer = blockReference.Layer;
+                            switch (ElectricalViewModel.electricalViewModel.IsAlongTheLine)
+                            {
+                                //是否沿线方向
+                                case true:
+                                    var vector3d = curve.GetFirstDerivative(point3D);                                    
+                                    br.Rotation = vector3d.GetAngleTo(new Vector3d(1, 0, 0), new Vector3d(0, 0, -1))+ElectricalViewModel.electricalViewModel.BlockAngle*Math.PI/180;                                    
+                                    break;
+                                case false:
+                                    br.Rotation = ElectricalViewModel.electricalViewModel.BlockAngle * Math.PI / 180;
+                                    break;
+                            } ;
+                            modelSpace.AppendEntity(br);
+                            transaction.AddNewlyCreatedDBObject(br, true);
+                        }
+                        break;
+                    //固定距离
+                    case false:
+                        double l = ElectricalViewModel.electricalViewModel.LightingLength;
+                        while (l <= 0)
+                        {
+                            PromptDoubleOptions promptDoubleOptions = new PromptDoubleOptions("请输入灯具间距：");
+                            promptDoubleOptions.DefaultValue = l;
+                            promptDoubleOptions.UseDefaultValue = true;
+                            var result = editor.GetDouble(promptDoubleOptions);
+                            if (result.Status == PromptStatus.OK)
+                            {
+                                ElectricalViewModel.electricalViewModel.LightingLength = l = result.Value;
+                            }
+                            else
+                            {
+                                return;
+                            }
+                        }
+                        int j = 0;                        
+                        while (true)
+                        {
+                            double tempLength = (j + ElectricalViewModel.electricalViewModel.Distance) * ElectricalViewModel.electricalViewModel.LightingLength;
+                            if (tempLength > curveLength) break;
+                            Point3d point3D = curve.GetPointAtDist(tempLength);
+                            BlockReference br = new BlockReference(point3D, blockTableRecord);
+                            br.ScaleFactors = blockReference.ScaleFactors;
+                            br.Layer = blockReference.Layer;
+                            switch (ElectricalViewModel.electricalViewModel.IsAlongTheLine)
+                            {
+                                //是否沿线方向
+                                case true:
+                                    var vector3d = curve.GetFirstDerivative(point3D);
+                                    br.Rotation = vector3d.GetAngleTo(new Vector3d(1, 0, 0), new Vector3d(0, 0, -1)) + ElectricalViewModel.electricalViewModel.BlockAngle * Math.PI / 180;
+                                    break;
+                                case false:
+                                    br.Rotation = ElectricalViewModel.electricalViewModel.BlockAngle * Math.PI / 180;
+                                    break;
+                            };
+                            modelSpace.AppendEntity(br);
+                            transaction.AddNewlyCreatedDBObject(br, true);
+                            j++;
+                        }
+                        break;
+                } ;
 
-                //while (true)
-                //{
-                //    PromptIntegerOptions promptIntegerOptions = new PromptIntegerOptions(c);
-                //    promptIntegerOptions.DefaultValue = 3000;
-                //    promptIntegerOptions.UseDefaultValue = true;
-                //    var result = editor.GetInteger(promptIntegerOptions);
-                //    if (result.Status == PromptStatus.OK)
-                //    {
-                //        d = result.Value;
-                //        break;
-                //    }
-                //    else if (result.Status == PromptStatus.Cancel)
-                //    {
-                //        return;
-                //    }
-                //    else
-                //    {
-                //        editor.WriteMessage("\n 请输入正确的间距");
-                //    }
-                //}
+                modelSpace.DowngradeOpen();
+                transaction.Commit();
 
             }
             catch

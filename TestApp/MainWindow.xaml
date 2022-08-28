@@ -7,66 +7,61 @@
     xmlns:local="clr-namespace:TestApp"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     Title="MainWindow"
-    Width="250"
+    Width="400"
     Height="450"
     mc:Ignorable="d">
     <Window.Resources>
         <ResourceDictionary Source="Shared.xaml" />
     </Window.Resources>
     <Grid>
-        <StackPanel>
-            <Behaviors:Interaction.Triggers>
-                <Behaviors:EventTrigger EventName="TextBoxBase.TextChanged">
-                    <Behaviors:InvokeCommandAction Command="{Binding CalculateCurrentCommand}" />
-                </Behaviors:EventTrigger>
-            </Behaviors:Interaction.Triggers>
-            <Button
-                Command="{Binding SumPowerCommand}"
-                Content="统计功率" />
-            <StackPanel Orientation="Horizontal">
-                <Label Content="额定功率Pe：" />
-                <TextBox Text="{Binding Pe, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
-                    
-                </TextBox>
-            </StackPanel>
-            <GroupBox
-                BorderBrush="Red"
-                Header="明细">
-                <StackPanel>
-                    <StackPanel Orientation="Horizontal">
-                        <Label Content="消防时：" />
-                        <Label Content="{Binding FirePower, Mode=OneWay}" />
-                    </StackPanel>
-                    <StackPanel Orientation="Horizontal">
-                        <Label Content="非消防时：" />
-                        <Label Content="{Binding NFirePower, Mode=OneWay}" />
-                    </StackPanel>
-                </StackPanel>
-            </GroupBox>
-            <StackPanel Orientation="Horizontal">
-                <Label Content="需要系数Kx" />
-                <TextBox Text="{Binding Kx, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
-                    
-                </TextBox>
-            </StackPanel>
-            <StackPanel Orientation="Horizontal">
-                <Label Content="功率因数Cosø" />
-                <TextBox Text="{Binding Cosø, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
-                    
-                </TextBox>
-            </StackPanel>
-            <StackPanel Orientation="Horizontal">
-                <Label Content="计算电流Ic" />
-                <Label Content="{Binding Ic, Mode=OneWay}" />
-            </StackPanel>
-            <Button
-                Command="{Binding CalculateCurrentCommand}"
-                Content="计算电流" />
-            <ComboBox Height="30">
-                <ComboBoxItem Content="1"/>
-                <ComboBoxItem Content="1"/>
-                <ComboBoxItem Content="1"/>
-            </ComboBox>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition />
+            <ColumnDefinition />
+        </Grid.ColumnDefinitions>
+        <StackPanel Grid.Row="0" Grid.Column="0">
+            <Label Content="当前AutoCAD版本" />
+            <TextBox Text="{Binding CadName}" />
+            <Label Content="NET程序路径" />
+            <TextBox Text="{Binding DllPath}" />
+            <Button Command="{Binding FileBrowseCommand}" Content="浏览..." />
+            <Label Content="应用程序名" />
+            <TextBox Text="{Binding AppName}" />
+            <Label Content="应用程序描述" />
+            <TextBox Text="{Binding AppDesc}" />
+        </StackPanel>
+        <StackPanel Grid.Row="1" Grid.Column="0">
+            <Button Command="{Binding AddRegistryKeyCommand}" Content="加入注册表" />
+            <Button Command="{Binding RemoveRegistryKeyCommand}" Content="删除注册表" />
+            <Button Command="{Binding Exit}" Content="退出" />
+            <CheckBox Content="IsCurrentUser" IsChecked="{Binding IsCurrentUser}"/>
+            <CheckBox Content="IsOverWrite" IsChecked="{Binding IsOverWrite}"/>
+        </StackPanel>
+        <StackPanel
+            Grid.Row="0"
+            Grid.RowSpan="2"
+            Grid.Column="1">
+            <Label Content="已自动加载的.NET程序集：" />
+            <ListView ItemsSource="{Binding CadDlls}">
+                <ListView.View>
+                    <GridView>
+                        <GridView.Columns>
+                            <GridViewColumn
+                                Width="50"
+                                DisplayMemberBinding="{Binding CadDll.Name}"
+                                Header="程序名" />
+                            <GridViewColumn
+                                Width="100"
+                                DisplayMemberBinding="{Binding CadDll.Path}"
+                                Header="文件路径" />
+                        </GridView.Columns>
+                    </GridView>
+                </ListView.View>
+            </ListView>
+            
         </StackPanel>
     </Grid>
 </Window>

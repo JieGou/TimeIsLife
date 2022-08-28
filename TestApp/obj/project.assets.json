@@ -11,14 +11,10 @@
           "System.Runtime.CompilerServices.Unsafe": "6.0.0"
         },
         "compile": {
-          "lib/netstandard2.0/CommunityToolkit.Mvvm.dll": {
-            "related": ".pdb;.xml"
-          }
+          "lib/netstandard2.0/CommunityToolkit.Mvvm.dll": {}
         },
         "runtime": {
-          "lib/netstandard2.0/CommunityToolkit.Mvvm.dll": {
-            "related": ".pdb;.xml"
-          }
+          "lib/netstandard2.0/CommunityToolkit.Mvvm.dll": {}
         },
         "build": {
           "buildTransitive/netstandard2.0/CommunityToolkit.Mvvm.targets": {}
@@ -30,14 +26,10 @@
           "System.Threading.Tasks.Extensions": "4.5.4"
         },
         "compile": {
-          "lib/net461/Microsoft.Bcl.AsyncInterfaces.dll": {
-            "related": ".xml"
-          }
+          "lib/net461/Microsoft.Bcl.AsyncInterfaces.dll": {}
         },
         "runtime": {
-          "lib/net461/Microsoft.Bcl.AsyncInterfaces.dll": {
-            "related": ".xml"
-          }
+          "lib/net461/Microsoft.Bcl.AsyncInterfaces.dll": {}
         }
       },
       "Microsoft.Xaml.Behaviors.Wpf/1.1.39": {
@@ -52,14 +44,10 @@
           "WindowsBase"
         ],
         "compile": {
-          "lib/net45/Microsoft.Xaml.Behaviors.dll": {
-            "related": ".pdb;.xml"
-          }
+          "lib/net45/Microsoft.Xaml.Behaviors.dll": {}
         },
         "runtime": {
-          "lib/net45/Microsoft.Xaml.Behaviors.dll": {
-            "related": ".pdb;.xml"
-          }
+          "lib/net45/Microsoft.Xaml.Behaviors.dll": {}
         }
       },
       "System.Buffers/4.5.1": {
@@ -68,14 +56,10 @@
           "mscorlib"
         ],
         "compile": {
-          "ref/net45/System.Buffers.dll": {
-            "related": ".xml"
-          }
+          "ref/net45/System.Buffers.dll": {}
         },
         "runtime": {
-          "lib/net461/System.Buffers.dll": {
-            "related": ".xml"
-          }
+          "lib/net461/System.Buffers.dll": {}
         }
       },
       "System.ComponentModel.Annotations/5.0.0": {
@@ -85,9 +69,7 @@
           "mscorlib"
         ],
         "compile": {
-          "ref/net461/System.ComponentModel.Annotations.dll": {
-            "related": ".xml"
-          }
+          "ref/net461/System.ComponentModel.Annotations.dll": {}
         },
         "runtime": {
           "lib/net461/System.ComponentModel.Annotations.dll": {}
@@ -105,14 +87,10 @@
           "mscorlib"
         ],
         "compile": {
-          "lib/net461/System.Memory.dll": {
-            "related": ".xml"
-          }
+          "lib/net461/System.Memory.dll": {}
         },
         "runtime": {
-          "lib/net461/System.Memory.dll": {
-            "related": ".xml"
-          }
+          "lib/net461/System.Memory.dll": {}
         }
       },
       "System.Numerics.Vectors/4.5.0": {
@@ -122,14 +100,10 @@
           "mscorlib"
         ],
         "compile": {
-          "ref/net46/System.Numerics.Vectors.dll": {
-            "related": ".xml"
-          }
+          "ref/net46/System.Numerics.Vectors.dll": {}
         },
         "runtime": {
-          "lib/net46/System.Numerics.Vectors.dll": {
-            "related": ".xml"
-          }
+          "lib/net46/System.Numerics.Vectors.dll": {}
         }
       },
       "System.Runtime.CompilerServices.Unsafe/6.0.0": {
@@ -138,14 +112,10 @@
           "mscorlib"
         ],
         "compile": {
-          "lib/net461/System.Runtime.CompilerServices.Unsafe.dll": {
-            "related": ".xml"
-          }
+          "lib/net461/System.Runtime.CompilerServices.Unsafe.dll": {}
         },
         "runtime": {
-          "lib/net461/System.Runtime.CompilerServices.Unsafe.dll": {
-            "related": ".xml"
-          }
+          "lib/net461/System.Runtime.CompilerServices.Unsafe.dll": {}
         }
       },
       "System.Threading.Tasks.Extensions/4.5.4": {
@@ -157,14 +127,10 @@
           "mscorlib"
         ],
         "compile": {
-          "lib/net461/System.Threading.Tasks.Extensions.dll": {
-            "related": ".xml"
-          }
+          "lib/net461/System.Threading.Tasks.Extensions.dll": {}
         },
         "runtime": {
-          "lib/net461/System.Threading.Tasks.Extensions.dll": {
-            "related": ".xml"
-          }
+          "lib/net461/System.Threading.Tasks.Extensions.dll": {}
         }
       }
     },
@@ -178,14 +144,10 @@
           "System.Runtime.CompilerServices.Unsafe": "6.0.0"
         },
         "compile": {
-          "lib/netstandard2.0/CommunityToolkit.Mvvm.dll": {
-            "related": ".pdb;.xml"
-          }
+          "lib/netstandard2.0/CommunityToolkit.Mvvm.dll": {}
         },
         "runtime": {
-          "lib/netstandard2.0/CommunityToolkit.Mvvm.dll": {
-            "related": ".pdb;.xml"
-          }
+          "lib/netstandard2.0/CommunityToolkit.Mvvm.dll": {}
         },
         "build": {
           "buildTransitive/netstandard2.0/CommunityToolkit.Mvvm.targets": {}
@@ -197,14 +159,10 @@
           "System.Threading.Tasks.Extensions": "4.5.4"
         },
         "compile": {
-          "lib/net461/Microsoft.Bcl.AsyncInterfaces.dll": {
-            "related": ".xml"
-          }
+          "lib/net461/Microsoft.Bcl.AsyncInterfaces.dll": {}
         },
         "runtime": {
-          "lib/net461/Microsoft.Bcl.AsyncInterfaces.dll": {
-            "related": ".xml"
-          }
+          "lib/net461/Microsoft.Bcl.AsyncInterfaces.dll": {}
         }
       },
       "Microsoft.Xaml.Behaviors.Wpf/1.1.39": {
@@ -219,14 +177,10 @@
           "WindowsBase"
         ],
         "compile": {
-          "lib/net45/Microsoft.Xaml.Behaviors.dll": {
-            "related": ".pdb;.xml"
-          }
+          "lib/net45/Microsoft.Xaml.Behaviors.dll": {}
         },
         "runtime": {
-          "lib/net45/Microsoft.Xaml.Behaviors.dll": {
-            "related": ".pdb;.xml"
-          }
+          "lib/net45/Microsoft.Xaml.Behaviors.dll": {}
         }
       },
       "System.Buffers/4.5.1": {
@@ -235,14 +189,10 @@
           "mscorlib"
         ],
         "compile": {
-          "ref/net45/System.Buffers.dll": {
-            "related": ".xml"
-          }
+          "ref/net45/System.Buffers.dll": {}
         },
         "runtime": {
-          "lib/net461/System.Buffers.dll": {
-            "related": ".xml"
-          }
+          "lib/net461/System.Buffers.dll": {}
         }
       },
       "System.ComponentModel.Annotations/5.0.0": {
@@ -252,9 +202,7 @@
           "mscorlib"
         ],
         "compile": {
-          "ref/net461/System.ComponentModel.Annotations.dll": {
-            "related": ".xml"
-          }
+          "ref/net461/System.ComponentModel.Annotations.dll": {}
         },
         "runtime": {
           "lib/net461/System.ComponentModel.Annotations.dll": {}
@@ -272,14 +220,10 @@
           "mscorlib"
         ],
         "compile": {
-          "lib/net461/System.Memory.dll": {
-            "related": ".xml"
-          }
+          "lib/net461/System.Memory.dll": {}
         },
         "runtime": {
-          "lib/net461/System.Memory.dll": {
-            "related": ".xml"
-          }
+          "lib/net461/System.Memory.dll": {}
         }
       },
       "System.Numerics.Vectors/4.5.0": {
@@ -289,14 +233,10 @@
           "mscorlib"
         ],
         "compile": {
-          "ref/net46/System.Numerics.Vectors.dll": {
-            "related": ".xml"
-          }
+          "ref/net46/System.Numerics.Vectors.dll": {}
         },
         "runtime": {
-          "lib/net46/System.Numerics.Vectors.dll": {
-            "related": ".xml"
-          }
+          "lib/net46/System.Numerics.Vectors.dll": {}
         }
       },
       "System.Runtime.CompilerServices.Unsafe/6.0.0": {
@@ -305,14 +245,10 @@
           "mscorlib"
         ],
         "compile": {
-          "lib/net461/System.Runtime.CompilerServices.Unsafe.dll": {
-            "related": ".xml"
-          }
+          "lib/net461/System.Runtime.CompilerServices.Unsafe.dll": {}
         },
         "runtime": {
-          "lib/net461/System.Runtime.CompilerServices.Unsafe.dll": {
-            "related": ".xml"
-          }
+          "lib/net461/System.Runtime.CompilerServices.Unsafe.dll": {}
         }
       },
       "System.Threading.Tasks.Extensions/4.5.4": {
@@ -324,14 +260,10 @@
           "mscorlib"
         ],
         "compile": {
-          "lib/net461/System.Threading.Tasks.Extensions.dll": {
-            "related": ".xml"
-          }
+          "lib/net461/System.Threading.Tasks.Extensions.dll": {}
         },
         "runtime": {
-          "lib/net461/System.Threading.Tasks.Extensions.dll": {
-            "related": ".xml"
-          }
+          "lib/net461/System.Threading.Tasks.Extensions.dll": {}
         }
       }
     },
@@ -345,14 +277,10 @@
           "System.Runtime.CompilerServices.Unsafe": "6.0.0"
         },
         "compile": {
-          "lib/netstandard2.0/CommunityToolkit.Mvvm.dll": {
-            "related": ".pdb;.xml"
-          }
+          "lib/netstandard2.0/CommunityToolkit.Mvvm.dll": {}
         },
         "runtime": {
-          "lib/netstandard2.0/CommunityToolkit.Mvvm.dll": {
-            "related": ".pdb;.xml"
-          }
+          "lib/netstandard2.0/CommunityToolkit.Mvvm.dll": {}
         },
         "build": {
           "buildTransitive/netstandard2.0/CommunityToolkit.Mvvm.targets": {}
@@ -364,14 +292,10 @@
           "System.Threading.Tasks.Extensions": "4.5.4"
         },
         "compile": {
-          "lib/net461/Microsoft.Bcl.AsyncInterfaces.dll": {
-            "related": ".xml"
-          }
+          "lib/net461/Microsoft.Bcl.AsyncInterfaces.dll": {}
         },
         "runtime": {
-          "lib/net461/Microsoft.Bcl.AsyncInterfaces.dll": {
-            "related": ".xml"
-          }
+          "lib/net461/Microsoft.Bcl.AsyncInterfaces.dll": {}
         }
       },
       "Microsoft.Xaml.Behaviors.Wpf/1.1.39": {
@@ -386,14 +310,10 @@
           "WindowsBase"
         ],
         "compile": {
-          "lib/net45/Microsoft.Xaml.Behaviors.dll": {
-            "related": ".pdb;.xml"
-          }
+          "lib/net45/Microsoft.Xaml.Behaviors.dll": {}
         },
         "runtime": {
-          "lib/net45/Microsoft.Xaml.Behaviors.dll": {
-            "related": ".pdb;.xml"
-          }
+          "lib/net45/Microsoft.Xaml.Behaviors.dll": {}
         }
       },
       "System.Buffers/4.5.1": {
@@ -402,14 +322,10 @@
           "mscorlib"
         ],
         "compile": {
-          "ref/net45/System.Buffers.dll": {
-            "related": ".xml"
-          }
+          "ref/net45/System.Buffers.dll": {}
         },
         "runtime": {
-          "lib/net461/System.Buffers.dll": {
-            "related": ".xml"
-          }
+          "lib/net461/System.Buffers.dll": {}
         }
       },
       "System.ComponentModel.Annotations/5.0.0": {
@@ -419,9 +335,7 @@
           "mscorlib"
         ],
         "compile": {
-          "ref/net461/System.ComponentModel.Annotations.dll": {
-            "related": ".xml"
-          }
+          "ref/net461/System.ComponentModel.Annotations.dll": {}
         },
         "runtime": {
           "lib/net461/System.ComponentModel.Annotations.dll": {}
@@ -439,14 +353,10 @@
           "mscorlib"
         ],
         "compile": {
-          "lib/net461/System.Memory.dll": {
-            "related": ".xml"
-          }
+          "lib/net461/System.Memory.dll": {}
         },
         "runtime": {
-          "lib/net461/System.Memory.dll": {
-            "related": ".xml"
-          }
+          "lib/net461/System.Memory.dll": {}
         }
       },
       "System.Numerics.Vectors/4.5.0": {
@@ -456,14 +366,10 @@
           "mscorlib"
         ],
         "compile": {
-          "ref/net46/System.Numerics.Vectors.dll": {
-            "related": ".xml"
-          }
+          "ref/net46/System.Numerics.Vectors.dll": {}
         },
         "runtime": {
-          "lib/net46/System.Numerics.Vectors.dll": {
-            "related": ".xml"
-          }
+          "lib/net46/System.Numerics.Vectors.dll": {}
         }
       },
       "System.Runtime.CompilerServices.Unsafe/6.0.0": {
@@ -472,14 +378,10 @@
           "mscorlib"
         ],
         "compile": {
-          "lib/net461/System.Runtime.CompilerServices.Unsafe.dll": {
-            "related": ".xml"
-          }
+          "lib/net461/System.Runtime.CompilerServices.Unsafe.dll": {}
         },
         "runtime": {
-          "lib/net461/System.Runtime.CompilerServices.Unsafe.dll": {
-            "related": ".xml"
-          }
+          "lib/net461/System.Runtime.CompilerServices.Unsafe.dll": {}
         }
       },
       "System.Threading.Tasks.Extensions/4.5.4": {
@@ -491,14 +393,10 @@
           "mscorlib"
         ],
         "compile": {
-          "lib/net461/System.Threading.Tasks.Extensions.dll": {
-            "related": ".xml"
-          }
+          "lib/net461/System.Threading.Tasks.Extensions.dll": {}
         },
         "runtime": {
-          "lib/net461/System.Threading.Tasks.Extensions.dll": {
-            "related": ".xml"
-          }
+          "lib/net461/System.Threading.Tasks.Extensions.dll": {}
         }
       }
     },
@@ -512,14 +410,10 @@
           "System.Runtime.CompilerServices.Unsafe": "6.0.0"
         },
         "compile": {
-          "lib/netstandard2.0/CommunityToolkit.Mvvm.dll": {
-            "related": ".pdb;.xml"
-          }
+          "lib/netstandard2.0/CommunityToolkit.Mvvm.dll": {}
         },
         "runtime": {
-          "lib/netstandard2.0/CommunityToolkit.Mvvm.dll": {
-            "related": ".pdb;.xml"
-          }
+          "lib/netstandard2.0/CommunityToolkit.Mvvm.dll": {}
         },
         "build": {
           "buildTransitive/netstandard2.0/CommunityToolkit.Mvvm.targets": {}
@@ -531,14 +425,10 @@
           "System.Threading.Tasks.Extensions": "4.5.4"
         },
         "compile": {
-          "lib/net461/Microsoft.Bcl.AsyncInterfaces.dll": {
-            "related": ".xml"
-          }
+          "lib/net461/Microsoft.Bcl.AsyncInterfaces.dll": {}
         },
         "runtime": {
-          "lib/net461/Microsoft.Bcl.AsyncInterfaces.dll": {
-            "related": ".xml"
-          }
+          "lib/net461/Microsoft.Bcl.AsyncInterfaces.dll": {}
         }
       },
       "Microsoft.Xaml.Behaviors.Wpf/1.1.39": {
@@ -553,14 +443,10 @@
           "WindowsBase"
         ],
         "compile": {
-          "lib/net45/Microsoft.Xaml.Behaviors.dll": {
-            "related": ".pdb;.xml"
-          }
+          "lib/net45/Microsoft.Xaml.Behaviors.dll": {}
         },
         "runtime": {
-          "lib/net45/Microsoft.Xaml.Behaviors.dll": {
-            "related": ".pdb;.xml"
-          }
+          "lib/net45/Microsoft.Xaml.Behaviors.dll": {}
         }
       },
       "System.Buffers/4.5.1": {
@@ -569,14 +455,10 @@
           "mscorlib"
         ],
         "compile": {
-          "ref/net45/System.Buffers.dll": {
-            "related": ".xml"
-          }
+          "ref/net45/System.Buffers.dll": {}
         },
         "runtime": {
-          "lib/net461/System.Buffers.dll": {
-            "related": ".xml"
-          }
+          "lib/net461/System.Buffers.dll": {}
         }
       },
       "System.ComponentModel.Annotations/5.0.0": {
@@ -586,9 +468,7 @@
           "mscorlib"
         ],
         "compile": {
-          "ref/net461/System.ComponentModel.Annotations.dll": {
-            "related": ".xml"
-          }
+          "ref/net461/System.ComponentModel.Annotations.dll": {}
         },
         "runtime": {
           "lib/net461/System.ComponentModel.Annotations.dll": {}
@@ -606,14 +486,10 @@
           "mscorlib"
         ],
         "compile": {
-          "lib/net461/System.Memory.dll": {
-            "related": ".xml"
-          }
+          "lib/net461/System.Memory.dll": {}
         },
         "runtime": {
-          "lib/net461/System.Memory.dll": {
-            "related": ".xml"
-          }
+          "lib/net461/System.Memory.dll": {}
         }
       },
       "System.Numerics.Vectors/4.5.0": {
@@ -623,14 +499,10 @@
           "mscorlib"
         ],
         "compile": {
-          "ref/net46/System.Numerics.Vectors.dll": {
-            "related": ".xml"
-          }
+          "ref/net46/System.Numerics.Vectors.dll": {}
         },
         "runtime": {
-          "lib/net46/System.Numerics.Vectors.dll": {
-            "related": ".xml"
-          }
+          "lib/net46/System.Numerics.Vectors.dll": {}
         }
       },
       "System.Runtime.CompilerServices.Unsafe/6.0.0": {
@@ -639,14 +511,10 @@
           "mscorlib"
         ],
         "compile": {
-          "lib/net461/System.Runtime.CompilerServices.Unsafe.dll": {
-            "related": ".xml"
-          }
+          "lib/net461/System.Runtime.CompilerServices.Unsafe.dll": {}
         },
         "runtime": {
-          "lib/net461/System.Runtime.CompilerServices.Unsafe.dll": {
-            "related": ".xml"
-          }
+          "lib/net461/System.Runtime.CompilerServices.Unsafe.dll": {}
         }
       },
       "System.Threading.Tasks.Extensions/4.5.4": {
@@ -658,14 +526,10 @@
           "mscorlib"
         ],
         "compile": {
-          "lib/net461/System.Threading.Tasks.Extensions.dll": {
-            "related": ".xml"
-          }
+          "lib/net461/System.Threading.Tasks.Extensions.dll": {}
         },
         "runtime": {
-          "lib/net461/System.Threading.Tasks.Extensions.dll": {
-            "related": ".xml"
-          }
+          "lib/net461/System.Threading.Tasks.Extensions.dll": {}
         }
       }
     }
@@ -1006,24 +870,24 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\53-liu-yq\\.nuget\\packages\\": {},
+    "C:\\Users\\LYQ\\.nuget\\packages\\": {},
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\github\\TimeIsLife\\TestApp\\TestApp.csproj",
+      "projectUniqueName": "D:\\GitHub\\TimeIsLife\\TestApp\\TestApp.csproj",
       "projectName": "TestApp",
-      "projectPath": "D:\\github\\TimeIsLife\\TestApp\\TestApp.csproj",
-      "packagesPath": "C:\\Users\\53-liu-yq\\.nuget\\packages\\",
-      "outputPath": "D:\\github\\TimeIsLife\\TestApp\\obj\\",
+      "projectPath": "D:\\GitHub\\TimeIsLife\\TestApp\\TestApp.csproj",
+      "packagesPath": "C:\\Users\\LYQ\\.nuget\\packages\\",
+      "outputPath": "D:\\GitHub\\TimeIsLife\\TestApp\\obj\\",
       "projectStyle": "PackageReference",
       "skipContentFileWrite": true,
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
       ],
       "configFilePaths": [
-        "C:\\Users\\53-liu-yq\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\LYQ\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],

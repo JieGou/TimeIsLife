@@ -39,7 +39,6 @@ namespace TimeIsLife.ViewModel
             SetCurrentStatusCommand = new RelayCommand(SetCurrentStatus);
             AlignUcsCommand = new RelayCommand(AlignUcs);
             EquipmentAngleCommand = new RelayCommand(EquipmentAngle);
-            PlineEquallyDividedCommand = new RelayCommand(PlineEquallyDivided);
             ExplodeMInsertBlockCommand = new RelayCommand(ExplodeMInsertBlock);
 
             //矩形布置
@@ -66,6 +65,7 @@ namespace TimeIsLife.ViewModel
             BlockAngle = BlockAngles[0];
             Distance = Distances[1];
 
+            IsAlongTheLine = true;
             IsLengthOrCount = true;
         }
 
@@ -202,12 +202,6 @@ namespace TimeIsLife.ViewModel
             Application.DocumentManager.MdiActiveDocument.SendStringToExecute("F5_EquipmentAngle\n", true, false, false);
         }
 
-        public IRelayCommand PlineEquallyDividedCommand { get; }
-        void PlineEquallyDivided()
-        {
-            Application.DocumentManager.MdiActiveDocument.SendStringToExecute("FF_PlineEquallyDivided\n", true, false, false);
-        }
-
         public IRelayCommand ExplodeMInsertBlockCommand { get; }
         void ExplodeMInsertBlock()
         {
@@ -328,12 +322,11 @@ namespace TimeIsLife.ViewModel
 
         #endregion
 
-
         #region 灯具沿线布置
 
-        //灯具布置间距
-        private double lightingLineCount;
-        public double LightingLineCount
+        //灯具布置数量
+        private int lightingLineCount;
+        public int LightingLineCount
         {
             get => lightingLineCount;
             set => SetProperty(ref lightingLineCount, value);

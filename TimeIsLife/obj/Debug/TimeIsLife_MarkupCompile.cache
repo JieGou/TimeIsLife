@@ -4,17 +4,17 @@
 library
 C#
 .cs
-D:\github\TimeIsLife\TimeIsLife\obj\Debug\
+D:\GitHub\TimeIsLife\TimeIsLife\obj\Debug\
 TimeIsLife
 none
 false
 DEBUG;TRACE
 
-2-2012032105
+5986419213
 
 15-430573615
-45328155456
-View\ElectricaView.xaml;Shared.xaml;
+451551881504
+Resources\Button.xaml;Resources\ComboBox.xaml;View\ElectricaView.xaml;Resources\Shared.xaml;Resources\Expander.xaml;
 
 False
 
