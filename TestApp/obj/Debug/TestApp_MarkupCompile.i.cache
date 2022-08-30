@@ -4,17 +4,17 @@
 winexe
 C#
 .cs
-D:\GitHub\TimeIsLife\TestApp\obj\Debug\
+D:\github\TimeIsLife\TestApp\obj\Debug\
 TestApp
 none
 false
 DEBUG;TRACE
-D:\GitHub\TimeIsLife\TestApp\App.xaml
+D:\github\TimeIsLife\TestApp\App.xaml
 21462763364
 
 7757920554
-26201639962
+16194636948
 Shared.xaml;MainWindow.xaml;
 
-False
+True
 
