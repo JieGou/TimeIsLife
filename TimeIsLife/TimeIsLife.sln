@@ -7,7 +7,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TimeIsLife", "TimeIsLife.cs
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestApp", "..\TestApp\TestApp.csproj", "{7FCEB4DA-1EC9-45B0-A55B-2F0618F499DC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Names", "..\Names\Names.csproj", "{48C2BD5E-2C46-4338-9E1E-B6CEB601A2C6}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Names", "..\Names\Names.csproj", "{48C2BD5E-2C46-4338-9E1E-B6CEB601A2C6}"
+EndProject
+Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "TimeIsLifeInstaller", "..\TimeIsLifeInstaller\TimeIsLifeInstaller.vdproj", "{C07E6CF6-B313-4379-8EEB-0B83151C2707}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -83,6 +85,16 @@ Global
 		{48C2BD5E-2C46-4338-9E1E-B6CEB601A2C6}.Release|x64.Build.0 = Release|Any CPU
 		{48C2BD5E-2C46-4338-9E1E-B6CEB601A2C6}.Release|x86.ActiveCfg = Release|Any CPU
 		{48C2BD5E-2C46-4338-9E1E-B6CEB601A2C6}.Release|x86.Build.0 = Release|Any CPU
+		{C07E6CF6-B313-4379-8EEB-0B83151C2707}.Debug|Any CPU.ActiveCfg = Debug
+		{C07E6CF6-B313-4379-8EEB-0B83151C2707}.Debug|ARM.ActiveCfg = Debug
+		{C07E6CF6-B313-4379-8EEB-0B83151C2707}.Debug|ARM64.ActiveCfg = Debug
+		{C07E6CF6-B313-4379-8EEB-0B83151C2707}.Debug|x64.ActiveCfg = Debug
+		{C07E6CF6-B313-4379-8EEB-0B83151C2707}.Debug|x86.ActiveCfg = Debug
+		{C07E6CF6-B313-4379-8EEB-0B83151C2707}.Release|Any CPU.ActiveCfg = Release
+		{C07E6CF6-B313-4379-8EEB-0B83151C2707}.Release|ARM.ActiveCfg = Release
+		{C07E6CF6-B313-4379-8EEB-0B83151C2707}.Release|ARM64.ActiveCfg = Release
+		{C07E6CF6-B313-4379-8EEB-0B83151C2707}.Release|x64.ActiveCfg = Release
+		{C07E6CF6-B313-4379-8EEB-0B83151C2707}.Release|x86.ActiveCfg = Release
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
