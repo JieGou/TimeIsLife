@@ -138,6 +138,7 @@ namespace TestApp
                 if (keyApplication.GetValue("MANAGED") != null)
                 {
                     //在列表框中添加.NET程序的名字和程序路径
+                    //CadDll cadDll = new CadDll(keyApplication.GetValue("DESCRIPTION").ToString(), keyApplication.GetValue("LOADER").ToString());
                     CadDll cadDll = new CadDll()
                     {
                         Name = keyApplication.GetValue("DESCRIPTION").ToString(),
@@ -194,9 +195,31 @@ namespace TestApp
 
     }
 
-    public class CadDll
+    public class CadDll: ObservableObject
     {
+
+        //public CadDll(string name, string path)
+        //{
+        //    Name = name; 
+        //    Path = path;
+        //}
+
+        //private string name;
+        //public string Name
+        //{
+        //    get => name;
+        //    set => SetProperty(ref name, value);
+        //}
+
+        //private string path;
+        //public string Path
+        //{
+        //    get => path;
+        //    set => SetProperty(ref path, value);
+        //}
+
         public string Name { get; set; }
         public string Path { get; set; }
+
     }
 }

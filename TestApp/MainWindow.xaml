@@ -22,46 +22,62 @@
             <ColumnDefinition />
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
-        <StackPanel Grid.Row="0" Grid.Column="0">
+        <StackPanel
+            Grid.Row="0"
+            Grid.Column="0">
             <Label Content="当前AutoCAD版本" />
             <TextBox Text="{Binding CadName}" />
             <Label Content="NET程序路径" />
             <TextBox Text="{Binding DllPath}" />
-            <Button Command="{Binding FileBrowseCommand}" Content="浏览..." />
+            <Button
+                Command="{Binding FileBrowseCommand}"
+                Content="浏览..." />
             <Label Content="应用程序名" />
             <TextBox Text="{Binding AppName}" />
             <Label Content="应用程序描述" />
             <TextBox Text="{Binding AppDesc}" />
         </StackPanel>
-        <StackPanel Grid.Row="1" Grid.Column="0">
-            <Button Command="{Binding AddRegistryKeyCommand}" Content="加入注册表" />
-            <Button Command="{Binding RemoveRegistryKeyCommand}" Content="删除注册表" />
-            <Button Command="{Binding Exit}" Content="退出" />
-            <CheckBox Content="IsCurrentUser" IsChecked="{Binding IsCurrentUser}"/>
-            <CheckBox Content="IsOverWrite" IsChecked="{Binding IsOverWrite}"/>
+        <StackPanel
+            Grid.Row="1"
+            Grid.Column="0">
+            <Button
+                Command="{Binding AddRegistryKeyCommand}"
+                Content="加入注册表" />
+            <Button
+                Command="{Binding RemoveRegistryKeyCommand}"
+                Content="删除注册表" />
+            <Button
+                Command="{Binding Exit}"
+                Content="退出" />
+            <CheckBox
+                Content="IsCurrentUser"
+                IsChecked="{Binding IsCurrentUser}" />
+            <CheckBox
+                Content="IsOverWrite"
+                IsChecked="{Binding IsOverWrite}" />
         </StackPanel>
         <StackPanel
             Grid.Row="0"
             Grid.RowSpan="2"
             Grid.Column="1">
             <Label Content="已自动加载的.NET程序集：" />
+            <Button
+                Command="{Binding}"
+                Content="加载..." />
             <ListView ItemsSource="{Binding CadDlls}">
                 <ListView.View>
                     <GridView>
-                        <GridView.Columns>
-                            <GridViewColumn
-                                Width="50"
-                                DisplayMemberBinding="{Binding CadDll.Name}"
-                                Header="程序名" />
-                            <GridViewColumn
-                                Width="100"
-                                DisplayMemberBinding="{Binding CadDll.Path}"
-                                Header="文件路径" />
-                        </GridView.Columns>
+                        <GridViewColumn
+                            Width="150"
+                            DisplayMemberBinding="{Binding Name}"
+                            Header="程序名" />
+                        <GridViewColumn
+                            Width="300"
+                            DisplayMemberBinding="{Binding Path}"
+                            Header="文件路径" />
                     </GridView>
                 </ListView.View>
             </ListView>
-            
         </StackPanel>
     </Grid>
 </Window>

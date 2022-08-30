@@ -66,6 +66,7 @@
     <Reference Include="DotNetARX, Version=1.0.0.0, Culture=neutral, processorArchitecture=AMD64">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>Ref\DotNetARX.dll</HintPath>
+      <Private>True</Private>
     </Reference>
     <Reference Include="PresentationFramework.Aero2" />
     <Reference Include="System" />

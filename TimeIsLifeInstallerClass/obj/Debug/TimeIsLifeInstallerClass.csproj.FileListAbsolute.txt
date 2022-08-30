@@ -1,0 +1,6 @@
+D:\github\TimeIsLife\TimeIsLifeInstallerClass\bin\Debug\TimeIsLifeInstallerClass.dll
+D:\github\TimeIsLife\TimeIsLifeInstallerClass\bin\Debug\TimeIsLifeInstallerClass.pdb
+D:\github\TimeIsLife\TimeIsLifeInstallerClass\obj\Debug\TimeIsLifeInstallerClass.csproj.AssemblyReference.cache
+D:\github\TimeIsLife\TimeIsLifeInstallerClass\obj\Debug\TimeIsLifeInstallerClass.csproj.CoreCompileInputs.cache
+D:\github\TimeIsLife\TimeIsLifeInstallerClass\obj\Debug\TimeIsLifeInstallerClass.dll
+D:\github\TimeIsLife\TimeIsLifeInstallerClass\obj\Debug\TimeIsLifeInstallerClass.pdb
