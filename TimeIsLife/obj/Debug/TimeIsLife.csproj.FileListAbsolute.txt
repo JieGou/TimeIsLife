@@ -1,3 +1,7 @@
+D:\GitHub\TimeIsLife\TimeIsLife\bin\Debug\TimeIsLife.dll
+D:\GitHub\TimeIsLife\TimeIsLife\bin\Debug\CommunityToolkit.Mvvm.dll
+D:\GitHub\TimeIsLife\TimeIsLife\bin\Debug\Microsoft.Xaml.Behaviors.dll
+D:\GitHub\TimeIsLife\TimeIsLife\bin\Debug\System.Memory.dll
 D:\GitHub\TimeIsLife\TimeIsLife\bin\Debug\Block\FA-08-智能型点型感烟探测器.dwg
 D:\GitHub\TimeIsLife\TimeIsLife\bin\Debug\FA\FA-01-接线端子箱.dwg
 D:\GitHub\TimeIsLife\TimeIsLife\bin\Debug\FA\FA-02-带消防电话插孔的手动报警按钮.dwg
@@ -41,7 +45,6 @@ D:\GitHub\TimeIsLife\TimeIsLife\bin\Debug\FA\火灾自动报警图例及示例.d
 D:\GitHub\TimeIsLife\TimeIsLife\bin\Debug\FA\操作说明.txt
 D:\GitHub\TimeIsLife\TimeIsLife\bin\Debug\Ref\DotNetARX.dll
 D:\GitHub\TimeIsLife\TimeIsLife\bin\Debug\TimeIsLife.dll.config
-D:\GitHub\TimeIsLife\TimeIsLife\bin\Debug\TimeIsLife.dll
 D:\GitHub\TimeIsLife\TimeIsLife\bin\Debug\TimeIsLife.pdb
 D:\GitHub\TimeIsLife\TimeIsLife\bin\Debug\AcCui.dll
 D:\GitHub\TimeIsLife\TimeIsLife\bin\Debug\AcDx.dll
@@ -56,20 +59,17 @@ D:\GitHub\TimeIsLife\TimeIsLife\bin\Debug\AdWindows.dll
 D:\GitHub\TimeIsLife\TimeIsLife\bin\Debug\AcCoreMgd.dll
 D:\GitHub\TimeIsLife\TimeIsLife\bin\Debug\AcDbMgd.dll
 D:\GitHub\TimeIsLife\TimeIsLife\bin\Debug\acdbmgdbrep.dll
-D:\GitHub\TimeIsLife\TimeIsLife\bin\Debug\CommunityToolkit.Mvvm.dll
 D:\GitHub\TimeIsLife\TimeIsLife\bin\Debug\CommunityToolkit.Mvvm.pdb
 D:\GitHub\TimeIsLife\TimeIsLife\bin\Debug\Dapper.dll
 D:\GitHub\TimeIsLife\TimeIsLife\bin\Debug\EntityFramework.SqlServer.dll
 D:\GitHub\TimeIsLife\TimeIsLife\bin\Debug\EntityFramework.dll
 D:\GitHub\TimeIsLife\TimeIsLife\bin\Debug\Microsoft.Bcl.AsyncInterfaces.dll
-D:\GitHub\TimeIsLife\TimeIsLife\bin\Debug\Microsoft.Xaml.Behaviors.dll
 D:\GitHub\TimeIsLife\TimeIsLife\bin\Debug\Microsoft.Xaml.Behaviors.pdb
 D:\GitHub\TimeIsLife\TimeIsLife\bin\Debug\System.Data.SQLite.dll
 D:\GitHub\TimeIsLife\TimeIsLife\bin\Debug\System.Buffers.dll
 D:\GitHub\TimeIsLife\TimeIsLife\bin\Debug\System.ComponentModel.Annotations.dll
 D:\GitHub\TimeIsLife\TimeIsLife\bin\Debug\System.Data.SQLite.EF6.dll
 D:\GitHub\TimeIsLife\TimeIsLife\bin\Debug\System.Data.SQLite.Linq.dll
-D:\GitHub\TimeIsLife\TimeIsLife\bin\Debug\System.Memory.dll
 D:\GitHub\TimeIsLife\TimeIsLife\bin\Debug\System.Numerics.Vectors.dll
 D:\GitHub\TimeIsLife\TimeIsLife\bin\Debug\System.Runtime.CompilerServices.Unsafe.dll
 D:\GitHub\TimeIsLife\TimeIsLife\bin\Debug\System.Threading.Tasks.Extensions.dll

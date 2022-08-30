@@ -8,68 +8,28 @@
           "AutoCAD.NET.Core": "[24.2.0]"
         },
         "compile": {
-          "lib/net47/AcCui.dll": {
-            "related": ".xml"
-          },
-          "lib/net47/AcDx.dll": {
-            "related": ".xml"
-          },
-          "lib/net47/AcMgd.dll": {
-            "related": ".xml"
-          },
-          "lib/net47/AcMr.dll": {
-            "related": ".xml"
-          },
-          "lib/net47/AcSeamless.dll": {
-            "related": ".xml"
-          },
-          "lib/net47/AcTcMgd.dll": {
-            "related": ".xml"
-          },
-          "lib/net47/AcWindows.dll": {
-            "related": ".xml"
-          },
-          "lib/net47/AdUIMgd.dll": {
-            "related": ".xml"
-          },
-          "lib/net47/AdUiPalettes.dll": {
-            "related": ".xml"
-          },
-          "lib/net47/AdWindows.dll": {
-            "related": ".xml"
-          }
+          "lib/net47/AcCui.dll": {},
+          "lib/net47/AcDx.dll": {},
+          "lib/net47/AcMgd.dll": {},
+          "lib/net47/AcMr.dll": {},
+          "lib/net47/AcSeamless.dll": {},
+          "lib/net47/AcTcMgd.dll": {},
+          "lib/net47/AcWindows.dll": {},
+          "lib/net47/AdUIMgd.dll": {},
+          "lib/net47/AdUiPalettes.dll": {},
+          "lib/net47/AdWindows.dll": {}
         },
         "runtime": {
-          "lib/net47/AcCui.dll": {
-            "related": ".xml"
-          },
-          "lib/net47/AcDx.dll": {
-            "related": ".xml"
-          },
-          "lib/net47/AcMgd.dll": {
-            "related": ".xml"
-          },
-          "lib/net47/AcMr.dll": {
-            "related": ".xml"
-          },
-          "lib/net47/AcSeamless.dll": {
-            "related": ".xml"
-          },
-          "lib/net47/AcTcMgd.dll": {
-            "related": ".xml"
-          },
-          "lib/net47/AcWindows.dll": {
-            "related": ".xml"
-          },
-          "lib/net47/AdUIMgd.dll": {
-            "related": ".xml"
-          },
-          "lib/net47/AdUiPalettes.dll": {
-            "related": ".xml"
-          },
-          "lib/net47/AdWindows.dll": {
-            "related": ".xml"
-          }
+          "lib/net47/AcCui.dll": {},
+          "lib/net47/AcDx.dll": {},
+          "lib/net47/AcMgd.dll": {},
+          "lib/net47/AcMr.dll": {},
+          "lib/net47/AcSeamless.dll": {},
+          "lib/net47/AcTcMgd.dll": {},
+          "lib/net47/AcWindows.dll": {},
+          "lib/net47/AdUIMgd.dll": {},
+          "lib/net47/AdUiPalettes.dll": {},
+          "lib/net47/AdWindows.dll": {}
         }
       },
       "AutoCAD.NET.Core/24.2.0": {
@@ -78,28 +38,20 @@
           "AutoCAD.NET.Model": "[24.2.0]"
         },
         "compile": {
-          "lib/net47/AcCoreMgd.dll": {
-            "related": ".xml"
-          }
+          "lib/net47/AcCoreMgd.dll": {}
         },
         "runtime": {
-          "lib/net47/AcCoreMgd.dll": {
-            "related": ".xml"
-          }
+          "lib/net47/AcCoreMgd.dll": {}
         }
       },
       "AutoCAD.NET.Model/24.2.0": {
         "type": "package",
         "compile": {
-          "lib/net47/AcDbMgd.dll": {
-            "related": ".xml"
-          },
+          "lib/net47/AcDbMgd.dll": {},
           "lib/net47/acdbmgdbrep.dll": {}
         },
         "runtime": {
-          "lib/net47/AcDbMgd.dll": {
-            "related": ".xml"
-          },
+          "lib/net47/AcDbMgd.dll": {},
           "lib/net47/acdbmgdbrep.dll": {}
         }
       },
@@ -112,14 +64,10 @@
           "System.Runtime.CompilerServices.Unsafe": "6.0.0"
         },
         "compile": {
-          "lib/netstandard2.0/CommunityToolkit.Mvvm.dll": {
-            "related": ".pdb;.xml"
-          }
+          "lib/netstandard2.0/CommunityToolkit.Mvvm.dll": {}
         },
         "runtime": {
-          "lib/netstandard2.0/CommunityToolkit.Mvvm.dll": {
-            "related": ".pdb;.xml"
-          }
+          "lib/netstandard2.0/CommunityToolkit.Mvvm.dll": {}
         },
         "build": {
           "buildTransitive/netstandard2.0/CommunityToolkit.Mvvm.targets": {}
@@ -128,14 +76,10 @@
       "Dapper/2.0.123": {
         "type": "package",
         "compile": {
-          "lib/net461/Dapper.dll": {
-            "related": ".xml"
-          }
+          "lib/net461/Dapper.dll": {}
         },
         "runtime": {
-          "lib/net461/Dapper.dll": {
-            "related": ".xml"
-          }
+          "lib/net461/Dapper.dll": {}
         }
       },
       "EntityFramework/6.4.4": {
@@ -144,20 +88,12 @@
           "System.ComponentModel.DataAnnotations"
         ],
         "compile": {
-          "lib/net45/EntityFramework.SqlServer.dll": {
-            "related": ".xml"
-          },
-          "lib/net45/EntityFramework.dll": {
-            "related": ".SqlServer.xml;.xml"
-          }
+          "lib/net45/EntityFramework.SqlServer.dll": {},
+          "lib/net45/EntityFramework.dll": {}
         },
         "runtime": {
-          "lib/net45/EntityFramework.SqlServer.dll": {
-            "related": ".xml"
-          },
-          "lib/net45/EntityFramework.dll": {
-            "related": ".SqlServer.xml;.xml"
-          }
+          "lib/net45/EntityFramework.SqlServer.dll": {},
+          "lib/net45/EntityFramework.dll": {}
         },
         "build": {
           "buildTransitive/EntityFramework.props": {},
@@ -170,14 +106,10 @@
           "System.Threading.Tasks.Extensions": "4.5.4"
         },
         "compile": {
-          "lib/net461/Microsoft.Bcl.AsyncInterfaces.dll": {
-            "related": ".xml"
-          }
+          "lib/net461/Microsoft.Bcl.AsyncInterfaces.dll": {}
         },
         "runtime": {
-          "lib/net461/Microsoft.Bcl.AsyncInterfaces.dll": {
-            "related": ".xml"
-          }
+          "lib/net461/Microsoft.Bcl.AsyncInterfaces.dll": {}
         }
       },
       "Microsoft.Xaml.Behaviors.Wpf/1.1.39": {
@@ -192,27 +124,19 @@
           "WindowsBase"
         ],
         "compile": {
-          "lib/net45/Microsoft.Xaml.Behaviors.dll": {
-            "related": ".pdb;.xml"
-          }
+          "lib/net45/Microsoft.Xaml.Behaviors.dll": {}
         },
         "runtime": {
-          "lib/net45/Microsoft.Xaml.Behaviors.dll": {
-            "related": ".pdb;.xml"
-          }
+          "lib/net45/Microsoft.Xaml.Behaviors.dll": {}
         }
       },
       "Stub.System.Data.SQLite.Core.NetFramework/1.0.116": {
         "type": "package",
         "compile": {
-          "lib/net46/System.Data.SQLite.dll": {
-            "related": ".dll.altconfig;.xml"
-          }
+          "lib/net46/System.Data.SQLite.dll": {}
         },
         "runtime": {
-          "lib/net46/System.Data.SQLite.dll": {
-            "related": ".dll.altconfig;.xml"
-          }
+          "lib/net46/System.Data.SQLite.dll": {}
         },
         "build": {
           "buildTransitive/net46/Stub.System.Data.SQLite.Core.NetFramework.targets": {}
@@ -224,14 +148,10 @@
           "mscorlib"
         ],
         "compile": {
-          "ref/net45/System.Buffers.dll": {
-            "related": ".xml"
-          }
+          "ref/net45/System.Buffers.dll": {}
         },
         "runtime": {
-          "lib/net461/System.Buffers.dll": {
-            "related": ".xml"
-          }
+          "lib/net461/System.Buffers.dll": {}
         }
       },
       "System.ComponentModel.Annotations/5.0.0": {
@@ -241,9 +161,7 @@
           "mscorlib"
         ],
         "compile": {
-          "ref/net461/System.ComponentModel.Annotations.dll": {
-            "related": ".xml"
-          }
+          "ref/net461/System.ComponentModel.Annotations.dll": {}
         },
         "runtime": {
           "lib/net461/System.ComponentModel.Annotations.dll": {}
@@ -296,14 +214,10 @@
           "mscorlib"
         ],
         "compile": {
-          "lib/net461/System.Memory.dll": {
-            "related": ".xml"
-          }
+          "lib/net461/System.Memory.dll": {}
         },
         "runtime": {
-          "lib/net461/System.Memory.dll": {
-            "related": ".xml"
-          }
+          "lib/net461/System.Memory.dll": {}
         }
       },
       "System.Numerics.Vectors/4.5.0": {
@@ -313,14 +227,10 @@
           "mscorlib"
         ],
         "compile": {
-          "ref/net46/System.Numerics.Vectors.dll": {
-            "related": ".xml"
-          }
+          "ref/net46/System.Numerics.Vectors.dll": {}
         },
         "runtime": {
-          "lib/net46/System.Numerics.Vectors.dll": {
-            "related": ".xml"
-          }
+          "lib/net46/System.Numerics.Vectors.dll": {}
         }
       },
       "System.Runtime.CompilerServices.Unsafe/6.0.0": {
@@ -329,14 +239,10 @@
           "mscorlib"
         ],
         "compile": {
-          "lib/net461/System.Runtime.CompilerServices.Unsafe.dll": {
-            "related": ".xml"
-          }
+          "lib/net461/System.Runtime.CompilerServices.Unsafe.dll": {}
         },
         "runtime": {
-          "lib/net461/System.Runtime.CompilerServices.Unsafe.dll": {
-            "related": ".xml"
-          }
+          "lib/net461/System.Runtime.CompilerServices.Unsafe.dll": {}
         }
       },
       "System.Threading.Tasks.Extensions/4.5.4": {
@@ -348,14 +254,10 @@
           "mscorlib"
         ],
         "compile": {
-          "lib/net461/System.Threading.Tasks.Extensions.dll": {
-            "related": ".xml"
-          }
+          "lib/net461/System.Threading.Tasks.Extensions.dll": {}
         },
         "runtime": {
-          "lib/net461/System.Threading.Tasks.Extensions.dll": {
-            "related": ".xml"
-          }
+          "lib/net461/System.Threading.Tasks.Extensions.dll": {}
         }
       }
     },
@@ -366,68 +268,28 @@
           "AutoCAD.NET.Core": "[24.2.0]"
         },
         "compile": {
-          "lib/net47/AcCui.dll": {
-            "related": ".xml"
-          },
-          "lib/net47/AcDx.dll": {
-            "related": ".xml"
-          },
-          "lib/net47/AcMgd.dll": {
-            "related": ".xml"
-          },
-          "lib/net47/AcMr.dll": {
-            "related": ".xml"
-          },
-          "lib/net47/AcSeamless.dll": {
-            "related": ".xml"
-          },
-          "lib/net47/AcTcMgd.dll": {
-            "related": ".xml"
-          },
-          "lib/net47/AcWindows.dll": {
-            "related": ".xml"
-          },
-          "lib/net47/AdUIMgd.dll": {
-            "related": ".xml"
-          },
-          "lib/net47/AdUiPalettes.dll": {
-            "related": ".xml"
-          },
-          "lib/net47/AdWindows.dll": {
-            "related": ".xml"
-          }
+          "lib/net47/AcCui.dll": {},
+          "lib/net47/AcDx.dll": {},
+          "lib/net47/AcMgd.dll": {},
+          "lib/net47/AcMr.dll": {},
+          "lib/net47/AcSeamless.dll": {},
+          "lib/net47/AcTcMgd.dll": {},
+          "lib/net47/AcWindows.dll": {},
+          "lib/net47/AdUIMgd.dll": {},
+          "lib/net47/AdUiPalettes.dll": {},
+          "lib/net47/AdWindows.dll": {}
         },
         "runtime": {
-          "lib/net47/AcCui.dll": {
-            "related": ".xml"
-          },
-          "lib/net47/AcDx.dll": {
-            "related": ".xml"
-          },
-          "lib/net47/AcMgd.dll": {
-            "related": ".xml"
-          },
-          "lib/net47/AcMr.dll": {
-            "related": ".xml"
-          },
-          "lib/net47/AcSeamless.dll": {
-            "related": ".xml"
-          },
-          "lib/net47/AcTcMgd.dll": {
-            "related": ".xml"
-          },
-          "lib/net47/AcWindows.dll": {
-            "related": ".xml"
-          },
-          "lib/net47/AdUIMgd.dll": {
-            "related": ".xml"
-          },
-          "lib/net47/AdUiPalettes.dll": {
-            "related": ".xml"
-          },
-          "lib/net47/AdWindows.dll": {
-            "related": ".xml"
-          }
+          "lib/net47/AcCui.dll": {},
+          "lib/net47/AcDx.dll": {},
+          "lib/net47/AcMgd.dll": {},
+          "lib/net47/AcMr.dll": {},
+          "lib/net47/AcSeamless.dll": {},
+          "lib/net47/AcTcMgd.dll": {},
+          "lib/net47/AcWindows.dll": {},
+          "lib/net47/AdUIMgd.dll": {},
+          "lib/net47/AdUiPalettes.dll": {},
+          "lib/net47/AdWindows.dll": {}
         }
       },
       "AutoCAD.NET.Core/24.2.0": {
@@ -436,28 +298,20 @@
           "AutoCAD.NET.Model": "[24.2.0]"
         },
         "compile": {
-          "lib/net47/AcCoreMgd.dll": {
-            "related": ".xml"
-          }
+          "lib/net47/AcCoreMgd.dll": {}
         },
         "runtime": {
-          "lib/net47/AcCoreMgd.dll": {
-            "related": ".xml"
-          }
+          "lib/net47/AcCoreMgd.dll": {}
         }
       },
       "AutoCAD.NET.Model/24.2.0": {
         "type": "package",
         "compile": {
-          "lib/net47/AcDbMgd.dll": {
-            "related": ".xml"
-          },
+          "lib/net47/AcDbMgd.dll": {},
           "lib/net47/acdbmgdbrep.dll": {}
         },
         "runtime": {
-          "lib/net47/AcDbMgd.dll": {
-            "related": ".xml"
-          },
+          "lib/net47/AcDbMgd.dll": {},
           "lib/net47/acdbmgdbrep.dll": {}
         }
       },
@@ -470,14 +324,10 @@
           "System.Runtime.CompilerServices.Unsafe": "6.0.0"
         },
         "compile": {
-          "lib/netstandard2.0/CommunityToolkit.Mvvm.dll": {
-            "related": ".pdb;.xml"
-          }
+          "lib/netstandard2.0/CommunityToolkit.Mvvm.dll": {}
         },
         "runtime": {
-          "lib/netstandard2.0/CommunityToolkit.Mvvm.dll": {
-            "related": ".pdb;.xml"
-          }
+          "lib/netstandard2.0/CommunityToolkit.Mvvm.dll": {}
         },
         "build": {
           "buildTransitive/netstandard2.0/CommunityToolkit.Mvvm.targets": {}
@@ -486,14 +336,10 @@
       "Dapper/2.0.123": {
         "type": "package",
         "compile": {
-          "lib/net461/Dapper.dll": {
-            "related": ".xml"
-          }
+          "lib/net461/Dapper.dll": {}
         },
         "runtime": {
-          "lib/net461/Dapper.dll": {
-            "related": ".xml"
-          }
+          "lib/net461/Dapper.dll": {}
         }
       },
       "EntityFramework/6.4.4": {
@@ -502,20 +348,12 @@
           "System.ComponentModel.DataAnnotations"
         ],
         "compile": {
-          "lib/net45/EntityFramework.SqlServer.dll": {
-            "related": ".xml"
-          },
-          "lib/net45/EntityFramework.dll": {
-            "related": ".SqlServer.xml;.xml"
-          }
+          "lib/net45/EntityFramework.SqlServer.dll": {},
+          "lib/net45/EntityFramework.dll": {}
         },
         "runtime": {
-          "lib/net45/EntityFramework.SqlServer.dll": {
-            "related": ".xml"
-          },
-          "lib/net45/EntityFramework.dll": {
-            "related": ".SqlServer.xml;.xml"
-          }
+          "lib/net45/EntityFramework.SqlServer.dll": {},
+          "lib/net45/EntityFramework.dll": {}
         },
         "build": {
           "buildTransitive/EntityFramework.props": {},
@@ -528,14 +366,10 @@
           "System.Threading.Tasks.Extensions": "4.5.4"
         },
         "compile": {
-          "lib/net461/Microsoft.Bcl.AsyncInterfaces.dll": {
-            "related": ".xml"
-          }
+          "lib/net461/Microsoft.Bcl.AsyncInterfaces.dll": {}
         },
         "runtime": {
-          "lib/net461/Microsoft.Bcl.AsyncInterfaces.dll": {
-            "related": ".xml"
-          }
+          "lib/net461/Microsoft.Bcl.AsyncInterfaces.dll": {}
         }
       },
       "Microsoft.Xaml.Behaviors.Wpf/1.1.39": {
@@ -550,27 +384,19 @@
           "WindowsBase"
         ],
         "compile": {
-          "lib/net45/Microsoft.Xaml.Behaviors.dll": {
-            "related": ".pdb;.xml"
-          }
+          "lib/net45/Microsoft.Xaml.Behaviors.dll": {}
         },
         "runtime": {
-          "lib/net45/Microsoft.Xaml.Behaviors.dll": {
-            "related": ".pdb;.xml"
-          }
+          "lib/net45/Microsoft.Xaml.Behaviors.dll": {}
         }
       },
       "Stub.System.Data.SQLite.Core.NetFramework/1.0.116": {
         "type": "package",
         "compile": {
-          "lib/net46/System.Data.SQLite.dll": {
-            "related": ".dll.altconfig;.xml"
-          }
+          "lib/net46/System.Data.SQLite.dll": {}
         },
         "runtime": {
-          "lib/net46/System.Data.SQLite.dll": {
-            "related": ".dll.altconfig;.xml"
-          }
+          "lib/net46/System.Data.SQLite.dll": {}
         },
         "build": {
           "buildTransitive/net46/Stub.System.Data.SQLite.Core.NetFramework.targets": {}
@@ -582,14 +408,10 @@
           "mscorlib"
         ],
         "compile": {
-          "ref/net45/System.Buffers.dll": {
-            "related": ".xml"
-          }
+          "ref/net45/System.Buffers.dll": {}
         },
         "runtime": {
-          "lib/net461/System.Buffers.dll": {
-            "related": ".xml"
-          }
+          "lib/net461/System.Buffers.dll": {}
         }
       },
       "System.ComponentModel.Annotations/5.0.0": {
@@ -599,9 +421,7 @@
           "mscorlib"
         ],
         "compile": {
-          "ref/net461/System.ComponentModel.Annotations.dll": {
-            "related": ".xml"
-          }
+          "ref/net461/System.ComponentModel.Annotations.dll": {}
         },
         "runtime": {
           "lib/net461/System.ComponentModel.Annotations.dll": {}
@@ -654,14 +474,10 @@
           "mscorlib"
         ],
         "compile": {
-          "lib/net461/System.Memory.dll": {
-            "related": ".xml"
-          }
+          "lib/net461/System.Memory.dll": {}
         },
         "runtime": {
-          "lib/net461/System.Memory.dll": {
-            "related": ".xml"
-          }
+          "lib/net461/System.Memory.dll": {}
         }
       },
       "System.Numerics.Vectors/4.5.0": {
@@ -671,14 +487,10 @@
           "mscorlib"
         ],
         "compile": {
-          "ref/net46/System.Numerics.Vectors.dll": {
-            "related": ".xml"
-          }
+          "ref/net46/System.Numerics.Vectors.dll": {}
         },
         "runtime": {
-          "lib/net46/System.Numerics.Vectors.dll": {
-            "related": ".xml"
-          }
+          "lib/net46/System.Numerics.Vectors.dll": {}
         }
       },
       "System.Runtime.CompilerServices.Unsafe/6.0.0": {
@@ -687,14 +499,10 @@
           "mscorlib"
         ],
         "compile": {
-          "lib/net461/System.Runtime.CompilerServices.Unsafe.dll": {
-            "related": ".xml"
-          }
+          "lib/net461/System.Runtime.CompilerServices.Unsafe.dll": {}
         },
         "runtime": {
-          "lib/net461/System.Runtime.CompilerServices.Unsafe.dll": {
-            "related": ".xml"
-          }
+          "lib/net461/System.Runtime.CompilerServices.Unsafe.dll": {}
         }
       },
       "System.Threading.Tasks.Extensions/4.5.4": {
@@ -706,14 +514,10 @@
           "mscorlib"
         ],
         "compile": {
-          "lib/net461/System.Threading.Tasks.Extensions.dll": {
-            "related": ".xml"
-          }
+          "lib/net461/System.Threading.Tasks.Extensions.dll": {}
         },
         "runtime": {
-          "lib/net461/System.Threading.Tasks.Extensions.dll": {
-            "related": ".xml"
-          }
+          "lib/net461/System.Threading.Tasks.Extensions.dll": {}
         }
       }
     },
@@ -724,68 +528,28 @@
           "AutoCAD.NET.Core": "[24.2.0]"
         },
         "compile": {
-          "lib/net47/AcCui.dll": {
-            "related": ".xml"
-          },
-          "lib/net47/AcDx.dll": {
-            "related": ".xml"
-          },
-          "lib/net47/AcMgd.dll": {
-            "related": ".xml"
-          },
-          "lib/net47/AcMr.dll": {
-            "related": ".xml"
-          },
-          "lib/net47/AcSeamless.dll": {
-            "related": ".xml"
-          },
-          "lib/net47/AcTcMgd.dll": {
-            "related": ".xml"
-          },
-          "lib/net47/AcWindows.dll": {
-            "related": ".xml"
-          },
-          "lib/net47/AdUIMgd.dll": {
-            "related": ".xml"
-          },
-          "lib/net47/AdUiPalettes.dll": {
-            "related": ".xml"
-          },
-          "lib/net47/AdWindows.dll": {
-            "related": ".xml"
-          }
+          "lib/net47/AcCui.dll": {},
+          "lib/net47/AcDx.dll": {},
+          "lib/net47/AcMgd.dll": {},
+          "lib/net47/AcMr.dll": {},
+          "lib/net47/AcSeamless.dll": {},
+          "lib/net47/AcTcMgd.dll": {},
+          "lib/net47/AcWindows.dll": {},
+          "lib/net47/AdUIMgd.dll": {},
+          "lib/net47/AdUiPalettes.dll": {},
+          "lib/net47/AdWindows.dll": {}
         },
         "runtime": {
-          "lib/net47/AcCui.dll": {
-            "related": ".xml"
-          },
-          "lib/net47/AcDx.dll": {
-            "related": ".xml"
-          },
-          "lib/net47/AcMgd.dll": {
-            "related": ".xml"
-          },
-          "lib/net47/AcMr.dll": {
-            "related": ".xml"
-          },
-          "lib/net47/AcSeamless.dll": {
-            "related": ".xml"
-          },
-          "lib/net47/AcTcMgd.dll": {
-            "related": ".xml"
-          },
-          "lib/net47/AcWindows.dll": {
-            "related": ".xml"
-          },
-          "lib/net47/AdUIMgd.dll": {
-            "related": ".xml"
-          },
-          "lib/net47/AdUiPalettes.dll": {
-            "related": ".xml"
-          },
-          "lib/net47/AdWindows.dll": {
-            "related": ".xml"
-          }
+          "lib/net47/AcCui.dll": {},
+          "lib/net47/AcDx.dll": {},
+          "lib/net47/AcMgd.dll": {},
+          "lib/net47/AcMr.dll": {},
+          "lib/net47/AcSeamless.dll": {},
+          "lib/net47/AcTcMgd.dll": {},
+          "lib/net47/AcWindows.dll": {},
+          "lib/net47/AdUIMgd.dll": {},
+          "lib/net47/AdUiPalettes.dll": {},
+          "lib/net47/AdWindows.dll": {}
         }
       },
       "AutoCAD.NET.Core/24.2.0": {
@@ -794,28 +558,20 @@
           "AutoCAD.NET.Model": "[24.2.0]"
         },
         "compile": {
-          "lib/net47/AcCoreMgd.dll": {
-            "related": ".xml"
-          }
+          "lib/net47/AcCoreMgd.dll": {}
         },
         "runtime": {
-          "lib/net47/AcCoreMgd.dll": {
-            "related": ".xml"
-          }
+          "lib/net47/AcCoreMgd.dll": {}
         }
       },
       "AutoCAD.NET.Model/24.2.0": {
         "type": "package",
         "compile": {
-          "lib/net47/AcDbMgd.dll": {
-            "related": ".xml"
-          },
+          "lib/net47/AcDbMgd.dll": {},
           "lib/net47/acdbmgdbrep.dll": {}
         },
         "runtime": {
-          "lib/net47/AcDbMgd.dll": {
-            "related": ".xml"
-          },
+          "lib/net47/AcDbMgd.dll": {},
           "lib/net47/acdbmgdbrep.dll": {}
         }
       },
@@ -828,14 +584,10 @@
           "System.Runtime.CompilerServices.Unsafe": "6.0.0"
         },
         "compile": {
-          "lib/netstandard2.0/CommunityToolkit.Mvvm.dll": {
-            "related": ".pdb;.xml"
-          }
+          "lib/netstandard2.0/CommunityToolkit.Mvvm.dll": {}
         },
         "runtime": {
-          "lib/netstandard2.0/CommunityToolkit.Mvvm.dll": {
-            "related": ".pdb;.xml"
-          }
+          "lib/netstandard2.0/CommunityToolkit.Mvvm.dll": {}
         },
         "build": {
           "buildTransitive/netstandard2.0/CommunityToolkit.Mvvm.targets": {}
@@ -844,14 +596,10 @@
       "Dapper/2.0.123": {
         "type": "package",
         "compile": {
-          "lib/net461/Dapper.dll": {
-            "related": ".xml"
-          }
+          "lib/net461/Dapper.dll": {}
         },
         "runtime": {
-          "lib/net461/Dapper.dll": {
-            "related": ".xml"
-          }
+          "lib/net461/Dapper.dll": {}
         }
       },
       "EntityFramework/6.4.4": {
@@ -860,20 +608,12 @@
           "System.ComponentModel.DataAnnotations"
         ],
         "compile": {
-          "lib/net45/EntityFramework.SqlServer.dll": {
-            "related": ".xml"
-          },
-          "lib/net45/EntityFramework.dll": {
-            "related": ".SqlServer.xml;.xml"
-          }
+          "lib/net45/EntityFramework.SqlServer.dll": {},
+          "lib/net45/EntityFramework.dll": {}
         },
         "runtime": {
-          "lib/net45/EntityFramework.SqlServer.dll": {
-            "related": ".xml"
-          },
-          "lib/net45/EntityFramework.dll": {
-            "related": ".SqlServer.xml;.xml"
-          }
+          "lib/net45/EntityFramework.SqlServer.dll": {},
+          "lib/net45/EntityFramework.dll": {}
         },
         "build": {
           "buildTransitive/EntityFramework.props": {},
@@ -886,14 +626,10 @@
           "System.Threading.Tasks.Extensions": "4.5.4"
         },
         "compile": {
-          "lib/net461/Microsoft.Bcl.AsyncInterfaces.dll": {
-            "related": ".xml"
-          }
+          "lib/net461/Microsoft.Bcl.AsyncInterfaces.dll": {}
         },
         "runtime": {
-          "lib/net461/Microsoft.Bcl.AsyncInterfaces.dll": {
-            "related": ".xml"
-          }
+          "lib/net461/Microsoft.Bcl.AsyncInterfaces.dll": {}
         }
       },
       "Microsoft.Xaml.Behaviors.Wpf/1.1.39": {
@@ -908,27 +644,19 @@
           "WindowsBase"
         ],
         "compile": {
-          "lib/net45/Microsoft.Xaml.Behaviors.dll": {
-            "related": ".pdb;.xml"
-          }
+          "lib/net45/Microsoft.Xaml.Behaviors.dll": {}
         },
         "runtime": {
-          "lib/net45/Microsoft.Xaml.Behaviors.dll": {
-            "related": ".pdb;.xml"
-          }
+          "lib/net45/Microsoft.Xaml.Behaviors.dll": {}
         }
       },
       "Stub.System.Data.SQLite.Core.NetFramework/1.0.116": {
         "type": "package",
         "compile": {
-          "lib/net46/System.Data.SQLite.dll": {
-            "related": ".dll.altconfig;.xml"
-          }
+          "lib/net46/System.Data.SQLite.dll": {}
         },
         "runtime": {
-          "lib/net46/System.Data.SQLite.dll": {
-            "related": ".dll.altconfig;.xml"
-          }
+          "lib/net46/System.Data.SQLite.dll": {}
         },
         "build": {
           "buildTransitive/net46/Stub.System.Data.SQLite.Core.NetFramework.targets": {}
@@ -940,14 +668,10 @@
           "mscorlib"
         ],
         "compile": {
-          "ref/net45/System.Buffers.dll": {
-            "related": ".xml"
-          }
+          "ref/net45/System.Buffers.dll": {}
         },
         "runtime": {
-          "lib/net461/System.Buffers.dll": {
-            "related": ".xml"
-          }
+          "lib/net461/System.Buffers.dll": {}
         }
       },
       "System.ComponentModel.Annotations/5.0.0": {
@@ -957,9 +681,7 @@
           "mscorlib"
         ],
         "compile": {
-          "ref/net461/System.ComponentModel.Annotations.dll": {
-            "related": ".xml"
-          }
+          "ref/net461/System.ComponentModel.Annotations.dll": {}
         },
         "runtime": {
           "lib/net461/System.ComponentModel.Annotations.dll": {}
@@ -1012,14 +734,10 @@
           "mscorlib"
         ],
         "compile": {
-          "lib/net461/System.Memory.dll": {
-            "related": ".xml"
-          }
+          "lib/net461/System.Memory.dll": {}
         },
         "runtime": {
-          "lib/net461/System.Memory.dll": {
-            "related": ".xml"
-          }
+          "lib/net461/System.Memory.dll": {}
         }
       },
       "System.Numerics.Vectors/4.5.0": {
@@ -1029,14 +747,10 @@
           "mscorlib"
         ],
         "compile": {
-          "ref/net46/System.Numerics.Vectors.dll": {
-            "related": ".xml"
-          }
+          "ref/net46/System.Numerics.Vectors.dll": {}
         },
         "runtime": {
-          "lib/net46/System.Numerics.Vectors.dll": {
-            "related": ".xml"
-          }
+          "lib/net46/System.Numerics.Vectors.dll": {}
         }
       },
       "System.Runtime.CompilerServices.Unsafe/6.0.0": {
@@ -1045,14 +759,10 @@
           "mscorlib"
         ],
         "compile": {
-          "lib/net461/System.Runtime.CompilerServices.Unsafe.dll": {
-            "related": ".xml"
-          }
+          "lib/net461/System.Runtime.CompilerServices.Unsafe.dll": {}
         },
         "runtime": {
-          "lib/net461/System.Runtime.CompilerServices.Unsafe.dll": {
-            "related": ".xml"
-          }
+          "lib/net461/System.Runtime.CompilerServices.Unsafe.dll": {}
         }
       },
       "System.Threading.Tasks.Extensions/4.5.4": {
@@ -1064,14 +774,10 @@
           "mscorlib"
         ],
         "compile": {
-          "lib/net461/System.Threading.Tasks.Extensions.dll": {
-            "related": ".xml"
-          }
+          "lib/net461/System.Threading.Tasks.Extensions.dll": {}
         },
         "runtime": {
-          "lib/net461/System.Threading.Tasks.Extensions.dll": {
-            "related": ".xml"
-          }
+          "lib/net461/System.Threading.Tasks.Extensions.dll": {}
         }
       }
     },
@@ -1082,68 +788,28 @@
           "AutoCAD.NET.Core": "[24.2.0]"
         },
         "compile": {
-          "lib/net47/AcCui.dll": {
-            "related": ".xml"
-          },
-          "lib/net47/AcDx.dll": {
-            "related": ".xml"
-          },
-          "lib/net47/AcMgd.dll": {
-            "related": ".xml"
-          },
-          "lib/net47/AcMr.dll": {
-            "related": ".xml"
-          },
-          "lib/net47/AcSeamless.dll": {
-            "related": ".xml"
-          },
-          "lib/net47/AcTcMgd.dll": {
-            "related": ".xml"
-          },
-          "lib/net47/AcWindows.dll": {
-            "related": ".xml"
-          },
-          "lib/net47/AdUIMgd.dll": {
-            "related": ".xml"
-          },
-          "lib/net47/AdUiPalettes.dll": {
-            "related": ".xml"
-          },
-          "lib/net47/AdWindows.dll": {
-            "related": ".xml"
-          }
+          "lib/net47/AcCui.dll": {},
+          "lib/net47/AcDx.dll": {},
+          "lib/net47/AcMgd.dll": {},
+          "lib/net47/AcMr.dll": {},
+          "lib/net47/AcSeamless.dll": {},
+          "lib/net47/AcTcMgd.dll": {},
+          "lib/net47/AcWindows.dll": {},
+          "lib/net47/AdUIMgd.dll": {},
+          "lib/net47/AdUiPalettes.dll": {},
+          "lib/net47/AdWindows.dll": {}
         },
         "runtime": {
-          "lib/net47/AcCui.dll": {
-            "related": ".xml"
-          },
-          "lib/net47/AcDx.dll": {
-            "related": ".xml"
-          },
-          "lib/net47/AcMgd.dll": {
-            "related": ".xml"
-          },
-          "lib/net47/AcMr.dll": {
-            "related": ".xml"
-          },
-          "lib/net47/AcSeamless.dll": {
-            "related": ".xml"
-          },
-          "lib/net47/AcTcMgd.dll": {
-            "related": ".xml"
-          },
-          "lib/net47/AcWindows.dll": {
-            "related": ".xml"
-          },
-          "lib/net47/AdUIMgd.dll": {
-            "related": ".xml"
-          },
-          "lib/net47/AdUiPalettes.dll": {
-            "related": ".xml"
-          },
-          "lib/net47/AdWindows.dll": {
-            "related": ".xml"
-          }
+          "lib/net47/AcCui.dll": {},
+          "lib/net47/AcDx.dll": {},
+          "lib/net47/AcMgd.dll": {},
+          "lib/net47/AcMr.dll": {},
+          "lib/net47/AcSeamless.dll": {},
+          "lib/net47/AcTcMgd.dll": {},
+          "lib/net47/AcWindows.dll": {},
+          "lib/net47/AdUIMgd.dll": {},
+          "lib/net47/AdUiPalettes.dll": {},
+          "lib/net47/AdWindows.dll": {}
         }
       },
       "AutoCAD.NET.Core/24.2.0": {
@@ -1152,28 +818,20 @@
           "AutoCAD.NET.Model": "[24.2.0]"
         },
         "compile": {
-          "lib/net47/AcCoreMgd.dll": {
-            "related": ".xml"
-          }
+          "lib/net47/AcCoreMgd.dll": {}
         },
         "runtime": {
-          "lib/net47/AcCoreMgd.dll": {
-            "related": ".xml"
-          }
+          "lib/net47/AcCoreMgd.dll": {}
         }
       },
       "AutoCAD.NET.Model/24.2.0": {
         "type": "package",
         "compile": {
-          "lib/net47/AcDbMgd.dll": {
-            "related": ".xml"
-          },
+          "lib/net47/AcDbMgd.dll": {},
           "lib/net47/acdbmgdbrep.dll": {}
         },
         "runtime": {
-          "lib/net47/AcDbMgd.dll": {
-            "related": ".xml"
-          },
+          "lib/net47/AcDbMgd.dll": {},
           "lib/net47/acdbmgdbrep.dll": {}
         }
       },
@@ -1186,14 +844,10 @@
           "System.Runtime.CompilerServices.Unsafe": "6.0.0"
         },
         "compile": {
-          "lib/netstandard2.0/CommunityToolkit.Mvvm.dll": {
-            "related": ".pdb;.xml"
-          }
+          "lib/netstandard2.0/CommunityToolkit.Mvvm.dll": {}
         },
         "runtime": {
-          "lib/netstandard2.0/CommunityToolkit.Mvvm.dll": {
-            "related": ".pdb;.xml"
-          }
+          "lib/netstandard2.0/CommunityToolkit.Mvvm.dll": {}
         },
         "build": {
           "buildTransitive/netstandard2.0/CommunityToolkit.Mvvm.targets": {}
@@ -1202,14 +856,10 @@
       "Dapper/2.0.123": {
         "type": "package",
         "compile": {
-          "lib/net461/Dapper.dll": {
-            "related": ".xml"
-          }
+          "lib/net461/Dapper.dll": {}
         },
         "runtime": {
-          "lib/net461/Dapper.dll": {
-            "related": ".xml"
-          }
+          "lib/net461/Dapper.dll": {}
         }
       },
       "EntityFramework/6.4.4": {
@@ -1218,20 +868,12 @@
           "System.ComponentModel.DataAnnotations"
         ],
         "compile": {
-          "lib/net45/EntityFramework.SqlServer.dll": {
-            "related": ".xml"
-          },
-          "lib/net45/EntityFramework.dll": {
-            "related": ".SqlServer.xml;.xml"
-          }
+          "lib/net45/EntityFramework.SqlServer.dll": {},
+          "lib/net45/EntityFramework.dll": {}
         },
         "runtime": {
-          "lib/net45/EntityFramework.SqlServer.dll": {
-            "related": ".xml"
-          },
-          "lib/net45/EntityFramework.dll": {
-            "related": ".SqlServer.xml;.xml"
-          }
+          "lib/net45/EntityFramework.SqlServer.dll": {},
+          "lib/net45/EntityFramework.dll": {}
         },
         "build": {
           "buildTransitive/EntityFramework.props": {},
@@ -1244,14 +886,10 @@
           "System.Threading.Tasks.Extensions": "4.5.4"
         },
         "compile": {
-          "lib/net461/Microsoft.Bcl.AsyncInterfaces.dll": {
-            "related": ".xml"
-          }
+          "lib/net461/Microsoft.Bcl.AsyncInterfaces.dll": {}
         },
         "runtime": {
-          "lib/net461/Microsoft.Bcl.AsyncInterfaces.dll": {
-            "related": ".xml"
-          }
+          "lib/net461/Microsoft.Bcl.AsyncInterfaces.dll": {}
         }
       },
       "Microsoft.Xaml.Behaviors.Wpf/1.1.39": {
@@ -1266,27 +904,19 @@
           "WindowsBase"
         ],
         "compile": {
-          "lib/net45/Microsoft.Xaml.Behaviors.dll": {
-            "related": ".pdb;.xml"
-          }
+          "lib/net45/Microsoft.Xaml.Behaviors.dll": {}
         },
         "runtime": {
-          "lib/net45/Microsoft.Xaml.Behaviors.dll": {
-            "related": ".pdb;.xml"
-          }
+          "lib/net45/Microsoft.Xaml.Behaviors.dll": {}
         }
       },
       "Stub.System.Data.SQLite.Core.NetFramework/1.0.116": {
         "type": "package",
         "compile": {
-          "lib/net46/System.Data.SQLite.dll": {
-            "related": ".dll.altconfig;.xml"
-          }
+          "lib/net46/System.Data.SQLite.dll": {}
         },
         "runtime": {
-          "lib/net46/System.Data.SQLite.dll": {
-            "related": ".dll.altconfig;.xml"
-          }
+          "lib/net46/System.Data.SQLite.dll": {}
         },
         "build": {
           "buildTransitive/net46/Stub.System.Data.SQLite.Core.NetFramework.targets": {}
@@ -1298,14 +928,10 @@
           "mscorlib"
         ],
         "compile": {
-          "ref/net45/System.Buffers.dll": {
-            "related": ".xml"
-          }
+          "ref/net45/System.Buffers.dll": {}
         },
         "runtime": {
-          "lib/net461/System.Buffers.dll": {
-            "related": ".xml"
-          }
+          "lib/net461/System.Buffers.dll": {}
         }
       },
       "System.ComponentModel.Annotations/5.0.0": {
@@ -1315,9 +941,7 @@
           "mscorlib"
         ],
         "compile": {
-          "ref/net461/System.ComponentModel.Annotations.dll": {
-            "related": ".xml"
-          }
+          "ref/net461/System.ComponentModel.Annotations.dll": {}
         },
         "runtime": {
           "lib/net461/System.ComponentModel.Annotations.dll": {}
@@ -1370,14 +994,10 @@
           "mscorlib"
         ],
         "compile": {
-          "lib/net461/System.Memory.dll": {
-            "related": ".xml"
-          }
+          "lib/net461/System.Memory.dll": {}
         },
         "runtime": {
-          "lib/net461/System.Memory.dll": {
-            "related": ".xml"
-          }
+          "lib/net461/System.Memory.dll": {}
         }
       },
       "System.Numerics.Vectors/4.5.0": {
@@ -1387,14 +1007,10 @@
           "mscorlib"
         ],
         "compile": {
-          "ref/net46/System.Numerics.Vectors.dll": {
-            "related": ".xml"
-          }
+          "ref/net46/System.Numerics.Vectors.dll": {}
         },
         "runtime": {
-          "lib/net46/System.Numerics.Vectors.dll": {
-            "related": ".xml"
-          }
+          "lib/net46/System.Numerics.Vectors.dll": {}
         }
       },
       "System.Runtime.CompilerServices.Unsafe/6.0.0": {
@@ -1403,14 +1019,10 @@
           "mscorlib"
         ],
         "compile": {
-          "lib/net461/System.Runtime.CompilerServices.Unsafe.dll": {
-            "related": ".xml"
-          }
+          "lib/net461/System.Runtime.CompilerServices.Unsafe.dll": {}
         },
         "runtime": {
-          "lib/net461/System.Runtime.CompilerServices.Unsafe.dll": {
-            "related": ".xml"
-          }
+          "lib/net461/System.Runtime.CompilerServices.Unsafe.dll": {}
         }
       },
       "System.Threading.Tasks.Extensions/4.5.4": {
@@ -1422,14 +1034,10 @@
           "mscorlib"
         ],
         "compile": {
-          "lib/net461/System.Threading.Tasks.Extensions.dll": {
-            "related": ".xml"
-          }
+          "lib/net461/System.Threading.Tasks.Extensions.dll": {}
         },
         "runtime": {
-          "lib/net461/System.Threading.Tasks.Extensions.dll": {
-            "related": ".xml"
-          }
+          "lib/net461/System.Threading.Tasks.Extensions.dll": {}
         }
       }
     }
@@ -2047,24 +1655,24 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\53-liu-yq\\.nuget\\packages\\": {},
+    "C:\\Users\\LYQ\\.nuget\\packages\\": {},
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\github\\TimeIsLife\\TimeIsLife\\TimeIsLife.csproj",
+      "projectUniqueName": "D:\\GitHub\\TimeIsLife\\TimeIsLife\\TimeIsLife.csproj",
       "projectName": "TimeIsLife",
-      "projectPath": "D:\\github\\TimeIsLife\\TimeIsLife\\TimeIsLife.csproj",
-      "packagesPath": "C:\\Users\\53-liu-yq\\.nuget\\packages\\",
-      "outputPath": "D:\\github\\TimeIsLife\\TimeIsLife\\obj\\",
+      "projectPath": "D:\\GitHub\\TimeIsLife\\TimeIsLife\\TimeIsLife.csproj",
+      "packagesPath": "C:\\Users\\LYQ\\.nuget\\packages\\",
+      "outputPath": "D:\\GitHub\\TimeIsLife\\TimeIsLife\\obj\\",
       "projectStyle": "PackageReference",
       "skipContentFileWrite": true,
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
       ],
       "configFilePaths": [
-        "C:\\Users\\53-liu-yq\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\LYQ\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
