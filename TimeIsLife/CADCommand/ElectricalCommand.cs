@@ -144,7 +144,7 @@ namespace TimeIsLife.CADCommand
             {
                 // 正则表达式剔除非数字字符（不包含小数点.）
                 //str = Regex.Replace(str, @"[^/d./d]", "");
-                MatchCollection matchCollection = Regex.Matches(str, "[0-9]+[.]?[0-9]+");
+                MatchCollection matchCollection = Regex.Matches(str, "[0-9]+[.]?[0-9]*");
                 if (matchCollection.Count == 1)
                 {
                     arr[0] = double.Parse(matchCollection[0].Value);

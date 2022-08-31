@@ -17,6 +17,7 @@
                 <ResourceDictionary Source="/TimeIsLife;component/Resources/Expander.xaml" />
                 <ResourceDictionary Source="/TimeIsLife;component/Resources/Button.xaml" />
                 <ResourceDictionary Source="/TimeIsLife;component/Resources/ComboBox.xaml" />
+                <ResourceDictionary Source="/TimeIsLife;component/Resources/TextBox.xaml"/>
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>
@@ -392,7 +393,7 @@
                                     IsChecked="{Binding IsLengthOrCount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                             </Grid>
                             <Button
-                                Command="{Binding CurLightingCommand}"
+                                Command="{Binding CurveLightingCommand}"
                                 Content="灯具沿线布置"
                                 Template="{DynamicResource ButtonTemplate}" />
 
@@ -459,7 +460,7 @@
                             <Label
                                 Grid.Row="2"
                                 Grid.Column="0"
-                                Content="首端距离"
+                                Content="首端距离偏移比例"
                                 Template="{DynamicResource LabelTemplate}" />
                             <ComboBox
                                 Grid.Row="2"

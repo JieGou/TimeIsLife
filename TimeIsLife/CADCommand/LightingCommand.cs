@@ -15,6 +15,7 @@ using System.Threading.Tasks;
 using System.Windows;
 
 using TimeIsLife.Jig;
+using TimeIsLife.Tools;
 using TimeIsLife.ViewModel;
 
 using Application = Autodesk.AutoCAD.ApplicationServices.Application;
@@ -183,8 +184,8 @@ namespace TimeIsLife.CADCommand
 
 
 
-        [CommandMethod("FF_CurLighting")]
-        public void FF_CurLighting()
+        [CommandMethod("FF_CurveLighting")]
+        public void FF_CurveLighting()
         {
             // Put your command code here
             Document document = Application.DocumentManager.CurrentDocument;
@@ -192,7 +193,6 @@ namespace TimeIsLife.CADCommand
             Editor editor = document.Editor;
 
             using Transaction transaction = database.TransactionManager.StartOpenCloseTransaction();
-
             BlockTable blockTable = transaction.GetObject(database.BlockTableId, OpenMode.ForRead) as BlockTable;
             BlockTableRecord modelSpace = transaction.GetObject(blockTable[BlockTableRecord.ModelSpace], OpenMode.ForWrite) as BlockTableRecord;
             Matrix3d matrixd = Application.DocumentManager.MdiActiveDocument.Editor.CurrentUserCoordinateSystem;
@@ -257,14 +257,39 @@ namespace TimeIsLife.CADCommand
                     }
                 }
 
+                string layer = baseBlockReference.Layer;
+                string blockName = baseBlockReference.Name;
+                Point3d point3d = new Point3d();
+                Scale3d scale3D = baseBlockReference.ScaleFactors;
+                double rotateAngle = 0;
+                Dictionary<string,string> attNameValues = new Dictionary<string,string>();
+                BlockTableRecord blockTableRecord = transaction.GetObject(baseBlockReference.BlockTableRecord,OpenMode.ForRead) as BlockTableRecord;
+                if (blockTableRecord == null) return;
+                if (blockTableRecord.HasAttributeDefinitions)
+                {
+                    foreach (var attri in baseBlockReference.AttributeCollection)
+                    {
+                        AttributeReference ar = null;
+                        if (attri is ObjectId objectId)
+                        {
+                            ar = transaction.GetObject(objectId, OpenMode.ForWrite) as AttributeReference;
+                        }
+                        else if (attri is AttributeReference attributeReference)
+                        {
+                            ar = attributeReference;
+                        }
 
-                var btrId = baseBlockReference.BlockTableRecord;
-                if (btrId == null) return;
+                        if (ar != null)
+                        {
+                            attNameValues.Add(ar.Tag.ToUpper(), ar.TextString);
+                        }
+                    }
+                }
 
                 switch (ElectricalViewModel.electricalViewModel.IsLengthOrCount)
                 {
                     //固定数量
-                    case true:                        
+                    case true:
                         int m = ElectricalViewModel.electricalViewModel.LightingLineCount;
                         while (m <= 0)
                         {
@@ -284,30 +309,20 @@ namespace TimeIsLife.CADCommand
                         double unitLength = curveLength / m;
                         for (int i = 0; i < m; i++)
                         {
-                            Point3d point3D = curve.GetPointAtDist(unitLength * (i + 0.5));
-
-                            BlockReference newBlockReference = (BlockReference)baseBlockReference.Clone();
-                            newBlockReference.Rotation = 0;
-                            newBlockReference.ScaleFactors = baseBlockReference.ScaleFactors;
-                            newBlockReference.Layer = baseBlockReference.Layer;
-                            newBlockReference.Position = point3D;
-
+                            point3d = curve.GetPointAtDist(unitLength * (i + ElectricalViewModel.electricalViewModel.Distance));
                             switch (ElectricalViewModel.electricalViewModel.IsAlongTheLine)
                             {
                                 //是否沿线方向
                                 case true:
-                                    var vector3d = curve.GetFirstDerivative(point3D);                                    
-                                    newBlockReference.Rotation = vector3d.GetAngleTo(new Vector3d(1, 0, 0), new Vector3d(0, 0, -1))+ElectricalViewModel.electricalViewModel.BlockAngle*Math.PI/180;                                    
+                                    var vector3d = curve.GetFirstDerivative(point3d);
+                                    rotateAngle = vector3d.GetAngleTo(new Vector3d(1, 0, 0), new Vector3d(0, 0, -1)) + ElectricalViewModel.electricalViewModel.BlockAngle * Math.PI / 180;
                                     break;
                                 case false:
-                                    newBlockReference.Rotation = ElectricalViewModel.electricalViewModel.BlockAngle * Math.PI / 180;
+                                    rotateAngle = ElectricalViewModel.electricalViewModel.BlockAngle * Math.PI / 180;
                                     break;
-                            } ;
-
-                            UpdateAttribute(transaction, matrixd, btrId, newBlockReference, baseBlockReference);
-
-                            modelSpace.AppendEntity(newBlockReference);
-                            transaction.AddNewlyCreatedDBObject(newBlockReference, true);
+                            };
+                                                        
+                            InsertBlockReference(database, transaction, modelSpace, baseBlockReference, layer, point3d, scale3D, rotateAngle, attNameValues, blockTableRecord);
                         }
                         break;
                     //固定距离
@@ -328,39 +343,31 @@ namespace TimeIsLife.CADCommand
                                 return;
                             }
                         }
-                        int j = 0;                        
+                        int j = 0;
                         while (true)
                         {
                             double tempLength = (j + ElectricalViewModel.electricalViewModel.Distance) * ElectricalViewModel.electricalViewModel.LightingLength;
                             if (tempLength > curveLength) break;
-                            Point3d point3D = curve.GetPointAtDist(tempLength);
 
-                            BlockReference newBlockReference = (BlockReference)baseBlockReference.Clone();
-                            newBlockReference.Rotation = 0;
-                            newBlockReference.ScaleFactors = baseBlockReference.ScaleFactors;
-                            newBlockReference.Layer = baseBlockReference.Layer;
-                            newBlockReference.Position = point3D;
-
+                            point3d = curve.GetPointAtDist(tempLength);
                             switch (ElectricalViewModel.electricalViewModel.IsAlongTheLine)
                             {
                                 //是否沿线方向
                                 case true:
-                                    var vector3d = curve.GetFirstDerivative(point3D);
-                                    newBlockReference.Rotation = vector3d.GetAngleTo(new Vector3d(1, 0, 0), new Vector3d(0, 0, -1)) + ElectricalViewModel.electricalViewModel.BlockAngle * Math.PI / 180;
+                                    var vector3d = curve.GetFirstDerivative(point3d);
+                                    rotateAngle = vector3d.GetAngleTo(new Vector3d(1, 0, 0), new Vector3d(0, 0, -1)) + ElectricalViewModel.electricalViewModel.BlockAngle * Math.PI / 180;
                                     break;
                                 case false:
-                                    newBlockReference.Rotation = ElectricalViewModel.electricalViewModel.BlockAngle * Math.PI / 180;
+                                    rotateAngle = ElectricalViewModel.electricalViewModel.BlockAngle * Math.PI / 180;
                                     break;
                             };
 
-                            UpdateAttribute(transaction,matrixd, btrId, newBlockReference, baseBlockReference);
-
-                            modelSpace.AppendEntity(newBlockReference);
-                            transaction.AddNewlyCreatedDBObject(newBlockReference, true);
+                            
+                            InsertBlockReference(database, transaction, modelSpace, baseBlockReference, layer, point3d, scale3D, rotateAngle, attNameValues, blockTableRecord);
                             j++;
                         }
                         break;
-                } ;
+                };
 
                 modelSpace.DowngradeOpen();
                 transaction.Commit();
@@ -372,28 +379,42 @@ namespace TimeIsLife.CADCommand
             }
         }
 
-        private void UpdateAttribute(Transaction transaction,Matrix3d matrixd, ObjectId btrId, BlockReference newBlockReference,BlockReference baseBlockReference)
+        private static void InsertBlockReference(Database database, Transaction transaction, BlockTableRecord modelSpace, BlockReference baseBlockReference, string layer, Point3d point3d, Scale3d scale3D, double rotateAngle, Dictionary<string, string> attNameValues, BlockTableRecord blockTableRecord)
         {
-            BlockTableRecord btr = (BlockTableRecord)transaction.GetObject(btrId,OpenMode.ForRead);
-            if (btr.HasAttributeDefinitions)
+            BlockReference newBlockReference = new BlockReference(point3d, baseBlockReference.BlockTableRecord)
             {
-                foreach (var attri in newBlockReference.AttributeCollection)
-                {
-                    AttributeReference ar = null;
-                    if (attri is ObjectId)
-                    {
-                        ar = ((ObjectId)attri).GetObject(OpenMode.ForWrite) as AttributeReference;
-                    }
-                    else if (attri is AttributeReference)
-                    {
-                        ar = (AttributeReference)attri;
-                    }
+                Layer = layer,
+                ScaleFactors = scale3D,
+                Rotation = rotateAngle
+            };
 
-                    if (ar != null)
+            modelSpace.AppendEntity(newBlockReference);
+            transaction.AddNewlyCreatedDBObject(newBlockReference, true);
+
+            if (blockTableRecord.HasAttributeDefinitions)
+            {
+                foreach (var id in blockTableRecord)
+                {
+                    AttributeDefinition attributeDefinition = transaction.GetObject(id, OpenMode.ForRead) as AttributeDefinition;
+                    if (attributeDefinition != null)
                     {
-                        Point3d point3D = baseBlockReference.Position;
-                        ar.TransformBy(Matrix3d.Rotation(newBlockReference.Rotation, Vector3d.ZAxis, point3D.TransformBy(matrixd)));
-                        ar.TransformBy(Matrix3d.Displacement(point3D.TransformBy(matrixd).GetVectorTo(newBlockReference.Position)));
+                        //创建一个新的属性对象
+                        AttributeReference attrbuteReference = new AttributeReference();
+                        //从属性定义获得属性对象的对象特性
+                        attrbuteReference.SetAttributeFromBlock(attributeDefinition, newBlockReference.BlockTransform);
+                        //设置属性对象的其它特性
+                        attrbuteReference.Position = attributeDefinition.Position.TransformBy(newBlockReference.BlockTransform);
+                        attrbuteReference.Rotation = rotateAngle;
+                        attrbuteReference.AdjustAlignment(database);
+                        //判断是否包含指定的属性名称
+                        if (attNameValues.ContainsKey(attributeDefinition.Tag.ToUpper()))
+                        {
+                            //设置属性值
+                            attrbuteReference.TextString = attNameValues[attributeDefinition.Tag.ToUpper()].ToString();
+                        }
+                        //向块参照添加属性对象
+                        newBlockReference.AttributeCollection.AppendAttribute(attrbuteReference);
+                        transaction.AddNewlyCreatedDBObject(attrbuteReference, true);
                     }
                 }
             }

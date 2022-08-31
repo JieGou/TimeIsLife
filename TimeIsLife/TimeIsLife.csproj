@@ -84,12 +84,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CADCommand\LightingCommand.cs" />
+    <Compile Include="Helper\TextBoxAutoSelectHelper.cs" />
     <Compile Include="Jig\LightingLayoutJig.cs" />
     <Compile Include="Model\BlockScaleEnum.cs" />
     <Compile Include="CADCommand\ElectricalCommand.cs" />
     <Compile Include="CADCommand\FireAlarmCommnad.cs" />
     <Compile Include="CADCommand\ToolCommand.cs" />
     <Compile Include="Jig\UcsSelectJig.cs" />
+    <Compile Include="Tools\BlockTools.cs" />
     <Compile Include="View\ElectricaView.xaml.cs">
       <DependentUpon>ElectricaView.xaml</DependentUpon>
     </Compile>
@@ -281,6 +283,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Resources\ComboBox.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Resources\TextBox.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

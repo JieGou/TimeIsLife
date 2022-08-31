@@ -44,21 +44,6 @@
         <Setter Property="VerticalContentAlignment" Value="Center" />
     </Style>
 
-
-
-    <Style TargetType="TextBox">
-        <Setter Property="Height" Value="30" />
-        <Setter Property="Margin" Value="1" />
-        <Setter Property="BorderBrush">
-            <Setter.Value>
-                <SolidColorBrush Color="{StaticResource {x:Static SystemColors.HotTrackColorKey}}" />
-            </Setter.Value>
-        </Setter>
-        <Setter Property="BorderThickness" Value="1" />
-        <Setter Property="VerticalContentAlignment" Value="Center" />
-    </Style>
-
-
     <Style TargetType="TextBlock">
         <Setter Property="VerticalAlignment" Value="Center" />
         <Setter Property="HorizontalAlignment" Value="Center" />

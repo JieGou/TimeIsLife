@@ -47,7 +47,7 @@ namespace TimeIsLife.ViewModel
             LightingCountCalculateCommand = new RelayCommand(LightingCountCalculate);
 
             //灯具沿线布置
-            CurLightingCommand = new RelayCommand(CurLighting);
+            CurveLightingCommand = new RelayCommand(CurveLighting);
         }
 
         private void Initialize()
@@ -355,11 +355,11 @@ namespace TimeIsLife.ViewModel
             get => isAlongTheLine;
             set => SetProperty(ref isAlongTheLine, value);
         }
-        public IRelayCommand CurLightingCommand { get; }
+        public IRelayCommand CurveLightingCommand { get; }
 
-        void CurLighting()
+        void CurveLighting()
         {
-            Application.DocumentManager.MdiActiveDocument.SendStringToExecute("FF_CurLighting\n", true, false, false);
+            Application.DocumentManager.MdiActiveDocument.SendStringToExecute("FF_CurveLighting\n", true, false, false);
         }
         #endregion
 
