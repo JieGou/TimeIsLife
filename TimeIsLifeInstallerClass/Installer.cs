@@ -60,7 +60,7 @@ namespace TimeIsLifeInstallerClass
             Process process = Process.Start(info);
             //Thread.Sleep(100);
 
-
+            process.WaitForExit();
 
 
             //Thread thread = new Thread(() =>

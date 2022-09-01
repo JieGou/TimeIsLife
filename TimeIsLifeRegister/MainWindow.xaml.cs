@@ -24,6 +24,7 @@ namespace TimeIsLifeRegister
         public static MainWindow? Instance { get; private set; }
         public MainWindow()
         {
+            Debugger.Launch();
             InitializeComponent();
             this.DataContext = new MainWindowViewModel();
             Instance = this;
