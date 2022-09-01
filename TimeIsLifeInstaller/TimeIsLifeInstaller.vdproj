@@ -208,12 +208,6 @@
         "Entry"
         {
         "MsmKey" = "8:_33637E1A42186CCC4128C0A30CF2BADA"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_33637E1A42186CCC4128C0A30CF2BADA"
         "OwnerKey" = "8:_97161EC363B21D666E9F3F9201FF0D34"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -507,12 +501,6 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_E1ACAF86E8D52C3A05F9D6418D7B3B8D"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
         "MsmKey" = "8:_E4C1CD5F9B57015364D6CA1A445093A4"
         "OwnerKey" = "8:_5AD56503FF46573A3D8189E09F796CB0"
         "MsmSig" = "8:_UNDEFINED"
@@ -592,6 +580,30 @@
         "Entry"
         {
         "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_FFA21C9904FD209EA688A8D8F1012383"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_97161EC363B21D666E9F3F9201FF0D34"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_5EF29AC92D29A9E9E957343A19FF48D0"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
+        "OwnerKey" = "8:_DA0082B1940BC64D83CC2C3F16D73865"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
+        "MsmKey" = "8:_UNDEFINED"
         "OwnerKey" = "8:_8F149F4841B540829FF96978DFD2E515"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -617,42 +629,6 @@
         {
         "MsmKey" = "8:_UNDEFINED"
         "OwnerKey" = "8:_4FF6CA92735308EE9BF5A5518F03FD55"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_FFA21C9904FD209EA688A8D8F1012383"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_97161EC363B21D666E9F3F9201FF0D34"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_5EF29AC92D29A9E9E957343A19FF48D0"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_E1ACAF86E8D52C3A05F9D6418D7B3B8D"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_DA0082B1940BC64D83CC2C3F16D73865"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_UNDEFINED"
-        "OwnerKey" = "8:_33637E1A42186CCC4128C0A30CF2BADA"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -1582,37 +1558,6 @@
                     }
                 }
             "SourcePath" = "8:System.Security.Cryptography.Algorithms.dll"
-            "TargetName" = "8:"
-            "Tag" = "8:"
-            "Folder" = "8:_F30B4A3420AD460AA1FCABC3016FC181"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:TRUE"
-            "IsolateTo" = "8:"
-            }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_33637E1A42186CCC4128C0A30CF2BADA"
-            {
-            "AssemblyRegister" = "3:1"
-            "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:System.Buffers, Version=4.0.3.0, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL"
-                "ScatterAssemblies"
-                {
-                    "_33637E1A42186CCC4128C0A30CF2BADA"
-                    {
-                    "Name" = "8:System.Buffers.dll"
-                    "Attributes" = "3:512"
-                    }
-                }
-            "SourcePath" = "8:System.Buffers.dll"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_F30B4A3420AD460AA1FCABC3016FC181"
@@ -2825,37 +2770,6 @@
             "IsDependency" = "11:TRUE"
             "IsolateTo" = "8:"
             }
-            "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_E1ACAF86E8D52C3A05F9D6418D7B3B8D"
-            {
-            "AssemblyRegister" = "3:1"
-            "AssemblyIsInGAC" = "11:FALSE"
-            "AssemblyAsmDisplayName" = "8:System.ComponentModel.Annotations, Version=4.2.1.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL"
-                "ScatterAssemblies"
-                {
-                    "_E1ACAF86E8D52C3A05F9D6418D7B3B8D"
-                    {
-                    "Name" = "8:System.ComponentModel.Annotations.dll"
-                    "Attributes" = "3:512"
-                    }
-                }
-            "SourcePath" = "8:System.ComponentModel.Annotations.dll"
-            "TargetName" = "8:"
-            "Tag" = "8:"
-            "Folder" = "8:_F30B4A3420AD460AA1FCABC3016FC181"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:TRUE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:FALSE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:TRUE"
-            "IsolateTo" = "8:"
-            }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_E4C1CD5F9B57015364D6CA1A445093A4"
             {
             "AssemblyRegister" = "3:1"
@@ -3225,7 +3139,7 @@
         "UpgradeCode" = "8:{5BF327F2-7647-4976-B54D-A53DD7B4398D}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
-        "RemovePreviousVersions" = "11:FALSE"
+        "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
         "ProductVersion" = "8:1.0.0"

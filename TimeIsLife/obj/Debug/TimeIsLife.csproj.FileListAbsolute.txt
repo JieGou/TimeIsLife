@@ -1,5 +1,5 @@
-D:\github\TimeIsLife\TimeIsLife\bin\Debug\AcMgd.dll
-D:\github\TimeIsLife\TimeIsLife\bin\Debug\AcWindows.dll
+D:\github\TimeIsLife\TimeIsLife\bin\Debug\AcDx.dll
+D:\github\TimeIsLife\TimeIsLife\bin\Debug\AdUiPalettes.dll
 D:\github\TimeIsLife\TimeIsLife\bin\Debug\Block\FA-08-智能型点型感烟探测器.dwg
 D:\github\TimeIsLife\TimeIsLife\bin\Debug\FA\FA-01-接线端子箱.dwg
 D:\github\TimeIsLife\TimeIsLife\bin\Debug\FA\FA-02-带消防电话插孔的手动报警按钮.dwg
@@ -46,12 +46,12 @@ D:\github\TimeIsLife\TimeIsLife\bin\Debug\TimeIsLife.dll.config
 D:\github\TimeIsLife\TimeIsLife\bin\Debug\TimeIsLife.dll
 D:\github\TimeIsLife\TimeIsLife\bin\Debug\TimeIsLife.pdb
 D:\github\TimeIsLife\TimeIsLife\bin\Debug\AcCui.dll
-D:\github\TimeIsLife\TimeIsLife\bin\Debug\AcDx.dll
+D:\github\TimeIsLife\TimeIsLife\bin\Debug\AcMgd.dll
 D:\github\TimeIsLife\TimeIsLife\bin\Debug\AcMr.dll
 D:\github\TimeIsLife\TimeIsLife\bin\Debug\AcSeamless.dll
 D:\github\TimeIsLife\TimeIsLife\bin\Debug\AcTcMgd.dll
+D:\github\TimeIsLife\TimeIsLife\bin\Debug\AcWindows.dll
 D:\github\TimeIsLife\TimeIsLife\bin\Debug\AdUIMgd.dll
-D:\github\TimeIsLife\TimeIsLife\bin\Debug\AdUiPalettes.dll
 D:\github\TimeIsLife\TimeIsLife\bin\Debug\AdWindows.dll
 D:\github\TimeIsLife\TimeIsLife\bin\Debug\AcCoreMgd.dll
 D:\github\TimeIsLife\TimeIsLife\bin\Debug\AcDbMgd.dll
