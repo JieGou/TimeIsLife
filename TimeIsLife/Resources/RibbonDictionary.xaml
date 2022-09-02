@@ -1,0 +1,31 @@
+﻿<ResourceDictionary
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:adw="clr-namespace:Autodesk.Windows;assembly=AdWindows">
+    <adw:RibbonTab
+        x:Key="TimeIsLife"
+        Title="TimeIsLife"
+        Id="TimeIsLife">
+        <adw:RibbonPanel>
+            <adw:RibbonPanelSource Title="工具面板">
+                <adw:RibbonButton
+                    CommandParameter="FF_Tools"
+                    Image="/TimeIsLife;component/Image/classify.ico"
+                    LargeImage="/TimeIsLife;component/Image/classify.ico"
+                    Size="Large"
+                    Orientation="Vertical"
+                    ShowImage="True"
+                    ShowText="True"
+                    Text="TimeIsLife">
+                    <adw:RibbonButton.ToolTip>
+                        <adw:RibbonToolTip
+                            Title="TimeIsLife"
+                            Command="FF_Tools"
+                            Content="打开工具面板"
+                            ExpandedContent="使用FF_Tools命令，可以打开工具面板" />
+                    </adw:RibbonButton.ToolTip>
+                </adw:RibbonButton>
+            </adw:RibbonPanelSource>
+        </adw:RibbonPanel>
+    </adw:RibbonTab>
+</ResourceDictionary>

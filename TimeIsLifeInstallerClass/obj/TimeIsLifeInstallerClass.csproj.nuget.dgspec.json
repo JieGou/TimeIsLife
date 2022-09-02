@@ -1,24 +1,24 @@
 {
   "format": 1,
   "restore": {
-    "D:\\GitHub\\TimeIsLife\\TimeIsLifeInstallerClass\\TimeIsLifeInstallerClass.csproj": {}
+    "D:\\github\\TimeIsLife\\TimeIsLifeInstallerClass\\TimeIsLifeInstallerClass.csproj": {}
   },
   "projects": {
-    "D:\\GitHub\\TimeIsLife\\TimeIsLifeInstallerClass\\TimeIsLifeInstallerClass.csproj": {
+    "D:\\github\\TimeIsLife\\TimeIsLifeInstallerClass\\TimeIsLifeInstallerClass.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\GitHub\\TimeIsLife\\TimeIsLifeInstallerClass\\TimeIsLifeInstallerClass.csproj",
+        "projectUniqueName": "D:\\github\\TimeIsLife\\TimeIsLifeInstallerClass\\TimeIsLifeInstallerClass.csproj",
         "projectName": "TimeIsLifeInstallerClass",
-        "projectPath": "D:\\GitHub\\TimeIsLife\\TimeIsLifeInstallerClass\\TimeIsLifeInstallerClass.csproj",
-        "packagesPath": "C:\\Users\\LYQ\\.nuget\\packages\\",
-        "outputPath": "D:\\GitHub\\TimeIsLife\\TimeIsLifeInstallerClass\\obj\\",
+        "projectPath": "D:\\github\\TimeIsLife\\TimeIsLifeInstallerClass\\TimeIsLifeInstallerClass.csproj",
+        "packagesPath": "C:\\Users\\53-liu-yq\\.nuget\\packages\\",
+        "outputPath": "D:\\github\\TimeIsLife\\TimeIsLifeInstallerClass\\obj\\",
         "projectStyle": "PackageReference",
         "skipContentFileWrite": true,
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
         ],
         "configFilePaths": [
-          "C:\\Users\\LYQ\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Users\\53-liu-yq\\AppData\\Roaming\\NuGet\\NuGet.Config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
           "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
@@ -36,18 +36,7 @@
         }
       },
       "frameworks": {
-        "net472": {
-          "dependencies": {
-            "CommunityToolkit.Mvvm": {
-              "target": "Package",
-              "version": "[8.0.0, )"
-            },
-            "Microsoft.Xaml.Behaviors.Wpf": {
-              "target": "Package",
-              "version": "[1.1.39, )"
-            }
-          }
-        }
+        "net472": {}
       },
       "runtimes": {
         "win": {

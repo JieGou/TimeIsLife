@@ -4,17 +4,17 @@
 library
 C#
 .cs
-D:\GitHub\TimeIsLife\TimeIsLife\obj\Debug\
+D:\github\TimeIsLife\TimeIsLife\obj\Debug\
 TimeIsLife
 none
 false
 DEBUG;TRACE
 
-6303870796
+7-247474063
 
-18769963246
-451551881504
-Resources\Button.xaml;Resources\ComboBox.xaml;Resources\TextBox.xaml;View\ElectricaView.xaml;Resources\Shared.xaml;Resources\Expander.xaml;
+17-1151814875
+45328155456
+Resources\Button.xaml;Resources\ComboBox.xaml;Resources\RibbonDictionary.xaml;Resources\TextBox.xaml;View\ElectricaView.xaml;Resources\Shared.xaml;Resources\Expander.xaml;
 
-True
+False
 

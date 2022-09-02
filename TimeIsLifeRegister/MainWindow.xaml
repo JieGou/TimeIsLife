@@ -25,9 +25,13 @@
         <DockPanel>
             <Label Content="CAD版本选择：" DockPanel.Dock="Top" />
             <Button
+                Command="{Binding RefreshCommand}"
+                Content="重新加载"
+                DockPanel.Dock="Top" />
+            <Button
                 Command="{Binding RegiserCommand}"
                 Content="确定"
-                DockPanel.Dock="Bottom" />
+                DockPanel.Dock="Bottom" />            
             <ListBox ItemsSource="{Binding Cads}" SelectionMode="Multiple">
                 <Behaviors:Interaction.Triggers>
                     <Behaviors:EventTrigger EventName="SelectionChanged">

@@ -276,13 +276,16 @@
       <Version>1.0.116</Version>
     </PackageReference>
   </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
     <Page Include="Resources\Button.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Resources\ComboBox.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Resources\RibbonDictionary.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -310,6 +313,19 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Ref\DotNetARX.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Image\classify.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Image\卸载.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Image\注册有礼.ico">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>

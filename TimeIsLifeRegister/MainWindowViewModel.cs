@@ -16,51 +16,72 @@ namespace TimeIsLifeRegister
         public MainWindowViewModel()
         {
             AutoLoadDlls();
-            FilePath = App.path;
+            if (string.IsNullOrEmpty(App.path))
+            {
+                FilePath = $"{Environment.CurrentDirectory}\\TimeIsLife.dll";
+            }
+            else
+            {
+                FilePath = App.path;
+            }
             RegiserCommand = new RelayCommand(Regiser);
             SelectedCommand = new RelayCommand(Selected);
+            RefreshCommand = new RelayCommand(Refresh);
         }
 
 
         private void AutoLoadDlls()
         {
-
-            List<string> cadKeyNames = new List<string>();
-            // 获取HKEY_CURRENT_USER键
-            RegistryKey keyCurrentUser = Registry.CurrentUser;
-            // 打开AutoCAD所属的注册表键:HKEY_CURRENT_USER\Software\Autodesk\AutoCAD
-            RegistryKey keyAutoCAD = keyCurrentUser.OpenSubKey("Software\\Autodesk\\AutoCAD");
-
-            foreach (var keyCurAutoCAD in keyAutoCAD.GetSubKeyNames())
+            try
             {
-
-                RegistryKey keyVersion = keyAutoCAD.OpenSubKey(keyCurAutoCAD);
-                string language = keyVersion.GetValue("CurVer").ToString();
-                RegistryKey keyLanguage = keyVersion.OpenSubKey(language);
-                string cadKeyName = keyLanguage.Name.Substring(keyCurrentUser.Name.Length + 1);
-                cadKeyNames.Add(cadKeyName);
-            }
-
-            foreach (var cadKeyName in cadKeyNames)
-            {
-                //打开HKEY_LOCAL_MACHINE下当前AutoCAD的注册表键以获得版本号
-                RegistryKey keyCAD = Registry.LocalMachine.OpenSubKey(cadKeyName);
-                //设置文本框显示当前AutoCAD版本号
-                string cadName = keyCAD.GetValue("ProductName").ToString();
-                Cads.Add(new CadKeyName(cadName, cadKeyName));
-            }
-
-            foreach (var item in Cads)
-            {
-                if (item.IsChecked == true)
+                List<string> cadKeyNames = new List<string>();
+                // 获取HKEY_CURRENT_USER键
+                RegistryKey keyCurrentUser = Registry.CurrentUser;
+                // 打开AutoCAD所属的注册表键:HKEY_CURRENT_USER\Software\Autodesk\AutoCAD
+                RegistryKey? keyAutoCAD = keyCurrentUser.OpenSubKey("Software\\Autodesk\\AutoCAD");
+                if (keyAutoCAD == null) return;
+                if (keyAutoCAD.GetSubKeyNames().Length == 0) return;
+                foreach (var keyCurAutoCAD in keyAutoCAD.GetSubKeyNames())
                 {
-                    AddRegistryKey(item, FilePath);
+                    RegistryKey? keyVersion = keyAutoCAD.OpenSubKey(keyCurAutoCAD);
+                    if (keyVersion == null) continue;
+                    string? language = keyVersion.GetValue("CurVer") as string;
+                    if (string.IsNullOrEmpty(language)) continue;
+                    RegistryKey? keyLanguage = keyVersion.OpenSubKey(language);
+                    if (keyLanguage == null) continue;
+                    string cadKeyName = keyLanguage.Name.Substring(keyCurrentUser.Name.Length + 1);
+                    cadKeyNames.Add(cadKeyName);
                 }
-                else
+
+                foreach (var cadKeyName in cadKeyNames)
                 {
-                    RemoveRegistryKey(item);
+                    //打开HKEY_LOCAL_MACHINE下当前AutoCAD的注册表键以获得版本号
+                    RegistryKey? keyCAD = Registry.LocalMachine.OpenSubKey(cadKeyName);
+                    //设置文本框显示当前AutoCAD版本号
+                    if(keyCAD == null) continue;
+                    string? cadName = keyCAD.GetValue("ProductName") as string;
+                    if(string.IsNullOrEmpty(cadName)) continue;
+                    Cads.Add(new CadKeyName(cadName, cadKeyName));
+                }
+
+                foreach (var item in Cads)
+                {
+                    if (item.IsChecked == true)
+                    {
+                        AddRegistryKey(item, FilePath);
+                    }
+                    else
+                    {
+                        RemoveRegistryKey(item);
+                    }
                 }
             }
+            catch
+            {
+
+                return;
+            }
+            
         }
 
         const string filePath = @"C:\Program Files\TimeIsLife\TimeIsLife\TimeIsLife.dll";
@@ -78,6 +99,7 @@ namespace TimeIsLifeRegister
 
         List<CadKeyName> selectedCads = new List<CadKeyName>();
 
+
         public IRelayCommand RegiserCommand { get; }
         void Regiser()
         {
@@ -93,6 +115,11 @@ namespace TimeIsLifeRegister
                 }
             }
             MainWindow.Instance.Close();
+        }
+        public IRelayCommand RefreshCommand { get; }
+        void Refresh()
+        {
+            AutoLoadDlls();
         }
 
         public IRelayCommand SelectedCommand { get; }

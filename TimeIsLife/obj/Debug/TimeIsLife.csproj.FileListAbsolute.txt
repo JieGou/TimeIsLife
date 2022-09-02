@@ -1,5 +1,5 @@
-D:\github\TimeIsLife\TimeIsLife\bin\Debug\AcDx.dll
-D:\github\TimeIsLife\TimeIsLife\bin\Debug\AdUiPalettes.dll
+D:\github\TimeIsLife\TimeIsLife\bin\Debug\TimeIsLife.dll
+D:\github\TimeIsLife\TimeIsLife\bin\Debug\EntityFramework.dll
 D:\github\TimeIsLife\TimeIsLife\bin\Debug\Block\FA-08-智能型点型感烟探测器.dwg
 D:\github\TimeIsLife\TimeIsLife\bin\Debug\FA\FA-01-接线端子箱.dwg
 D:\github\TimeIsLife\TimeIsLife\bin\Debug\FA\FA-02-带消防电话插孔的手动报警按钮.dwg
@@ -43,15 +43,16 @@ D:\github\TimeIsLife\TimeIsLife\bin\Debug\FA\火灾自动报警图例及示例.d
 D:\github\TimeIsLife\TimeIsLife\bin\Debug\FA\操作说明.txt
 D:\github\TimeIsLife\TimeIsLife\bin\Debug\Ref\DotNetARX.dll
 D:\github\TimeIsLife\TimeIsLife\bin\Debug\TimeIsLife.dll.config
-D:\github\TimeIsLife\TimeIsLife\bin\Debug\TimeIsLife.dll
 D:\github\TimeIsLife\TimeIsLife\bin\Debug\TimeIsLife.pdb
 D:\github\TimeIsLife\TimeIsLife\bin\Debug\AcCui.dll
+D:\github\TimeIsLife\TimeIsLife\bin\Debug\AcDx.dll
 D:\github\TimeIsLife\TimeIsLife\bin\Debug\AcMgd.dll
 D:\github\TimeIsLife\TimeIsLife\bin\Debug\AcMr.dll
 D:\github\TimeIsLife\TimeIsLife\bin\Debug\AcSeamless.dll
 D:\github\TimeIsLife\TimeIsLife\bin\Debug\AcTcMgd.dll
 D:\github\TimeIsLife\TimeIsLife\bin\Debug\AcWindows.dll
 D:\github\TimeIsLife\TimeIsLife\bin\Debug\AdUIMgd.dll
+D:\github\TimeIsLife\TimeIsLife\bin\Debug\AdUiPalettes.dll
 D:\github\TimeIsLife\TimeIsLife\bin\Debug\AdWindows.dll
 D:\github\TimeIsLife\TimeIsLife\bin\Debug\AcCoreMgd.dll
 D:\github\TimeIsLife\TimeIsLife\bin\Debug\AcDbMgd.dll
@@ -60,7 +61,6 @@ D:\github\TimeIsLife\TimeIsLife\bin\Debug\CommunityToolkit.Mvvm.dll
 D:\github\TimeIsLife\TimeIsLife\bin\Debug\CommunityToolkit.Mvvm.pdb
 D:\github\TimeIsLife\TimeIsLife\bin\Debug\Dapper.dll
 D:\github\TimeIsLife\TimeIsLife\bin\Debug\EntityFramework.SqlServer.dll
-D:\github\TimeIsLife\TimeIsLife\bin\Debug\EntityFramework.dll
 D:\github\TimeIsLife\TimeIsLife\bin\Debug\Microsoft.Bcl.AsyncInterfaces.dll
 D:\github\TimeIsLife\TimeIsLife\bin\Debug\Microsoft.Xaml.Behaviors.dll
 D:\github\TimeIsLife\TimeIsLife\bin\Debug\Microsoft.Xaml.Behaviors.pdb
@@ -77,6 +77,7 @@ D:\github\TimeIsLife\TimeIsLife\bin\Debug\DotNetARX.dll
 D:\github\TimeIsLife\TimeIsLife\obj\Debug\TimeIsLife.csproj.AssemblyReference.cache
 D:\github\TimeIsLife\TimeIsLife\obj\Debug\Resources\Button.baml
 D:\github\TimeIsLife\TimeIsLife\obj\Debug\Resources\ComboBox.baml
+D:\github\TimeIsLife\TimeIsLife\obj\Debug\Resources\RibbonDictionary.baml
 D:\github\TimeIsLife\TimeIsLife\obj\Debug\Resources\Expander.baml
 D:\github\TimeIsLife\TimeIsLife\obj\Debug\View\ElectricaView.g.cs
 D:\github\TimeIsLife\TimeIsLife\obj\Debug\GeneratedInternalTypeHelper.g.cs
@@ -92,3 +93,5 @@ D:\github\TimeIsLife\TimeIsLife\obj\Debug\TimeIsLife.csproj.CoreCompileInputs.ca
 D:\github\TimeIsLife\TimeIsLife\obj\Debug\TimeIsLife.csproj.CopyComplete
 D:\github\TimeIsLife\TimeIsLife\obj\Debug\TimeIsLife.dll
 D:\github\TimeIsLife\TimeIsLife\obj\Debug\TimeIsLife.pdb
+D:\github\TimeIsLife\TimeIsLife\bin\Debug\Image\卸载.ico
+D:\github\TimeIsLife\TimeIsLife\bin\Debug\Image\注册有礼.ico

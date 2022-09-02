@@ -21,10 +21,10 @@ namespace TimeIsLifeRegister
     /// </summary>
     public partial class MainWindow : Window
     {
-        public static MainWindow? Instance { get; private set; }
+        public static MainWindow Instance { get; private set; }
         public MainWindow()
         {
-            Debugger.Launch();
+            //Debugger.Launch();
             InitializeComponent();
             this.DataContext = new MainWindowViewModel();
             Instance = this;

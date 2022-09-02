@@ -1,17 +1,9 @@
 ﻿using Microsoft.Win32;
 
-using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Configuration.Install;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Windows.Forms;
-using System.Windows.Threading;
 
 namespace TimeIsLifeInstallerClass
 {
@@ -60,7 +52,7 @@ namespace TimeIsLifeInstallerClass
             Process process = Process.Start(info);
             //Thread.Sleep(100);
 
-            process.WaitForExit();
+            //process.WaitForExit();
 
 
             //Thread thread = new Thread(() =>
@@ -79,24 +71,6 @@ namespace TimeIsLifeInstallerClass
 
         }
 
-        public string GetAutoCADKeyName()
-        {
-            // 获取HKEY_CURRENT_USER键
-            RegistryKey keyCurrentUser = Registry.CurrentUser;
-            // 打开AutoCAD所属的注册表键:HKEY_CURRENT_USER\Software\Autodesk\AutoCAD
-            RegistryKey keyAutoCAD = keyCurrentUser.OpenSubKey("Software\\Autodesk\\AutoCAD");
-            //获得表示当前的AutoCAD版本的注册表键值:R18.2
-            string valueCurAutoCAD = (string)keyAutoCAD.GetValue("CurVer");
-            if (valueCurAutoCAD == null) return "";//如果未安装AutoCAD，则返回
-            //获取当前的AutoCAD版本的注册表键:HKEY_LOCAL_MACHINE\Software\Autodesk\AutoCAD\R18.2
-            RegistryKey keyCurAutoCAD = keyAutoCAD.OpenSubKey(valueCurAutoCAD);
-            //获取表示AutoCAD当前语言的注册表键值:ACAD-a001:804
-            string language = keyCurAutoCAD.GetValue("CurVer").ToString();
-            //获取AutoCAD当前语言的注册表键:HKEY_LOCAL_MACHINE\Software\Autodesk\AutoCAD\R18.2\ACAD-a001:804
-            RegistryKey keyLanguage = keyCurAutoCAD.OpenSubKey(language);
-            //返回去除HKEY_LOCAL_MACHINE前缀的当前AutoCAD注册表项的键名:Software\Autodesk\AutoCAD\R18.2\ACAD-a001:804
-            return keyLanguage.Name.Substring(keyCurrentUser.Name.Length + 1);
-        }
         #endregion
 
 

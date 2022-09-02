@@ -135,19 +135,19 @@ namespace TimeIsLife.ViewModel
 
         void SumPower()
         {
-            Application.DocumentManager.MdiActiveDocument.SendStringToExecute("FF_SumPower\n", true, false, false);
+            Application.DocumentManager.MdiActiveDocument.SendStringToExecute("FF_SumPower\n", true, false, true);
         }
 
         public IRelayCommand AddCalculateCurrentCommand { get; }
         void AddCalculateCurrent()
         {
-            Application.DocumentManager.MdiActiveDocument.SendStringToExecute("FF_AddCalculateCurrent\n", true, false, false);
+            Application.DocumentManager.MdiActiveDocument.SendStringToExecute("FF_AddCalculateCurrent\n", true, false, true);
         }
 
         public IRelayCommand AddSumPowerCommand { get; }
         void AddSumPower()
         {
-            Application.DocumentManager.MdiActiveDocument.SendStringToExecute("FF_AddSumPower\n", true, false, false);
+            Application.DocumentManager.MdiActiveDocument.SendStringToExecute("FF_AddSumPower\n", true, false, true);
         }
         #endregion
 
@@ -169,43 +169,43 @@ namespace TimeIsLife.ViewModel
         public IRelayCommand QuickUcsCommand { get; }
         void QuickUcs()
         {
-            Application.DocumentManager.MdiActiveDocument.SendStringToExecute("FF_QuickUcs\n", true, false, false);
+            Application.DocumentManager.MdiActiveDocument.SendStringToExecute("FF_QuickUcs\n", true, false, true);
         }
 
         public IRelayCommand SetCurrentStatusCommand { get; }
         void SetCurrentStatus()
         {
-            Application.DocumentManager.MdiActiveDocument.SendStringToExecute("F2_SetCurrentStatus\n", true, false, false);
+            Application.DocumentManager.MdiActiveDocument.SendStringToExecute("F2_SetCurrentStatus\n", true, false, true);
         }
 
         public IRelayCommand ConnectLineCommand { get; }
         void ConnectLine()
         {
-            Application.DocumentManager.MdiActiveDocument.SendStringToExecute("F1_ConnectLine\n", true, false, false);
+            Application.DocumentManager.MdiActiveDocument.SendStringToExecute("F1_ConnectLine\n", true, false, true);
         }
 
         public IRelayCommand ConnectLinesCommand { get; }
         void ConnectLines()
         {
-            Application.DocumentManager.MdiActiveDocument.SendStringToExecute("F3_ConnectLines\n", true, false, false);
+            Application.DocumentManager.MdiActiveDocument.SendStringToExecute("F3_ConnectLines\n", true, false, true);
         }
 
         public IRelayCommand AlignUcsCommand { get; }
         void AlignUcs()
         {
-            Application.DocumentManager.MdiActiveDocument.SendStringToExecute("F4_AlignUcs\n", true, false, false);
+            Application.DocumentManager.MdiActiveDocument.SendStringToExecute("F4_AlignUcs\n", true, false, true);
         }
 
         public IRelayCommand EquipmentAngleCommand { get; }
         void EquipmentAngle()
         {
-            Application.DocumentManager.MdiActiveDocument.SendStringToExecute("F5_EquipmentAngle\n", true, false, false);
+            Application.DocumentManager.MdiActiveDocument.SendStringToExecute("F5_EquipmentAngle\n", true, false, true);
         }
 
         public IRelayCommand ExplodeMInsertBlockCommand { get; }
         void ExplodeMInsertBlock()
         {
-            Application.DocumentManager.MdiActiveDocument.SendStringToExecute("FF_ExplodeMInsertBlock\n", true, false, false);
+            Application.DocumentManager.MdiActiveDocument.SendStringToExecute("FF_ExplodeMInsertBlock\n", true, false, true);
         }
         #endregion
 
@@ -298,13 +298,13 @@ namespace TimeIsLife.ViewModel
         public IRelayCommand GetAreaCommand { get; }
         void GetArea()
         {
-            Application.DocumentManager.MdiActiveDocument.SendStringToExecute("FF_GetArea\n", true, false, false);
+            Application.DocumentManager.MdiActiveDocument.SendStringToExecute("FF_GetArea\n", true, false, true);
         }
 
         public IRelayCommand RecLightingCommand { get; }
         void RecLighting()
         {
-            Application.DocumentManager.MdiActiveDocument.SendStringToExecute("FF_RecLighting\n", true, false, false);
+            Application.DocumentManager.MdiActiveDocument.SendStringToExecute("FF_RecLighting\n", true, false, true);
         }
 
 
@@ -359,7 +359,7 @@ namespace TimeIsLife.ViewModel
 
         void CurveLighting()
         {
-            Application.DocumentManager.MdiActiveDocument.SendStringToExecute("FF_CurveLighting\n", true, false, false);
+            Application.DocumentManager.MdiActiveDocument.SendStringToExecute("FF_CurveLighting\n", true, false, true);
         }
         #endregion
 
