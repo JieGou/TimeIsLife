@@ -8,7 +8,7 @@
     xmlns:local="clr-namespace:TimeIsLife.View"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     d:DesignHeight="641.74"
-    d:DesignWidth="400"
+    d:DesignWidth="200"
     mc:Ignorable="d">
     <UserControl.Resources>
         <ResourceDictionary>
@@ -17,12 +17,13 @@
                 <ResourceDictionary Source="/TimeIsLife;component/Resources/Expander.xaml" />
                 <ResourceDictionary Source="/TimeIsLife;component/Resources/Button.xaml" />
                 <ResourceDictionary Source="/TimeIsLife;component/Resources/ComboBox.xaml" />
-                <ResourceDictionary Source="/TimeIsLife;component/Resources/TextBox.xaml"/>
+                <ResourceDictionary Source="/TimeIsLife;component/Resources/TextBox.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </UserControl.Resources>
     <ScrollViewer
         Padding="5"
+        HorizontalContentAlignment="Left"
         HorizontalScrollBarVisibility="Auto"
         VerticalScrollBarVisibility="Auto">
         <StackPanel Orientation="Vertical">
@@ -168,10 +169,32 @@
             </Expander>
             <Expander Header="火灾自动报警" Template="{StaticResource ExpanderTemplate}">
                 <StackPanel>
-                    <Button
-                        Command="{Binding LoadYdbFileCommand}"
-                        Content="读取YDB文件"
-                        Template="{StaticResource ButtonTemplate}" />
+                    <GroupBox Header="读取YDB文件">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition />
+                                <RowDefinition />
+                            </Grid.RowDefinitions>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition />
+                                <ColumnDefinition />
+                            </Grid.ColumnDefinitions>
+                            <CheckBox
+                                Grid.Row="0"
+                                Grid.Column="0"
+                                Grid.ColumnSpan="2"
+                                IsChecked="{Binding IsLayoutAtHole}"
+                                Content="在楼板开洞位置布置烟感" />
+                            <Button
+                                Grid.Row="1"
+                                Grid.Column="0"
+                                Grid.ColumnSpan="2"
+                                Command="{Binding LoadYdbFileCommand}"
+                                Content="选择文件"
+                                Template="{StaticResource ButtonTemplate}" />
+                        </Grid>
+                    </GroupBox>
+
                     <Button
                         Command="{Binding FasCommand}"
                         Content="生成火灾自动报警系统图"

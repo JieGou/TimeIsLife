@@ -12,8 +12,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows;
 
 using TimeIsLife.Jig;
+
+using Application = Autodesk.AutoCAD.ApplicationServices.Application;
 
 [assembly: CommandClass(typeof(TimeIsLife.CADCommand.ToolCommand))]
 
@@ -28,8 +31,31 @@ namespace TimeIsLife.CADCommand
             Document document = Application.DocumentManager.CurrentDocument;
             Database database = document.Database;
             Editor editor = document.Editor;
+            //using Transaction transaction = database.TransactionManager.StartOpenCloseTransaction();
+            //try
+            //{
+            //    ViewportTableRecord viewportTableRecord = (ViewportTableRecord)transaction.GetObject(database.CurrentViewportTableRecordId, OpenMode.ForWrite);
+            //    if (viewportTableRecord == null) return;
+            //    editor.WriteMessage($"{viewportTableRecord.IconAtOrigin}");
+            //    viewportTableRecord.IconAtOrigin = !viewportTableRecord.IconAtOrigin;
+            //    //ViewTableRecord viewTableRecord = editor.GetCurrentView();
+            //    //if (viewTableRecord == null) return;
+            //    //viewTableRecord.UcsIconAtOrigin = true;
 
-            document.SendStringToExecute("ucs\nob\n", true, false, false);
+            //    //UcsTableRecord ucsTableRecord = (UcsTableRecord)transaction.GetObject(viewTableRecord.UcsName, OpenMode.ForWrite);
+            //    //if (ucsTableRecord == null) return;
+            //    //ucsTableRecord.Origin = Point3d.Origin;
+            //    //ucsTableRecord.DowngradeOpen();
+            //    transaction.Commit();
+            //}
+            //catch
+            //{
+            //    transaction.Abort();
+            //}
+            document.SendStringToExecute("UCSICON\nN\n", true, false, true);
+            document.SendStringToExecute("UCS\nOB\n", true, false, true);
+
+
         }
         #endregion
 

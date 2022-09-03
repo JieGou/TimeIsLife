@@ -45,7 +45,7 @@ namespace TimeIsLife.CADCommand
             if (paletteSet == null)//如果面板没有被创建
             {
 
-                paletteSet = new PaletteSet("时间就是生命");
+                paletteSet = new PaletteSet("TimeIsLife");
                 paletteSet.DockEnabled = DockSides.Left;
                 paletteSet.TitleBarLocation = PaletteSetTitleBarLocation.Left;
                 paletteSet.Dock = DockSides.Left;

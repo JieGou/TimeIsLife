@@ -20,6 +20,8 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
+using TimeIsLife.ViewModel;
+
 using Application = Autodesk.AutoCAD.ApplicationServices.Application;
 
 [assembly: CommandClass(typeof(TimeIsLife.CADCommand.FireAlarmCommnad))]
@@ -28,6 +30,7 @@ namespace TimeIsLife.CADCommand
 {
     class FireAlarmCommnad
     {
+        
         #region F6_CheckBeam
         [CommandMethod("F6_CheckBeam")]
         public void F6_CheckBeam()
@@ -836,8 +839,12 @@ namespace TimeIsLife.CADCommand
             {
                 try
                 {
+                    string codeBase = Assembly.GetExecutingAssembly().CodeBase;
+                    UriBuilder uri = new UriBuilder(codeBase);
+                    string path = Uri.UnescapeDataString(uri.Path);
+                    
                     //载入感烟探测器块
-                    string blockPath = Path.Combine(Environment.CurrentDirectory, "Block", "FA-08-智能型点型感烟探测器.dwg");
+                    string blockPath = Path.Combine(Path.GetDirectoryName(path), "Block", "FA-08-智能型点型感烟探测器.dwg");
                     string blockName = SymbolUtilityServices.GetSymbolNameFromPathName(blockPath, "dwg");
 
                     ObjectId id = ObjectId.Null;
@@ -854,9 +861,10 @@ namespace TimeIsLife.CADCommand
                             {
                                 id = db.Insert(blockName, tempDb, true);
 
-                                #region 生成板
+                                #region 生成板及烟感
                                 foreach (var slab in slabs)
                                 {
+                                    bool bo = true;
                                     if (slab.Floor.LevelB != floor.LevelB) continue;
 
                                     SetLayer(db, $"slab-{slab.Thickness.ToString()}mm", 7);
@@ -866,6 +874,11 @@ namespace TimeIsLife.CADCommand
                                     polyline.CreatePolyline(point2Ds);
                                     db.AddToModelSpace(polyline);
 
+                                    if (slab.Thickness == 0)
+                                    {
+                                        if (!ElectricalViewModel.electricalViewModel.IsLayoutAtHole) bo = false;
+                                    }
+                                    if (!bo) continue;
                                     //在板的重心添加感烟探测器
                                     SetLayer(db, $"E-EQUIP-{slab.Thickness.ToString()}", 4);
 

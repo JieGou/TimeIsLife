@@ -152,6 +152,17 @@ namespace TimeIsLife.ViewModel
         #endregion
 
         #region 火灾自动报警
+
+        #region 属性
+        //计算电流
+        private bool isLayoutAtHole;
+        public bool IsLayoutAtHole
+        {
+            get => isLayoutAtHole;
+            set => SetProperty(ref isLayoutAtHole, value);
+        }
+        #endregion
+
         public IRelayCommand LoadYdbFileCommand { get; }
         void LoadYdbFile()
         {

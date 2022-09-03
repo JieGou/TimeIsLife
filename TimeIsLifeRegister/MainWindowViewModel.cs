@@ -5,6 +5,7 @@ using Microsoft.Win32;
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -32,6 +33,8 @@ namespace TimeIsLifeRegister
 
         private void AutoLoadDlls()
         {
+            string AppName = "TimeIsLife";
+            //Debugger.Launch();
             try
             {
                 List<string> cadKeyNames = new List<string>();
@@ -61,20 +64,31 @@ namespace TimeIsLifeRegister
                     if(keyCAD == null) continue;
                     string? cadName = keyCAD.GetValue("ProductName") as string;
                     if(string.IsNullOrEmpty(cadName)) continue;
-                    Cads.Add(new CadKeyName(cadName, cadKeyName));
-                }
 
-                foreach (var item in Cads)
-                {
-                    if (item.IsChecked == true)
+                    //打开HKEY_CURRENT_USER下当前AutoCAD的Applications注册表键以显示已加载的.NET程序
+                    RegistryKey keyApplications = Registry.CurrentUser.CreateSubKey(cadKeyName + "\\" + "Applications");
+                    
+                    if (keyApplications.GetSubKeyNames().Contains(AppName))
                     {
-                        AddRegistryKey(item, FilePath);
+                        Cads.Add(new CadKeyName(cadName, cadKeyName,true));
                     }
                     else
                     {
-                        RemoveRegistryKey(item);
+                        Cads.Add(new CadKeyName(cadName, cadKeyName,false));
                     }
                 }
+
+                //foreach (var item in Cads)
+                //{
+                //    if (item.IsChecked == true)
+                //    {
+                //        AddRegistryKey(item, FilePath);
+                //    }
+                //    else
+                //    {
+                //        RemoveRegistryKey(item);
+                //    }
+                //}
             }
             catch
             {
@@ -116,6 +130,8 @@ namespace TimeIsLifeRegister
             }
             MainWindow.Instance.Close();
         }
+
+
         public IRelayCommand RefreshCommand { get; }
         void Refresh()
         {
@@ -137,6 +153,7 @@ namespace TimeIsLifeRegister
                 }
             }
         }
+
         void AddRegistryKey(CadKeyName selectedCadKeyName, string filePath)
         {
             string AppName = "TimeIsLife";
@@ -162,8 +179,9 @@ namespace TimeIsLifeRegister
             try
             {
                 // 以写的方式打开Applications注册表键
-                RegistryKey keyApp = Registry.CurrentUser.OpenSubKey(selectedCadKeyName.Key + "\\" + "Applications", true);
+                RegistryKey? keyApp = Registry.CurrentUser.OpenSubKey(selectedCadKeyName.Key + "\\" + "Applications", true);
                 //删除指定名称的注册表键
+                if(keyApp != null)
                 keyApp.DeleteSubKeyTree(AppName);
             }
             catch
@@ -176,22 +194,22 @@ namespace TimeIsLifeRegister
 
     public class CadKeyName : ObservableObject
     {
-        public CadKeyName(string name, string key)
+        public CadKeyName(string name, string key,bool isChecked)
         {
             Name = name;
             Key = key;
-            IsChecked = false;
+            IsChecked = isChecked;
         }
 
-        private string name;
-        public string Name
+        private string? name;
+        public string? Name
         {
             get => name;
             set => SetProperty(ref name, value);
         }
 
-        private string key;
-        public string Key
+        private string? key;
+        public string? Key
         {
             get => key;
             set => SetProperty(ref key, value);
