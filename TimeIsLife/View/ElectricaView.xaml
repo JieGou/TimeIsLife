@@ -231,6 +231,10 @@
                         Command="{Binding ExplodeMInsertBlockCommand}"
                         Content="分解多重插入块"
                         Template="{StaticResource ButtonTemplate}" />
+                    <Button
+                        Command="{Binding ModifyTextStyleCommand}"
+                        Content="修复字体样式"
+                        Template="{StaticResource ButtonTemplate}" />
                 </StackPanel>
             </Expander>
             <Expander

@@ -40,6 +40,7 @@ namespace TimeIsLife.ViewModel
             AlignUcsCommand = new RelayCommand(AlignUcs);
             EquipmentAngleCommand = new RelayCommand(EquipmentAngle);
             ExplodeMInsertBlockCommand = new RelayCommand(ExplodeMInsertBlock);
+            ModifyTextStyleCommand = new RelayCommand(ModifyTextStyle);
 
             //矩形布置
             GetAreaCommand = new RelayCommand(GetArea);
@@ -218,6 +219,15 @@ namespace TimeIsLife.ViewModel
         {
             Application.DocumentManager.MdiActiveDocument.SendStringToExecute("FF_ExplodeMInsertBlock\n", true, false, true);
         }
+
+        public IRelayCommand ModifyTextStyleCommand { get; }
+        void ModifyTextStyle()
+        {
+            Application.DocumentManager.MdiActiveDocument.SendStringToExecute("FF_ModifyTextStyle\n", true, false, true);
+        }
+        
+
+
         #endregion
 
         #region 矩形布置

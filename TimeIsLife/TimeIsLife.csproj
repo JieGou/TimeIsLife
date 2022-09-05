@@ -84,6 +84,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CADCommand\LightingCommand.cs" />
+    <Compile Include="Helper\PointHelper.cs" />
     <Compile Include="Helper\TextBoxAutoSelectHelper.cs" />
     <Compile Include="Jig\LightingLayoutJig.cs" />
     <Compile Include="Model\BlockScaleEnum.cs" />
