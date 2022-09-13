@@ -169,7 +169,7 @@
             </Expander>
             <Expander Header="火灾自动报警" Template="{StaticResource ExpanderTemplate}">
                 <StackPanel>
-                    <GroupBox Header="读取YDB文件">
+                    <GroupBox Header="根据结构模型布置烟感">
                         <Grid>
                             <Grid.RowDefinitions>
                                 <RowDefinition />
@@ -190,7 +190,7 @@
                                 Grid.Column="0"
                                 Grid.ColumnSpan="2"
                                 Command="{Binding LoadYdbFileCommand}"
-                                Content="选择文件"
+                                Content="选择模型文件"
                                 Template="{StaticResource ButtonTemplate}" />
                         </Grid>
                     </GroupBox>
