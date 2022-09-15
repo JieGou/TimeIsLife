@@ -15,7 +15,6 @@ using System.Threading.Tasks;
 using System.Windows;
 
 using TimeIsLife.Jig;
-using TimeIsLife.Tools;
 using TimeIsLife.ViewModel;
 
 using Application = Autodesk.AutoCAD.ApplicationServices.Application;
@@ -27,27 +26,44 @@ namespace TimeIsLife.CADCommand
     class LightingCommand
     {
 
-        [CommandMethod("FF_GetArea")]
+        [CommandMethod("FF_GetArea",CommandFlags.UsePickSet)]
         public void FF_GetArea()
         {
             Document document = Application.DocumentManager.MdiActiveDocument;
             Editor editor = document.Editor;
             Database database = document.Database;
-
+            
             using Transaction transaction = document.TransactionManager.StartTransaction();
             try
             {
-                PromptSelectionOptions promptSelectionOptions = new PromptSelectionOptions()
+                Polyline polyLine = null;
+
+                PromptSelectionResult psr = editor.SelectImplied();
+
+                if (psr.Status == PromptStatus.OK)
                 {
-                    SingleOnly = true,
-                    RejectObjectsOnLockedLayers = true,
-                };
-                PromptSelectionResult promptSelectionResult = editor.GetSelection(promptSelectionOptions);
-                if (promptSelectionResult.Status != PromptStatus.OK) return;
+                    SelectionSet set = psr.Value;
+                    if (set.Count >0)
+                    {
+                        polyLine = (Polyline)transaction.GetObject(set.GetObjectIds()[0], OpenMode.ForRead);
+                    }
+                }
+                else
+                {
+                    PromptSelectionOptions promptSelectionOptions = new PromptSelectionOptions()
+                    {
+                        SingleOnly = true,
+                        RejectObjectsOnLockedLayers = true,
+                    };
+                    PromptSelectionResult promptSelectionResult = editor.GetSelection(promptSelectionOptions);
+                    if (promptSelectionResult.Status != PromptStatus.OK) return;
 
-                SelectionSet selectionSet = promptSelectionResult.Value;
+                    SelectionSet selectionSet = promptSelectionResult.Value;
 
-                Polyline polyLine = (Polyline)transaction.GetObject(selectionSet.GetObjectIds()[0], OpenMode.ForRead);
+                    polyLine = (Polyline)transaction.GetObject(selectionSet.GetObjectIds()[0], OpenMode.ForRead);
+                }
+
+                
                 if (polyLine == null) return;
 
                 double polyLineArea = polyLine.Area;
@@ -92,7 +108,12 @@ namespace TimeIsLife.CADCommand
                     if (promptSelectionResult.Status != PromptStatus.OK) return;
                     SelectionSet selectionSet = promptSelectionResult.Value;
 
+                    //亮显选择的块参照
+                    //editor.SetImpliedSelection(selectionSet.GetObjectIds());
+
+
                     BlockReference blockReference = (BlockReference)transaction.GetObject(selectionSet.GetObjectIds()[0], OpenMode.ForRead);
+                    blockReference.Highlight();
                     BlockTableRecord btr = (BlockTableRecord)blockReference.BlockTableRecord.GetObject(OpenMode.ForRead);
                     if (btr == null) return;
 
@@ -125,50 +146,13 @@ namespace TimeIsLife.CADCommand
                     PromptResult resJig = editor.Drag(lightingLayoutJig);
                     if (resJig.Status != PromptStatus.OK) return;
 
+                    blockReference.Unhighlight();
+
                     modelSpace.UpgradeOpen();
                     foreach (var reference in lightingLayoutJig.blockReferences)
                     {
                         modelSpace.AppendEntity(reference);
                         transaction.AddNewlyCreatedDBObject(reference, true);
-
-                        //if (btr.HasAttributeDefinitions)
-                        //{
-                        //    foreach (var attri in reference.AttributeCollection)
-                        //    {
-                        //        AttributeReference ar = null;
-                        //        if (attri is ObjectId)
-                        //        {
-                        //            ar = transaction.GetObject((ObjectId)attri,OpenMode.ForWrite) as AttributeReference;
-                        //        }
-                        //        else if(attri is AttributeReference)
-                        //        {
-                        //            ar = (AttributeReference)attri;
-                        //        }
-
-                        //        if (ar != null)
-                        //        {
-                        //            //ar.UpgradeOpen();
-                        //            //reference.UpgradeOpen();
-                        //            bool b1  = ar.IsWriteEnabled;
-                        //            bool b2 = reference.IsWriteEnabled;
-
-
-                        //            Point3d point3D = blockReference.Position;
-                        //            //ar.TransformBy(matrixd.Inverse());
-                        //            //reference.TransformBy(matrixd.Inverse());
-                        //            ar.TransformBy(Matrix3d.Rotation(blockReference.Rotation, Vector3d.ZAxis, point3D.TransformBy(matrixd)).Inverse());
-
-                        //            ar.TransformBy(Matrix3d.Displacement(point3D.TransformBy(matrixd).GetVectorTo(reference.Position)));
-                        //            //ar.TransformBy(Matrix3d.Rotation((BlockReferenceAngle * Math.PI) / 180.0, Vector3d.ZAxis, reference.Position));
-
-
-                        //            //ar.TransformBy(matrixd);
-                        //            //reference.TransformBy(matrixd);
-                        //            //ar.DowngradeOpen();
-                        //            //reference.DowngradeOpen();
-                        //        }
-                        //    }
-                        //}
 
                     }
                     modelSpace.DowngradeOpen();
@@ -181,8 +165,6 @@ namespace TimeIsLife.CADCommand
                 }
             }
         }
-
-
 
         [CommandMethod("FF_CurveLighting")]
         public void FF_CurveLighting()
@@ -216,6 +198,7 @@ namespace TimeIsLife.CADCommand
                             editor.WriteMessage("\n请选择块！");
                             continue;
                         }
+                        baseBlockReference.Highlight();
                         break;
                     }
                     else if (result.Status == PromptStatus.Cancel)
@@ -249,6 +232,7 @@ namespace TimeIsLife.CADCommand
                             editor.WriteMessage("\n请选择圆弧或直线或多段线！");
                             continue;
                         }
+                        baseBlockReference.Unhighlight();
                         break;
                     }
                     else if (result.Status == PromptStatus.Cancel)
@@ -368,10 +352,8 @@ namespace TimeIsLife.CADCommand
                         }
                         break;
                 };
-
                 modelSpace.DowngradeOpen();
-                transaction.Commit();
-
+                transaction.Commit();                
             }
             catch
             {

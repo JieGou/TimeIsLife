@@ -82,14 +82,69 @@ namespace TimeIsLife.CADCommand
                 try
                 {
                     BlockTable blockTable = transaction.GetObject(database.BlockTableId, OpenMode.ForRead) as BlockTable;
-                    BlockTableRecord btr = transaction.GetObject(blockTable[BlockTableRecord.ModelSpace], OpenMode.ForRead) as BlockTableRecord;
+                    BlockTableRecord modelSpace = transaction.GetObject(blockTable[BlockTableRecord.ModelSpace], OpenMode.ForRead) as BlockTableRecord;
 
                     List<List<Point3d>> point3Ds1 = new List<List<Point3d>>();
                     Dictionary<List<Point3d>, double> keyValuePairs = new Dictionary<List<Point3d>, double>();
-                    Point3dCollection point3DCollection1 = GetPoint3DCollection();
+
+                    Point3dCollection point3DCollection1 = new Point3dCollection();
+                    Point3dCollection point3DCollection2 = new Point3dCollection();
+                    BlockReference blockReference1 = null;
+                    BlockReference blockReference2 = null;
+
+                    PromptSelectionOptions promptSelectionOptions = new PromptSelectionOptions()
+                    {
+                        SingleOnly = true,
+                        RejectObjectsOnLockedLayers = true,
+                    };
+                    TypedValueList typedValues = new TypedValueList();
+                    typedValues.Add(typeof(BlockReference));
+                    SelectionFilter selectionFilter = new SelectionFilter(typedValues);
+
+                    PromptSelectionResult promptSelectionResult1 = editor.GetSelection(promptSelectionOptions, selectionFilter);
+                    if (promptSelectionResult1.Status == PromptStatus.OK)
+                    {
+                        SelectionSet selectionSet = promptSelectionResult1.Value;
+                        foreach (var id in selectionSet.GetObjectIds())
+                        {
+                            blockReference1 = transaction.GetObject(id, OpenMode.ForRead) as BlockReference;
+                            if (blockReference1 == null) continue;
+
+                            Matrix3d matrix3D = blockReference1.BlockTransform;
+                            BlockTableRecord btr1 = transaction.GetObject(blockReference1.BlockTableRecord, OpenMode.ForRead) as BlockTableRecord;
+                            if (btr1 == null) continue;
+                            foreach (var objectId in btr1)
+                            {
+                                DBPoint dBPoint = transaction.GetObject(objectId, OpenMode.ForRead) as DBPoint;
+                                if (dBPoint == null) continue;
+                                point3DCollection1.Add(dBPoint.Position.TransformBy(matrix3D));
+                            }
+                        }
+                    }
                     if (point3DCollection1.Count == 0) break;
-                    Point3dCollection point3DCollection2 = GetPoint3DCollection();
+                    blockReference1.Highlight();
+
+                    PromptSelectionResult promptSelectionResult2 = editor.GetSelection(promptSelectionOptions, selectionFilter);
+                    if (promptSelectionResult2.Status == PromptStatus.OK)
+                    {
+                        SelectionSet selectionSet = promptSelectionResult2.Value;
+                        foreach (var id in selectionSet.GetObjectIds())
+                        {
+                            blockReference2 = transaction.GetObject(id, OpenMode.ForRead) as BlockReference;
+                            if (blockReference2 == null) continue;
+                            Matrix3d matrix3D = blockReference2.BlockTransform;
+                            BlockTableRecord btr2 = transaction.GetObject(blockReference2.BlockTableRecord, OpenMode.ForRead) as BlockTableRecord;
+                            if (btr2 == null) continue;
+                            foreach (var objectId in btr2)
+                            {
+                                DBPoint dBPoint = transaction.GetObject(objectId, OpenMode.ForRead) as DBPoint;
+                                if (dBPoint == null) continue;
+                                point3DCollection2.Add(dBPoint.Position.TransformBy(matrix3D));
+                            }
+                        }
+                    }
                     if (point3DCollection2.Count == 0) break;
+                    blockReference1.Unhighlight();
 
                     foreach (Point3d item1 in point3DCollection1)
                     {
@@ -111,63 +166,19 @@ namespace TimeIsLife.CADCommand
                         }
                     }
                     if (line == null) continue;
-                    btr.UpgradeOpen();
-                    btr.AppendEntity(line);
+                    modelSpace.UpgradeOpen();
+                    modelSpace.AppendEntity(line);
                     transaction.AddNewlyCreatedDBObject(line, true);
-                    btr.DowngradeOpen();
+                    modelSpace.DowngradeOpen();
                     transaction.Commit();
                 }
                 catch (System.Exception)
                 {
-
+                    transaction.Abort();
                 }
             }
         }
 
-        private Point3dCollection GetPoint3DCollection()
-        {
-            Document document = Application.DocumentManager.CurrentDocument;
-            Database database = document.Database;
-            Editor editor = document.Editor;
-            Point3dCollection point3DCollection = new Point3dCollection();
-
-            using (Transaction transaction = database.TransactionManager.StartOpenCloseTransaction())
-            {
-                PromptSelectionOptions promptSelectionOptions = new PromptSelectionOptions()
-                {
-                    SingleOnly = true,
-                    RejectObjectsOnLockedLayers = true,
-                };
-
-                TypedValueList typedValues = new TypedValueList();
-                typedValues.Add(typeof(BlockReference));
-                SelectionFilter selectionFilter = new SelectionFilter(typedValues);
-
-                PromptSelectionResult promptSelectionResult = editor.GetSelection(promptSelectionOptions, selectionFilter);
-
-                if (promptSelectionResult.Status == PromptStatus.OK)
-                {
-                    SelectionSet selectionSet = promptSelectionResult.Value;
-                    foreach (var id in selectionSet.GetObjectIds())
-                    {
-                        BlockReference blockReference = transaction.GetObject(id, OpenMode.ForRead) as BlockReference;
-                        if (blockReference == null) continue;
-                        Matrix3d matrix3D = blockReference.BlockTransform;
-
-                        BlockTableRecord btr = transaction.GetObject(blockReference.BlockTableRecord, OpenMode.ForRead) as BlockTableRecord;
-                        if (btr == null) continue;
-                        foreach (var objectId in btr)
-                        {
-                            DBPoint dBPoint = transaction.GetObject(objectId, OpenMode.ForRead) as DBPoint;
-                            if (dBPoint == null) continue;
-                            point3DCollection.Add(dBPoint.Position.TransformBy(matrix3D));
-                        }
-                    }
-                }
-            }
-
-            return point3DCollection;
-        }
         #endregion
 
         #region F2_SetCurrentStatus
