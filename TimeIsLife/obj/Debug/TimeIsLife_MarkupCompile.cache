@@ -4,7 +4,7 @@
 library
 C#
 .cs
-D:\github\TimeIsLife\TimeIsLife\obj\Debug\
+D:\GitHub\TimeIsLife\TimeIsLife\obj\Debug\
 TimeIsLife
 none
 false
@@ -12,9 +12,9 @@ DEBUG;TRACE
 
 7-247474063
 
-322053514191
-46-1146202026
+33-319674984
+4677524022
 Resources\Button.xaml;Resources\ComboBox.xaml;Resources\RibbonDictionary.xaml;Resources\TextBox.xaml;View\ElectricaView.xaml;Resources\Shared.xaml;Resources\Expander.xaml;
 
-False
+True
 

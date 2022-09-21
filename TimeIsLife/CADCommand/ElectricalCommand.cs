@@ -189,20 +189,25 @@ namespace TimeIsLife.CADCommand
 
             using Transaction transaction = database.TransactionManager.StartOpenCloseTransaction();
             BlockTable blockTable = transaction.GetObject(database.BlockTableId, OpenMode.ForRead) as BlockTable;
-            BlockTableRecord modelSpace = transaction.GetObject(blockTable[BlockTableRecord.ModelSpace], OpenMode.ForWrite) as BlockTableRecord;
+            BlockTableRecord modelSpace = transaction.GetObject(blockTable[BlockTableRecord.ModelSpace], OpenMode.ForRead) as BlockTableRecord;
             Matrix3d matrixd = Application.DocumentManager.MdiActiveDocument.Editor.CurrentUserCoordinateSystem;
 
             //E-配电箱-竖向干线
             string blockName1 = "E-配电箱-竖向干线";
             //E-配电箱-电气火灾监控器
             string blockName2 = "E-配电箱-电气火灾监控器";
+            Point3d point3D2 = new Point3d();
             //E-配电箱-消防设备电源监控系统图
             string blockName3 = "E-配电箱-消防设备电源监控系统图";
+            Point3d point3D3 = new Point3d();
             //E-配电箱-电力能量监控系统
             string blockName4 = "E-配电箱-电力能量监控系统";
+            Point3d point3D4 = new Point3d();
+
+            //在第几层敷设主干路由
+            string pathLevel = "B1";
 
             List<BlockReference> blockReferences1 = new List<BlockReference>();
-
             PromptSelectionResult psr = editor.SelectImplied();
             if (psr.Status == PromptStatus.OK)
             {
@@ -239,7 +244,207 @@ namespace TimeIsLife.CADCommand
                 diagramPanels.Add(GetDiagramPanel(blockReference1));
             }
 
-            editor.WriteMessage("ok!");
+            if (diagramPanels.Count == 0) return;
+            List<DiagramPanel> ALPanels = diagramPanels.Where(p => Regex.IsMatch(p.Name, "[A][L][^TE]")).ToList();
+            List<DiagramPanel> ALTPanels = diagramPanels.Where(p => Regex.IsMatch(p.Name, "[A][L][T]")).ToList();
+            List<DiagramPanel> ALEPanels = diagramPanels.Where(p => Regex.IsMatch(p.Name, "[A][L][E]")).ToList();
+            List<DiagramPanel> APPanels = diagramPanels.Where(p => Regex.IsMatch(p.Name, "[A][P][^TE]")).ToList();
+            List<DiagramPanel> APTPanels = diagramPanels.Where(p => Regex.IsMatch(p.Name, "[A][P][T]")).ToList();
+            List<DiagramPanel> APEPanels = diagramPanels.Where(p => Regex.IsMatch(p.Name, "[A][P][E]")).ToList();
+
+            List<string> areas = new List<string>();
+            foreach (var item in diagramPanels)
+            {
+                areas.Add(Regex.Match(item.Name, "^[0-9]").Value);
+            }
+            areas.Distinct();
+            areas.Sort();
+
+            List<string> floors = new List<string>();
+            foreach (var item in ALPanels)
+            {
+                floors.Add(Regex.Match(item.Name, "[A][L]\\w*\\d*").Value.Substring(3));
+            }
+            foreach (var item in ALTPanels)
+            {
+                floors.Add(Regex.Match(item.Name, "[A][L][T]\\w*\\d*").Value.Substring(4));
+            }
+            foreach (var item in ALEPanels)
+            {
+                floors.Add(Regex.Match(item.Name, "[A][L][E]\\w*\\d*").Value.Substring(4));
+            }
+            foreach (var item in APPanels)
+            {
+                floors.Add(Regex.Match(item.Name, "[A][P]\\w*\\d*").Value.Substring(3));
+            }
+            foreach (var item in APTPanels)
+            {
+                floors.Add(Regex.Match(item.Name, "[A][P][T]\\w*\\d*").Value.Substring(4));
+            }
+            foreach (var item in APEPanels)
+            {
+                floors.Add(Regex.Match(item.Name, "[A][P][E]\\w*\\d*").Value.Substring(4));
+            }
+
+            floors.Distinct();
+            floors.Sort();
+
+            for (int i = 0; i < floors.Count-1; i++)
+            {
+                for (int j = i+1; j < floors.Count-i; j++)
+                {
+                    string temp = null;
+                    string a = floors[i];
+                    string b = floors[j];
+                    if (a.Contains("B") && b.Contains("B"))
+                    {
+                        string a1 = Regex.Match(a, "[B]\\d*").Value.Substring(1);
+                        string b1 = Regex.Match(b, "[B]\\d*").Value.Substring(1);
+
+                        string a2 = Regex.Match(a, "[B]\\w*").Value.Substring(1);
+                        string b2 = Regex.Match(b, "[B]\\w*").Value.Substring(1);
+
+                        if (!string.IsNullOrEmpty(a1) && !string.IsNullOrEmpty(b1))
+                        {
+                            if (int.Parse(a1) < int.Parse(b1))
+                            {
+                                temp = a;
+                                a = b;
+                                b = temp;
+                            }
+                        }
+                        else if(string.IsNullOrEmpty(a1) && !string.IsNullOrEmpty(b1))
+                        {
+                            temp = a;
+                            a = b;
+                            b = temp;
+                        }
+                        else if(!string.IsNullOrEmpty(a2) && string.IsNullOrEmpty(b2))
+                        {
+                            temp = a;
+                            a = b;
+                            b = temp;
+                        }
+                        else if (!string.IsNullOrEmpty(a2) && !string.IsNullOrEmpty(b1))
+                        {
+                            temp = a;
+                            a = b;
+                            b = temp;
+                        }
+                    }
+                    else if(!a.Contains("B") && b.Contains("B"))
+                    {
+                        temp = a;
+                        a = b;
+                        b = temp;
+                    }
+                    else if(!a.Contains("B") && !b.Contains("B"))
+                    {
+                        string a1 = Regex.Match(a, "\\d*").Value;
+                        string b1 = Regex.Match(b, "\\d*").Value;
+
+                        string a2 = Regex.Match(a, "\\w*").Value;
+                        string b2 = Regex.Match(b, "\\w*").Value;
+
+                        if (!string.IsNullOrEmpty(a1) && !string.IsNullOrEmpty(b1))
+                        {
+                            if (int.Parse(a1) > int.Parse(b1))
+                            {
+                                temp = a;
+                                a = b;
+                                b = temp;
+                            }
+                        }
+                        else if (string.IsNullOrEmpty(a1))
+                        {
+                            temp = a;
+                            a = b;
+                            b = temp;
+                        }
+                        else if (!string.IsNullOrEmpty(a2) && string.IsNullOrEmpty(b2))
+                        {
+                            temp = a;
+                            a = b;
+                            b = temp;
+                        }
+                    }
+                }
+            }
+
+            SetLayer(database, "E-ANNO-TEXT", 7);
+            List<Point3d> points = new List<Point3d>();
+            for (int i = 0; i <= floors.Count; i++)
+            {
+                if (floors[i] == pathLevel)
+                {
+                    i++;
+                }
+                points.Add(point3D4 + new Vector3d(18150, 4000, 0) + new Vector3d(0, 2000 * i, 0));
+            }
+
+            Point3d xMaxPoint3d = new Point3d();
+            for (int i = 0; i < areas.Count; i++)
+            {
+                for (int j = 0; j <= floors.Count; j++)
+                {
+                    for (int k = 0; k < ALPanels.Count; k++)
+                    {
+                        if (floors[j] == pathLevel)
+                        {
+                            j++;
+                        }
+                        if (areas[i] == Regex.Match(ALPanels[k].Name, "^[0-9]").Value && floors[j] == Regex.Match(ALPanels[k].Name, "[A][L]\\w*\\d*").Value.Substring(3))
+                        {
+                            Point3d tempPoint3d = point3D4 + new Vector3d(18150, 4000, 0) + new Vector3d(1000, 500, 0) + new Vector3d(k * 2100, 0, 0) + new Vector3d(0, 2000 * j, 0);
+                            if (tempPoint3d.X> xMaxPoint3d.X)
+                            {
+                                xMaxPoint3d = tempPoint3d;
+                            }
+                        }
+                    }
+                    foreach (var item in ALPanels)
+                    {
+                        
+                    }
+                    foreach (var item in ALTPanels)
+                    {
+
+                    }
+                    foreach (var item in ALEPanels)
+                    {
+
+                    }
+                    foreach (var item in APPanels)
+                    {
+
+                    }
+                    foreach (var item in APTPanels)
+                    {
+
+                    }
+                    foreach (var item in APEPanels)
+                    {
+
+                    }
+                }
+            }
+
+            //电力能量监控系统
+            foreach (var area in areas)
+            {
+                List<DiagramPanel> areaDiagramPanels = diagramPanels.Where(p => Regex.Match(p.Name, "^[0-9]").Value == area).ToList();
+                foreach (var item in areaDiagramPanels)
+                {
+
+                }
+
+
+
+
+            }
+
+
+            transaction.Commit();
         }
 
         DiagramPanel GetDiagramPanel(BlockReference blockReference)
@@ -261,6 +466,7 @@ namespace TimeIsLife.CADCommand
                 if (entity == null) continue;
                 extents3D.AddExtents(entity.GeometricExtents);
             }
+
             Point3d leftButtomPoint = extents3D.MinPoint;
             Point3d rightUpPoint = extents3D.MaxPoint;
             Point3d rightButtomPoint = new Point3d(rightUpPoint.X, leftButtomPoint.Y, 0);
@@ -299,7 +505,7 @@ namespace TimeIsLife.CADCommand
             DBText dBText2 = transaction.GetObject(selectionSet2.GetObjectIds()[0], OpenMode.ForRead) as DBText;
             if (dBText2 == null) return null;
             diagramPanel.Name = dBText2.TextString;
-
+            transaction.Commit();
             return diagramPanel;
         }
 
@@ -319,6 +525,13 @@ namespace TimeIsLife.CADCommand
             }
             polyline.TransformBy(matrix3D);
             return polyline;
+        }
+
+        void SetLayer(Database db, string layerName, int colorIndex)
+        {
+            db.AddLayer(layerName);
+            db.SetLayerColor(layerName, (short)colorIndex);
+            db.SetCurrentLayer(layerName);
         }
 
         #endregion
