@@ -26,6 +26,7 @@ using TimeIsLife.View;
 using TimeIsLife.ViewModel;
 
 using Application = Autodesk.AutoCAD.ApplicationServices.Application;
+using CommandFlags = Autodesk.AutoCAD.Runtime.CommandFlags;
 
 [assembly: CommandClass(typeof(TimeIsLife.CADCommand.ElectricalCommand))]
 
@@ -174,7 +175,153 @@ namespace TimeIsLife.CADCommand
         {
             MessageBox.Show("还未实现");
         }
+
         #endregion
+
+        #region FF_GenerateMonitorSystem
+        [CommandMethod("FF_GenerateMonitorSystem", CommandFlags.UsePickSet)]
+        public void FF_GenerateMonitorSystem()
+        {
+            Document document = Application.DocumentManager.CurrentDocument;
+            Database database = document.Database;
+            Editor editor = document.Editor;
+
+            using Transaction transaction = database.TransactionManager.StartOpenCloseTransaction();
+            BlockTable blockTable = transaction.GetObject(database.BlockTableId, OpenMode.ForRead) as BlockTable;
+            BlockTableRecord modelSpace = transaction.GetObject(blockTable[BlockTableRecord.ModelSpace], OpenMode.ForWrite) as BlockTableRecord;
+            Matrix3d matrixd = Application.DocumentManager.MdiActiveDocument.Editor.CurrentUserCoordinateSystem;
+
+            //E-配电箱-竖向干线
+            string blockName1 = "E-配电箱-竖向干线";
+            //E-配电箱-电气火灾监控器
+            string blockName2 = "E-配电箱-电气火灾监控器";
+            //E-配电箱-消防设备电源监控系统图
+            string blockName3 = "E-配电箱-消防设备电源监控系统图";
+            //E-配电箱-电力能量监控系统
+            string blockName4 = "E-配电箱-电力能量监控系统";
+
+            List<BlockReference> blockReferences1 = new List<BlockReference>();
+
+            PromptSelectionResult psr = editor.SelectImplied();
+            if (psr.Status == PromptStatus.OK)
+            {
+                SelectionSet selectionSet = psr.Value;
+                if (selectionSet.Count > 0)
+                {
+                    foreach (var objectId in selectionSet.GetObjectIds())
+                    {
+                        BlockReference blockReference =transaction.GetObject(objectId, OpenMode.ForRead) as BlockReference;
+                        if (blockReference == null || blockReference.Name != blockName1) continue;
+                        blockReferences1.Add(blockReference);
+                    }
+                }
+            }
+            else
+            {
+                TypedValueList typedValues = new TypedValueList();
+                typedValues.Add(typeof(BlockReference));
+                SelectionFilter selectionFilter = new SelectionFilter(typedValues);
+                PromptSelectionResult promptSelectionResult = editor.GetSelection(selectionFilter);
+                if (promptSelectionResult.Status != PromptStatus.OK) return;
+                SelectionSet selectionSet = promptSelectionResult.Value;
+                foreach (var objectId in selectionSet.GetObjectIds())
+                {
+                    BlockReference blockReference = transaction.GetObject(objectId, OpenMode.ForRead) as BlockReference;
+                    if (blockReference == null || blockReference.Name != blockName1) continue;
+                    blockReferences1.Add(blockReference);
+                }
+            }
+
+            List<DiagramPanel> diagramPanels = new List<DiagramPanel>();
+            foreach (var blockReference1 in blockReferences1)
+            {
+                diagramPanels.Add(GetDiagramPanel(blockReference1, transaction, editor));
+            }
+
+            editor.WriteMessage("ok!");
+        }
+
+        DiagramPanel GetDiagramPanel(BlockReference blockReference, Transaction transaction, Editor editor)
+        {
+            DiagramPanel diagramPanel = new DiagramPanel();
+            Matrix3d matrix3D = blockReference.BlockTransform;
+
+            BlockTableRecord blockTableRecord = transaction.GetObject(blockReference.BlockTableRecord, OpenMode.ForRead) as BlockTableRecord;
+            Extents3d extents3D = new Extents3d();
+            foreach (var objectId in blockTableRecord)
+            {
+                Entity entity = transaction.GetObject(objectId, OpenMode.ForRead) as Entity;
+                if (entity == null) continue;
+                extents3D.AddExtents(entity.GeometricExtents);
+            }
+            Point3d leftButtomPoint = extents3D.MinPoint;
+            Point3d rightUpPoint = extents3D.MaxPoint;
+            Point3d rightButtomPoint = new Point3d(rightUpPoint.X, leftButtomPoint.Y, 0);
+            Point3d leftUpPoint = new Point3d(leftButtomPoint.X, rightUpPoint.Y, 0);
+            Point3d leftMidPoint = new Point3d(leftButtomPoint.X, leftButtomPoint.Y + (leftUpPoint.Y - leftButtomPoint.Y) / 2, 0);
+            Point3d rightMidPoint = new Point3d(rightUpPoint.X, rightButtomPoint.Y + (rightUpPoint.Y - rightButtomPoint.Y) / 2, 0);
+
+            Point3dCollection point3DCollection1 = new Point3dCollection();
+            Polyline polyline1 = new Polyline();
+            for (int i = 0; i < 4; i++)
+            {
+                polyline1.AddVertexAt(i, new Point2d(0, 0), 0, 0, 0);
+            }
+            polyline1.Closed = true;
+            polyline1.Normal = Vector3d.ZAxis;
+            polyline1.Elevation = 0;
+            polyline1.SetPointAt(0, leftButtomPoint.ToPoint2d());
+            polyline1.SetPointAt(1, rightButtomPoint.ToPoint2d());
+            polyline1.SetPointAt(2, rightMidPoint.ToPoint2d());
+            polyline1.SetPointAt(3, leftMidPoint.ToPoint2d());
+            polyline1.TransformBy(matrix3D);
+            for (int i = 0; i < 4; i++)
+            {
+                point3DCollection1.Add(polyline1.GetPoint3dAt(i));
+            }
+
+            Point3dCollection point3DCollection2 = new Point3dCollection();
+            Polyline polyline2 = new Polyline();
+            for (int i = 0; i < 4; i++)
+            {
+                polyline2.AddVertexAt(i, new Point2d(0, 0), 0, 0, 0);
+            }
+            polyline2.Closed = true;
+            polyline2.Normal = Vector3d.ZAxis;
+            polyline2.Elevation = 0;
+            polyline2.SetPointAt(0, leftButtomPoint.ToPoint2d());
+            polyline2.SetPointAt(1, rightButtomPoint.ToPoint2d());
+            polyline2.SetPointAt(2, rightMidPoint.ToPoint2d());
+            polyline2.SetPointAt(3, leftMidPoint.ToPoint2d());
+            polyline2.TransformBy(matrix3D);
+            for (int i = 0; i < 4; i++)
+            {
+                point3DCollection2.Add(polyline2.GetPoint3dAt(i));
+            }
+
+            TypedValueList typedValues = new TypedValueList();
+            typedValues.Add(typeof(DBText));
+            SelectionFilter selectionFilter = new SelectionFilter(typedValues);
+
+            PromptSelectionResult promptSelectionResult1 = editor.SelectWindowPolygon(point3DCollection1, selectionFilter);
+            if (promptSelectionResult1.Status != PromptStatus.OK) return null;
+            SelectionSet selectionSet1 = promptSelectionResult1.Value;
+            DBText dBText1 = transaction.GetObject(selectionSet1.GetObjectIds()[0], OpenMode.ForRead) as DBText;
+            if (dBText1 == null) return null;
+            diagramPanel.Load = dBText1.TextString;
+
+            PromptSelectionResult promptSelectionResult2 = editor.SelectWindowPolygon(point3DCollection2, selectionFilter);
+            if (promptSelectionResult2.Status != PromptStatus.OK) return null;
+            SelectionSet selectionSet2 = promptSelectionResult2.Value;
+            DBText dBText2 = transaction.GetObject(selectionSet2.GetObjectIds()[0], OpenMode.ForRead) as DBText;
+            if (dBText2 == null) return null;
+            diagramPanel.Name = dBText2.TextString;
+
+            return diagramPanel;
+        }
+
+        #endregion
+
 
         //#region 1.2 计算电流
 

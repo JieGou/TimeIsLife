@@ -86,7 +86,14 @@
     <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Model\DiagramPanel.cs" />
+    <Compile Include="Model\MonitoringSystemPanel.cs" />
+    <Compile Include="Model\AirOperatedCircuitBreaker.cs" />
     <Compile Include="CADCommand\LightingCommand.cs" />
+    <Compile Include="Model\IsolatingSwitch.cs" />
+    <Compile Include="Model\LoadSwitch.cs" />
+    <Compile Include="Model\MiniatureCircuitBreaker.cs" />
+    <Compile Include="Model\Circuit.cs" />
     <Compile Include="Helper\PointHelper.cs" />
     <Compile Include="Helper\TextBoxAutoSelectHelper.cs" />
     <Compile Include="Jig\LightingLayoutJig.cs" />
@@ -95,6 +102,12 @@
     <Compile Include="CADCommand\FireAlarmCommnad.cs" />
     <Compile Include="CADCommand\ToolCommand.cs" />
     <Compile Include="Jig\UcsSelectJig.cs" />
+    <Compile Include="Model\PoleEnum.cs" />
+    <Compile Include="Model\Switch.cs" />
+    <Compile Include="Model\MoldedCaseCircuitBreaker.cs" />
+    <Compile Include="Model\SwitchTypeEnum.cs" />
+    <Compile Include="Model\Panel.cs" />
+    <Compile Include="Model\PanelType.cs" />
     <Compile Include="Tools\BlockTools.cs" />
     <Compile Include="View\ElectricaView.xaml.cs">
       <DependentUpon>ElectricaView.xaml</DependentUpon>
@@ -145,6 +158,8 @@
     <None Include="Block\FA-08-智能型点型感烟探测器.dwg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="ClassDiagram1.cd" />
+    <None Include="ElectrialClassDiagram.cd" />
     <None Include="FA\FA-01-接线端子箱.dwg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
