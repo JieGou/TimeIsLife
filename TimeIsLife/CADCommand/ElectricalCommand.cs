@@ -22,6 +22,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Forms.Integration;
 
+using TimeIsLife.Helper;
 using TimeIsLife.View;
 using TimeIsLife.ViewModel;
 
@@ -182,7 +183,7 @@ namespace TimeIsLife.CADCommand
         [CommandMethod("FF_GenerateMonitorSystem", CommandFlags.UsePickSet)]
         public void FF_GenerateMonitorSystem()
         {
-            Document document = Application.DocumentManager.CurrentDocument;
+            Document document = Application.DocumentManager.MdiActiveDocument;
             Database database = document.Database;
             Editor editor = document.Editor;
 
@@ -235,17 +236,23 @@ namespace TimeIsLife.CADCommand
             List<DiagramPanel> diagramPanels = new List<DiagramPanel>();
             foreach (var blockReference1 in blockReferences1)
             {
-                diagramPanels.Add(GetDiagramPanel(blockReference1, transaction, editor));
+                diagramPanels.Add(GetDiagramPanel(blockReference1));
             }
 
             editor.WriteMessage("ok!");
         }
 
-        DiagramPanel GetDiagramPanel(BlockReference blockReference, Transaction transaction, Editor editor)
+        DiagramPanel GetDiagramPanel(BlockReference blockReference)
         {
-            DiagramPanel diagramPanel = new DiagramPanel();
-            Matrix3d matrix3D = blockReference.BlockTransform;
+            Document document = Application.DocumentManager.MdiActiveDocument;
+            Database database = document.Database;
+            Editor editor = document.Editor;
+            using Transaction transaction = database.TransactionManager.StartOpenCloseTransaction();
+            
 
+            DiagramPanel diagramPanel = new DiagramPanel();
+
+            Matrix3d matrix3D = blockReference.BlockTransform;
             BlockTableRecord blockTableRecord = transaction.GetObject(blockReference.BlockTableRecord, OpenMode.ForRead) as BlockTableRecord;
             Extents3d extents3D = new Extents3d();
             foreach (var objectId in blockTableRecord)
@@ -262,55 +269,31 @@ namespace TimeIsLife.CADCommand
             Point3d rightMidPoint = new Point3d(rightUpPoint.X, rightButtomPoint.Y + (rightUpPoint.Y - rightButtomPoint.Y) / 2, 0);
 
             Point3dCollection point3DCollection1 = new Point3dCollection();
-            Polyline polyline1 = new Polyline();
-            for (int i = 0; i < 4; i++)
-            {
-                polyline1.AddVertexAt(i, new Point2d(0, 0), 0, 0, 0);
-            }
-            polyline1.Closed = true;
-            polyline1.Normal = Vector3d.ZAxis;
-            polyline1.Elevation = 0;
-            polyline1.SetPointAt(0, leftButtomPoint.ToPoint2d());
-            polyline1.SetPointAt(1, rightButtomPoint.ToPoint2d());
-            polyline1.SetPointAt(2, rightMidPoint.ToPoint2d());
-            polyline1.SetPointAt(3, leftMidPoint.ToPoint2d());
-            polyline1.TransformBy(matrix3D);
-            for (int i = 0; i < 4; i++)
-            {
-                point3DCollection1.Add(polyline1.GetPoint3dAt(i));
-            }
+            point3DCollection1.Add(leftButtomPoint);
+            point3DCollection1.Add(rightButtomPoint);
+            point3DCollection1.Add(rightMidPoint);
+            point3DCollection1.Add(leftMidPoint);
+            Polyline polyline1 = GetTextArea(matrix3D, point3DCollection1);
 
             Point3dCollection point3DCollection2 = new Point3dCollection();
-            Polyline polyline2 = new Polyline();
-            for (int i = 0; i < 4; i++)
-            {
-                polyline2.AddVertexAt(i, new Point2d(0, 0), 0, 0, 0);
-            }
-            polyline2.Closed = true;
-            polyline2.Normal = Vector3d.ZAxis;
-            polyline2.Elevation = 0;
-            polyline2.SetPointAt(0, leftButtomPoint.ToPoint2d());
-            polyline2.SetPointAt(1, rightButtomPoint.ToPoint2d());
-            polyline2.SetPointAt(2, rightMidPoint.ToPoint2d());
-            polyline2.SetPointAt(3, leftMidPoint.ToPoint2d());
-            polyline2.TransformBy(matrix3D);
-            for (int i = 0; i < 4; i++)
-            {
-                point3DCollection2.Add(polyline2.GetPoint3dAt(i));
-            }
+            point3DCollection2.Add(leftMidPoint);
+            point3DCollection2.Add(rightMidPoint);
+            point3DCollection2.Add(rightUpPoint);
+            point3DCollection2.Add(leftUpPoint);
+            Polyline polyline2 = GetTextArea(matrix3D, point3DCollection2);
 
             TypedValueList typedValues = new TypedValueList();
             typedValues.Add(typeof(DBText));
             SelectionFilter selectionFilter = new SelectionFilter(typedValues);
 
-            PromptSelectionResult promptSelectionResult1 = editor.SelectWindowPolygon(point3DCollection1, selectionFilter);
+            PromptSelectionResult promptSelectionResult1 = editor.SelectWindowPolygon(polyline1.GetPoint3DCollection(), selectionFilter);
             if (promptSelectionResult1.Status != PromptStatus.OK) return null;
             SelectionSet selectionSet1 = promptSelectionResult1.Value;
             DBText dBText1 = transaction.GetObject(selectionSet1.GetObjectIds()[0], OpenMode.ForRead) as DBText;
             if (dBText1 == null) return null;
             diagramPanel.Load = dBText1.TextString;
 
-            PromptSelectionResult promptSelectionResult2 = editor.SelectWindowPolygon(point3DCollection2, selectionFilter);
+            PromptSelectionResult promptSelectionResult2 = editor.SelectWindowPolygon(polyline2.GetPoint3DCollection(), selectionFilter);
             if (promptSelectionResult2.Status != PromptStatus.OK) return null;
             SelectionSet selectionSet2 = promptSelectionResult2.Value;
             DBText dBText2 = transaction.GetObject(selectionSet2.GetObjectIds()[0], OpenMode.ForRead) as DBText;
@@ -318,6 +301,24 @@ namespace TimeIsLife.CADCommand
             diagramPanel.Name = dBText2.TextString;
 
             return diagramPanel;
+        }
+
+        private Polyline GetTextArea(Matrix3d matrix3D, Point3dCollection point3DCollection)
+        {
+            Polyline polyline = new Polyline();
+            for (int i = 0; i < point3DCollection.Count; i++)
+            {
+                polyline.AddVertexAt(i, new Point2d(0, 0), 0, 0, 0);
+            }
+            polyline.Closed = true;
+            polyline.Normal = Vector3d.ZAxis;
+            polyline.Elevation = 0;
+            for (int i = 0; i < point3DCollection.Count; i++)
+            {
+                polyline.SetPointAt(i, point3DCollection[i].ToPoint2d());
+            }
+            polyline.TransformBy(matrix3D);
+            return polyline;
         }
 
         #endregion

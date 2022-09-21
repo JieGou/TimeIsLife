@@ -7,20 +7,8 @@ namespace TimeIsLife
 {
     public class Panel
     {
-        public int ID
-        {
-            get => default;
-            set
-            {
-            }
-        }
+        public int ID { get; set; }
 
-        public string Name
-        {
-            get => default;
-            set
-            {
-            }
-        }
+        public string Name { get; set; }
     }
 }

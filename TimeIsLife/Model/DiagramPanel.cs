@@ -7,13 +7,6 @@ namespace TimeIsLife
 {
     public class DiagramPanel : Panel
     {
-
-        public string Load
-        {
-            get => default;
-            set
-            {
-            }
-        }
+        public string Load { get; set; }
     }
 }
