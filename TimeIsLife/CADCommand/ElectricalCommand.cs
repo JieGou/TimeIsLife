@@ -202,10 +202,20 @@ namespace TimeIsLife.CADCommand
             Point3d point3D3 = new Point3d();
             //E-配电箱-电力能量监控系统
             string blockName4 = "E-配电箱-电力能量监控系统";
-            Point3d point3D4 = new Point3d();
+            PromptPointOptions pointOptions = new PromptPointOptions("\n请选择起始点：");
+            PromptPointResult pointResult = editor.GetPoint(pointOptions);
+            if (pointResult.Status != PromptStatus.OK) return;
+            Point3d point3D4 = pointResult.Value;
 
             //在第几层敷设主干路由
             string pathLevel = "B1";
+
+            //获取Block文件夹路径
+            string codeBase = Assembly.GetExecutingAssembly().CodeBase;
+            UriBuilder uri = new UriBuilder(codeBase);
+            string path = Uri.UnescapeDataString(uri.Path);
+            string AssemblyDirectory = Path.GetDirectoryName(path);
+            string directory = Path.Combine(AssemblyDirectory, "Block");
 
             List<BlockReference> blockReferences1 = new List<BlockReference>();
             PromptSelectionResult psr = editor.SelectImplied();
@@ -252,41 +262,43 @@ namespace TimeIsLife.CADCommand
             List<DiagramPanel> APTPanels = diagramPanels.Where(p => Regex.IsMatch(p.Name, "[A][P][T]")).ToList();
             List<DiagramPanel> APEPanels = diagramPanels.Where(p => Regex.IsMatch(p.Name, "[A][P][E]")).ToList();
 
-            List<string> areas = new List<string>();
+            //获取配电划分区域
+            List<string> tempAreas = new List<string>();
             foreach (var item in diagramPanels)
             {
-                areas.Add(Regex.Match(item.Name, "^[0-9]").Value);
+                tempAreas.Add(Regex.Match(item.Name, "^[0-9]").Value);
             }
-            areas.Distinct();
+            List<string> areas = tempAreas.Distinct().ToList();
             areas.Sort();
 
-            List<string> floors = new List<string>();
+            //获取楼层集合并排序
+            List<string> tempFloors = new List<string>();
             foreach (var item in ALPanels)
             {
-                floors.Add(Regex.Match(item.Name, "[A][L]\\w*\\d*").Value.Substring(3));
+                tempFloors.Add(Regex.Match(item.Name, "[A][L]\\w*\\d*").Value.Substring(2));
             }
             foreach (var item in ALTPanels)
             {
-                floors.Add(Regex.Match(item.Name, "[A][L][T]\\w*\\d*").Value.Substring(4));
+                tempFloors.Add(Regex.Match(item.Name, "[A][L][T]\\w*\\d*").Value.Substring(3));
             }
             foreach (var item in ALEPanels)
             {
-                floors.Add(Regex.Match(item.Name, "[A][L][E]\\w*\\d*").Value.Substring(4));
+                tempFloors.Add(Regex.Match(item.Name, "[A][L][E]\\w*\\d*").Value.Substring(3));
             }
             foreach (var item in APPanels)
             {
-                floors.Add(Regex.Match(item.Name, "[A][P]\\w*\\d*").Value.Substring(3));
+                tempFloors.Add(Regex.Match(item.Name, "[A][P]\\w*\\d*").Value.Substring(2));
             }
             foreach (var item in APTPanels)
             {
-                floors.Add(Regex.Match(item.Name, "[A][P][T]\\w*\\d*").Value.Substring(4));
+                tempFloors.Add(Regex.Match(item.Name, "[A][P][T]\\w*\\d*").Value.Substring(3));
             }
             foreach (var item in APEPanels)
             {
-                floors.Add(Regex.Match(item.Name, "[A][P][E]\\w*\\d*").Value.Substring(4));
+                tempFloors.Add(Regex.Match(item.Name, "[A][P][E]\\w*\\d*").Value.Substring(3));
             }
 
-            floors.Distinct();
+            List<string> floors = tempFloors.Distinct().ToList();
             floors.Sort();
 
             for (int i = 0; i < floors.Count-1; i++)
@@ -301,8 +313,8 @@ namespace TimeIsLife.CADCommand
                         string a1 = Regex.Match(a, "[B]\\d*").Value.Substring(1);
                         string b1 = Regex.Match(b, "[B]\\d*").Value.Substring(1);
 
-                        string a2 = Regex.Match(a, "[B]\\w*").Value.Substring(1);
-                        string b2 = Regex.Match(b, "[B]\\w*").Value.Substring(1);
+                        string a2 = Regex.Match(a, "[B][A-Za-z]").Value.Substring(1);
+                        string b2 = Regex.Match(b, "[B][A-Za-z]").Value.Substring(1);
 
                         if (!string.IsNullOrEmpty(a1) && !string.IsNullOrEmpty(b1))
                         {
@@ -343,8 +355,8 @@ namespace TimeIsLife.CADCommand
                         string a1 = Regex.Match(a, "\\d*").Value;
                         string b1 = Regex.Match(b, "\\d*").Value;
 
-                        string a2 = Regex.Match(a, "\\w*").Value;
-                        string b2 = Regex.Match(b, "\\w*").Value;
+                        string a2 = Regex.Match(a, "[A-Za-z]*").Value;
+                        string b2 = Regex.Match(b, "[A-Za-z]*").Value;
 
                         if (!string.IsNullOrEmpty(a1) && !string.IsNullOrEmpty(b1))
                         {
@@ -371,80 +383,226 @@ namespace TimeIsLife.CADCommand
                 }
             }
 
-            SetLayer(database, "E-ANNO-TEXT", 7);
-            List<Point3d> points = new List<Point3d>();
+            string layerName = "E-ANNO-TEXT";
+            int colorIndex = 7;
+            //SetLayer(database, "E-ANNO-TEXT", 7);
+            LayerTable layerTable = (LayerTable)transaction.GetObject(database.LayerTableId, OpenMode.ForRead);
+            LayerTableRecord layerTableRecord = new LayerTableRecord();
+            if (!layerTable.Has(layerName))
+            {
+                
+                layerTableRecord.Name = layerName;
+                layerTable.UpgradeOpen();
+                layerTable.Add(layerTableRecord);
+                transaction.AddNewlyCreatedDBObject(layerTableRecord, true);
+                layerTable.DowngradeOpen();
+            }
+
+            
+            layerTableRecord.Color = Color.FromColorIndex(ColorMethod.ByAci, (short)colorIndex);
+            
+
+            ObjectId layerId = layerTable[layerName];
+            if (database.Clayer != layerId)
+            {
+                database.Clayer = layerId;
+            }
+
+
+            //生成电力能量系统图
+            string file1 = Path.Combine(directory, "多功能表2.dwg");
+            if (!File.Exists(file1)) return;
+            string file2 = Path.Combine(directory, "电力能量监控系统图.dwg");
+            if (!File.Exists(file2)) return;
+
+            AddElectricalPowerSystem(database, point3D4, file2);
+
+            Point3d xMaxPoint3d = GetStartPoint(point3D4);
+            for (int i = 0; i < areas.Count; i++)
+            {
+                Point3d areaStartPoint = GetAreaStartPoint(point3D4, xMaxPoint3d);
+                for (int j = 0; j <= floors.Count; j++)
+                {
+                    if (floors[j] == pathLevel)
+                    {
+                        j++;
+                    }
+                    Point3d floorStartPoint = areaStartPoint + new Vector3d(0, 2000 * j, 0);
+                    int l = 0;
+                    for (int k = 0; k < ALPanels.Count; k++)
+                    {
+                        string name = ALPanels[k].Name;
+                        if (areas[i] == Regex.Match(name, "^[0-9]").Value && floors[j] == Regex.Match(name, "[A][L]\\w*\\d*").Value.Substring(2))
+                        {
+                            Point3d tempPoint3d = floorStartPoint + new Vector3d(l * 2100, 0, 0);
+                            if (tempPoint3d.X> xMaxPoint3d.X)
+                            {
+                                xMaxPoint3d = tempPoint3d;
+                            }
+                            l++;
+                            //绘制图元
+                            AddPanel(database, tempPoint3d, name, path);
+                        }
+                    }
+                    for (int k = 0; k < ALTPanels.Count; k++)
+                    {
+                        string name = ALTPanels[k].Name;
+                        if (areas[i] == Regex.Match(name, "^[0-9]").Value && floors[j] == Regex.Match(name, "[A][L][T]\\w*\\d*").Value.Substring(3))
+                        {
+                            Point3d tempPoint3d = floorStartPoint + new Vector3d(l * 2100, 0, 0);
+                            if (tempPoint3d.X > xMaxPoint3d.X)
+                            {
+                                xMaxPoint3d = tempPoint3d;
+                            }
+                            l++;
+                            //绘制图元
+                            AddPanel(database, tempPoint3d, name, path);
+                        }
+                    }
+                    for (int k = 0; k < ALEPanels.Count; k++)
+                    {
+                        string name = ALEPanels[k].Name;
+                        if (areas[i] == Regex.Match(name, "^[0-9]").Value && floors[j] == Regex.Match(name, "[A][L][E]\\w*\\d*").Value.Substring(3))
+                        {
+                            Point3d tempPoint3d = floorStartPoint + new Vector3d(l * 2100, 0, 0);
+                            if (tempPoint3d.X > xMaxPoint3d.X)
+                            {
+                                xMaxPoint3d = tempPoint3d;
+                            }
+                            l++;
+                            //绘制图元
+                            AddPanel(database, tempPoint3d, name, path);
+                        }
+                    }
+                    for (int k = 0; k < APPanels.Count; k++)
+                    {
+                        string name = APPanels[k].Name;
+                        if (areas[i] == Regex.Match(name, "^[0-9]").Value && floors[j] == Regex.Match(name, "[A][P]\\w*\\d*").Value.Substring(2))
+                        {
+                            Point3d tempPoint3d = floorStartPoint + new Vector3d(l * 2100, 0, 0);
+                            if (tempPoint3d.X > xMaxPoint3d.X)
+                            {
+                                xMaxPoint3d = tempPoint3d;
+                            }
+                            l++;
+                            //绘制图元
+                            AddPanel(database, tempPoint3d, name, path);
+                        }
+                    }
+                    for (int k = 0; k < APTPanels.Count; k++)
+                    {
+                        string name = APTPanels[k].Name;
+                        if (areas[i] == Regex.Match(name, "^[0-9]").Value && floors[j] == Regex.Match(name, "[A][P][T]\\w*\\d*").Value.Substring(3))
+                        {
+                            Point3d tempPoint3d = floorStartPoint + new Vector3d(l * 2100, 0, 0);
+                            if (tempPoint3d.X > xMaxPoint3d.X)
+                            {
+                                xMaxPoint3d = tempPoint3d;
+                            }
+                            l++;
+                            //绘制图元
+                            AddPanel(database, tempPoint3d, name, path);
+                        }
+                    }
+                    for (int k = 0; k < APEPanels.Count; k++)
+                    {
+                        string name = APEPanels[k].Name;
+                        if (areas[i] == Regex.Match(name, "^[0-9]").Value && floors[j] == Regex.Match(name, "[A][L][E]\\w*\\d*").Value.Substring(3))
+                        {
+                            Point3d tempPoint3d = floorStartPoint + new Vector3d(l * 2100, 0, 0);
+                            if (tempPoint3d.X > xMaxPoint3d.X)
+                            {
+                                xMaxPoint3d = tempPoint3d;
+                            }
+                            l++;
+                            //绘制图元
+                            AddPanel(database, tempPoint3d, name, path);
+                        }
+                    }
+                }
+            }
+
+            //绘制楼层线
+            string linetypeName = "DASHED";
+            LinetypeTable linetypeTable = (LinetypeTable)database.LinetypeTableId.GetObject(OpenMode.ForRead);
+            if (!linetypeTable.Has(linetypeName))
+            {
+                database.LoadLineTypeFile(linetypeName, "acad.lin");
+            }
+
+            modelSpace.UpgradeOpen();
             for (int i = 0; i <= floors.Count; i++)
             {
                 if (floors[i] == pathLevel)
                 {
                     i++;
                 }
-                points.Add(point3D4 + new Vector3d(18150, 4000, 0) + new Vector3d(0, 2000 * i, 0));
+                Point3d startPoint = point3D4 + new Vector3d(18150, 4000, 0) + new Vector3d(0, 2000 * i, 0);
+                Point3d endPoint = new Point3d(xMaxPoint3d.X, startPoint.Y, startPoint.Z) + new Vector3d(4000, 0, 0);
+                Line line = new Line(startPoint, endPoint);
+                line.Linetype = "DASHED";
+                line.ColorIndex = 8;
+                modelSpace.AppendEntity(line);
+                transaction.AddNewlyCreatedDBObject(line,true); ;
             }
-
-            Point3d xMaxPoint3d = new Point3d();
-            for (int i = 0; i < areas.Count; i++)
-            {
-                for (int j = 0; j <= floors.Count; j++)
-                {
-                    for (int k = 0; k < ALPanels.Count; k++)
-                    {
-                        if (floors[j] == pathLevel)
-                        {
-                            j++;
-                        }
-                        if (areas[i] == Regex.Match(ALPanels[k].Name, "^[0-9]").Value && floors[j] == Regex.Match(ALPanels[k].Name, "[A][L]\\w*\\d*").Value.Substring(3))
-                        {
-                            Point3d tempPoint3d = point3D4 + new Vector3d(18150, 4000, 0) + new Vector3d(1000, 500, 0) + new Vector3d(k * 2100, 0, 0) + new Vector3d(0, 2000 * j, 0);
-                            if (tempPoint3d.X> xMaxPoint3d.X)
-                            {
-                                xMaxPoint3d = tempPoint3d;
-                            }
-                        }
-                    }
-                    foreach (var item in ALPanels)
-                    {
-                        
-                    }
-                    foreach (var item in ALTPanels)
-                    {
-
-                    }
-                    foreach (var item in ALEPanels)
-                    {
-
-                    }
-                    foreach (var item in APPanels)
-                    {
-
-                    }
-                    foreach (var item in APTPanels)
-                    {
-
-                    }
-                    foreach (var item in APEPanels)
-                    {
-
-                    }
-                }
-            }
-
-            //电力能量监控系统
-            foreach (var area in areas)
-            {
-                List<DiagramPanel> areaDiagramPanels = diagramPanels.Where(p => Regex.Match(p.Name, "^[0-9]").Value == area).ToList();
-                foreach (var item in areaDiagramPanels)
-                {
-
-                }
-
-
-
-
-            }
-
+            modelSpace.DowngradeOpen();
 
             transaction.Commit();
+        }
+
+        void AddElectricalPowerSystem(Database database, Point3d point, string file)
+        {
+            Matrix3d matrix3D = Matrix3d.Displacement(Point3d.Origin.GetVectorTo(point));
+            using (Database tmepDatabase = new Database(false, true))
+            using (Transaction tempTransaction = tmepDatabase.TransactionManager.StartOpenCloseTransaction())
+            {
+                tmepDatabase.ReadDwgFile(file, FileShare.Read, true, null);
+                tmepDatabase.CloseInput(true);
+                database.Insert(matrix3D, tmepDatabase, false);
+                tempTransaction.Commit();
+            }
+        }
+
+        void AddPanel(Database database,Point3d point, string name, string file)
+        {
+            Matrix3d matrix3D = Matrix3d.Displacement(Point3d.Origin.GetVectorTo(point));
+            using (Database tmepDatabase = new Database(false, true))
+            using (Transaction tempTransaction = tmepDatabase.TransactionManager.StartOpenCloseTransaction())
+            {
+                tmepDatabase.ReadDwgFile(file, FileShare.Read, true, null);
+                tmepDatabase.CloseInput(true);
+
+                BlockTable tempBlockTable = tempTransaction.GetObject(tmepDatabase.BlockTableId, OpenMode.ForRead) as BlockTable;
+                BlockTableRecord tempModelSpace = tempTransaction.GetObject(tempBlockTable[BlockTableRecord.ModelSpace], OpenMode.ForRead) as BlockTableRecord;
+                List<DBText> dBTexts = new List<DBText>();
+                foreach (var item in tempModelSpace)
+                {
+                    DBText dBText = tempTransaction.GetObject(item, OpenMode.ForRead) as DBText;
+                    if (dBText != null)
+                    {
+                        dBTexts.Add(dBText);
+                    }
+                }
+                dBTexts = dBTexts.OrderByDescending(d => d.Position.Y).ToList();
+                dBTexts[0].UpgradeOpen();
+                dBTexts[0].TextString = name;
+                dBTexts[0].DowngradeOpen();
+                tempTransaction.Commit();
+
+                database.Insert(matrix3D, tmepDatabase, false);
+            }
+        }
+
+        Point3d GetStartPoint(Point3d startPoint)
+        {
+            return startPoint + new Vector3d(18150, 4000, 0) + new Vector3d(2000, 500, 0);
+        }
+
+        //i区起始点
+        Point3d GetAreaStartPoint(Point3d startPoint, Point3d tempMaxPoint)
+        {
+            Point3d tempPoint = GetStartPoint(startPoint);
+            return new Point3d(tempMaxPoint.X, tempPoint.Y, tempPoint.Z) + new Vector3d(4000, 0, 0);
         }
 
         DiagramPanel GetDiagramPanel(BlockReference blockReference)

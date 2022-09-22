@@ -95,3 +95,7 @@ D:\github\TimeIsLife\TimeIsLife\obj\Debug\TimeIsLife.csproj.CoreCompileInputs.ca
 D:\github\TimeIsLife\TimeIsLife\obj\Debug\TimeIsLife.csproj.CopyComplete
 D:\github\TimeIsLife\TimeIsLife\obj\Debug\TimeIsLife.dll
 D:\github\TimeIsLife\TimeIsLife\obj\Debug\TimeIsLife.pdb
+D:\GitHub\TimeIsLife\TimeIsLife\bin\Debug\Block\多功能表2.dwg
+D:\GitHub\TimeIsLife\TimeIsLife\bin\Debug\Block\消防电源监控模块.dwg
+D:\GitHub\TimeIsLife\TimeIsLife\bin\Debug\Block\电气火灾监控器.dwg
+D:\GitHub\TimeIsLife\TimeIsLife\bin\Debug\Block\电力能量监控系统图.dwg
