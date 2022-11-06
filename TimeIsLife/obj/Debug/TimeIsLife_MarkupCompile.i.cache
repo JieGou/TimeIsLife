@@ -16,5 +16,5 @@ DEBUG;TRACE
 4677524022
 Resources\Button.xaml;Resources\ComboBox.xaml;Resources\RibbonDictionary.xaml;Resources\TextBox.xaml;View\ElectricaView.xaml;Resources\Shared.xaml;Resources\Expander.xaml;
 
-False
+True
 

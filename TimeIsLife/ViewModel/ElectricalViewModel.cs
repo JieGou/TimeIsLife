@@ -31,6 +31,8 @@ namespace TimeIsLife.ViewModel
             //火灾自动报警
             LoadYdbFileCommand = new RelayCommand(LoadYdbFile);
             FasCommand = new RelayCommand(Fas);
+            ToHydrantAlarmButtonCommand = new RelayCommand(ToHydrantAlarmButton);
+
 
             //工具
             QuickUcsCommand = new RelayCommand(QuickUcs);
@@ -183,6 +185,14 @@ namespace TimeIsLife.ViewModel
         void Fas()
         {
             Application.DocumentManager.MdiActiveDocument.SendStringToExecute("FF_FAS\n", true, false, false);
+        }
+
+        
+
+        public IRelayCommand ToHydrantAlarmButtonCommand { get; }
+        void ToHydrantAlarmButton()
+        {
+            Application.DocumentManager.MdiActiveDocument.SendStringToExecute("FF_ToHydrantAlarmButton\n", true, false, false);
         }
         #endregion
 

@@ -1160,5 +1160,89 @@ namespace TimeIsLife.CADCommand
         #endregion
 
         #endregion
+
+        #region FF_ToHydrantAlarmButtonCommand
+        [CommandMethod("FF_ToHydrantAlarmButton")]
+        public void FF_ToHydrantAlarmButton()
+        {
+            // Put your command code here
+            Document document = Application.DocumentManager.CurrentDocument;
+            Database database = document.Database;
+            Editor editor = document.Editor;
+
+            using (Database tempDatabase = new Database(false, true))
+            using (Transaction transaction = database.TransactionManager.StartTransaction())
+            {
+                try
+                {
+                    BlockTable blockTable = transaction.GetObject(database.BlockTableId, OpenMode.ForRead) as BlockTable;
+                    BlockTableRecord modelSpace = transaction.GetObject(blockTable[BlockTableRecord.ModelSpace], OpenMode.ForWrite) as BlockTableRecord;
+                    Matrix3d matrixd = Application.DocumentManager.MdiActiveDocument.Editor.CurrentUserCoordinateSystem;
+
+                    string codeBase = Assembly.GetExecutingAssembly().CodeBase;
+                    UriBuilder uri = new UriBuilder(codeBase);
+                    string path = Uri.UnescapeDataString(uri.Path);
+
+                    //载入消火栓起泵按钮
+                    string blockPath = Path.Combine(Path.GetDirectoryName(path), "Block", "FA-07-消火栓起泵按钮.dwg");
+                    string blockName = SymbolUtilityServices.GetSymbolNameFromPathName(blockPath, "dwg");
+
+                    ObjectId btrId = ObjectId.Null;
+                    tempDatabase.ReadDwgFile(blockPath, FileOpenMode.OpenForReadAndReadShare, allowCPConversion: true, null);
+                    tempDatabase.CloseInput(true);
+
+                    btrId = database.Insert(blockName, tempDatabase, true);
+
+                    string name = "消火栓起泵按钮";
+                    if (!blockTable.Has(name)) return;
+                    //BlockTableRecord btr = transaction.GetObject(blockTable[name], OpenMode.ForRead) as BlockTableRecord;
+
+                    List<BlockReference> blockReferences = new List<BlockReference>();
+                    TypedValueList typedValues = new TypedValueList();
+                    typedValues.Add(typeof(BlockReference));
+                    SelectionFilter blockReferenceSelectionFilter = new SelectionFilter(typedValues);
+                    PromptSelectionResult promptSelectionResult = editor.SelectAll(blockReferenceSelectionFilter);
+                    SelectionSet selectionSet = promptSelectionResult.Value;
+
+                    foreach (ObjectId blockReferenceId in selectionSet.GetObjectIds())
+                    {
+                        BlockReference blockReference = transaction.GetObject(blockReferenceId, OpenMode.ForRead) as BlockReference;
+                        if (blockReference.Name != name) continue;
+                        Matrix3d blockreferenceMatrix = blockReference.BlockTransform;
+
+
+                        BlockReference newBlockReference = new BlockReference(Point3d.Origin, btrId);
+                        newBlockReference.TransformBy(blockreferenceMatrix);
+                        newBlockReference.ScaleFactors = new Scale3d(100, 100, 100);
+                        database.AddToModelSpace(newBlockReference);
+                    }
+                }
+                catch
+                {
+                    transaction.Abort();
+                    return;
+                }
+
+                transaction.Commit();
+            }
+                
+
+            //Matrix3d GetBlockReferenceMatrix3d(BlockReference blockReference)
+            //{
+            //    Matrix3d blockreferenceMatrix = blockReference.BlockTransform;
+            //    ObjectId ownerId = blockReference.OwnerId;
+            //    if (ownerId.GetBlockName() != BlockTableRecord.ModelSpace)
+            //    {
+            //        BlockReference ownerBlockReference = transaction.GetObject(ownerId, OpenMode.ForRead) as BlockReference;
+            //        Matrix3d ownerBlockreferenceMatrix = GetBlockReferenceMatrix3d(ownerBlockReference);
+            //        Matrix3d matrix3D = blockreferenceMatrix.
+
+            //    }
+            //    return blockreferenceMatrix;
+            //}
+        }
+
+        
+        #endregion
     }
 }

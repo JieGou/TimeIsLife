@@ -200,6 +200,10 @@
                         Command="{Binding FasCommand}"
                         Content="生成火灾自动报警系统图"
                         Template="{StaticResource ButtonTemplate}" />
+                    <Button
+                        Command="{Binding ToHydrantAlarmButtonCommand}"
+                        Content="消防栓转消防栓报警按钮"
+                        Template="{StaticResource ButtonTemplate}" />
                 </StackPanel>
             </Expander>
             <Expander Header="工具" Template="{StaticResource ExpanderTemplate}">
