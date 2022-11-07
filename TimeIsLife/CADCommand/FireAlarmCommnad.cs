@@ -19,8 +19,12 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Windows.Media.Media3D;
 
+using TimeIsLife.Helper;
 using TimeIsLife.ViewModel;
+
+using static TimeIsLife.CADCommand.FireAlarmCommnad;
 
 using Application = Autodesk.AutoCAD.ApplicationServices.Application;
 
@@ -1179,25 +1183,38 @@ namespace TimeIsLife.CADCommand
                     BlockTableRecord modelSpace = transaction.GetObject(blockTable[BlockTableRecord.ModelSpace], OpenMode.ForWrite) as BlockTableRecord;
                     Matrix3d matrixd = Application.DocumentManager.MdiActiveDocument.Editor.CurrentUserCoordinateSystem;
 
-                    string codeBase = Assembly.GetExecutingAssembly().CodeBase;
-                    UriBuilder uri = new UriBuilder(codeBase);
-                    string path = Uri.UnescapeDataString(uri.Path);
+                    #region 获取文件路径，载入消火栓起泵按钮块
+                    string blockFullName = "FA-07-消火栓起泵按钮.dwg";
+                    ObjectId btrId = InsertBlock(database, tempDatabase, blockFullName);
+                    #endregion
 
-                    //载入消火栓起泵按钮
-                    string blockPath = Path.Combine(Path.GetDirectoryName(path), "Block", "FA-07-消火栓起泵按钮.dwg");
-                    string blockName = SymbolUtilityServices.GetSymbolNameFromPathName(blockPath, "dwg");
+                    string name = "";
 
-                    ObjectId btrId = ObjectId.Null;
-                    tempDatabase.ReadDwgFile(blockPath, FileOpenMode.OpenForReadAndReadShare, allowCPConversion: true, null);
-                    tempDatabase.CloseInput(true);
+                    PromptSelectionOptions promptSelectionOptions1 = new PromptSelectionOptions()
+                    {
+                        SingleOnly = true,
+                        RejectObjectsOnLockedLayers = true,
+                    };
+                    TypedValueList typedValues1 = new TypedValueList();
+                    typedValues1.Add(typeof(BlockReference));
+                    SelectionFilter selectionFilter = new SelectionFilter(typedValues1);
 
-                    btrId = database.Insert(blockName, tempDatabase, true);
+                    PromptSelectionResult promptSelectionResult1 = editor.GetSelection(promptSelectionOptions1, selectionFilter);
+                    if (promptSelectionResult1.Status == PromptStatus.OK)
+                    {
+                        SelectionSet selectionSet1 = promptSelectionResult1.Value;
+                        foreach (var id in selectionSet1.GetObjectIds())
+                        {
+                            BlockReference blockReference1 = transaction.GetObject(id, OpenMode.ForRead) as BlockReference;
+                            if (blockReference1 == null) continue;
+                            name = blockReference1.Name;
+                        }
+                    }
 
-                    string name = "消火栓起泵按钮";
-                    if (!blockTable.Has(name)) return;
-                    //BlockTableRecord btr = transaction.GetObject(blockTable[name], OpenMode.ForRead) as BlockTableRecord;
+                    if (name.IsNullOrWhiteSpace()) return;
 
                     List<BlockReference> blockReferences = new List<BlockReference>();
+
                     TypedValueList typedValues = new TypedValueList();
                     typedValues.Add(typeof(BlockReference));
                     SelectionFilter blockReferenceSelectionFilter = new SelectionFilter(typedValues);
@@ -1207,13 +1224,17 @@ namespace TimeIsLife.CADCommand
                     foreach (ObjectId blockReferenceId in selectionSet.GetObjectIds())
                     {
                         BlockReference blockReference = transaction.GetObject(blockReferenceId, OpenMode.ForRead) as BlockReference;
-                        if (blockReference.Name != name) continue;
+                        if (blockReference.Name != name || blockReference == null) continue;
+                        blockReference.UpgradeOpen();
+                        Scale3d scale3D = blockReference.ScaleFactors;
+                        blockReference.ScaleFactors = blockReference.GetUnitScale3d(100);
                         Matrix3d blockreferenceMatrix = blockReference.BlockTransform;
+                        blockReference.ScaleFactors = scale3D;
+                        blockReference.DowngradeOpen();
 
-
+                        SetLayer(database, $"E-EQUIP", 4);
                         BlockReference newBlockReference = new BlockReference(Point3d.Origin, btrId);
                         newBlockReference.TransformBy(blockreferenceMatrix);
-                        newBlockReference.ScaleFactors = new Scale3d(100, 100, 100);
                         database.AddToModelSpace(newBlockReference);
                     }
                 }
@@ -1242,7 +1263,24 @@ namespace TimeIsLife.CADCommand
             //}
         }
 
-        
+        private static ObjectId InsertBlock(Database database, Database tempDatabase, string blockFullName)
+        {
+            string codeBase = Assembly.GetExecutingAssembly().CodeBase;
+            UriBuilder uri = new UriBuilder(codeBase);
+            string path = Uri.UnescapeDataString(uri.Path);
+
+            string blockPath = Path.Combine(Path.GetDirectoryName(path), "Block", blockFullName);
+            string blockName = SymbolUtilityServices.GetSymbolNameFromPathName(blockPath, "dwg");
+
+            ObjectId btrId = ObjectId.Null;
+            tempDatabase.ReadDwgFile(blockPath, FileOpenMode.OpenForReadAndReadShare, allowCPConversion: true, null);
+            tempDatabase.CloseInput(true);
+
+            btrId = database.Insert(blockName, tempDatabase, true);
+            return btrId;
+        }
+
+
         #endregion
     }
 }
