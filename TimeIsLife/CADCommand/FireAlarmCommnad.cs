@@ -21,6 +21,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Windows.Media;
 using System.Windows.Media.Media3D;
 
 using TimeIsLife.Helper;
@@ -923,19 +924,64 @@ namespace TimeIsLife.CADCommand
                                             Extents3d slabExtents3d = slabPolyline.GeometricExtents;
                                             //判断多段线的矩形轮廓是否相交，相交继续，不相交跳过
                                             if (!CheckCross(roomExtents3d,slabExtents3d)) continue;
-                                            //房间区域与板相交
-                                            if (GetIntersectPoint3d(roomPolyline,slabPolyline).Count>0)
+                                            List<Polyline> polylines = new List<Polyline>();
+                                            //判断房间区域与板是否相交
+                                            Point3dCollection IntersectPoint3DCollection = GetIntersectPoint3d(roomPolyline, slabPolyline);
+                                            if (IntersectPoint3DCollection.Count>0)
                                             {
+                                                //房间区域与板相交,获取相交区域轮廓线
+                                                for (int i = 0; i < roomPolyline.NumberOfVertices; i++)
+                                                {
+                                                    if (i < roomPolyline.NumberOfVertices - 1 && roomPolyline.Closed)
+                                                    {
+                                                        if (roomPolyline.GetPoint2dAt(i).IsInPolygon1(slabPolyline.GetPoint2DCollection().ToArray().ToList()))
+                                                        {
+                                                            IntersectPoint3DCollection.Add(roomPolyline.GetPoint3dAt(i));
+                                                        }
+                                                    }
+                                                }
+                                                for (int i = 0; i < slabPolyline.NumberOfVertices; i++)
+                                                {
+                                                    if (i < slabPolyline.NumberOfVertices - 1 && slabPolyline.Closed)
+                                                    {
+                                                        if (slabPolyline.GetPoint2dAt(i).IsInPolygon1(slabPolyline.GetPoint2DCollection().ToArray().ToList()))
+                                                        {
+                                                            IntersectPoint3DCollection.Add(slabPolyline.GetPoint3dAt(i));
+                                                        }
+                                                    }
+                                                }
 
+                                                SortPolyPoints(IntersectPoint3DCollection);
+                                                Polyline polyline = new Polyline();
+                                                polyline.CreatePolyline(IntersectPoint3DCollection);
+                                                db.AddToModelSpace(polyline);
+                                                polylines.Add(polyline);
                                             }
                                             else
                                             {
-                                                //房间区域包含板
+                                                //获取多段线的重心
+                                                //Point2d roomCenterPoint = getCenterOfGravityPoint(GetRoomPoint2Ds(roomArea));
+                                                //Point2d slabCenterPoint = getCenterOfGravityPoint(GetSlabPoint2Ds(slab));
 
-                                                //房间区域被板包含
+                                                if (roomPolyline.IsPolylineInPolyline(slabPolyline))
+                                                {
+                                                    //房间区域被板包含,房间内放置一个探测器
+                                                    polylines.Add(roomPolyline);
+                                                }
+                                                else
+                                                {
+                                                    //房间区域包含板
+                                                    polylines.Add(slabPolyline);
+                                                }
                                             }
 
+                                            //对多段线集合按照面积进行排序
 
+                                            //根据多段线集合生成探测器
+                                            foreach (var item in polylines)
+                                            {
+
+                                            }
 
 
 
@@ -975,9 +1021,6 @@ namespace TimeIsLife.CADCommand
                                             Area4 = 12
                                         };
                                     }
-
-
-                                    
                                 }
 
 
@@ -1251,6 +1294,12 @@ namespace TimeIsLife.CADCommand
                 && Math.Abs(roomMaxPoint.Y + roomMinPoint.Y - slabMaxPoint.Y - slabMinPoint.Y) < roomMaxPoint.Y - roomMinPoint.Y + slabMaxPoint.Y - slabMinPoint.Y);            
         }
 
+        /// <summary>
+        /// 判断两个多边形是否有交点
+        /// </summary>
+        /// <param name="roomPolyline"></param>
+        /// <param name="slabPolyline"></param>
+        /// <returns></returns>
         private Point3dCollection GetIntersectPoint3d(Polyline roomPolyline, Polyline slabPolyline)
         {
             Point3dCollection intPoints3d = new Point3dCollection();
@@ -1258,23 +1307,29 @@ namespace TimeIsLife.CADCommand
             {
                 if (i< slabPolyline.NumberOfVertices-1 || slabPolyline.Closed)
                 {
-                    SegmentType roomSegmentType = slabPolyline.GetSegmentType(i);
-                    if (roomSegmentType == SegmentType.Line)
+                    SegmentType slabSegmentType = slabPolyline.GetSegmentType(i);
+                    if (slabSegmentType == SegmentType.Line)
                     {
                         LineSegment2d slabLine = slabPolyline.GetLineSegment2dAt(i);
                         PolyIntersectWithLine(roomPolyline, slabLine, 0.0001, ref intPoints3d);
                     }
-                    else if(roomSegmentType == SegmentType.Arc)
+                    else if(slabSegmentType == SegmentType.Arc)
                     {
 
                     }
                 }
             }
-
             return intPoints3d;
         }
 
-        // 多段线和直线求交点
+
+        /// <summary>
+        /// 多段线和直线求交点
+        /// </summary>
+        /// <param name="poly"></param>
+        /// <param name="geLine"></param>
+        /// <param name="tol"></param>
+        /// <param name="points"></param>
         private void PolyIntersectWithLine(Polyline poly, LineSegment2d geLine, double tol, ref Point3dCollection points)
         {
             Point2dCollection intPoints2d = new Point2dCollection();
@@ -1286,7 +1341,7 @@ namespace TimeIsLife.CADCommand
             Tolerance tolerance = new Tolerance(tol, tol);
             for (int i = 0; i < poly.NumberOfVertices; i++)
             {
-                if (i < poly.NumberOfVertices - 1 || poly.Closed)
+                if (i < poly.NumberOfVertices - 1 && poly.Closed)
                 {
                     SegmentType st = poly.GetSegmentType(i);
                     if (st == SegmentType.Line)
@@ -1328,6 +1383,7 @@ namespace TimeIsLife.CADCommand
             }
         }
 
+        
         // 点是否在集合中
         private int FindPointIn(Point2dCollection points, Point2d pt, double tol)
         {
@@ -1358,6 +1414,67 @@ namespace TimeIsLife.CADCommand
         {
             return new Point3d(point2d.X, point2d.Y, elevation);
         }
+
+
+        /// <summary>
+        /// 多边形点集排序
+        /// </summary>
+        /// <param name="points"></param>
+        /// <returns></returns>
+        public Point3dCollection SortPolyPoints(Point3dCollection points)
+        {
+
+            if (points == null || points.Count == 0) return null;
+            //计算重心
+            Point3d center = new Point3d();
+            double X = 0, Y = 0;
+            for (int i = 0; i < points.Count; i++)
+            {
+                X += points[i].X;
+                Y += points[i].Y;
+            }
+            center = new Point3d((int)X / points.Count, (int)Y / points.Count, points[0].Z);
+            //冒泡排序
+            for (int i = 0; i < points.Count - 1; i++)
+            {
+                for (int j = 0; j < points.Count - i - 1; j++)
+                {
+                    if (PointCmp(points[j], points[j + 1], center))
+                    {
+                        Point3d tmp = points[j];
+                        points[j] = points[j + 1];
+                        points[j + 1] = tmp;
+                    }
+                }
+            }
+            return points;
+        }
+
+        /// <summary>
+        /// 若点a大于点b,即点a在点b顺时针方向,返回true,否则返回false
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <param name="center"></param>
+        /// <returns></returns>
+        private bool PointCmp(Point3d a, Point3d b, Point3d center)
+        {
+            if (a.X >= 0 && b.X < 0)
+                return true;
+            else if (a.X == 0 && b.X == 0)
+                return a.Y > b.Y;
+            //向量OA和向量OB的叉积
+            double det = (a.X - center.X) * (b.Y - center.Y) - (b.X - center.X) * (a.Y - center.Y);
+            if (det < 0)
+                return true;
+            if (det > 0)
+                return false;
+            //向量OA和向量OB共线，以距离判断大小
+            double d1 = (a.X - center.X) * (a.X - center.X) + (a.Y - center.Y) * (a.Y - center.Y);
+            double d2 = (b.X - center.X) * (b.X - center.X) + (b.Y - center.Y) * (b.Y - center.Y);
+            return d1 > d2;
+        }
+
 
         #region 结构类
         public class Floor
