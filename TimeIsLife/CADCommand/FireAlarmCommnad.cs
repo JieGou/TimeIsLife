@@ -4,6 +4,7 @@ using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.Runtime;
+using Autodesk.AutoCAD.Windows.ToolPalette;
 
 using Dapper;
 
@@ -15,6 +16,7 @@ using System.Data.SQLite;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
@@ -769,17 +771,23 @@ namespace TimeIsLife.CADCommand
             Database database = document.Database;
             Editor editor = document.Editor;
 
-            string filename = GetFilePath();
-            if (filename == null) return;
-            string directoryName = Path.GetDirectoryName(filename);
-            editor.WriteMessage("\n文件名：" + filename);
+            //载入YDB数据库
+            string ydbDB = GetFilePath();
+            if (ydbDB == null) return;
+            string directoryName = Path.GetDirectoryName(ydbDB);
+            editor.WriteMessage("\n文件名：" + ydbDB);
 
-            #region 数据查询
-            var conn = new SQLiteConnection($"Data Source={filename}");
+            //载入区域数据库
+            string areaDB = GetFilePath();
+            if (areaDB == null) return;
+            editor.WriteMessage("\n文件名：" + areaDB);
+
+            #region YDB数据查询
+            var YDBConn = new SQLiteConnection($"Data Source={ydbDB}");
 
             //查询标高
             string sqlFloor = "SELECT f.ID,f.LevelB,f.Height FROM tblFloor AS f WHERE f.Height != 0";
-            var floors = conn.Query<Floor>(sqlFloor);
+            var floors = YDBConn.Query<Floor>(sqlFloor);
 
             //查询梁
             string sqlBeam = "SELECT b.ID,f.ID,f.LevelB,f.Height,bs.ID,bs.kind,bs.ShapeVal,bs.ShapeVal1,g.ID,j1.ID,j1.X,j1.Y,j2.ID,j2.X,j2.Y " +
@@ -801,7 +809,7 @@ namespace TimeIsLife.CADCommand
                     return beam;
                 };
 
-            var beams = conn.Query(sqlBeam, mappingBeam);
+            var beams = YDBConn.Query(sqlBeam, mappingBeam);
 
             //查询板
             string sqlSlab = "SELECT s.ID,s.GridsID,s.VertexX,s.VertexY,s.VertexZ,s.Thickness,f.ID,f.LevelB,f.Height FROM tblSlab  AS s INNER JOIN tblFloor AS f on f.StdFlrID = s.StdFlrID";
@@ -811,7 +819,7 @@ namespace TimeIsLife.CADCommand
                     slab.Floor = floor;
                     return slab;
                 };
-            var slabs = conn.Query(sqlSlab, mappingSlab);
+            var slabs = YDBConn.Query(sqlSlab, mappingSlab);
 
             //查询墙
             string sqlWall = "SELECT w.ID,f.ID,f.LevelB,f.Height,ws.ID,ws.kind,ws.B,g.ID,j1.ID,j1.X,j1.Y,j2.ID,j2.X,j2.Y " +
@@ -832,11 +840,26 @@ namespace TimeIsLife.CADCommand
                     wall.WallSect = wallSect;
                     return wall;
                 };
-            var walls = conn.Query(sqlWall, mappingWall);
+            var walls = YDBConn.Query(sqlWall, mappingWall);
             //关闭数据库
-            conn.Close();
+            YDBConn.Close();
 
             #endregion
+
+            #region 区域数据查询
+            var areaConn = new SQLiteConnection($"Data Source={areaDB}");
+
+            //查询标高
+            string sqlFloorArea = "SELECT a.ID,a.Tag1,a.Tag2,a.LevelB,a.Height,a.kind,a.X,a.Y FROM tbArea AS a WHERE kind=0";
+            string sqlFireArea = "SELECT a.ID,a.Tag1,a.Tag2,a.LevelB,a.Height,a.kind,a.X,a.Y FROM tbArea AS a WHERE kind=1";
+            string sqlRoomArea = "SELECT a.ID,a.Tag1,a.Tag2,a.LevelB,a.Height,a.kind,a.X,a.Y FROM tbArea AS a WHERE kind=2";
+            var floorAreas = areaConn.Query<Area>(sqlFloorArea);
+            var fireAreas = areaConn.Query<Area>(sqlFireArea);
+            var roomAreas = areaConn.Query<Area>(sqlRoomArea);
+            areaConn.Close();            
+            #endregion
+
+
 
             using (Database tempDb = new Database(false, true))
             using (Transaction tempTransaction = tempDb.TransactionManager.StartTransaction())
@@ -848,11 +871,13 @@ namespace TimeIsLife.CADCommand
                     string path = Uri.UnescapeDataString(uri.Path);
                     
                     //载入感烟探测器块
-                    string blockPath = Path.Combine(Path.GetDirectoryName(path), "Block", "FA-08-智能型点型感烟探测器.dwg");
-                    string blockName = SymbolUtilityServices.GetSymbolNameFromPathName(blockPath, "dwg");
+                    string smokeDetectorPath = Path.Combine(Path.GetDirectoryName(path), "Block", "FA-08-智能型点型感烟探测器.dwg");
+                    string temperatureDetectorPath = Path.Combine(Path.GetDirectoryName(path), "Block", "FA-09-智能型点型感温探测器.dwg");
+                    string smokeDetector = SymbolUtilityServices.GetSymbolNameFromPathName(smokeDetectorPath, "dwg");
+                    string temperatureDetector = SymbolUtilityServices.GetSymbolNameFromPathName(temperatureDetectorPath, "dwg");
 
-                    ObjectId id = ObjectId.Null;
-                    tempDb.ReadDwgFile(blockPath, FileOpenMode.OpenForReadAndReadShare, allowCPConversion: true, null);
+                    tempDb.ReadDwgFile(smokeDetectorPath, FileOpenMode.OpenForReadAndReadShare, allowCPConversion: true, null);
+                    tempDb.ReadDwgFile(temperatureDetectorPath, FileOpenMode.OpenForReadAndReadShare, allowCPConversion: true, null);
                     tempDb.CloseInput(true);
 
                     //根据标高生成梁图
@@ -863,9 +888,103 @@ namespace TimeIsLife.CADCommand
                         {
                             try
                             {
-                                id = db.Insert(blockName, tempDb, true);
+                                ObjectId smokeDetectorID = db.Insert(smokeDetector, tempDb, true);
+                                ObjectId temperatureDetectorID = db.Insert(temperatureDetector, tempDb, true);
 
                                 #region 生成板及烟感
+                                foreach (var roomArea in roomAreas)
+                                {
+                                    if (roomArea.LevelB != floor.LevelB) continue;
+                                    string areaType =roomArea.Tag;
+                                    if (areaType.IsNullOrWhiteSpace() || areaType.Contains("A1H1") || areaType.Contains("A2H1") || areaType.Contains("A4")) continue;
+                                    if(areaType.Contains("A1H2"))
+                                    {
+                                        DetectorInfo detectorInfo = new DetectorInfo
+                                        {
+                                            Radius = 6700,
+                                            Area1 = 16,
+                                            Area2 = 24,
+                                            Area3 = 32,
+                                            Area4 = 48
+                                        };
+
+                                        Point2dCollection roomPoint2Ds = GetRoomPoint2Ds(roomArea);
+                                        Polyline roomPolyline = new Polyline();
+                                        roomPolyline.CreatePolyline(roomPoint2Ds);
+                                        Extents3d roomExtents3d = roomPolyline.GeometricExtents;
+                                        
+
+                                        foreach (var slab in slabs)
+                                        {
+                                            if (slab.Floor.LevelB != floor.LevelB) continue;
+                                            Point2dCollection slabPoint2Ds = GetSlabPoint2Ds(slab);
+                                            Polyline slabPolyline = new Polyline();
+                                            slabPolyline.CreatePolyline(slabPoint2Ds); 
+                                            Extents3d slabExtents3d = slabPolyline.GeometricExtents;
+                                            //判断多段线的矩形轮廓是否相交，相交继续，不相交跳过
+                                            if (!CheckCross(roomExtents3d,slabExtents3d)) continue;
+                                            //房间区域与板相交
+                                            if (GetIntersectPoint3d(roomPolyline,slabPolyline).Count>0)
+                                            {
+
+                                            }
+                                            else
+                                            {
+                                                //房间区域包含板
+
+                                                //房间区域被板包含
+                                            }
+
+
+
+
+
+                                        }
+
+                                    }
+                                    if (areaType.Contains("A1H3"))
+                                    {
+                                        DetectorInfo detectorInfo = new DetectorInfo
+                                        {
+                                            Radius = 5800,
+                                            Area1 = 12,
+                                            Area2 = 18,
+                                            Area3 = 24,
+                                            Area4 = 36
+                                        };
+                                    }
+                                    if (areaType.Contains("A2H2"))
+                                    {
+                                        DetectorInfo detectorInfo = new DetectorInfo
+                                        {
+                                            Radius = 4400,
+                                            Area1 = 6,
+                                            Area2 = 9,
+                                            Area3 = 12,
+                                            Area4 = 18
+                                        };
+                                    }
+                                    if (areaType.Contains("A2H3"))
+                                    {
+                                        DetectorInfo detectorInfo = new DetectorInfo
+                                        {
+                                            Radius = 3600,
+                                            Area1 = 4,
+                                            Area2 = 6,
+                                            Area3 = 8,
+                                            Area4 = 12
+                                        };
+                                    }
+
+
+                                    
+                                }
+
+
+
+
+
+
                                 foreach (var slab in slabs)
                                 {
                                     bool bo = true;
@@ -874,7 +993,7 @@ namespace TimeIsLife.CADCommand
                                     SetLayer(db, $"slab-{slab.Thickness.ToString()}mm", 7);
 
                                     Polyline polyline = new Polyline();
-                                    Point2dCollection point2Ds = GetPoint2Ds(slab);
+                                    Point2dCollection point2Ds = GetSlabPoint2Ds(slab);
                                     polyline.CreatePolyline(point2Ds);
                                     db.AddToModelSpace(polyline);
 
@@ -888,7 +1007,7 @@ namespace TimeIsLife.CADCommand
 
                                     Point2d p = getCenterOfGravityPoint(point2Ds);
                                     BlockTable bt = (BlockTable)transaction.GetObject(db.BlockTableId, OpenMode.ForRead);
-                                    BlockReference blockReference = new BlockReference(p.ToPoint3d(), id);
+                                    BlockReference blockReference = new BlockReference(p.ToPoint3d(), smokeDetectorID);
                                     blockReference.ScaleFactors = new Scale3d(100);
                                     db.AddToModelSpace(blockReference);
 
@@ -1058,7 +1177,7 @@ namespace TimeIsLife.CADCommand
         /// </summary>
         /// <param name="slab">板</param>
         /// <returns>点集合</returns>
-        private Point2dCollection GetPoint2Ds(Slab slab)
+        private Point2dCollection GetSlabPoint2Ds(Slab slab)
         {
             Point2dCollection points = new Point2dCollection();
             int n = slab.VertexX.Split(',').Length;
@@ -1095,6 +1214,149 @@ namespace TimeIsLife.CADCommand
                 return null;
             }
             return name;
+        }
+
+        
+        /// <summary>
+        /// 获取房间轮廓线点的集合
+        /// </summary>
+        /// <param name="slab">板</param>
+        /// <returns>点集合</returns>
+        private Point2dCollection GetRoomPoint2Ds(Area area)
+        {
+            Point2dCollection points = new Point2dCollection();
+            int n = area.X.Split(',').Length;
+            for (int i = 0; i < n; i++)
+            {
+                points.Add(new Point2d(double.Parse(area.X.Split(',')[i % (n - 1)]), double.Parse(area.Y.Split(',')[i % (n - 1)])));
+            }
+            return points;
+        }
+
+        /// <summary>
+        /// 判断两个矩形是否相交和包含
+        /// </summary>
+        /// <param name="roomExtents3d">房间外轮廓</param>
+        /// <param name="slabExtents3d">板外轮廓</param>
+        /// <returns></returns>
+        private bool CheckCross(Extents3d roomExtents3d, Extents3d slabExtents3d)
+        {
+            Point2d roomMaxPoint = roomExtents3d.MaxPoint.ToPoint2d();
+            Point2d roomMinPoint = roomExtents3d.MinPoint.ToPoint2d();
+
+            Point2d slabMaxPoint = slabExtents3d.MaxPoint.ToPoint2d();
+            Point2d slabMinPoint = slabExtents3d.MinPoint.ToPoint2d();
+
+            return((Math.Abs(roomMaxPoint.X + roomMinPoint.X - slabMaxPoint.X - slabMinPoint.X) < roomMaxPoint.X - roomMinPoint.X + slabMaxPoint.X - slabMinPoint.X) 
+                && Math.Abs(roomMaxPoint.Y + roomMinPoint.Y - slabMaxPoint.Y - slabMinPoint.Y) < roomMaxPoint.Y - roomMinPoint.Y + slabMaxPoint.Y - slabMinPoint.Y);            
+        }
+
+        private Point3dCollection GetIntersectPoint3d(Polyline roomPolyline, Polyline slabPolyline)
+        {
+            Point3dCollection intPoints3d = new Point3dCollection();
+            for (int i = 0; i < slabPolyline.NumberOfVertices; i++)
+            {
+                if (i< slabPolyline.NumberOfVertices-1 || slabPolyline.Closed)
+                {
+                    SegmentType roomSegmentType = slabPolyline.GetSegmentType(i);
+                    if (roomSegmentType == SegmentType.Line)
+                    {
+                        LineSegment2d slabLine = slabPolyline.GetLineSegment2dAt(i);
+                        PolyIntersectWithLine(roomPolyline, slabLine, 0.0001, ref intPoints3d);
+                    }
+                    else if(roomSegmentType == SegmentType.Arc)
+                    {
+
+                    }
+                }
+            }
+
+            return intPoints3d;
+        }
+
+        // 多段线和直线求交点
+        private void PolyIntersectWithLine(Polyline poly, LineSegment2d geLine, double tol, ref Point3dCollection points)
+        {
+            Point2dCollection intPoints2d = new Point2dCollection();
+
+            // 获得直线对应的几何类
+            //LineSegment2d geLine = new LineSegment2d(ToPoint2d(line.StartPoint), ToPoint2d(line.EndPoint));
+
+            // 每一段分别计算交点
+            Tolerance tolerance = new Tolerance(tol, tol);
+            for (int i = 0; i < poly.NumberOfVertices; i++)
+            {
+                if (i < poly.NumberOfVertices - 1 || poly.Closed)
+                {
+                    SegmentType st = poly.GetSegmentType(i);
+                    if (st == SegmentType.Line)
+                    {
+                        LineSegment2d geLineSeg = poly.GetLineSegment2dAt(i);
+                        Point2d[] pts = geLineSeg.IntersectWith(geLine, tolerance);
+                        if (pts != null)
+                        {
+                            for (int j = 0; j < pts.Length; j++)
+                            {
+                                if (FindPointIn(intPoints2d, pts[j], tol) < 0)
+                                {
+                                    intPoints2d.Add(pts[j]);
+                                }
+                            }
+                        }
+                    }
+                    else if (st == SegmentType.Arc)
+                    {
+                        CircularArc2d geArcSeg = poly.GetArcSegment2dAt(i);
+                        Point2d[] pts = geArcSeg.IntersectWith(geLine, tolerance);
+                        if (pts != null)
+                        {
+                            for (int j = 0; j < pts.Length; j++)
+                            {
+                                if (FindPointIn(intPoints2d, pts[j], tol) < 0)
+                                {
+                                    intPoints2d.Add(pts[j]);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            for (int i = 0; i < intPoints2d.Count; i++)
+            {
+                points.Add(ToPoint3d(intPoints2d[i]));
+            }
+        }
+
+        // 点是否在集合中
+        private int FindPointIn(Point2dCollection points, Point2d pt, double tol)
+        {
+            for (int i = 0; i < points.Count; i++)
+            {
+                if (Math.Abs(points[i].X - pt.X) < tol && Math.Abs(points[i].Y - pt.Y) < tol)
+                {
+                    return i;
+                }
+            }
+
+            return -1;
+        }
+
+        // 三维点转二维点
+        private static Point2d ToPoint2d(Point3d point3d)
+        {
+            return new Point2d(point3d.X, point3d.Y);
+        }
+
+        // 二维点转三维点
+        private static Point3d ToPoint3d(Point2d point2d)
+        {
+            return new Point3d(point2d.X, point2d.Y, 0);
+        }
+
+        private static Point3d ToPoint3d(Point2d point2d, double elevation)
+        {
+            return new Point3d(point2d.X, point2d.Y, elevation);
         }
 
         #region 结构类
@@ -1160,6 +1422,27 @@ namespace TimeIsLife.CADCommand
             public Floor Floor { get; set; }
             public WallSect WallSect { get; set; }
             public Grid Grid { get; set; }
+        }
+
+        public class Area
+        {
+            public int ID { get; set; }
+            public string Tag { get; set; }
+            public double LevelB { get; set; }
+            public double Height { get; set; }
+            //0为楼层区域，1为防火分区，2为房间区域
+            public int Kind { get; set; }
+            public string X { get; set; }
+            public string Y { get; set; }
+        }
+
+        public class DetectorInfo
+        {
+            public int Radius { get; set; }
+            public int Area1 { get; set; }
+            public int Area2 { get; set; }
+            public int Area3 { get; set; }
+            public int Area4 { get; set; }
         }
         #endregion
 
