@@ -30,6 +30,7 @@ using TimeIsLife.ViewModel;
 using static TimeIsLife.CADCommand.FireAlarmCommnad;
 
 using Application = Autodesk.AutoCAD.ApplicationServices.Application;
+using Color = Autodesk.AutoCAD.Colors.Color;
 
 [assembly: CommandClass(typeof(TimeIsLife.CADCommand.FireAlarmCommnad))]
 
@@ -308,7 +309,7 @@ namespace TimeIsLife.CADCommand
 
                             string area = keyValuePairs.ElementAt(i).Value.Key.TextString;
                             Point3d layoutPoint3d = basePoint3d + new Vector3d(0, 2500 * i, 0);
-                            Point3d tempPoint3d = new Point3d(layoutPoint3d.X, layoutPoint3d.Y, layoutPoint3d.Z);
+                            Point3d tempPoint3d = new Point3d(layoutPoint3d.X, layoutPoint3d.Y, layoutPoint3d.Z)+new Vector3d(12100,0,0);
                             List<string> blockNames = new List<string>();
                             List<BlockReference> blockReferences = new List<BlockReference>();
 
@@ -347,152 +348,185 @@ namespace TimeIsLife.CADCommand
                                             select blockReference).ToList().Count.ToString();
                                 string blockName = blockNames[j];
                                 string file = Path.Combine(directory, blockName + ".dwg");
+
                                 switch (blockName)
                                 {
                                     case "FA-01-接线端子箱":
-                                        AddElement2500(database, tempPoint3d, file, area);
-                                        tempPoint3d = tempPoint3d + new Vector3d(2500, 0, 0);
+                                        int n1 = 0, n2 = 0;
+                                        //获取短路隔离器数量n1
+                                        //获取接线端子箱数量n2
+                                        foreach (var item in blockReferences)
+                                        {
+                                            if (item.Name == "FA-总线短路隔离器")
+                                            {
+                                                foreach (ObjectId id in item.AttributeCollection)
+                                                {
+                                                    AttributeReference attref = transaction.GetObject(id, OpenMode.ForRead) as AttributeReference;
+                                                    if (attref != null)
+                                                    {
+                                                        n1 += int.Parse(attref.TextString);
+                                                    }
+                                                }
+                                            }
+                                            if (item.Name == "FA-01-接线端子箱")
+                                            {
+                                                foreach (ObjectId id in item.AttributeCollection)
+                                                {
+                                                    AttributeReference attref = transaction.GetObject(id, OpenMode.ForRead) as AttributeReference;
+                                                    if (attref != null)
+                                                    {
+                                                        n2 += int.Parse(attref.TextString);
+                                                    }
+                                                }
+                                            }
+                                        }
+
+                                        AddElement2500(database, layoutPoint3d, file, area, n1.ToString(), n2.ToString());
                                         break;
                                     case "FA-02-带消防电话插孔的手动报警按钮":
-                                        AddElement1(database, tempPoint3d, file, n);
-                                        tempPoint3d = tempPoint3d + new Vector3d(700, 0, 0);
+                                        AddElement(database, layoutPoint3d + new Vector3d(2500, 0, 0), file, n);
                                         break;
                                     case "FA-03-火灾报警电话机":
-                                        AddElement1(database, tempPoint3d, file, n);
-                                        tempPoint3d = tempPoint3d + new Vector3d(700, 0, 0);
+                                        AddElement(database, layoutPoint3d + new Vector3d(3200, 0, 0), file, n);
                                         break;
                                     case "FA-04-声光警报器":
-                                        AddElement1(database, tempPoint3d, file, n);
-                                        tempPoint3d = tempPoint3d + new Vector3d(900, 0, 0);
+                                        AddElement(database, layoutPoint3d + new Vector3d(3900, 0, 0), file, n);
                                         break;
                                     case "FA-05-3W火灾警报扬声器(挂墙明装距地2.4m)":
-                                        AddElement1600(database, tempPoint3d, file, n);
-                                        tempPoint3d = tempPoint3d + new Vector3d(1600, 0, 0);
+                                        AddElement1600(database, layoutPoint3d + new Vector3d(4800, 0, 0), file, n);
                                         break;
                                     case "FA-06-3W火灾警报扬声器(吸顶安装)":
-                                        AddElement1(database, tempPoint3d, file, n);
-                                        tempPoint3d = tempPoint3d + new Vector3d(700, 0, 0);
+                                        AddElement(database, layoutPoint3d + new Vector3d(6400, 0, 0), file, n);
                                         break;
                                     case "FA-07-消火栓起泵按钮":
-                                        AddElement1(database, tempPoint3d, file, n);
-                                        tempPoint3d = tempPoint3d + new Vector3d(700, 0, 0);
+                                        AddElement(database, layoutPoint3d + new Vector3d(7100, 0, 0), file, n);
                                         break;
                                     case "FA-08-智能型点型感烟探测器":
-                                        AddElement1(database, tempPoint3d, file, n);
-                                        tempPoint3d = tempPoint3d + new Vector3d(900, 0, 0);
+                                        AddElement(database, layoutPoint3d + new Vector3d(7800, 0, 0), file, n);
                                         break;
                                     case "FA-09-智能型点型感温探测器":
-                                        AddElement1(database, tempPoint3d, file, n);
-                                        tempPoint3d = tempPoint3d + new Vector3d(700, 0, 0);
+                                        AddElement(database, layoutPoint3d + new Vector3d(8700, 0, 0), file, n);
                                         break;
                                     case "FA-10-防火阀(70°C熔断关闭)":
-                                        AddElement1(database, tempPoint3d, file, n);
-                                        tempPoint3d = tempPoint3d + new Vector3d(900, 0, 0);
+                                        AddElement(database, layoutPoint3d + new Vector3d(9400, 0, 0), file, n);
                                         break;
                                     case "FA-11-防火阀(280°C熔断关闭)":
-                                        AddElement1(database, tempPoint3d, file, n);
-                                        tempPoint3d = tempPoint3d + new Vector3d(900, 0, 0);
+                                        AddElement(database, layoutPoint3d + new Vector3d(10300, 0, 0), file, n);
                                         break;
                                     case "FA-12-电动排烟阀(常闭)":
-                                        AddElement1(database, tempPoint3d, file, n);
-                                        tempPoint3d = tempPoint3d + new Vector3d(900, 0, 0);
+                                        AddElement(database, layoutPoint3d + new Vector3d(11200, 0, 0), file, n);
                                         break;
                                     case "FA-13-电动排烟阀(常开)":
-                                        AddElement1(database, tempPoint3d, file, n);
-                                        tempPoint3d = tempPoint3d + new Vector3d(900, 0, 0);
+                                        AddElement(database, tempPoint3d, file, n);
+                                        tempPoint3d += new Vector3d(900, 0, 0);
                                         break;
                                     case "FA-14-常闭正压送风口":
-                                        AddElement1(database, tempPoint3d, file, n);
-                                        tempPoint3d = tempPoint3d + new Vector3d(900, 0, 0);
+                                        AddElement(database, tempPoint3d, file, n);
+                                        tempPoint3d += new Vector3d(900, 0, 0);
                                         break;
                                     case "FA-15-防火卷帘控制箱":
                                         AddElement2(database, tempPoint3d, file, n);
-                                        tempPoint3d = tempPoint3d + new Vector3d(900, 0, 0);
+                                        tempPoint3d += new Vector3d(900, 0, 0);
                                         break;
                                     case "FA-16-电动挡烟垂壁控制箱":
-                                        AddElement1(database, tempPoint3d, file, n);
-                                        tempPoint3d = tempPoint3d + new Vector3d(900, 0, 0);
+                                        AddElement(database, tempPoint3d, file, n);
+                                        tempPoint3d += new Vector3d(900, 0, 0);
                                         break;
                                     case "FA-17-水流指示器":
-                                        AddElement1(database, tempPoint3d, file, n);
-                                        tempPoint3d = tempPoint3d + new Vector3d(900, 0, 0);
+                                        AddElement(database, tempPoint3d, file, n);
+                                        tempPoint3d += new Vector3d(900, 0, 0);
                                         break;
                                     case "FA-18-信号阀":
-                                        AddElement1(database, tempPoint3d, file, n);
-                                        tempPoint3d = tempPoint3d + new Vector3d(900, 0, 0);
+                                        AddElement(database, tempPoint3d, file, n);
+                                        tempPoint3d += new Vector3d(900, 0, 0);
                                         break;
                                     case "FA-19-智能线型红外光束感烟探测器（发射端）":
-                                        AddElement1(database, tempPoint3d, file, n);
-                                        tempPoint3d = tempPoint3d + new Vector3d(900, 0, 0);
+                                        AddElement(database, tempPoint3d, file, n);
+                                        tempPoint3d += new Vector3d(900, 0, 0);
                                         break;
                                     case "FA-20-智能线型红外光束感烟探测器（接收端）":
-                                        AddElement1(database, tempPoint3d, file, n);
-                                        tempPoint3d = tempPoint3d + new Vector3d(900, 0, 0);
+                                        AddElement(database, tempPoint3d, file, n);
+                                        tempPoint3d += new Vector3d(900, 0, 0);
                                         break;
                                     case "FA-21-电动排烟窗控制箱":
-                                        AddElement1(database, tempPoint3d, file, n);
-                                        tempPoint3d = tempPoint3d + new Vector3d(900, 0, 0);
+                                        AddElement(database, tempPoint3d, file, n);
+                                        tempPoint3d += new Vector3d(900, 0, 0);
                                         break;
                                     case "FA-22-消防电梯控制箱":
-                                        AddElement1(database, tempPoint3d, file, n);
-                                        tempPoint3d = tempPoint3d + new Vector3d(900, 0, 0);
+                                        AddElement(database, tempPoint3d, file, n);
+                                        tempPoint3d += new Vector3d(900, 0, 0);
                                         break;
                                     case "FA-23-电梯控制箱":
-                                        AddElement1(database, tempPoint3d, file, n);
-                                        tempPoint3d = tempPoint3d + new Vector3d(900, 0, 0);
+                                        AddElement(database, tempPoint3d, file, n);
+                                        tempPoint3d += new Vector3d(900, 0, 0);
                                         break;
                                     case "FA-24-湿式报警阀组":
-                                        AddElement1(database, tempPoint3d, file, n);
-                                        tempPoint3d = tempPoint3d + new Vector3d(900, 0, 0);
+                                        AddElement(database, tempPoint3d, file, n);
+                                        tempPoint3d += new Vector3d(900, 0, 0);
                                         break;
                                     case "FA-25-预作用报警阀组":
-                                        AddElement1(database, tempPoint3d, file, n);
-                                        tempPoint3d = tempPoint3d + new Vector3d(900, 0, 0);
+                                        AddElement(database, tempPoint3d, file, n);
+                                        tempPoint3d += new Vector3d(900, 0, 0);
                                         break;
                                     case "FA-26-可燃气体探测控制器":
-                                        AddElement1(database, tempPoint3d, file, n);
-                                        tempPoint3d = tempPoint3d + new Vector3d(900, 0, 0);
+                                        AddElement(database, tempPoint3d, file, n);
+                                        tempPoint3d += new Vector3d(900, 0, 0);
                                         break;
                                     case "FA-27-流量开关":
-                                        AddElement1(database, tempPoint3d, file, n);
-                                        tempPoint3d = tempPoint3d + new Vector3d(900, 0, 0);
+                                        AddElement(database, tempPoint3d, file, n);
+                                        tempPoint3d += new Vector3d(900, 0, 0);
                                         break;
                                     case "FA-28-非消防配电箱":
-                                        AddElement1(database, tempPoint3d, file, n);
-                                        tempPoint3d = tempPoint3d + new Vector3d(900, 0, 0);
+                                        AddElement(database, tempPoint3d, file, n);
+                                        tempPoint3d += new Vector3d(900, 0, 0);
                                         break;
                                     case "FA-29-消防泵控制箱":
-                                        AddElement1(database, tempPoint3d, file, n);
-                                        tempPoint3d = tempPoint3d + new Vector3d(900, 0, 0);
+                                        AddElement(database, tempPoint3d, file, n);
+                                        tempPoint3d += new Vector3d(900, 0, 0);
                                         break;
                                     case "FA-30-喷淋泵控制箱":
-                                        AddElement1(database, tempPoint3d, file, n);
-                                        tempPoint3d = tempPoint3d + new Vector3d(900, 0, 0);
+                                        AddElement(database, tempPoint3d, file, n);
+                                        tempPoint3d += new Vector3d(900, 0, 0);
                                         break;
                                     case "FA-31-消防稳压泵控制箱":
-                                        AddElement1(database, tempPoint3d, file, n);
-                                        tempPoint3d = tempPoint3d + new Vector3d(900, 0, 0);
+                                        AddElement(database, tempPoint3d, file, n);
+                                        tempPoint3d += new Vector3d(900, 0, 0);
                                         break;
                                     case "FA-32-雨淋泵控制箱":
-                                        AddElement1(database, tempPoint3d, file, n);
-                                        tempPoint3d = tempPoint3d + new Vector3d(900, 0, 0);
+                                        AddElement(database, tempPoint3d, file, n);
+                                        tempPoint3d += new Vector3d(900, 0, 0);
                                         break;
                                     case "FA-33-水幕泵控制箱":
-                                        AddElement1(database, tempPoint3d, file, n);
-                                        tempPoint3d = tempPoint3d + new Vector3d(900, 0, 0);
+                                        AddElement(database, tempPoint3d, file, n);
+                                        tempPoint3d += new Vector3d(900, 0, 0);
                                         break;
                                     case "FA-34-消防风机控制箱":
-                                        AddElement1(database, tempPoint3d, file, n);
-                                        tempPoint3d = tempPoint3d + new Vector3d(900, 0, 0);
+                                        AddElement(database, tempPoint3d, file, n);
+                                        tempPoint3d += new Vector3d(900, 0, 0);
                                         break;
                                     case "FA-35-就地液位显示盘":
                                         AddElement3(database, layoutPoint3d, file, n);
                                         break;
                                     case "FA-37-区域显示器":
-                                        AddElement(database, layoutPoint3d, file, n, -1300);
+                                        AddElement(database, layoutPoint3d + new Vector3d(-1300, 0, 0), file, n);
                                         break;
-                                    case "FA-38-防火门控制箱":
-                                        AddElement(database, layoutPoint3d, file, n, -2600);
+                                    case "FA-38-常闭防火门监控模块":
+                                        AddElement(database, layoutPoint3d + new Vector3d(-2600, 0, 0), file, n);
+                                        break;
+                                    case "FA-39-常开防火门监控模块":
+                                        AddElement(database, layoutPoint3d + new Vector3d(-2600, 0, 0), file, n);
+                                        break;
+                                    case "FA-40-压力开关":
+                                        AddElement(database, tempPoint3d, file, n);
+                                        tempPoint3d += new Vector3d(900, 0, 0);
+                                        break;
+                                    case "FA-41-火焰探测器":
+                                        AddElement(database, tempPoint3d, file, n);
+                                        tempPoint3d += new Vector3d(700, 0, 0);
+                                        break;
+                                    case "FA-42-电磁阀":
+                                        AddElement(database, tempPoint3d, file, n);
+                                        tempPoint3d += new Vector3d(900, 0, 0);
                                         break;
                                     default:
                                         break;
@@ -501,7 +535,6 @@ namespace TimeIsLife.CADCommand
                         }
                     }
                     transaction.Commit();
-
                 }
             }
             catch (System.Exception)
@@ -509,17 +542,17 @@ namespace TimeIsLife.CADCommand
 
             }
         }
+
         /// <summary>
         /// 添加接线端子箱
         /// </summary>
-        /// <param name="database"></param>
-        /// <param name="editor"></param>
-        /// <param name="directory"></param>
-        /// <param name="tempPoint3d"></param>
-        /// <param name="basePoint3d"></param>
-        /// <param name="name"></param>
-        /// <param name="area"></param>
-        private void AddElement2500(Database database, Point3d tempPoint3d, string file, string area)
+        /// <param name="database">当前文件数据库</param>
+        /// <param name="tempPoint3d">插入基点</param>
+        /// <param name="file">插入的DWG文件路径</param>
+        /// <param name="area">防火分区编号</param>
+        /// <param name="n1">短路隔离器数量</param>
+        /// <param name="n2">接线端子箱数量</param>
+        private void AddElement2500(Database database, Point3d tempPoint3d, string file, string area,string n1,string n2)
         {
             Matrix3d matrix3D = Matrix3d.Displacement(Point3d.Origin.GetVectorTo(tempPoint3d));
             if (File.Exists(file))
@@ -532,28 +565,44 @@ namespace TimeIsLife.CADCommand
                     db.CloseInput(true);
 
                     BlockTable blockTable = transaction.GetObject(db.BlockTableId, OpenMode.ForRead) as BlockTable;
-                    BlockTableRecord blockTableRecord = transaction.GetObject(blockTable[BlockTableRecord.ModelSpace], OpenMode.ForRead) as BlockTableRecord;
+                    BlockTableRecord modelSpace = transaction.GetObject(blockTable[BlockTableRecord.ModelSpace], OpenMode.ForRead) as BlockTableRecord;
                     List<DBText> dBTexts = new List<DBText>();
-                    foreach (var item in blockTableRecord)
+                    foreach (var item in modelSpace)
                     {
                         DBText dBText = transaction.GetObject(item, OpenMode.ForRead) as DBText;
                         if (dBText != null)
                         {
                             dBTexts.Add(dBText);
                         }
+
+                        BlockReference blockReference = transaction.GetObject(item, OpenMode.ForRead) as BlockReference;
+                        if (blockReference!= null && blockReference.Name.Equals("FA-总线短路隔离器"))
+                        {
+                            blockReference.UpgradeOpen();
+                            foreach (ObjectId id in blockReference.AttributeCollection)
+                            {
+                                AttributeReference attref = transaction.GetObject(id,OpenMode.ForRead) as AttributeReference;
+                                if (attref!=null)
+                                {
+                                    attref.UpgradeOpen();
+                                    //设置属性值
+                                    attref.TextString = n1;
+
+                                    attref.DowngradeOpen();
+                                }
+                            }
+                            blockReference.DowngradeOpen();
+                        }
                     }
-                    dBTexts = dBTexts.OrderBy(d => d.Position.Y).ToList();
-                    dBTexts[0].UpgradeOpen();
-                    dBTexts[0].TextString = area;
-                    dBTexts[0].DowngradeOpen();
+                    dBTexts = dBTexts.OrderBy(d => d.Position.X).ToList();
+                    dBTexts[0].EditContent(area);
+                    dBTexts[1].EditContent(n2);
                     transaction.Commit();
 
                     database.Insert(matrix3D, db, false);
                 }
             }
         }
-
-
 
         /// <summary>
         /// 添加壁装消防广播
@@ -609,7 +658,7 @@ namespace TimeIsLife.CADCommand
         /// <param name="basePoint3d"></param>
         /// <param name="name"></param>
         /// <param name="n"></param>
-        private void AddElement1(Database database, Point3d tempPoint3d, string file, string n)
+        private void AddElement(Database database, Point3d tempPoint3d, string file, string n)
         {
             Matrix3d matrix3D = Matrix3d.Displacement(Point3d.Origin.GetVectorTo(tempPoint3d));
             if (File.Exists(file))
@@ -644,8 +693,6 @@ namespace TimeIsLife.CADCommand
                 }
             }
         }
-
-
 
         /// <summary>
         /// 添加防火卷帘
@@ -711,51 +758,6 @@ namespace TimeIsLife.CADCommand
                     db.ReadDwgFile(file, FileShare.Read, true, null);
                     db.CloseInput(true);
                     transaction.Commit();
-                    database.Insert(matrix3D, db, false);
-                }
-            }
-        }
-
-        /// <summary>
-        /// 添加区域显示器、防火门监控器
-        /// </summary>
-        /// <param name="database"></param>
-        /// <param name="layoutPoint3d"></param>
-        /// <param name="file"></param>
-        /// <param name="n"></param>
-        /// <param name="num"></param>
-        private void AddElement(Database database, Point3d layoutPoint3d, string file, string n, int distance)
-        {
-            Matrix3d matrix3D = Matrix3d.Displacement(Point3d.Origin.GetVectorTo(layoutPoint3d) + new Vector3d(distance, 0, 0));
-
-            if (File.Exists(file))
-            {
-
-                using (Database db = new Database(false, true))
-                using (Transaction transaction = db.TransactionManager.StartOpenCloseTransaction())
-                {
-                    db.ReadDwgFile(file, FileShare.Read, true, null);
-                    db.CloseInput(true);
-
-                    BlockTable blockTable = transaction.GetObject(db.BlockTableId, OpenMode.ForRead) as BlockTable;
-                    BlockTableRecord blockTableRecord = transaction.GetObject(blockTable[BlockTableRecord.ModelSpace], OpenMode.ForRead) as BlockTableRecord;
-                    List<DBText> dBTexts = new List<DBText>();
-                    foreach (var item in blockTableRecord)
-                    {
-                        DBText dBText = transaction.GetObject(item, OpenMode.ForRead) as DBText;
-                        if (dBText != null)
-                        {
-                            dBTexts.Add(dBText);
-                        }
-                    }
-                    for (int i = 0; i < dBTexts.Count; i++)
-                    {
-                        dBTexts[i].UpgradeOpen();
-                        dBTexts[i].TextString = n;
-                        dBTexts[i].DowngradeOpen();
-                    }
-                    transaction.Commit();
-
                     database.Insert(matrix3D, db, false);
                 }
             }

@@ -87,6 +87,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Helper\BlockReferenceHelper.cs" />
+    <Compile Include="Helper\DBTextHelper.cs" />
     <Compile Include="Helper\PolylineHelper.cs" />
     <Compile Include="Model\DiagramPanel.cs" />
     <Compile Include="Model\MonitoringSystemPanel.cs" />
