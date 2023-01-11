@@ -304,10 +304,12 @@ namespace TimeIsLife.CADCommand
 
 
                         //循环防火分区
+                        List<string> areas = new List<string>();
                         for (int i = 0; i < keyValuePairs.Count; i++)
                         {
-
                             string area = keyValuePairs.ElementAt(i).Value.Key.TextString;
+                            if (areas.Contains(area)) continue;
+                            areas.Add(area);
                             Point3d layoutPoint3d = basePoint3d + new Vector3d(0, 2500 * i, 0);
                             Point3d tempPoint3d = new Point3d(layoutPoint3d.X, layoutPoint3d.Y, layoutPoint3d.Z)+new Vector3d(12100,0,0);
                             List<string> blockNames = new List<string>();
@@ -316,6 +318,30 @@ namespace TimeIsLife.CADCommand
                             TypedValueList typedValues3 = new TypedValueList();
                             typedValues3.Add(typeof(BlockReference));
                             SelectionFilter blockReferenceSelectionFilter = new SelectionFilter(typedValues3);
+
+                            for (int j = i+1; j < keyValuePairs.Count; j++)
+                            {
+                                if (area == keyValuePairs.ElementAt(j).Value.Key.TextString)
+                                {                                    
+                                    PromptSelectionResult promptSelectionResult3 = editor.SelectWindowPolygon(keyValuePairs.ElementAt(j).Value.Value, blockReferenceSelectionFilter);
+                                    SelectionSet selectionSet3 = promptSelectionResult3.Value;
+
+                                    foreach (var objectId in selectionSet3.GetObjectIds())
+                                    {
+                                        BlockReference blockReference = transaction.GetObject(objectId, OpenMode.ForRead) as BlockReference;
+                                        if (blockReference != null)
+                                        {
+                                            LayerTableRecord layerTableRecord = transaction.GetObject(blockReference.LayerId, OpenMode.ForRead) as LayerTableRecord;
+                                            if (layerTableRecord != null && layerTableRecord.IsLocked == false)
+                                            {
+                                                blockNames.Add(blockReference.Name);
+                                                blockReferences.Add(blockReference);
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            
                             PromptSelectionResult promptSelectionResult2 = editor.SelectWindowPolygon(keyValuePairs.ElementAt(i).Value.Value, blockReferenceSelectionFilter);
                             SelectionSet selectionSet2 = promptSelectionResult2.Value;
 
@@ -359,6 +385,7 @@ namespace TimeIsLife.CADCommand
                                         {
                                             if (item.Name == "FA-总线短路隔离器")
                                             {
+                                                item.UpgradeOpen();
                                                 foreach (ObjectId id in item.AttributeCollection)
                                                 {
                                                     AttributeReference attref = transaction.GetObject(id, OpenMode.ForRead) as AttributeReference;
@@ -367,9 +394,11 @@ namespace TimeIsLife.CADCommand
                                                         n1 += int.Parse(attref.TextString);
                                                     }
                                                 }
+                                                item.DowngradeOpen();
                                             }
                                             if (item.Name == "FA-01-接线端子箱")
                                             {
+                                                item.UpgradeOpen();
                                                 foreach (ObjectId id in item.AttributeCollection)
                                                 {
                                                     AttributeReference attref = transaction.GetObject(id, OpenMode.ForRead) as AttributeReference;
@@ -378,50 +407,51 @@ namespace TimeIsLife.CADCommand
                                                         n2 += int.Parse(attref.TextString);
                                                     }
                                                 }
+                                                item.DowngradeOpen();
                                             }
                                         }
 
                                         AddElement2500(database, layoutPoint3d, file, area, n1.ToString(), n2.ToString());
                                         break;
                                     case "FA-02-带消防电话插孔的手动报警按钮":
-                                        AddElement(database, layoutPoint3d + new Vector3d(2500, 0, 0), file, n);
+                                        AddElement1(database, layoutPoint3d + new Vector3d(2500, 0, 0), file, n);
                                         break;
                                     case "FA-03-火灾报警电话机":
-                                        AddElement(database, layoutPoint3d + new Vector3d(3200, 0, 0), file, n);
+                                        AddElement1(database, layoutPoint3d + new Vector3d(3200, 0, 0), file, n);
                                         break;
                                     case "FA-04-声光警报器":
-                                        AddElement(database, layoutPoint3d + new Vector3d(3900, 0, 0), file, n);
+                                        AddElement1(database, layoutPoint3d + new Vector3d(3900, 0, 0), file, n);
                                         break;
                                     case "FA-05-3W火灾警报扬声器(挂墙明装距地2.4m)":
                                         AddElement1600(database, layoutPoint3d + new Vector3d(4800, 0, 0), file, n);
                                         break;
                                     case "FA-06-3W火灾警报扬声器(吸顶安装)":
-                                        AddElement(database, layoutPoint3d + new Vector3d(6400, 0, 0), file, n);
+                                        AddElement1(database, layoutPoint3d + new Vector3d(6400, 0, 0), file, n);
                                         break;
                                     case "FA-07-消火栓起泵按钮":
-                                        AddElement(database, layoutPoint3d + new Vector3d(7100, 0, 0), file, n);
+                                        AddElement1(database, layoutPoint3d + new Vector3d(7100, 0, 0), file, n);
                                         break;
                                     case "FA-08-智能型点型感烟探测器":
-                                        AddElement(database, layoutPoint3d + new Vector3d(7800, 0, 0), file, n);
+                                        AddElement1(database, layoutPoint3d + new Vector3d(7800, 0, 0), file, n);
                                         break;
                                     case "FA-09-智能型点型感温探测器":
-                                        AddElement(database, layoutPoint3d + new Vector3d(8700, 0, 0), file, n);
+                                        AddElement1(database, layoutPoint3d + new Vector3d(8700, 0, 0), file, n);
                                         break;
                                     case "FA-10-防火阀(70°C熔断关闭)":
-                                        AddElement(database, layoutPoint3d + new Vector3d(9400, 0, 0), file, n);
+                                        AddElement1(database, layoutPoint3d + new Vector3d(9400, 0, 0), file, n);
                                         break;
                                     case "FA-11-防火阀(280°C熔断关闭)":
-                                        AddElement(database, layoutPoint3d + new Vector3d(10300, 0, 0), file, n);
+                                        AddElement1(database, layoutPoint3d + new Vector3d(10300, 0, 0), file, n);
                                         break;
                                     case "FA-12-电动排烟阀(常闭)":
-                                        AddElement(database, layoutPoint3d + new Vector3d(11200, 0, 0), file, n);
+                                        AddElement1(database, layoutPoint3d + new Vector3d(11200, 0, 0), file, n);
                                         break;
                                     case "FA-13-电动排烟阀(常开)":
-                                        AddElement(database, tempPoint3d, file, n);
+                                        AddElement1(database, tempPoint3d, file, n);
                                         tempPoint3d += new Vector3d(900, 0, 0);
                                         break;
                                     case "FA-14-常闭正压送风口":
-                                        AddElement(database, tempPoint3d, file, n);
+                                        AddElement1(database, tempPoint3d, file, n);
                                         tempPoint3d += new Vector3d(900, 0, 0);
                                         break;
                                     case "FA-15-防火卷帘控制箱":
@@ -429,103 +459,140 @@ namespace TimeIsLife.CADCommand
                                         tempPoint3d += new Vector3d(900, 0, 0);
                                         break;
                                     case "FA-16-电动挡烟垂壁控制箱":
-                                        AddElement(database, tempPoint3d, file, n);
+                                        AddElement1(database, tempPoint3d, file, n);
                                         tempPoint3d += new Vector3d(900, 0, 0);
                                         break;
                                     case "FA-17-水流指示器":
-                                        AddElement(database, tempPoint3d, file, n);
+                                        AddElement1(database, tempPoint3d, file, n);
                                         tempPoint3d += new Vector3d(900, 0, 0);
                                         break;
                                     case "FA-18-信号阀":
-                                        AddElement(database, tempPoint3d, file, n);
+                                        AddElement1(database, tempPoint3d, file, n);
                                         tempPoint3d += new Vector3d(900, 0, 0);
                                         break;
                                     case "FA-19-智能线型红外光束感烟探测器（发射端）":
-                                        AddElement(database, tempPoint3d, file, n);
+                                        AddElement1(database, tempPoint3d, file, n);
                                         tempPoint3d += new Vector3d(900, 0, 0);
                                         break;
                                     case "FA-20-智能线型红外光束感烟探测器（接收端）":
-                                        AddElement(database, tempPoint3d, file, n);
+                                        AddElement1(database, tempPoint3d, file, n);
                                         tempPoint3d += new Vector3d(900, 0, 0);
                                         break;
                                     case "FA-21-电动排烟窗控制箱":
-                                        AddElement(database, tempPoint3d, file, n);
+                                        AddElement1(database, tempPoint3d, file, n);
                                         tempPoint3d += new Vector3d(900, 0, 0);
                                         break;
                                     case "FA-22-消防电梯控制箱":
-                                        AddElement(database, tempPoint3d, file, n);
+                                        AddElement1(database, tempPoint3d, file, n);
                                         tempPoint3d += new Vector3d(900, 0, 0);
                                         break;
                                     case "FA-23-电梯控制箱":
-                                        AddElement(database, tempPoint3d, file, n);
+                                        AddElement1(database, tempPoint3d, file, n);
                                         tempPoint3d += new Vector3d(900, 0, 0);
                                         break;
                                     case "FA-24-湿式报警阀组":
-                                        AddElement(database, tempPoint3d, file, n);
+                                        AddElement1(database, tempPoint3d, file, n);
                                         tempPoint3d += new Vector3d(900, 0, 0);
                                         break;
                                     case "FA-25-预作用报警阀组":
-                                        AddElement(database, tempPoint3d, file, n);
+                                        AddElement1(database, tempPoint3d, file, n);
                                         tempPoint3d += new Vector3d(900, 0, 0);
                                         break;
                                     case "FA-26-可燃气体探测控制器":
-                                        AddElement(database, tempPoint3d, file, n);
+                                        AddElement1(database, tempPoint3d, file, n);
                                         tempPoint3d += new Vector3d(900, 0, 0);
                                         break;
                                     case "FA-27-流量开关":
-                                        AddElement(database, tempPoint3d, file, n);
+                                        AddElement1(database, tempPoint3d, file, n);
                                         tempPoint3d += new Vector3d(900, 0, 0);
                                         break;
                                     case "FA-28-非消防配电箱":
-                                        AddElement(database, tempPoint3d, file, n);
+                                        //获取非消防配电箱数量n
+                                        int n3= 0;
+                                        foreach (var item in blockReferences)
+                                        {
+                                            if (item.Name == "FA-28-非消防配电箱")
+                                            {
+                                                item.UpgradeOpen();
+                                                foreach (ObjectId id in item.AttributeCollection)
+                                                {
+                                                    AttributeReference attref = transaction.GetObject(id, OpenMode.ForRead) as AttributeReference;
+                                                    if (attref != null)
+                                                    {
+                                                        n3 += int.Parse(attref.TextString);
+                                                    }
+                                                }
+                                                item.DowngradeOpen();
+                                            }
+                                        }
+                                        AddElement4(database, tempPoint3d, file, n3.ToString());
                                         tempPoint3d += new Vector3d(900, 0, 0);
                                         break;
                                     case "FA-29-消防泵控制箱":
-                                        AddElement(database, tempPoint3d, file, n);
+                                        AddElement1(database, tempPoint3d, file, n);
                                         tempPoint3d += new Vector3d(900, 0, 0);
                                         break;
                                     case "FA-30-喷淋泵控制箱":
-                                        AddElement(database, tempPoint3d, file, n);
+                                        AddElement1(database, tempPoint3d, file, n);
                                         tempPoint3d += new Vector3d(900, 0, 0);
                                         break;
                                     case "FA-31-消防稳压泵控制箱":
-                                        AddElement(database, tempPoint3d, file, n);
+                                        AddElement1(database, tempPoint3d, file, n);
                                         tempPoint3d += new Vector3d(900, 0, 0);
                                         break;
                                     case "FA-32-雨淋泵控制箱":
-                                        AddElement(database, tempPoint3d, file, n);
+                                        AddElement1(database, tempPoint3d, file, n);
                                         tempPoint3d += new Vector3d(900, 0, 0);
                                         break;
                                     case "FA-33-水幕泵控制箱":
-                                        AddElement(database, tempPoint3d, file, n);
+                                        AddElement1(database, tempPoint3d, file, n);
                                         tempPoint3d += new Vector3d(900, 0, 0);
                                         break;
                                     case "FA-34-消防风机控制箱":
-                                        AddElement(database, tempPoint3d, file, n);
+                                        //获取消防风机控制箱数量n4，消防风机数量n5
+                                        int n4 = 0,n5=0;
+                                        foreach (var item in blockReferences)
+                                        {
+                                            if (item.Name == "FA-34-消防风机控制箱")
+                                            {
+                                                n4++;
+                                                item.UpgradeOpen();
+                                                foreach (ObjectId id in item.AttributeCollection)
+                                                {
+                                                    AttributeReference attref = transaction.GetObject(id, OpenMode.ForRead) as AttributeReference;
+                                                    if (attref != null)
+                                                    {
+                                                        n5 += int.Parse(attref.TextString);
+                                                    }
+                                                }
+                                                item.DowngradeOpen();
+                                            }
+                                        }
+                                        AddElement5(database, tempPoint3d, file, n4.ToString(),n5.ToString());
                                         tempPoint3d += new Vector3d(900, 0, 0);
                                         break;
                                     case "FA-35-就地液位显示盘":
                                         AddElement3(database, layoutPoint3d, file, n);
                                         break;
                                     case "FA-37-区域显示器":
-                                        AddElement(database, layoutPoint3d + new Vector3d(-1300, 0, 0), file, n);
+                                        AddElement1(database, layoutPoint3d + new Vector3d(-1300, 0, 0), file, n);
                                         break;
                                     case "FA-38-常闭防火门监控模块":
-                                        AddElement(database, layoutPoint3d + new Vector3d(-2600, 0, 0), file, n);
+                                        AddElement1(database, layoutPoint3d + new Vector3d(-2600, 0, 0), file, n);
                                         break;
                                     case "FA-39-常开防火门监控模块":
-                                        AddElement(database, layoutPoint3d + new Vector3d(-2600, 0, 0), file, n);
+                                        AddElement1(database, layoutPoint3d + new Vector3d(-2600, 0, 0), file, n);
                                         break;
                                     case "FA-40-压力开关":
-                                        AddElement(database, tempPoint3d, file, n);
+                                        AddElement1(database, tempPoint3d, file, n);
                                         tempPoint3d += new Vector3d(900, 0, 0);
                                         break;
                                     case "FA-41-火焰探测器":
-                                        AddElement(database, tempPoint3d, file, n);
+                                        AddElement1(database, tempPoint3d, file, n);
                                         tempPoint3d += new Vector3d(700, 0, 0);
                                         break;
                                     case "FA-42-电磁阀":
-                                        AddElement(database, tempPoint3d, file, n);
+                                        AddElement1(database, tempPoint3d, file, n);
                                         tempPoint3d += new Vector3d(900, 0, 0);
                                         break;
                                     default:
@@ -658,7 +725,7 @@ namespace TimeIsLife.CADCommand
         /// <param name="basePoint3d"></param>
         /// <param name="name"></param>
         /// <param name="n"></param>
-        private void AddElement(Database database, Point3d tempPoint3d, string file, string n)
+        private void AddElement1(Database database, Point3d tempPoint3d, string file, string n)
         {
             Matrix3d matrix3D = Matrix3d.Displacement(Point3d.Origin.GetVectorTo(tempPoint3d));
             if (File.Exists(file))
@@ -763,6 +830,104 @@ namespace TimeIsLife.CADCommand
             }
         }
 
+        /// <summary>
+        /// 添加非消防强切点位
+        /// </summary>
+        /// <param name="database"></param>
+        /// <param name="tempPoint3d"></param>
+        /// <param name="file"></param>
+        /// <param name="n">非消防强切点位</param>
+        private void AddElement4(Database database, Point3d tempPoint3d, string file, string n)
+        {
+            Matrix3d matrix3D = Matrix3d.Displacement(Point3d.Origin.GetVectorTo(tempPoint3d));
+            if (File.Exists(file))
+            {
+
+                using (Database db = new Database(false, true))
+                using (Transaction transaction = db.TransactionManager.StartOpenCloseTransaction())
+                {
+                    db.ReadDwgFile(file, FileShare.Read, true, null);
+                    db.CloseInput(true);
+
+                    BlockTable blockTable = transaction.GetObject(db.BlockTableId, OpenMode.ForRead) as BlockTable;
+                    BlockTableRecord modelSpace = transaction.GetObject(blockTable[BlockTableRecord.ModelSpace], OpenMode.ForRead) as BlockTableRecord;
+                    List<DBText> dBTexts = new List<DBText>();
+                    foreach (var item in modelSpace)
+                    {
+                        DBText dBText = transaction.GetObject(item, OpenMode.ForRead) as DBText;
+                        if (dBText != null)
+                        {
+                            dBText.UpgradeOpen();
+                            dBText.TextString = n;
+                            dBText.DowngradeOpen();
+                        }
+
+                        BlockReference blockReference = transaction.GetObject(item, OpenMode.ForRead) as BlockReference;
+                        if (blockReference != null && blockReference.Name.Equals("FA-28-非消防配电箱"))
+                        {
+                            blockReference.UpgradeOpen();
+                            foreach (ObjectId id in blockReference.AttributeCollection)
+                            {
+                                AttributeReference attref = transaction.GetObject(id, OpenMode.ForRead) as AttributeReference;
+                                if (attref != null)
+                                {
+                                    attref.UpgradeOpen();
+                                    //设置属性值
+                                    attref.TextString = n;
+
+                                    attref.DowngradeOpen();
+                                }
+                            }
+                            blockReference.DowngradeOpen();
+                        }
+                    }
+                    transaction.Commit();
+
+                    database.Insert(matrix3D, db, false);
+                }
+            }
+        }
+
+        /// <summary>
+        /// 添加消防风机控制箱
+        /// </summary>
+        /// <param name="database"></param>
+        /// <param name="tempPoint3d"></param>
+        /// <param name="file"></param>
+        /// <param name="n1">消防风机控制箱数量</param>
+        /// <param name="n2">消防风机数量</param>
+        private void AddElement5(Database database, Point3d tempPoint3d, string file, string n1, string n2)
+        {
+            Matrix3d matrix3D = Matrix3d.Displacement(Point3d.Origin.GetVectorTo(tempPoint3d));
+            if (File.Exists(file))
+            {
+
+                using (Database db = new Database(false, true))
+                using (Transaction transaction = db.TransactionManager.StartOpenCloseTransaction())
+                {
+                    db.ReadDwgFile(file, FileShare.Read, true, null);
+                    db.CloseInput(true);
+
+                    BlockTable blockTable = transaction.GetObject(db.BlockTableId, OpenMode.ForRead) as BlockTable;
+                    BlockTableRecord modelSpace = transaction.GetObject(blockTable[BlockTableRecord.ModelSpace], OpenMode.ForRead) as BlockTableRecord;
+                    List<DBText> dBTexts = new List<DBText>();
+                    foreach (var item in modelSpace)
+                    {
+                        DBText dBText = transaction.GetObject(item, OpenMode.ForRead) as DBText;
+                        if (dBText != null)
+                        {
+                            dBTexts.Add(dBText);
+                        }
+                    }
+                    dBTexts = dBTexts.OrderBy(d => d.Position.Y).ToList();
+                    dBTexts[0].EditContent(n1);
+                    dBTexts[1].EditContent(n2);
+                    transaction.Commit();
+
+                    database.Insert(matrix3D, db, false);
+                }
+            }
+        }
         #endregion
 
         #region FF_LoadYdbFile
@@ -859,10 +1024,8 @@ namespace TimeIsLife.CADCommand
             var floorAreas = areaConn.Query<Area>(sqlFloorArea);
             var fireAreas = areaConn.Query<Area>(sqlFireArea);
             var roomAreas = areaConn.Query<Area>(sqlRoomArea);
-            areaConn.Close();            
+            areaConn.Close();
             #endregion
-
-
 
             using (Database tempDb = new Database(false, true))
             using (Transaction tempTransaction = tempDb.TransactionManager.StartTransaction())
@@ -886,15 +1049,15 @@ namespace TimeIsLife.CADCommand
                     //根据标高生成梁图
                     foreach (var floor in floors)
                     {
-                        using (Database db = new Database())
-                        using (Transaction transaction = db.TransactionManager.StartTransaction())
+                        using (Database newDatabase = new Database())
+                        using (Transaction newTransaction = newDatabase.TransactionManager.StartTransaction())
                         {
                             try
                             {
-                                ObjectId smokeDetectorID = db.Insert(smokeDetector, tempDb, true);
-                                ObjectId temperatureDetectorID = db.Insert(temperatureDetector, tempDb, true);
+                                ObjectId smokeDetectorID = newDatabase.Insert(smokeDetector, tempDb, true);
+                                ObjectId temperatureDetectorID = newDatabase.Insert(temperatureDetector, tempDb, true);
 
-                                #region 生成板及烟感
+                                #region 根据房间边界及板轮廓生成烟感
                                 foreach (var roomArea in roomAreas)
                                 {
                                     if (roomArea.LevelB != floor.LevelB) continue;
@@ -956,7 +1119,7 @@ namespace TimeIsLife.CADCommand
                                                 SortPolyPoints(IntersectPoint3DCollection);
                                                 Polyline polyline = new Polyline();
                                                 polyline.CreatePolyline(IntersectPoint3DCollection);
-                                                db.AddToModelSpace(polyline);
+                                                newDatabase.AddToModelSpace(polyline);
                                                 polylines.Add(polyline);
                                             }
                                             else
@@ -1035,12 +1198,12 @@ namespace TimeIsLife.CADCommand
                                     bool bo = true;
                                     if (slab.Floor.LevelB != floor.LevelB) continue;
 
-                                    SetLayer(db, $"slab-{slab.Thickness.ToString()}mm", 7);
+                                    SetLayer(newDatabase, $"slab-{slab.Thickness.ToString()}mm", 7);
 
                                     Polyline polyline = new Polyline();
                                     Point2dCollection point2Ds = GetSlabPoint2Ds(slab);
                                     polyline.CreatePolyline(point2Ds);
-                                    db.AddToModelSpace(polyline);
+                                    newDatabase.AddToModelSpace(polyline);
 
                                     if (slab.Thickness == 0)
                                     {
@@ -1048,13 +1211,13 @@ namespace TimeIsLife.CADCommand
                                     }
                                     if (!bo) continue;
                                     //在板的重心添加感烟探测器
-                                    SetLayer(db, $"E-EQUIP-{slab.Thickness.ToString()}", 4);
+                                    SetLayer(newDatabase, $"E-EQUIP-{slab.Thickness.ToString()}", 4);
 
                                     Point2d p = getCenterOfGravityPoint(point2Ds);
-                                    BlockTable bt = (BlockTable)transaction.GetObject(db.BlockTableId, OpenMode.ForRead);
+                                    BlockTable bt = (BlockTable)newTransaction.GetObject(newDatabase.BlockTableId, OpenMode.ForRead);
                                     BlockReference blockReference = new BlockReference(p.ToPoint3d(), smokeDetectorID);
                                     blockReference.ScaleFactors = new Scale3d(100);
-                                    db.AddToModelSpace(blockReference);
+                                    newDatabase.AddToModelSpace(blockReference);
 
                                     //设置块参照图层错误
                                     //blockReference.Layer = layerName;
@@ -1084,7 +1247,7 @@ namespace TimeIsLife.CADCommand
 
                                             polyline.AddVertexAt(0, p1, 0, startWidth, endWidth);
                                             polyline.AddVertexAt(1, p2, 0, startWidth, endWidth);
-                                            SetLayer(db, $"beam-concrete-{height.ToString()}mm", 7);
+                                            SetLayer(newDatabase, $"beam-concrete-{height.ToString()}mm", 7);
                                             break;
                                         case 2:
                                             startWidth = endWidth = double.Parse(beam.BeamSect.ShapeVal.Split(',')[3]);
@@ -1092,7 +1255,7 @@ namespace TimeIsLife.CADCommand
 
                                             polyline.AddVertexAt(0, p1, 0, startWidth, endWidth);
                                             polyline.AddVertexAt(1, p2, 0, startWidth, endWidth);
-                                            SetLayer(db, $"beam-steel-{beam.BeamSect.Kind.ToString()}-{height.ToString()}mm", 7);
+                                            SetLayer(newDatabase, $"beam-steel-{beam.BeamSect.Kind.ToString()}-{height.ToString()}mm", 7);
                                             break;
                                         case 7:
                                             startWidth = endWidth = double.Parse(beam.BeamSect.ShapeVal.Split(',')[1]);
@@ -1100,7 +1263,7 @@ namespace TimeIsLife.CADCommand
 
                                             polyline.AddVertexAt(0, p1, 0, startWidth, endWidth);
                                             polyline.AddVertexAt(1, p2, 0, startWidth, endWidth);
-                                            SetLayer(db, $"beam-steel-{beam.BeamSect.Kind.ToString()}-{height.ToString()}mm", 7);
+                                            SetLayer(newDatabase, $"beam-steel-{beam.BeamSect.Kind.ToString()}-{height.ToString()}mm", 7);
                                             break;
                                         case 13:
                                             startWidth = endWidth = double.Parse(beam.BeamSect.ShapeVal.Split(',')[1]);
@@ -1108,7 +1271,7 @@ namespace TimeIsLife.CADCommand
 
                                             polyline.AddVertexAt(0, p1, 0, startWidth, endWidth);
                                             polyline.AddVertexAt(1, p2, 0, startWidth, endWidth);
-                                            SetLayer(db, $"beam-steel-{beam.BeamSect.Kind.ToString()}-{height.ToString()}mm", 7);
+                                            SetLayer(newDatabase, $"beam-steel-{beam.BeamSect.Kind.ToString()}-{height.ToString()}mm", 7);
                                             break;
                                         case 22:
                                             startWidth = endWidth = double.Parse(beam.BeamSect.ShapeVal.Split(',')[1]);
@@ -1116,7 +1279,7 @@ namespace TimeIsLife.CADCommand
 
                                             polyline.AddVertexAt(0, p1, 0, startWidth, endWidth);
                                             polyline.AddVertexAt(1, p2, 0, startWidth, endWidth);
-                                            SetLayer(db, $"beam-steel-{beam.BeamSect.Kind.ToString()}-{height.ToString()}mm", 7);
+                                            SetLayer(newDatabase, $"beam-steel-{beam.BeamSect.Kind.ToString()}-{height.ToString()}mm", 7);
                                             break;
                                         case 26:
                                             startWidth = endWidth = double.Parse(beam.BeamSect.ShapeVal.Split(',')[5]);
@@ -1124,7 +1287,7 @@ namespace TimeIsLife.CADCommand
 
                                             polyline.AddVertexAt(0, p1, 0, startWidth, endWidth);
                                             polyline.AddVertexAt(1, p2, 0, startWidth, endWidth);
-                                            SetLayer(db, $"beam-steel-{beam.BeamSect.Kind.ToString()}-{height.ToString()}mm", 7);
+                                            SetLayer(newDatabase, $"beam-steel-{beam.BeamSect.Kind.ToString()}-{height.ToString()}mm", 7);
                                             break;
 
                                         default:
@@ -1133,11 +1296,11 @@ namespace TimeIsLife.CADCommand
 
                                             polyline.AddVertexAt(0, p1, 0, startWidth, endWidth);
                                             polyline.AddVertexAt(1, p2, 0, startWidth, endWidth);
-                                            SetLayer(db, $"beam-steel-{beam.BeamSect.Kind.ToString()}-{height.ToString()}mm", 7);
+                                            SetLayer(newDatabase, $"beam-steel-{beam.BeamSect.Kind.ToString()}-{height.ToString()}mm", 7);
                                             break;
                                     }
 
-                                    db.AddToModelSpace(polyline);
+                                    newDatabase.AddToModelSpace(polyline);
                                 }
                                 #endregion
 
@@ -1146,7 +1309,7 @@ namespace TimeIsLife.CADCommand
                                 {
                                     if (wall.Floor.LevelB != floor.LevelB) continue;
 
-                                    SetLayer(db, "wall", 53);
+                                    SetLayer(newDatabase, "wall", 53);
 
                                     Point2d p1 = new Point2d(wall.Grid.Joint1.X, wall.Grid.Joint1.Y);
                                     Point2d p2 = new Point2d(wall.Grid.Joint2.X, wall.Grid.Joint2.Y);
@@ -1156,19 +1319,19 @@ namespace TimeIsLife.CADCommand
                                     Polyline polyline = new Polyline();
                                     polyline.AddVertexAt(0, p1, 0, startWidth, endWidth);
                                     polyline.AddVertexAt(1, p2, 0, startWidth, endWidth);
-                                    db.AddToModelSpace(polyline);
+                                    newDatabase.AddToModelSpace(polyline);
                                 }
                                 #endregion
 
 
                                 string dwgName = Path.Combine(directoryName, floor.LevelB.ToString() + ".dwg");
-                                db.SaveAs(dwgName, DwgVersion.Current);
-                                transaction.Commit();
+                                newDatabase.SaveAs(dwgName, DwgVersion.Current);
+                                newTransaction.Commit();
                                 editor.WriteMessage($"\n{dwgName}");
                             }
                             catch
                             {
-                                transaction.Abort();
+                                newTransaction.Abort();
                                 editor.WriteMessage("\n发生错误1");
                             }
                         }
