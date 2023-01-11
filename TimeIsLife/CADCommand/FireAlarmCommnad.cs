@@ -1077,24 +1077,30 @@ namespace TimeIsLife.CADCommand
                                         Point2dCollection roomPoint2Ds = GetRoomPoint2Ds(roomArea);
                                         Polyline roomPolyline = new Polyline();
                                         roomPolyline.CreatePolyline(roomPoint2Ds);
+                                        //房间外形轮廓
                                         Extents3d roomExtents3d = roomPolyline.GeometricExtents;
-                                        
+
+                                        //房间范围内的闭合区域
+                                        List<Polyline> polylines = new List<Polyline>();
+                                        //房间范围关联的板
+                                        List<Slab> slabs1 = new List<Slab>();
 
                                         foreach (var slab in slabs)
                                         {
                                             if (slab.Floor.LevelB != floor.LevelB) continue;
                                             Point2dCollection slabPoint2Ds = GetSlabPoint2Ds(slab);
                                             Polyline slabPolyline = new Polyline();
-                                            slabPolyline.CreatePolyline(slabPoint2Ds); 
-                                            Extents3d slabExtents3d = slabPolyline.GeometricExtents;
+                                            slabPolyline.CreatePolyline(slabPoint2Ds);
+                                            //板外形轮廓
+                                            Extents3d slabExtents3d = slabPolyline.GeometricExtents; 
                                             //判断多段线的矩形轮廓是否相交，相交继续，不相交跳过
                                             if (!CheckCross(roomExtents3d,slabExtents3d)) continue;
-                                            List<Polyline> polylines = new List<Polyline>();
                                             //判断房间区域与板是否相交
                                             Point3dCollection IntersectPoint3DCollection = GetIntersectPoint3d(roomPolyline, slabPolyline);
                                             if (IntersectPoint3DCollection.Count>0)
                                             {
                                                 //房间区域与板相交,获取相交区域轮廓线
+                                                //获取房间轮廓在板轮廓内的点
                                                 for (int i = 0; i < roomPolyline.NumberOfVertices; i++)
                                                 {
                                                     if (i < roomPolyline.NumberOfVertices - 1 && roomPolyline.Closed)
@@ -1105,11 +1111,12 @@ namespace TimeIsLife.CADCommand
                                                         }
                                                     }
                                                 }
+                                                //获取板轮廓在房间轮廓内的点
                                                 for (int i = 0; i < slabPolyline.NumberOfVertices; i++)
                                                 {
                                                     if (i < slabPolyline.NumberOfVertices - 1 && slabPolyline.Closed)
                                                     {
-                                                        if (slabPolyline.GetPoint2dAt(i).IsInPolygon1(slabPolyline.GetPoint2DCollection().ToArray().ToList()))
+                                                        if (slabPolyline.GetPoint2dAt(i).IsInPolygon1(roomPolyline.GetPoint2DCollection().ToArray().ToList()))
                                                         {
                                                             IntersectPoint3DCollection.Add(slabPolyline.GetPoint3dAt(i));
                                                         }
@@ -1141,11 +1148,67 @@ namespace TimeIsLife.CADCommand
                                             }
 
                                             //对多段线集合按照面积进行排序
-
+                                            polylines.OrderByDescending(p => p.Area);
                                             //根据多段线集合生成探测器
-                                            foreach (var item in polylines)
+                                            foreach (var p in polylines)
                                             {
+                                                if (p.Area> detectorInfo.Area4)
+                                                {
+                                                    Point2d centerPoint = getCenterOfGravityPoint(p.GetPoint2DCollection());
+                                                    //Circle circle = new Circle(centerPoint.ToPoint3d(), new Vector3d(0, 0, 1), detectorInfo.Radius);
+                                                    bool b = false;
+                                                    for (int i = 0; i < p.NumberOfVertices; i++)
+                                                    {
+                                                        if (i < p.NumberOfVertices - 1 && p.Closed)
+                                                        {
+                                                            double d =centerPoint.GetDistanceTo(p.GetPoint2dAt(i));
+                                                            if (d>detectorInfo.Radius)
+                                                            {
+                                                                b = true;
+                                                            }
+                                                        }
+                                                    }
+                                                    //如果为真，超出保护范围，需要切分为n个子区域
+                                                    if (b) 
+                                                    {
+                                                        int n = 2;
+                                                        while (true)
+                                                        {
+                                                            //
 
+
+
+
+
+                                                            n++;
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        BlockReference blockReference = new BlockReference(centerPoint.ToPoint3d(), smokeDetectorID)
+                                                        {
+                                                            ScaleFactors = new Scale3d(100)
+                                                        };
+                                                        newDatabase.AddToModelSpace(blockReference);
+                                                    }
+
+                                                }
+                                                else if (detectorInfo.Area3 < p.Area && p.Area <= detectorInfo.Area4)
+                                                {
+
+                                                }
+                                                else if (detectorInfo.Area2 < p.Area && p.Area <= detectorInfo.Area3)
+                                                {
+
+                                                }
+                                                else if (detectorInfo.Area1 < p.Area && p.Area <= detectorInfo.Area2)
+                                                {
+
+                                                }
+                                                else if (p.Area < detectorInfo.Area1)
+                                                {
+
+                                                }
                                             }
 
 
