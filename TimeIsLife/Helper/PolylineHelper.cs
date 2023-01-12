@@ -14,6 +14,11 @@ namespace TimeIsLife.Helper
 {
     internal static class PolylineHelper
     {
+        /// <summary>
+        /// 获取三维点集
+        /// </summary>
+        /// <param name="polyline"></param>
+        /// <returns></returns>
         public static Point3dCollection GetPoint3DCollection(this Polyline polyline)
         {
             Point3dCollection points = new Point3dCollection();
@@ -25,9 +30,30 @@ namespace TimeIsLife.Helper
             return points;
         }
 
+        /// <summary>
+        /// 获取二维点集
+        /// </summary>
+        /// <param name="polyline"></param>
+        /// <returns></returns>
         public static Point2dCollection GetPoint2DCollection(this Polyline polyline)
         {
             Point2dCollection points = new Point2dCollection();
+
+            for (int i = 0; i < polyline.NumberOfVertices; i++)
+            {
+                points.Add(new Point2d(polyline.GetPoint3dAt(i).X, polyline.GetPoint3dAt(i).Y));
+            }
+            return points;
+        }
+
+        /// <summary>
+        /// 获取二维点集
+        /// </summary>
+        /// <param name="polyline"></param>
+        /// <returns></returns>
+        public static List<Point2d> GetPoint2Ds(this Polyline polyline)
+        {
+            List<Point2d> points = new List<Point2d>();
 
             for (int i = 0; i < polyline.NumberOfVertices; i++)
             {

@@ -1,4 +1,6 @@
-﻿using Autodesk.AutoCAD.ApplicationServices;
+﻿using Accord.MachineLearning;
+
+using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.Colors;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
@@ -7,6 +9,8 @@ using Autodesk.AutoCAD.Runtime;
 using Autodesk.AutoCAD.Windows.ToolPalette;
 
 using Dapper;
+
+using DelaunatorSharp;
 
 using DotNetARX;
 
@@ -1105,7 +1109,7 @@ namespace TimeIsLife.CADCommand
                                                 {
                                                     if (i < roomPolyline.NumberOfVertices - 1 && roomPolyline.Closed)
                                                     {
-                                                        if (roomPolyline.GetPoint2dAt(i).IsInPolygon1(slabPolyline.GetPoint2DCollection().ToArray().ToList()))
+                                                        if (roomPolyline.GetPoint2dAt(i).IsInPolygon1(slabPolyline.GetPoint2Ds()))
                                                         {
                                                             IntersectPoint3DCollection.Add(roomPolyline.GetPoint3dAt(i));
                                                         }
@@ -1116,7 +1120,7 @@ namespace TimeIsLife.CADCommand
                                                 {
                                                     if (i < slabPolyline.NumberOfVertices - 1 && slabPolyline.Closed)
                                                     {
-                                                        if (slabPolyline.GetPoint2dAt(i).IsInPolygon1(roomPolyline.GetPoint2DCollection().ToArray().ToList()))
+                                                        if (slabPolyline.GetPoint2dAt(i).IsInPolygon1(roomPolyline.GetPoint2Ds()))
                                                         {
                                                             IntersectPoint3DCollection.Add(slabPolyline.GetPoint3dAt(i));
                                                         }
@@ -1152,6 +1156,7 @@ namespace TimeIsLife.CADCommand
                                             //根据多段线集合生成探测器
                                             foreach (var p in polylines)
                                             {
+                                                //多边形内布置一个或多个点位
                                                 if (p.Area> detectorInfo.Area4)
                                                 {
                                                     Point2d centerPoint = getCenterOfGravityPoint(p.GetPoint2DCollection());
@@ -1703,6 +1708,73 @@ namespace TimeIsLife.CADCommand
             return d1 > d2;
         }
 
+        /// <summary>
+        /// 按照指定数量切分多边形
+        /// </summary>
+        /// <param name="polyline">多边形</param>
+        /// <param name="count">平分份数</param>
+        /// <param name="n">点集数量（kmeans算法用，越多越精确但速度越慢）</param>
+        /// <param name="detectorInfo">探测器</param>
+        /// <returns>符合条件的平分多边形的质心点集</returns>
+        List<Point2d> SplitPolyline(Polyline polyline, int count, int n, DetectorInfo detectorInfo)
+        {
+            Random random = new Random();
+            //质心点集
+            List<Point2d> Points = new List<Point2d>();
+
+            Extents3d Extents3d = polyline.GeometricExtents;
+            Point2d maxPoint = Extents3d.MaxPoint.ToPoint2d();
+            Point2d minPoint = Extents3d.MinPoint.ToPoint2d();
+
+            //构建随机点并判断点是否在多边形内部
+            double[][] randomPoints = new double[n][];            
+            for (int i = 0; i < n; i++)
+            {
+                while (true)
+                {
+                    double x = minPoint.X + random.NextDouble() * (maxPoint.X - minPoint.X);
+                    double y = minPoint.Y + random.NextDouble() * (maxPoint.Y - minPoint.Y);
+                    Point2d point2D = new Point2d(x,y);
+
+                    if (point2D.IsInPolygon1(polyline.GetPoint2Ds()))
+                    {
+                        randomPoints[i] = new double[2] { x, y };                        
+                        break;
+                    }
+                    else
+                    {
+                        continue;
+                    }
+                }
+            }
+
+            //利用EKmeans 获取分组和簇的质心
+            Accord.Math.Random.Generator.Seed = 0;
+            KMeans kMeans = new KMeans(count);
+            KMeansClusterCollection clusters = kMeans.Learn(randomPoints);
+            double[][] centerPoints = clusters.Centroids;
+
+            //构建泰森多边形
+            foreach (var c in centerPoints)
+            {
+                Points.Add(new Point2d(c[0], c[1]));
+            }
+
+            IPoint[] coords = new IPoint[centerPoints.Length];
+            for (int i = 0; i < centerPoints.Length; i++)
+            {
+
+                coords[i] = new Point(centerPoints[i][0], centerPoints[i][1]);
+            }
+            
+            Delaunator delaunator = new Delaunator(coords);
+            List< IEdge> edges = (List<IEdge>)delaunator.GetVoronoiEdges();
+            delaunator.
+
+
+
+            return Points;
+        }
 
         #region 结构类
         public class Floor
