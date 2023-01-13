@@ -211,15 +211,6 @@
           }
         }
       },
-      "Delaunator/1.0.10": {
-        "type": "package",
-        "compile": {
-          "lib/net471/DelaunatorSharp.dll": {}
-        },
-        "runtime": {
-          "lib/net471/DelaunatorSharp.dll": {}
-        }
-      },
       "EntityFramework/6.4.4": {
         "type": "package",
         "frameworkAssemblies": [
@@ -309,23 +300,7 @@
           }
         }
       },
-      "NetTopologySuite.IO.GeoTools/1.13.2": {
-        "type": "package",
-        "dependencies": {
-          "NetTopologySuite": "1.13.2"
-        },
-        "frameworkAssemblies": [
-          "System",
-          "System.Core"
-        ],
-        "compile": {
-          "lib/net403-client/NetTopologySuite.IO.GeoTools.dll": {}
-        },
-        "runtime": {
-          "lib/net403-client/NetTopologySuite.IO.GeoTools.dll": {}
-        }
-      },
-      "Stub.System.Data.SQLite.Core.NetFramework/1.0.116": {
+      "Stub.System.Data.SQLite.Core.NetFramework/1.0.117": {
         "type": "package",
         "compile": {
           "lib/net46/System.Data.SQLite.dll": {
@@ -372,21 +347,21 @@
           "lib/net461/System.ComponentModel.Annotations.dll": {}
         }
       },
-      "System.Data.SQLite/1.0.116": {
+      "System.Data.SQLite/1.0.117": {
         "type": "package",
         "dependencies": {
-          "System.Data.SQLite.Core": "[1.0.116]",
-          "System.Data.SQLite.EF6": "[1.0.116]",
-          "System.Data.SQLite.Linq": "[1.0.116]"
+          "System.Data.SQLite.Core": "[1.0.117]",
+          "System.Data.SQLite.EF6": "[1.0.117]",
+          "System.Data.SQLite.Linq": "[1.0.117]"
         }
       },
-      "System.Data.SQLite.Core/1.0.116": {
+      "System.Data.SQLite.Core/1.0.117": {
         "type": "package",
         "dependencies": {
-          "Stub.System.Data.SQLite.Core.NetFramework": "[1.0.116]"
+          "Stub.System.Data.SQLite.Core.NetFramework": "[1.0.117]"
         }
       },
-      "System.Data.SQLite.EF6/1.0.116": {
+      "System.Data.SQLite.EF6/1.0.117": {
         "type": "package",
         "dependencies": {
           "EntityFramework": "6.4.4"
@@ -398,7 +373,7 @@
           "lib/net46/System.Data.SQLite.EF6.dll": {}
         }
       },
-      "System.Data.SQLite.Linq/1.0.116": {
+      "System.Data.SQLite.Linq/1.0.117": {
         "type": "package",
         "compile": {
           "lib/net46/System.Data.SQLite.Linq.dll": {}
@@ -692,15 +667,6 @@
           }
         }
       },
-      "Delaunator/1.0.10": {
-        "type": "package",
-        "compile": {
-          "lib/net471/DelaunatorSharp.dll": {}
-        },
-        "runtime": {
-          "lib/net471/DelaunatorSharp.dll": {}
-        }
-      },
       "EntityFramework/6.4.4": {
         "type": "package",
         "frameworkAssemblies": [
@@ -790,23 +756,7 @@
           }
         }
       },
-      "NetTopologySuite.IO.GeoTools/1.13.2": {
-        "type": "package",
-        "dependencies": {
-          "NetTopologySuite": "1.13.2"
-        },
-        "frameworkAssemblies": [
-          "System",
-          "System.Core"
-        ],
-        "compile": {
-          "lib/net403-client/NetTopologySuite.IO.GeoTools.dll": {}
-        },
-        "runtime": {
-          "lib/net403-client/NetTopologySuite.IO.GeoTools.dll": {}
-        }
-      },
-      "Stub.System.Data.SQLite.Core.NetFramework/1.0.116": {
+      "Stub.System.Data.SQLite.Core.NetFramework/1.0.117": {
         "type": "package",
         "compile": {
           "lib/net46/System.Data.SQLite.dll": {
@@ -853,21 +803,21 @@
           "lib/net461/System.ComponentModel.Annotations.dll": {}
         }
       },
-      "System.Data.SQLite/1.0.116": {
+      "System.Data.SQLite/1.0.117": {
         "type": "package",
         "dependencies": {
-          "System.Data.SQLite.Core": "[1.0.116]",
-          "System.Data.SQLite.EF6": "[1.0.116]",
-          "System.Data.SQLite.Linq": "[1.0.116]"
+          "System.Data.SQLite.Core": "[1.0.117]",
+          "System.Data.SQLite.EF6": "[1.0.117]",
+          "System.Data.SQLite.Linq": "[1.0.117]"
         }
       },
-      "System.Data.SQLite.Core/1.0.116": {
+      "System.Data.SQLite.Core/1.0.117": {
         "type": "package",
         "dependencies": {
-          "Stub.System.Data.SQLite.Core.NetFramework": "[1.0.116]"
+          "Stub.System.Data.SQLite.Core.NetFramework": "[1.0.117]"
         }
       },
-      "System.Data.SQLite.EF6/1.0.116": {
+      "System.Data.SQLite.EF6/1.0.117": {
         "type": "package",
         "dependencies": {
           "EntityFramework": "6.4.4"
@@ -879,7 +829,7 @@
           "lib/net46/System.Data.SQLite.EF6.dll": {}
         }
       },
-      "System.Data.SQLite.Linq/1.0.116": {
+      "System.Data.SQLite.Linq/1.0.117": {
         "type": "package",
         "compile": {
           "lib/net46/System.Data.SQLite.Linq.dll": {}
@@ -1173,15 +1123,6 @@
           }
         }
       },
-      "Delaunator/1.0.10": {
-        "type": "package",
-        "compile": {
-          "lib/net471/DelaunatorSharp.dll": {}
-        },
-        "runtime": {
-          "lib/net471/DelaunatorSharp.dll": {}
-        }
-      },
       "EntityFramework/6.4.4": {
         "type": "package",
         "frameworkAssemblies": [
@@ -1271,23 +1212,7 @@
           }
         }
       },
-      "NetTopologySuite.IO.GeoTools/1.13.2": {
-        "type": "package",
-        "dependencies": {
-          "NetTopologySuite": "1.13.2"
-        },
-        "frameworkAssemblies": [
-          "System",
-          "System.Core"
-        ],
-        "compile": {
-          "lib/net403-client/NetTopologySuite.IO.GeoTools.dll": {}
-        },
-        "runtime": {
-          "lib/net403-client/NetTopologySuite.IO.GeoTools.dll": {}
-        }
-      },
-      "Stub.System.Data.SQLite.Core.NetFramework/1.0.116": {
+      "Stub.System.Data.SQLite.Core.NetFramework/1.0.117": {
         "type": "package",
         "compile": {
           "lib/net46/System.Data.SQLite.dll": {
@@ -1334,21 +1259,21 @@
           "lib/net461/System.ComponentModel.Annotations.dll": {}
         }
       },
-      "System.Data.SQLite/1.0.116": {
+      "System.Data.SQLite/1.0.117": {
         "type": "package",
         "dependencies": {
-          "System.Data.SQLite.Core": "[1.0.116]",
-          "System.Data.SQLite.EF6": "[1.0.116]",
-          "System.Data.SQLite.Linq": "[1.0.116]"
+          "System.Data.SQLite.Core": "[1.0.117]",
+          "System.Data.SQLite.EF6": "[1.0.117]",
+          "System.Data.SQLite.Linq": "[1.0.117]"
         }
       },
-      "System.Data.SQLite.Core/1.0.116": {
+      "System.Data.SQLite.Core/1.0.117": {
         "type": "package",
         "dependencies": {
-          "Stub.System.Data.SQLite.Core.NetFramework": "[1.0.116]"
+          "Stub.System.Data.SQLite.Core.NetFramework": "[1.0.117]"
         }
       },
-      "System.Data.SQLite.EF6/1.0.116": {
+      "System.Data.SQLite.EF6/1.0.117": {
         "type": "package",
         "dependencies": {
           "EntityFramework": "6.4.4"
@@ -1360,7 +1285,7 @@
           "lib/net46/System.Data.SQLite.EF6.dll": {}
         }
       },
-      "System.Data.SQLite.Linq/1.0.116": {
+      "System.Data.SQLite.Linq/1.0.117": {
         "type": "package",
         "compile": {
           "lib/net46/System.Data.SQLite.Linq.dll": {}
@@ -1654,15 +1579,6 @@
           }
         }
       },
-      "Delaunator/1.0.10": {
-        "type": "package",
-        "compile": {
-          "lib/net471/DelaunatorSharp.dll": {}
-        },
-        "runtime": {
-          "lib/net471/DelaunatorSharp.dll": {}
-        }
-      },
       "EntityFramework/6.4.4": {
         "type": "package",
         "frameworkAssemblies": [
@@ -1752,23 +1668,7 @@
           }
         }
       },
-      "NetTopologySuite.IO.GeoTools/1.13.2": {
-        "type": "package",
-        "dependencies": {
-          "NetTopologySuite": "1.13.2"
-        },
-        "frameworkAssemblies": [
-          "System",
-          "System.Core"
-        ],
-        "compile": {
-          "lib/net403-client/NetTopologySuite.IO.GeoTools.dll": {}
-        },
-        "runtime": {
-          "lib/net403-client/NetTopologySuite.IO.GeoTools.dll": {}
-        }
-      },
-      "Stub.System.Data.SQLite.Core.NetFramework/1.0.116": {
+      "Stub.System.Data.SQLite.Core.NetFramework/1.0.117": {
         "type": "package",
         "compile": {
           "lib/net46/System.Data.SQLite.dll": {
@@ -1815,21 +1715,21 @@
           "lib/net461/System.ComponentModel.Annotations.dll": {}
         }
       },
-      "System.Data.SQLite/1.0.116": {
+      "System.Data.SQLite/1.0.117": {
         "type": "package",
         "dependencies": {
-          "System.Data.SQLite.Core": "[1.0.116]",
-          "System.Data.SQLite.EF6": "[1.0.116]",
-          "System.Data.SQLite.Linq": "[1.0.116]"
+          "System.Data.SQLite.Core": "[1.0.117]",
+          "System.Data.SQLite.EF6": "[1.0.117]",
+          "System.Data.SQLite.Linq": "[1.0.117]"
         }
       },
-      "System.Data.SQLite.Core/1.0.116": {
+      "System.Data.SQLite.Core/1.0.117": {
         "type": "package",
         "dependencies": {
-          "Stub.System.Data.SQLite.Core.NetFramework": "[1.0.116]"
+          "Stub.System.Data.SQLite.Core.NetFramework": "[1.0.117]"
         }
       },
-      "System.Data.SQLite.EF6/1.0.116": {
+      "System.Data.SQLite.EF6/1.0.117": {
         "type": "package",
         "dependencies": {
           "EntityFramework": "6.4.4"
@@ -1841,7 +1741,7 @@
           "lib/net46/System.Data.SQLite.EF6.dll": {}
         }
       },
-      "System.Data.SQLite.Linq/1.0.116": {
+      "System.Data.SQLite.Linq/1.0.117": {
         "type": "package",
         "compile": {
           "lib/net46/System.Data.SQLite.Linq.dll": {}
@@ -2197,19 +2097,6 @@
         "lib/netstandard2.0/Dapper.xml"
       ]
     },
-    "Delaunator/1.0.10": {
-      "sha512": "BYRTAWhPb0N9gIRGwSZ3vN5loMDIvNOOhJCsLT4usMYBqNH/oOuVsinzLxVrY8RFx7u3dGKaNhAbsuEVNJ79pw==",
-      "type": "package",
-      "path": "delaunator/1.0.10",
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "delaunator.1.0.10.nupkg.sha512",
-        "delaunator.nuspec",
-        "lib/net471/DelaunatorSharp.dll",
-        "lib/netstandard2.0/DelaunatorSharp.dll"
-      ]
-    },
     "EntityFramework/6.4.4": {
       "sha512": "yj1+/4tci7Panu3jKDHYizxwVm0Jvm7b7m057b5h4u8NUHGCR8WIWirBTw+8EptRffwftIWPBeIRGNKD1ewEMQ==",
       "type": "package",
@@ -2340,25 +2227,10 @@
         "nettopologysuite.nuspec"
       ]
     },
-    "NetTopologySuite.IO.GeoTools/1.13.2": {
-      "sha512": "pCZ+/CrknZcd68QGEem/OS/RvTNz1g7MQGMjhq4j/lktyd8WYAO18r6IAyiOUjkqMV+7ceAr9+/IKb/0QP90Fw==",
+    "Stub.System.Data.SQLite.Core.NetFramework/1.0.117": {
+      "sha512": "My72UHGDfOX8mY020DU88q7o6qyRj4hEjpq80Cwxc5euIEQ9jdvs5Y+hRr+HyvKP4EPMfD0+9ntGqeSeGauw5A==",
       "type": "package",
-      "path": "nettopologysuite.io.geotools/1.13.2",
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "lib/net20/NetTopologySuite.IO.GeoTools.dll",
-        "lib/net35-client/NetTopologySuite.IO.GeoTools.dll",
-        "lib/net40-client/NetTopologySuite.IO.GeoTools.dll",
-        "lib/net403-client/NetTopologySuite.IO.GeoTools.dll",
-        "nettopologysuite.io.geotools.1.13.2.nupkg.sha512",
-        "nettopologysuite.io.geotools.nuspec"
-      ]
-    },
-    "Stub.System.Data.SQLite.Core.NetFramework/1.0.116": {
-      "sha512": "wIGWCPYwxEXJZSkIzXePu06uiyhADuNdo9mYRjDlhIY/YvScadeSnflle2UqgFrhGnsX4pPAAe08zkl9kjIyRw==",
-      "type": "package",
-      "path": "stub.system.data.sqlite.core.netframework/1.0.116",
+      "path": "stub.system.data.sqlite.core.netframework/1.0.117",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -2397,7 +2269,7 @@
         "lib/net46/System.Data.SQLite.dll",
         "lib/net46/System.Data.SQLite.dll.altconfig",
         "lib/net46/System.Data.SQLite.xml",
-        "stub.system.data.sqlite.core.netframework.1.0.116.nupkg.sha512",
+        "stub.system.data.sqlite.core.netframework.1.0.117.nupkg.sha512",
         "stub.system.data.sqlite.core.netframework.nuspec"
       ]
     },
@@ -2522,32 +2394,32 @@
         "version.txt"
       ]
     },
-    "System.Data.SQLite/1.0.116": {
-      "sha512": "ykbwLhE8ejsQKMGb1xUCVsbMboNG1BWEr88fdxCW6t3yoIFqGpYpkSpskXw7IACveAFf7FDNuYRSqNIqBlZFMg==",
+    "System.Data.SQLite/1.0.117": {
+      "sha512": "yL8FPHoK9LfP9mPk0FGTJlF8ZiqujKfeyn2lIdE/5LyKDhhyXRNWtOF2dN6+OpBdmO1ZSHaYr8HyOY3a3rZ4sw==",
       "type": "package",
-      "path": "system.data.sqlite/1.0.116",
+      "path": "system.data.sqlite/1.0.117",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
-        "system.data.sqlite.1.0.116.nupkg.sha512",
+        "system.data.sqlite.1.0.117.nupkg.sha512",
         "system.data.sqlite.nuspec"
       ]
     },
-    "System.Data.SQLite.Core/1.0.116": {
-      "sha512": "djwmo97syWCpUPJbDS0e2qUFUa8cDLeIfMotVkaRkAC5gpfBSZLMzvoLkLp1prY8waAuH1jEC3wcB2ymVVQWtA==",
+    "System.Data.SQLite.Core/1.0.117": {
+      "sha512": "lGfOhA3QQod9XhdWYqLgNgbgq5uZnVG6DtnhDAdPisbLpTTgZBNbeGnp+GWt8C+3EyaqBYTGJWXcxHlHKwo05A==",
       "type": "package",
-      "path": "system.data.sqlite.core/1.0.116",
+      "path": "system.data.sqlite.core/1.0.117",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
-        "system.data.sqlite.core.1.0.116.nupkg.sha512",
+        "system.data.sqlite.core.1.0.117.nupkg.sha512",
         "system.data.sqlite.core.nuspec"
       ]
     },
-    "System.Data.SQLite.EF6/1.0.116": {
-      "sha512": "oWkl3W9ZKb4oiS4mFd363qK317t/l5KyM3dmj7BD+eW7Qji8Oid5L4Tn+OshQrgY7xNpG4Ga9NUZVXyF91qXAA==",
+    "System.Data.SQLite.EF6/1.0.117": {
+      "sha512": "Q1y/Jz1K63okYr1Jea7DyNGrOyWJiOpPHdpJ9cbjWAJanKJ0RUAZ8HQHKy9oEdxfjv0kfPR+Up9QcWni8lryCQ==",
       "type": "package",
-      "path": "system.data.sqlite.ef6/1.0.116",
+      "path": "system.data.sqlite.ef6/1.0.117",
       "hasTools": true,
       "files": [
         ".nupkg.metadata",
@@ -2573,7 +2445,7 @@
         "lib/net451/System.Data.SQLite.EF6.dll",
         "lib/net46/System.Data.SQLite.EF6.dll",
         "lib/netstandard2.1/System.Data.SQLite.EF6.dll",
-        "system.data.sqlite.ef6.1.0.116.nupkg.sha512",
+        "system.data.sqlite.ef6.1.0.117.nupkg.sha512",
         "system.data.sqlite.ef6.nuspec",
         "tools/net40/install.ps1",
         "tools/net45/install.ps1",
@@ -2581,10 +2453,10 @@
         "tools/net46/install.ps1"
       ]
     },
-    "System.Data.SQLite.Linq/1.0.116": {
-      "sha512": "chSy8+xdCkyMH47BvggLb4fZwkd+/ZqBG14WFbXoURgqfpS+8qVdc/0ASoZbsPjNBWSoEsEfKPqfMCY08MvEMg==",
+    "System.Data.SQLite.Linq/1.0.117": {
+      "sha512": "n79RR22rVM+dkN6TF9QgbuLdJV+JKMmBaC5XE1HDcuXCy0n0Dq577DdaaWMwsAJc+8UNRrc2mNvxzTEoO0frNA==",
       "type": "package",
-      "path": "system.data.sqlite.linq/1.0.116",
+      "path": "system.data.sqlite.linq/1.0.117",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -2603,7 +2475,7 @@
         "lib/net45/System.Data.SQLite.Linq.dll",
         "lib/net451/System.Data.SQLite.Linq.dll",
         "lib/net46/System.Data.SQLite.Linq.dll",
-        "system.data.sqlite.linq.1.0.116.nupkg.sha512",
+        "system.data.sqlite.linq.1.0.117.nupkg.sha512",
         "system.data.sqlite.linq.nuspec"
       ]
     },
@@ -2746,33 +2618,31 @@
       "AutoCAD.NET >= 24.2.0",
       "CommunityToolkit.Mvvm >= 8.0.0",
       "Dapper >= 2.0.123",
-      "Delaunator >= 1.0.10",
       "Microsoft.Xaml.Behaviors.Wpf >= 1.1.39",
       "NetTopologySuite >= 2.5.0",
-      "NetTopologySuite.IO.GeoTools >= 1.13.2",
-      "System.Data.SQLite >= 1.0.116",
+      "System.Data.SQLite >= 1.0.117",
       "geometry3Sharp >= 1.0.324"
     ]
   },
   "packageFolders": {
-    "C:\\Users\\LYQ\\.nuget\\packages\\": {},
+    "C:\\Users\\53-liu-yq\\.nuget\\packages\\": {},
     "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\GitHub\\TimeIsLife\\TimeIsLife\\TimeIsLife.csproj",
+      "projectUniqueName": "D:\\github\\TimeIsLife\\TimeIsLife\\TimeIsLife.csproj",
       "projectName": "TimeIsLife",
-      "projectPath": "D:\\GitHub\\TimeIsLife\\TimeIsLife\\TimeIsLife.csproj",
-      "packagesPath": "C:\\Users\\LYQ\\.nuget\\packages\\",
-      "outputPath": "D:\\GitHub\\TimeIsLife\\TimeIsLife\\obj\\",
+      "projectPath": "D:\\github\\TimeIsLife\\TimeIsLife\\TimeIsLife.csproj",
+      "packagesPath": "C:\\Users\\53-liu-yq\\.nuget\\packages\\",
+      "outputPath": "D:\\github\\TimeIsLife\\TimeIsLife\\obj\\",
       "projectStyle": "PackageReference",
       "skipContentFileWrite": true,
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
       ],
       "configFilePaths": [
-        "C:\\Users\\LYQ\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\53-liu-yq\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
@@ -2808,10 +2678,6 @@
             "target": "Package",
             "version": "[2.0.123, )"
           },
-          "Delaunator": {
-            "target": "Package",
-            "version": "[1.0.10, )"
-          },
           "Microsoft.Xaml.Behaviors.Wpf": {
             "target": "Package",
             "version": "[1.1.39, )"
@@ -2820,13 +2686,9 @@
             "target": "Package",
             "version": "[2.5.0, )"
           },
-          "NetTopologySuite.IO.GeoTools": {
-            "target": "Package",
-            "version": "[1.13.2, )"
-          },
           "System.Data.SQLite": {
             "target": "Package",
-            "version": "[1.0.116, )"
+            "version": "[1.0.117, )"
           },
           "geometry3Sharp": {
             "target": "Package",

@@ -3,6 +3,8 @@ using Autodesk.AutoCAD.Geometry;
 
 using DotNetARX;
 
+using NetTopologySuite.Geometries;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -58,6 +60,22 @@ namespace TimeIsLife.Helper
             for (int i = 0; i < polyline.NumberOfVertices; i++)
             {
                 points.Add(new Point2d(polyline.GetPoint3dAt(i).X, polyline.GetPoint3dAt(i).Y));
+            }
+            return points;
+        }
+
+        /// <summary>
+        /// 获取二维点集
+        /// </summary>
+        /// <param name="polyline"></param>
+        /// <returns></returns>
+        public static List<Coordinate> GetCoordinates(this Polyline polyline)
+        {
+            List<Coordinate> points = new List<Coordinate>();
+
+            for (int i = 0; i < polyline.NumberOfVertices; i++)
+            {
+                points.Add(new Coordinate(polyline.GetPoint3dAt(i).X, polyline.GetPoint3dAt(i).Y));
             }
             return points;
         }

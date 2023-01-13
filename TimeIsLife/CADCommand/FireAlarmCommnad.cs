@@ -38,6 +38,8 @@ using static TimeIsLife.CADCommand.FireAlarmCommnad;
 
 using Application = Autodesk.AutoCAD.ApplicationServices.Application;
 using Color = Autodesk.AutoCAD.Colors.Color;
+using Geometry = NetTopologySuite.Geometries.Geometry;
+using GeometryCollection = NetTopologySuite.Geometries.GeometryCollection;
 
 [assembly: CommandClass(typeof(TimeIsLife.CADCommand.FireAlarmCommnad))]
 
@@ -1719,12 +1721,11 @@ namespace TimeIsLife.CADCommand
         /// <param name="n">点集数量（kmeans算法用，越多越精确但速度越慢）</param>
         /// <param name="detectorInfo">探测器</param>
         /// <returns>符合条件的平分多边形的质心点集</returns>
-        List<Point2d> SplitPolyline(Polyline polyline, int count, int n, DetectorInfo detectorInfo)
+        MultiPolygon SplitPolyline(Polyline polyline, int count, int n)
         {
             Random random = new Random();
             //质心点集
-            List<Point2d> Points = new List<Point2d>();
-            List<Coordinate> coords = new List<Coordinate>();
+            //List<Point2d> Points = new List<Point2d>();
 
             Extents3d Extents3d = polyline.GeometricExtents;
             Point2d maxPoint = Extents3d.MaxPoint.ToPoint2d();
@@ -1759,216 +1760,33 @@ namespace TimeIsLife.CADCommand
             double[][] centerPoints = clusters.Centroids;
 
             //构建泰森多边形
+            List<Coordinate> coords = new List<Coordinate>();
             foreach (var c in centerPoints)
             {
-                Points.Add(new Point2d(c[0], c[1]));
+                //Points.Add(new Point2d(c[0], c[1]));
                 coords.Add(new Coordinate(c[0], c[1]));
             }
 
-            //IPoint[] coords = new IPoint[centerPoints.Length];
-            //for (int i = 0; i < centerPoints.Length; i++)
-            //{
-
-            //    coords[i] = new Point(centerPoints[i][0], centerPoints[i][1]);
-            //}
-
-            //Delaunator delaunator = new Delaunator(coords);
-            //List< IEdge> edges = (List<IEdge>)delaunator.GetVoronoiEdges();
             GeometryFactory geometryFactory = new GeometryFactory();
-            VoronoiDiagramBuilder voronoiDiagramBuilder = new VoronoiDiagramBuilder();
             Envelope clipEnvelpoe = new Envelope();
+            VoronoiDiagramBuilder voronoiDiagramBuilder = new VoronoiDiagramBuilder();
+            voronoiDiagramBuilder.ClipEnvelope = clipEnvelpoe;
             voronoiDiagramBuilder.SetSites(coords);
-            voronoiDiagramBuilder.SetClipEnvelope(clipEnvelpoe);
-            Geometry geom = voronoiDiagramBuilder.GetDiagram(JTSFactoryFinder.GetGeometryFactory());
-            // 4. 利用封闭面切割泰森多边形
-            Coordinate[] coordinates = Polygon.getCoordinates();
-            Polygon pyg = GeometryFactory.CreatePolygon(coordinates);
-            List<Geometry> geometries = new ArrayList<>();
-            for (int i = 0; i < geom.getNumGeometries(); i++)
-            {
-                Geometry geometry = Geom.getGeometryN(i);
-                geometries.add(pyg.intersection(geometry));
-            }
-            MultiPolygon multiPolygon = GeometryFactory.CreateMultiPolygon(geometries.ToArray(new Polygon[0]));
-
-
-
-
-            return Points;
-        }
-
-        /**
- * 多边形平分
- *
- * @param polygon 多边形
- * @param count   平分份数
- * @param random  点集数量（kmeans算法用，越多越精确但速度越慢）
- */
-        public static MultiPolygon splitPolygon(Polygon polygon, int count, int random)
-        {
-            GeometryFactory geometryFactory = new GeometryFactory();
-            // 1. 构建随机点
-            double minY = 90;
-            double maxY = -90;
-            double minX = 180;
-            double maxX = -180;
-
-            for (Coordinate point : polygon.getCoordinates())
-            {
-                // 最小
-                if (point.getY() < minY)
-                {
-                    minY = point.getY();
-                }
-                if (point.getX() < minX)
-                {
-                    minX = point.getX();
-                }
-                // 最大
-                if (point.getY() > maxY)
-                {
-                    maxY = point.getY();
-                }
-                if (point.getX() > maxX)
-                {
-                    maxX = point.getX();
-                }
-            }
-
-            double[][] points = new double[random][2];
-            int index = 0;
-            do
-            {
-                double x = RandomUtils.nextDouble(minX, maxX);
-                double y = RandomUtils.nextDouble(minY, maxY);
-                if (polygon.contains(geometryFactory.createPoint(new Coordinate(x, y))))
-                {
-                    points[index++] = new double[] { x, y };
-                }
-            } while (index < random);
-            // 2. 利用EKmeans 获取分组和簇的质心
-            double[][] centroids = new double[count][2];
-            EKmeans eKmeans = new EKmeans(centroids, points);
-            eKmeans.setEqual(true);
-            // 替换距离计算方法，使用基于经纬度的距离计算
-            eKmeans.setDistanceFunction((p1, p2)-> new Coordinate(p1[0], p1[1]).distance(new Coordinate(p1[0], p1[1])));
-            eKmeans.run();
-
-            // 获取分组id和中心聚合
-            centroids = eKmeans.getCentroids();
-
-            // 3. 构建泰森多边形
-            List<Coordinate> coords = new ArrayList<>();
-            for (double[] p : centroids)
-            {
-                coords.add(new Coordinate(p[0], p[1]));
-            }
-
-            VoronoiDiagramBuilder voronoiDiagramBuilder = new VoronoiDiagramBuilder();
-            Envelope clipEnvelpoe = new Envelope();
-            voronoiDiagramBuilder.setSites(coords);
-            voronoiDiagramBuilder.setClipEnvelope(clipEnvelpoe);
-
-            Geometry geom = voronoiDiagramBuilder.getDiagram(JTSFactoryFinder.getGeometryFactory());
+            GeometryCollection geometryCollection = voronoiDiagramBuilder.GetDiagram(GeometryFactory.Floating);
 
             // 4. 利用封闭面切割泰森多边形
-            Coordinate[] coordinates = polygon.getCoordinates();
-            Polygon pyg = geometryFactory.createPolygon(coordinates);
-
-            List<Geometry> geometries = new ArrayList<>();
-            for (int i = 0; i < geom.getNumGeometries(); i++)
+            
+            Polygon pyg = geometryFactory.CreatePolygon(polyline.GetCoordinates().ToArray());
+            List<Geometry> geometries = new List<Geometry>();
+            for (int i = 0; i < geometryCollection.Length; i++)
             {
-                Geometry geometry = geom.getGeometryN(i);
-                geometries.add(pyg.intersection(geometry));
+                Geometry geometry = geometryCollection.GetGeometryN(i);
+                geometries.Add(pyg.Intersection(geometry));
             }
-
-            MultiPolygon multiPolygon = geometryFactory.createMultiPolygon(geometries.toArray(new Polygon[0]));
-
+            MultiPolygon multiPolygon = geometryFactory.CreateMultiPolygon((Polygon[])geometries.ToArray());
             return multiPolygon;
         }
-        /**
-         * Geometry平分
-         *
-         * @param geometry Geometry
-         * @param count    平分份数
-         * @param random   点集数量（kmeans算法用，越多越精确但速度越慢）
-         * @return
-         */
-        public static List<Geometry> splitGeometry(Geometry geometry, int count, int random)
-        {
-            GeometryFactory geometryFactory = new GeometryFactory();
-            // 1. 构建随机点
-            double minY = 90;
-            double maxY = -90;
-            double minX = 180;
-            double maxX = -180;
-            for (Coordinate point : geometry.getCoordinates())
-            {
-                // 最小
-                if (point.getY() < minY)
-                {
-                    minY = point.getY();
-                }
-                if (point.getX() < minX)
-                {
-                    minX = point.getX();
-                }
-                // 最大
-                if (point.getY() > maxY)
-                {
-                    maxY = point.getY();
-                }
-                if (point.getX() > maxX)
-                {
-                    maxX = point.getX();
-                }
-            }
-            double[][] points = new double[random][2];
-            int index = 0;
-            do
-            {
-                double x = RandomUtils.nextDouble(minX, maxX);
-                double y = RandomUtils.nextDouble(minY, maxY);
-                if (geometry.contains(geometryFactory.createPoint(new Coordinate(x, y))))
-                {
-                    points[index++] = new double[] { x, y };
-                }
-            } while (index < random);
 
-            // 2. 利用EKmeans 获取分组和簇的质心
-            double[][] centroids = new double[count][2];
-            EKmeans eKmeans = new EKmeans(centroids, points);
-            eKmeans.setEqual(true);
-            // 替换距离计算方法，使用基于经纬度的距离计算
-            eKmeans.setDistanceFunction((p1, p2)->Coordinates.getDistance(new CoordinatesPoint(p1[0], p1[1]), new CoordinatesPoint(p2[0], p2[1])));
-            eKmeans.run();
-
-            // 获取分组id和中心聚合
-            centroids = eKmeans.getCentroids();
-
-            // 3. 构建泰森多边形
-            List<Coordinate> coords = new ArrayList<>();
-            for (double[] p : centroids)
-            {
-                coords.add(new Coordinate(p[0], p[1]));
-            }
-
-            VoronoiDiagramBuilder voronoiDiagramBuilder = new VoronoiDiagramBuilder();
-            Envelope clipEnvelpoe = new Envelope();
-            voronoiDiagramBuilder.setSites(coords);
-            voronoiDiagramBuilder.setClipEnvelope(clipEnvelpoe);
-
-            Geometry geom = voronoiDiagramBuilder.getDiagram(JTSFactoryFinder.getGeometryFactory());
-
-            // 4. 利用封闭面切割泰森多边形
-            List<Geometry> geometries = new ArrayList<>();
-            for (int i = 0; i < geom.getNumGeometries(); i++)
-            {
-                geometries.add(geometry.intersection(geom.getGeometryN(i)));
-            }
-
-            return geometries;
-        }
 
         #region 结构类
         public class Floor
