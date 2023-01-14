@@ -10,7 +10,6 @@ using Autodesk.AutoCAD.Windows.ToolPalette;
 
 using Dapper;
 
-using DelaunatorSharp;
 
 using DotNetARX;
 
@@ -1159,19 +1158,19 @@ namespace TimeIsLife.CADCommand
                                             //对多段线集合按照面积进行排序
                                             polylines.OrderByDescending(p => p.Area);
                                             //根据多段线集合生成探测器
-                                            foreach (var p in polylines)
+                                            foreach (var polyline in polylines)
                                             {
                                                 //多边形内布置一个或多个点位
-                                                if (p.Area> detectorInfo.Area4)
+                                                if (polyline.Area> detectorInfo.Area4)
                                                 {
-                                                    Point2d centerPoint = getCenterOfGravityPoint(p.GetPoint2DCollection());
+                                                    Point2d centerPoint = getCenterOfGravityPoint(polyline.GetPoint2DCollection());
                                                     //Circle circle = new Circle(centerPoint.ToPoint3d(), new Vector3d(0, 0, 1), detectorInfo.Radius);
                                                     bool b = false;
-                                                    for (int i = 0; i < p.NumberOfVertices; i++)
+                                                    for (int i = 0; i < polyline.NumberOfVertices; i++)
                                                     {
-                                                        if (i < p.NumberOfVertices - 1 && p.Closed)
+                                                        if (i < polyline.NumberOfVertices - 1 && polyline.Closed)
                                                         {
-                                                            double d =centerPoint.GetDistanceTo(p.GetPoint2dAt(i));
+                                                            double d =centerPoint.GetDistanceTo(polyline.GetPoint2dAt(i));
                                                             if (d>detectorInfo.Radius)
                                                             {
                                                                 b = true;
@@ -1203,19 +1202,19 @@ namespace TimeIsLife.CADCommand
                                                     }
 
                                                 }
-                                                else if (detectorInfo.Area3 < p.Area && p.Area <= detectorInfo.Area4)
+                                                else if (detectorInfo.Area3 < polyline.Area && polyline.Area <= detectorInfo.Area4)
                                                 {
 
                                                 }
-                                                else if (detectorInfo.Area2 < p.Area && p.Area <= detectorInfo.Area3)
+                                                else if (detectorInfo.Area2 < polyline.Area && polyline.Area <= detectorInfo.Area3)
                                                 {
 
                                                 }
-                                                else if (detectorInfo.Area1 < p.Area && p.Area <= detectorInfo.Area2)
+                                                else if (detectorInfo.Area1 < polyline.Area && polyline.Area <= detectorInfo.Area2)
                                                 {
 
                                                 }
-                                                else if (p.Area < detectorInfo.Area1)
+                                                else if (polyline.Area < detectorInfo.Area1)
                                                 {
 
                                                 }
@@ -1776,14 +1775,15 @@ namespace TimeIsLife.CADCommand
 
             // 4. 利用封闭面切割泰森多边形
             
-            Polygon pyg = geometryFactory.CreatePolygon(polyline.GetCoordinates().ToArray());
+            Polygon polygon = geometryFactory.CreatePolygon(polyline.GetCoordinates().ToArray());
             List<Geometry> geometries = new List<Geometry>();
             for (int i = 0; i < geometryCollection.Length; i++)
             {
                 Geometry geometry = geometryCollection.GetGeometryN(i);
-                geometries.Add(pyg.Intersection(geometry));
+                geometries.Add(polygon.Intersection(geometry));
             }
             MultiPolygon multiPolygon = geometryFactory.CreateMultiPolygon((Polygon[])geometries.ToArray());
+
             return multiPolygon;
         }
 
