@@ -111,9 +111,11 @@
     <Compile Include="Model\SwitchTypeEnum.cs" />
     <Compile Include="Model\Panel.cs" />
     <Compile Include="Model\PanelType.cs" />
+    <Compile Include="NTSHelper\CommonHelper.cs" />
     <Compile Include="NTSHelper\CoordinateHelper.cs" />
     <Compile Include="NTSHelper\GeometryHelper.cs" />
     <Compile Include="NTSHelper\MultiPolygonHelper.cs" />
+    <Compile Include="NTSHelper\MyCompare.cs" />
     <Compile Include="Tools\BlockTools.cs" />
     <Compile Include="View\ElectricaView.xaml.cs">
       <DependentUpon>ElectricaView.xaml</DependentUpon>
