@@ -12,8 +12,13 @@ using Dapper;
 
 
 using DotNetARX;
-
+using NetTopologySuite;
+using NetTopologySuite.Algorithm;
 using NetTopologySuite.Geometries;
+using NetTopologySuite.IO;
+using NetTopologySuite.Operation.Buffer;
+using NetTopologySuite.Operation.Linemerge;
+using NetTopologySuite.Operation.Polygonize;
 using NetTopologySuite.Triangulate;
 
 using System;
@@ -31,7 +36,9 @@ using System.Windows.Media;
 using System.Windows.Media.Media3D;
 
 using TimeIsLife.Helper;
+using TimeIsLife.NTSHelper;
 using TimeIsLife.ViewModel;
+using TimeIsLife.Model;
 
 using static TimeIsLife.CADCommand.FireAlarmCommnad;
 
@@ -39,6 +46,19 @@ using Application = Autodesk.AutoCAD.ApplicationServices.Application;
 using Color = Autodesk.AutoCAD.Colors.Color;
 using Geometry = NetTopologySuite.Geometries.Geometry;
 using GeometryCollection = NetTopologySuite.Geometries.GeometryCollection;
+using Accord.Math;
+using Accord;
+using Autodesk.AutoCAD.GraphicsInterface;
+using Autodesk.AutoCAD.Windows.Data;
+using Autodesk.AutoCAD.Windows.Features.PointCloud.PointCloudColorMapping;
+using static System.Net.Mime.MediaTypeNames;
+using System.Collections;
+using System.Windows.Interop;
+using System.Windows;
+using Polyline = Autodesk.AutoCAD.DatabaseServices.Polyline;
+using TimeIsLife.View;
+using Point = NetTopologySuite.Geometries.Point;
+using TimeIsLife.Jig;
 
 [assembly: CommandClass(typeof(TimeIsLife.CADCommand.FireAlarmCommnad))]
 
@@ -46,7 +66,7 @@ namespace TimeIsLife.CADCommand
 {
     class FireAlarmCommnad
     {
-        
+
         #region F6_CheckBeam
         [CommandMethod("F6_CheckBeam")]
         public void F6_CheckBeam()
@@ -319,7 +339,7 @@ namespace TimeIsLife.CADCommand
                             if (areas.Contains(area)) continue;
                             areas.Add(area);
                             Point3d layoutPoint3d = basePoint3d + new Vector3d(0, 2500 * i, 0);
-                            Point3d tempPoint3d = new Point3d(layoutPoint3d.X, layoutPoint3d.Y, layoutPoint3d.Z)+new Vector3d(12100,0,0);
+                            Point3d tempPoint3d = new Point3d(layoutPoint3d.X, layoutPoint3d.Y, layoutPoint3d.Z) + new Vector3d(12100, 0, 0);
                             List<string> blockNames = new List<string>();
                             List<BlockReference> blockReferences = new List<BlockReference>();
 
@@ -327,10 +347,10 @@ namespace TimeIsLife.CADCommand
                             typedValues3.Add(typeof(BlockReference));
                             SelectionFilter blockReferenceSelectionFilter = new SelectionFilter(typedValues3);
 
-                            for (int j = i+1; j < keyValuePairs.Count; j++)
+                            for (int j = i + 1; j < keyValuePairs.Count; j++)
                             {
                                 if (area == keyValuePairs.ElementAt(j).Value.Key.TextString)
-                                {                                    
+                                {
                                     PromptSelectionResult promptSelectionResult3 = editor.SelectWindowPolygon(keyValuePairs.ElementAt(j).Value.Value, blockReferenceSelectionFilter);
                                     SelectionSet selectionSet3 = promptSelectionResult3.Value;
 
@@ -349,7 +369,7 @@ namespace TimeIsLife.CADCommand
                                     }
                                 }
                             }
-                            
+
                             PromptSelectionResult promptSelectionResult2 = editor.SelectWindowPolygon(keyValuePairs.ElementAt(i).Value.Value, blockReferenceSelectionFilter);
                             SelectionSet selectionSet2 = promptSelectionResult2.Value;
 
@@ -516,7 +536,7 @@ namespace TimeIsLife.CADCommand
                                         break;
                                     case "FA-28-非消防配电箱":
                                         //获取非消防配电箱数量n
-                                        int n3= 0;
+                                        int n3 = 0;
                                         foreach (var item in blockReferences)
                                         {
                                             if (item.Name == "FA-28-非消防配电箱")
@@ -558,7 +578,7 @@ namespace TimeIsLife.CADCommand
                                         break;
                                     case "FA-34-消防风机控制箱":
                                         //获取消防风机控制箱数量n4，消防风机数量n5
-                                        int n4 = 0,n5=0;
+                                        int n4 = 0, n5 = 0;
                                         foreach (var item in blockReferences)
                                         {
                                             if (item.Name == "FA-34-消防风机控制箱")
@@ -576,7 +596,7 @@ namespace TimeIsLife.CADCommand
                                                 item.DowngradeOpen();
                                             }
                                         }
-                                        AddElement5(database, tempPoint3d, file, n4.ToString(),n5.ToString());
+                                        AddElement5(database, tempPoint3d, file, n4.ToString(), n5.ToString());
                                         tempPoint3d += new Vector3d(900, 0, 0);
                                         break;
                                     case "FA-35-就地液位显示盘":
@@ -627,7 +647,7 @@ namespace TimeIsLife.CADCommand
         /// <param name="area">防火分区编号</param>
         /// <param name="n1">短路隔离器数量</param>
         /// <param name="n2">接线端子箱数量</param>
-        private void AddElement2500(Database database, Point3d tempPoint3d, string file, string area,string n1,string n2)
+        private void AddElement2500(Database database, Point3d tempPoint3d, string file, string area, string n1, string n2)
         {
             Matrix3d matrix3D = Matrix3d.Displacement(Point3d.Origin.GetVectorTo(tempPoint3d));
             if (File.Exists(file))
@@ -651,13 +671,13 @@ namespace TimeIsLife.CADCommand
                         }
 
                         BlockReference blockReference = transaction.GetObject(item, OpenMode.ForRead) as BlockReference;
-                        if (blockReference!= null && blockReference.Name.Equals("FA-总线短路隔离器"))
+                        if (blockReference != null && blockReference.Name.Equals("FA-总线短路隔离器"))
                         {
                             blockReference.UpgradeOpen();
                             foreach (ObjectId id in blockReference.AttributeCollection)
                             {
-                                AttributeReference attref = transaction.GetObject(id,OpenMode.ForRead) as AttributeReference;
-                                if (attref!=null)
+                                AttributeReference attref = transaction.GetObject(id, OpenMode.ForRead) as AttributeReference;
+                                if (attref != null)
                                 {
                                     attref.UpgradeOpen();
                                     //设置属性值
@@ -938,32 +958,1255 @@ namespace TimeIsLife.CADCommand
         }
         #endregion
 
-        #region FF_LoadYdbFile
-
-        [CommandMethod("FF_LoadYdbFile")]
-        public void FF_LoadYdbFile()
+        #region FF_CreateAreaDb
+        [CommandMethod("FF_CreateAreaDb")]
+        public void FF_CreateAreaDb()
         {
             Document document = Application.DocumentManager.CurrentDocument;
             Database database = document.Database;
             Editor editor = document.Editor;
 
+            string name = null;
+            string dbPath = SaveAs(name);
+
+            // Connect to database
+            using (var connection = new SQLiteConnection($"Data Source={dbPath}"))
+            {
+                // Create Floor table
+                connection.Execute(@"CREATE TABLE IF NOT EXISTS Floor (
+                                        ID INTEGER NOT NULL PRIMARY KEY,
+                                        Name TEXT NULL,
+                                        Level REAL NOT NULL,
+                                        X REAL NOT NULL,
+                                        Y REAL NOT NULL,
+                                        Z REAL NOT NULL
+                                    );");
+
+                // Create Area table
+                connection.Execute(@"CREATE TABLE IF NOT EXISTS Area (
+                                        ID INTEGER NOT NULL PRIMARY KEY,
+                                        FloorID INTEGER NOT NULL,
+                                        VertexX TEXT NOT NULL,
+                                        VertexY TEXT NOT NULL,
+                                        VertexZ TEXT NOT NULL,
+                                        Kind INTEGER NOT NULL,
+                                        Note TEXT NOT NULL
+                                    );");
+
+                // Insert data into Floor table
+                var floorId = connection.Execute("INSERT INTO Floor (ID, Name, Level, X, Y, Z) VALUES (@ID, @Name, @Level, @X, @Y, @Z)",
+                    new { ID = 1, Name = "First Floor", Level = 0, X = 0, Y = 0, Z = 0 });
+
+                // Insert data into Area table
+                var areaId = connection.Execute("INSERT INTO Area (ID, FloorID, VertexX, VertexY, VertexZ, Kind, Note) VALUES (@ID, @FloorID, @VertexX, @VertexY, @VertexZ, @Kind, @Note)",
+                    new { ID = 1, FloorID = floorId, VertexX = "0", VertexY = "0", VertexZ = "0", Kind = 1, Note = "Room 1" });
+
+                // Read data from Floor table
+                var floor = connection.QueryFirstOrDefault<AreaFloor>("SELECT * FROM Floor WHERE ID = @ID", new { ID = floorId });
+                Console.WriteLine("Floor Name: " + floor.Name);
+
+                // Read data from Area table
+                var area = connection.QueryFirstOrDefault<Model.Area>("SELECT * FROM Area WHERE ID = @ID", new { ID = areaId });
+                Console.WriteLine("Area Note: " + area.Note);
+
+                // Update data in Floor table
+                connection.Execute("UPDATE Floor SET Name = @Name WHERE ID = @ID", new { ID = floorId, Name = "Ground Floor" });
+
+                // Update data in Area table
+                connection.Execute("UPDATE Area SET Note = @Note WHERE ID = @ID", new { ID = areaId, Note = "Living Room" });
+
+                // Delete data from Floor table
+                connection.Execute("DELETE FROM Floor WHERE ID = @ID", new { ID = floorId });
+
+            }
+        }
+
+        private string SaveAs(string name)
+        {
+            string dbPath = null;
+            SaveFileDialog saveFileDialog = new SaveFileDialog
+            {
+                Filter = "区域数据库(*.area)|*.area|所有文件|*.*",
+                FilterIndex = 0,
+                RestoreDirectory = false,
+                FileName = name,
+                DefaultExt = ".area",
+                AddExtension = true,
+            };
+
+            if (saveFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                dbPath = saveFileDialog.FileName;
+            }
+            return dbPath;
+        }
+        #endregion
+
+
+        #region FF_ToHydrantAlarmButtonCommand
+        [CommandMethod("FF_ToHydrantAlarmButton")]
+        public void FF_ToHydrantAlarmButton()
+        {
+            // Put your command code here
+            Document document = Application.DocumentManager.CurrentDocument;
+            Database database = document.Database;
+            Editor editor = document.Editor;
+
+            using (Database tempDatabase = new Database(false, true))
+            using (Transaction transaction = database.TransactionManager.StartTransaction())
+            {
+                try
+                {
+                    BlockTable blockTable = transaction.GetObject(database.BlockTableId, OpenMode.ForRead) as BlockTable;
+                    BlockTableRecord modelSpace = transaction.GetObject(blockTable[BlockTableRecord.ModelSpace], OpenMode.ForWrite) as BlockTableRecord;
+                    Matrix3d matrixd = Application.DocumentManager.MdiActiveDocument.Editor.CurrentUserCoordinateSystem;
+
+                    #region 获取文件路径，载入消火栓起泵按钮块
+                    string blockFullName = "FA-07-消火栓起泵按钮.dwg";
+                    ObjectId btrId = InsertBlock(database, tempDatabase, blockFullName);
+                    #endregion
+
+                    string name = "";
+
+                    PromptSelectionOptions promptSelectionOptions1 = new PromptSelectionOptions()
+                    {
+                        SingleOnly = true,
+                        RejectObjectsOnLockedLayers = true,
+                    };
+                    TypedValueList typedValues1 = new TypedValueList();
+                    typedValues1.Add(typeof(BlockReference));
+                    SelectionFilter selectionFilter = new SelectionFilter(typedValues1);
+
+                    PromptSelectionResult promptSelectionResult1 = editor.GetSelection(promptSelectionOptions1, selectionFilter);
+                    if (promptSelectionResult1.Status == PromptStatus.OK)
+                    {
+                        SelectionSet selectionSet1 = promptSelectionResult1.Value;
+                        foreach (var id in selectionSet1.GetObjectIds())
+                        {
+                            BlockReference blockReference1 = transaction.GetObject(id, OpenMode.ForRead) as BlockReference;
+                            if (blockReference1 == null) continue;
+                            name = blockReference1.Name;
+                        }
+                    }
+
+                    if (name.IsNullOrWhiteSpace()) return;
+
+                    List<BlockReference> blockReferences = new List<BlockReference>();
+
+                    TypedValueList typedValues = new TypedValueList();
+                    typedValues.Add(typeof(BlockReference));
+                    SelectionFilter blockReferenceSelectionFilter = new SelectionFilter(typedValues);
+                    PromptSelectionResult promptSelectionResult = editor.SelectAll(blockReferenceSelectionFilter);
+                    SelectionSet selectionSet = promptSelectionResult.Value;
+
+                    foreach (ObjectId blockReferenceId in selectionSet.GetObjectIds())
+                    {
+                        BlockReference blockReference = transaction.GetObject(blockReferenceId, OpenMode.ForRead) as BlockReference;
+                        if (blockReference.Name != name || blockReference == null) continue;
+                        blockReference.UpgradeOpen();
+                        Scale3d scale3D = blockReference.ScaleFactors;
+                        blockReference.ScaleFactors = blockReference.GetUnitScale3d(100);
+                        Matrix3d blockreferenceMatrix = blockReference.BlockTransform;
+                        blockReference.ScaleFactors = scale3D;
+                        blockReference.DowngradeOpen();
+
+                        SetLayer(database, $"E-EQUIP", 4);
+                        BlockReference newBlockReference = new BlockReference(Point3d.Origin, btrId);
+                        newBlockReference.TransformBy(blockreferenceMatrix);
+                        database.AddToModelSpace(newBlockReference);
+                    }
+                }
+                catch
+                {
+                    transaction.Abort();
+                    return;
+                }
+
+                transaction.Commit();
+            }
+        }
+
+        private static ObjectId InsertBlock(Database database, Database tempDatabase, string blockFullName)
+        {
+            string codeBase = Assembly.GetExecutingAssembly().CodeBase;
+            UriBuilder uri = new UriBuilder(codeBase);
+            string path = Uri.UnescapeDataString(uri.Path);
+
+            string blockPath = Path.Combine(Path.GetDirectoryName(path), "Block", blockFullName);
+            string blockName = SymbolUtilityServices.GetSymbolNameFromPathName(blockPath, "dwg");
+
+            ObjectId btrId = ObjectId.Null;
+            tempDatabase.ReadDwgFile(blockPath, FileOpenMode.OpenForReadAndReadShare, allowCPConversion: true, null);
+            tempDatabase.CloseInput(true);
+
+            btrId = database.Insert(blockName, tempDatabase, true);
+            return btrId;
+        }
+
+
+        #endregion
+
+        #region _FF_GetFloorAreaName
+        [CommandMethod("_FF_GetFloorAreaLayerName")]
+        public void _FF_GetFloorAreaName()
+        {
+            Document document = Application.DocumentManager.CurrentDocument;
+            Database database = document.Database;
+            Editor editor = document.Editor;
+
+            using (Transaction transaction = database.TransactionManager.StartTransaction())
+            {
+                try
+                {
+                    //获取块表
+                    BlockTable blockTable = transaction.GetObject(database.BlockTableId, OpenMode.ForRead) as BlockTable;
+                    //获取模型空间
+                    BlockTableRecord modelSpace = transaction.GetObject(blockTable[BlockTableRecord.ModelSpace], OpenMode.ForRead) as BlockTableRecord;
+                    //获取图纸空间
+                    BlockTableRecord paperSpace = transaction.GetObject(blockTable[BlockTableRecord.PaperSpace], OpenMode.ForRead) as BlockTableRecord;
+
+                    //选择选项
+                    PromptSelectionOptions promptSelectionOptions = new PromptSelectionOptions();
+                    promptSelectionOptions.SingleOnly = true;
+                    promptSelectionOptions.RejectObjectsOnLockedLayers = true;
+                    promptSelectionOptions.MessageForAdding = $"选择表示楼层区域的闭合多段线";
+
+                    #region DxfCode                
+                    //Alpha = 440,32位整数值，用于真彩色时，表示透明度值
+                    //Angle = 50,角度
+                    //ArbitraryHandle = 320,任意对象句柄；“按原样”获取的句柄值。它们在 INSERT 和 XREF 操作期间不进行转换
+                    //AttributePrompt = 3,其他文字或名称值
+                    //AttributeTag = 2,名称（属性标记、块名等）
+                    //BinaryChunk = 310,具有相同表示和 1004 组码限制的任意二进制块：用最大长度为 254 个字符的十六进制字符串表示最大长度为 127 个字节的数据块
+                    //BlockName = 2,名称（属性标记、块名等）
+                    //Bool = 290,布尔标志值
+                    //CircleSides = 0x48,
+                    //CLShapeName = 4,其他文字或名称值
+                    //CLShapeText = 9,DXF：变量名称标识符（仅在 DXF 文件的 HEADER 段中使用）
+                    //Color = 0x3e,
+                    //ColorName = 430,字符串；用于真彩色时，则为表示颜色名称的字符串
+                    //ColorRgb = 420,
+                    //Comment = 0x3e7,
+                    //ControlString = 0x66,
+                    //DashLength = 0x31,
+                    //Description = 3,其他文字或名称值
+                    //DimBlk1 = 6,线型名（固定）
+                    //DimBlk2 = 7,文字样式名（固定）
+                    //DimensionAlternativePrefixSuffix = 4,其他文字或名称值
+                    //DimensionBlock = 5,图元句柄；最多 16 个十六进制数字的字符串（固定）
+                    //DimPostString = 3,其他文字或名称值
+                    //DimStyleName = 3,其他文字或名称值
+                    //DimVarHandle = 0x69,
+                    //Elevation = 0x26,
+                    //EmbeddedObjectStart = 0x65,
+                    //End = -1,APP：图元名。每次打开图形时，图元名都会发生变化，从不保存（固定）
+                    //ExtendedDataAsciiString = 0x3e8,
+                    //ExtendedDataBinaryChunk = 0x3ec,
+                    //ExtendedDataControlString = 0x3ea,
+                    //ExtendedDataDist = 0x411,
+                    //ExtendedDataHandle = 0x3ed,
+                    //ExtendedDataInteger16 = 0x42e,
+                    //ExtendedDataInteger32 = 0x42f,
+                    //ExtendedDataLayerName = 0x3eb,
+                    //ExtendedDataReal = 0x410,
+                    //ExtendedDataRegAppName = 0x3e9,
+                    //ExtendedDataScale = 0x412,
+                    //ExtendedDataWorldXCoordinate = 0x3f3,
+                    //ExtendedDataWorldXDir = 0x3f5,
+                    //ExtendedDataWorldXDisp = 0x3f4,
+                    //ExtendedDataWorldYCoordinate = 0x3fd,
+                    //ExtendedDataWorldYDir = 0x3ff,
+                    //ExtendedDataWorldYDisp = 0x3fe,
+                    //ExtendedDataWorldZCoordinate = 0x407,
+                    //ExtendedDataWorldZDir = 0x409,
+                    //ExtendedDataWorldZDisp = 0x408,
+                    //ExtendedDataXCoordinate = 0x3f2,
+                    //ExtendedDataYCoordinate = 0x3fc,
+                    //ExtendedDataZCoordinate = 0x406,
+                    //ExtendedInt16 = 400,16 位整数
+                    //FirstEntityId = -2,APP：图元名参照（固定）
+                    //GradientAngle = 460,双精度浮点值
+                    //GradientColCount = 0x1c5,
+                    //GradientColVal = 0x1cf,
+                    //GradientName = 470,字符串
+                    //GradientObjType = 450,长整数
+                    //GradientPatType = 0x1c3,
+                    //GradientShift = 0x1cd,
+                    //GradientTintType = 0x1c4,
+                    //GradientTintVal = 0x1ce,
+                    //Handle = 5,图元句柄；最多 16 个十六进制数字的字符串（固定）
+                    //HardOwnershipId = 360,硬所有者句柄；指向同一个 DXF 文件或图形中的其他对象的任意硬所有者指针。在 INSERT 和 XREF 操作期间进行转换
+                    //HardPointerId = 340,硬指针句柄；指向同一个 DXF 文件或图形中的其他对象的任意硬指针。在 INSERT 和 XREF 操作期间进行转换
+                    //HasSubentities = 0x42,
+                    //HeaderId = -2,APP：图元名参照（固定）
+                    //Int16 = 70,
+                    //Int32 = 90,
+                    //Int64 = 160,
+                    //Int8 = 280,
+                    //Invalid = -9999,
+                    //LayerLinetype = 0x3d,
+                    //LayerName = 8,图层名（固定）
+                    //LayoutName = 410,
+                    //LinetypeAlign = 0x48,
+                    //LinetypeElement = 0x31,
+                    //LinetypeName = 6,线型名（固定）
+                    //LinetypePdc = 0x49,
+                    //LinetypeProse = 3,其他文字或名称值
+                    //LinetypeScale = 0x30,
+                    //LineWeight = 370,
+                    //MlineOffset = 0x31,
+                    //MlineStyleName = 2,
+                    //NormalX = 210,
+                    //NormalY = 220,
+                    //NormalZ = 230,
+                    //Operator = -4,APP：条件运算符（仅与 ssget 一起使用）
+                    //PixelScale = 0x2f,
+                    //PlotStyleNameId = 390,
+                    //PlotStyleNameType = 380,
+                    //PReactors = -5,APP：永久反应器链
+                    //Real = 40,
+                    //RegAppFlags = 0x47,
+                    //RenderMode = 0x119,
+                    //ShapeName = 2,
+                    //ShapeScale = 0x2e,
+                    //ShapeXOffset = 0x2c,
+                    //ShapeYOffset = 0x2d,
+                    //SoftOwnershipId = 350,
+                    //SoftPointerId = 330,
+                    //Start = 0,表示图元类型的字符串（固定）
+                    //Subclass = 100,
+                    //SymbolTableName = 2,
+                    //SymbolTableRecordComments = 4,
+                    //SymbolTableRecordName = 2,
+                    //Text = 1,
+                    //TextBigFontFile = 4,
+                    //TextFontFile = 3,
+                    //TextStyleName = 7,文字样式名（固定）
+                    //Thickness = 0x27,
+                    //TxtSize = 40,
+                    //TxtStyleFlags = 0x47,
+                    //TxtStylePSize = 0x2a,
+                    //TxtStyleXScale = 0x29,
+                    //UcsOrg = 110,
+                    //UcsOrientationX = 0x6f,
+                    //UcsOrientationY = 0x70,
+                    //ViewBackClip = 0x2c,
+                    //ViewBrightness = 0x8d,
+                    //ViewContrast = 0x8e,
+                    //ViewFrontClip = 0x2b,
+                    //ViewHeight = 0x2d,
+                    //ViewLensLength = 0x2a,
+                    //ViewMode = 0x47,
+                    //ViewportActive = 0x44,
+                    //ViewportAspect = 0x29,
+                    //ViewportGrid = 0x4c,
+                    //ViewportHeight = 40,
+                    //ViewportIcon = 0x4a,
+                    //ViewportNumber = 0x45,
+                    //ViewportSnap = 0x4b,
+                    //ViewportSnapAngle = 50,
+                    //ViewportSnapPair = 0x4e,
+                    //ViewportSnapStyle = 0x4d,
+                    //ViewportTwist = 0x33,
+                    //ViewportVisibility = 0x43,
+                    //ViewportZoom = 0x49,
+                    //ViewWidth = 0x29,
+                    //Visibility = 60,
+                    //XCoordinate = 10,
+                    //XDataStart = -3,
+                    //XDictionary = -6,
+                    //XInt16 = 170,
+                    //XReal = 140,
+                    //XRefPath = 1,
+                    //XTextString = 300,
+                    //XXInt16 = 270,
+                    //YCoordinate = 20,
+                    //ZCoordinate = 30
+                    #endregion
+                    //过滤器
+                    TypedValueList typedValues = new TypedValueList()
+                {
+                    //类型
+                    new TypedValue((int)DxfCode.Start,"Polyline"),
+                    //图层名称
+                    //new TypedValue((int)DxfCode.LayerName,""),
+                    //块名
+                    //new TypedValue((int)DxfCode.BlockName,"")
+                };
+
+                    SelectionSet selectionSet = editor.GetSelectionSet(SelectString.GetSelection, promptSelectionOptions, typedValues, null);
+                    Polyline polyline = transaction.GetObject(selectionSet.GetObjectIds().FirstOrDefault(), OpenMode.ForRead) as Polyline;
+                    if (polyline == null) return;
+                    FireAlarmWindowViewModel.instance.FloorAreaLayerName = polyline.Layer;
+                    transaction.Commit();
+                }
+                catch
+                {
+                    transaction.Abort();
+                }
+            }
+        }
+        #endregion
+
+        #region _FF_GetFireAreaLayerName
+        [CommandMethod("_FF_GetFireAreaLayerName")]
+        public void _FF_GetFireAreaLayerName()
+        {
+            Document document = Application.DocumentManager.CurrentDocument;
+            Database database = document.Database;
+            Editor editor = document.Editor;
+
+            using (Transaction transaction = database.TransactionManager.StartTransaction())
+            {
+                try
+                {
+                    //获取块表
+                    BlockTable blockTable = transaction.GetObject(database.BlockTableId, OpenMode.ForRead) as BlockTable;
+                    //获取模型空间
+                    BlockTableRecord modelSpace = transaction.GetObject(blockTable[BlockTableRecord.ModelSpace], OpenMode.ForRead) as BlockTableRecord;
+                    //获取图纸空间
+                    BlockTableRecord paperSpace = transaction.GetObject(blockTable[BlockTableRecord.PaperSpace], OpenMode.ForRead) as BlockTableRecord;
+
+                    //选择选项
+                    PromptSelectionOptions promptSelectionOptions = new PromptSelectionOptions();
+                    promptSelectionOptions.SingleOnly = true;
+                    promptSelectionOptions.RejectObjectsOnLockedLayers = true;
+                    promptSelectionOptions.MessageForAdding = $"选择表示防火分区的闭合多段线";
+
+                    #region DxfCode                
+                    //Alpha = 440,32位整数值，用于真彩色时，表示透明度值
+                    //Angle = 50,角度
+                    //ArbitraryHandle = 320,任意对象句柄；“按原样”获取的句柄值。它们在 INSERT 和 XREF 操作期间不进行转换
+                    //AttributePrompt = 3,其他文字或名称值
+                    //AttributeTag = 2,名称（属性标记、块名等）
+                    //BinaryChunk = 310,具有相同表示和 1004 组码限制的任意二进制块：用最大长度为 254 个字符的十六进制字符串表示最大长度为 127 个字节的数据块
+                    //BlockName = 2,名称（属性标记、块名等）
+                    //Bool = 290,布尔标志值
+                    //CircleSides = 0x48,
+                    //CLShapeName = 4,其他文字或名称值
+                    //CLShapeText = 9,DXF：变量名称标识符（仅在 DXF 文件的 HEADER 段中使用）
+                    //Color = 0x3e,
+                    //ColorName = 430,字符串；用于真彩色时，则为表示颜色名称的字符串
+                    //ColorRgb = 420,
+                    //Comment = 0x3e7,
+                    //ControlString = 0x66,
+                    //DashLength = 0x31,
+                    //Description = 3,其他文字或名称值
+                    //DimBlk1 = 6,线型名（固定）
+                    //DimBlk2 = 7,文字样式名（固定）
+                    //DimensionAlternativePrefixSuffix = 4,其他文字或名称值
+                    //DimensionBlock = 5,图元句柄；最多 16 个十六进制数字的字符串（固定）
+                    //DimPostString = 3,其他文字或名称值
+                    //DimStyleName = 3,其他文字或名称值
+                    //DimVarHandle = 0x69,
+                    //Elevation = 0x26,
+                    //EmbeddedObjectStart = 0x65,
+                    //End = -1,APP：图元名。每次打开图形时，图元名都会发生变化，从不保存（固定）
+                    //ExtendedDataAsciiString = 0x3e8,
+                    //ExtendedDataBinaryChunk = 0x3ec,
+                    //ExtendedDataControlString = 0x3ea,
+                    //ExtendedDataDist = 0x411,
+                    //ExtendedDataHandle = 0x3ed,
+                    //ExtendedDataInteger16 = 0x42e,
+                    //ExtendedDataInteger32 = 0x42f,
+                    //ExtendedDataLayerName = 0x3eb,
+                    //ExtendedDataReal = 0x410,
+                    //ExtendedDataRegAppName = 0x3e9,
+                    //ExtendedDataScale = 0x412,
+                    //ExtendedDataWorldXCoordinate = 0x3f3,
+                    //ExtendedDataWorldXDir = 0x3f5,
+                    //ExtendedDataWorldXDisp = 0x3f4,
+                    //ExtendedDataWorldYCoordinate = 0x3fd,
+                    //ExtendedDataWorldYDir = 0x3ff,
+                    //ExtendedDataWorldYDisp = 0x3fe,
+                    //ExtendedDataWorldZCoordinate = 0x407,
+                    //ExtendedDataWorldZDir = 0x409,
+                    //ExtendedDataWorldZDisp = 0x408,
+                    //ExtendedDataXCoordinate = 0x3f2,
+                    //ExtendedDataYCoordinate = 0x3fc,
+                    //ExtendedDataZCoordinate = 0x406,
+                    //ExtendedInt16 = 400,16 位整数
+                    //FirstEntityId = -2,APP：图元名参照（固定）
+                    //GradientAngle = 460,双精度浮点值
+                    //GradientColCount = 0x1c5,
+                    //GradientColVal = 0x1cf,
+                    //GradientName = 470,字符串
+                    //GradientObjType = 450,长整数
+                    //GradientPatType = 0x1c3,
+                    //GradientShift = 0x1cd,
+                    //GradientTintType = 0x1c4,
+                    //GradientTintVal = 0x1ce,
+                    //Handle = 5,图元句柄；最多 16 个十六进制数字的字符串（固定）
+                    //HardOwnershipId = 360,硬所有者句柄；指向同一个 DXF 文件或图形中的其他对象的任意硬所有者指针。在 INSERT 和 XREF 操作期间进行转换
+                    //HardPointerId = 340,硬指针句柄；指向同一个 DXF 文件或图形中的其他对象的任意硬指针。在 INSERT 和 XREF 操作期间进行转换
+                    //HasSubentities = 0x42,
+                    //HeaderId = -2,APP：图元名参照（固定）
+                    //Int16 = 70,
+                    //Int32 = 90,
+                    //Int64 = 160,
+                    //Int8 = 280,
+                    //Invalid = -9999,
+                    //LayerLinetype = 0x3d,
+                    //LayerName = 8,图层名（固定）
+                    //LayoutName = 410,
+                    //LinetypeAlign = 0x48,
+                    //LinetypeElement = 0x31,
+                    //LinetypeName = 6,线型名（固定）
+                    //LinetypePdc = 0x49,
+                    //LinetypeProse = 3,其他文字或名称值
+                    //LinetypeScale = 0x30,
+                    //LineWeight = 370,
+                    //MlineOffset = 0x31,
+                    //MlineStyleName = 2,
+                    //NormalX = 210,
+                    //NormalY = 220,
+                    //NormalZ = 230,
+                    //Operator = -4,APP：条件运算符（仅与 ssget 一起使用）
+                    //PixelScale = 0x2f,
+                    //PlotStyleNameId = 390,
+                    //PlotStyleNameType = 380,
+                    //PReactors = -5,APP：永久反应器链
+                    //Real = 40,
+                    //RegAppFlags = 0x47,
+                    //RenderMode = 0x119,
+                    //ShapeName = 2,
+                    //ShapeScale = 0x2e,
+                    //ShapeXOffset = 0x2c,
+                    //ShapeYOffset = 0x2d,
+                    //SoftOwnershipId = 350,
+                    //SoftPointerId = 330,
+                    //Start = 0,表示图元类型的字符串（固定）
+                    //Subclass = 100,
+                    //SymbolTableName = 2,
+                    //SymbolTableRecordComments = 4,
+                    //SymbolTableRecordName = 2,
+                    //Text = 1,
+                    //TextBigFontFile = 4,
+                    //TextFontFile = 3,
+                    //TextStyleName = 7,文字样式名（固定）
+                    //Thickness = 0x27,
+                    //TxtSize = 40,
+                    //TxtStyleFlags = 0x47,
+                    //TxtStylePSize = 0x2a,
+                    //TxtStyleXScale = 0x29,
+                    //UcsOrg = 110,
+                    //UcsOrientationX = 0x6f,
+                    //UcsOrientationY = 0x70,
+                    //ViewBackClip = 0x2c,
+                    //ViewBrightness = 0x8d,
+                    //ViewContrast = 0x8e,
+                    //ViewFrontClip = 0x2b,
+                    //ViewHeight = 0x2d,
+                    //ViewLensLength = 0x2a,
+                    //ViewMode = 0x47,
+                    //ViewportActive = 0x44,
+                    //ViewportAspect = 0x29,
+                    //ViewportGrid = 0x4c,
+                    //ViewportHeight = 40,
+                    //ViewportIcon = 0x4a,
+                    //ViewportNumber = 0x45,
+                    //ViewportSnap = 0x4b,
+                    //ViewportSnapAngle = 50,
+                    //ViewportSnapPair = 0x4e,
+                    //ViewportSnapStyle = 0x4d,
+                    //ViewportTwist = 0x33,
+                    //ViewportVisibility = 0x43,
+                    //ViewportZoom = 0x49,
+                    //ViewWidth = 0x29,
+                    //Visibility = 60,
+                    //XCoordinate = 10,
+                    //XDataStart = -3,
+                    //XDictionary = -6,
+                    //XInt16 = 170,
+                    //XReal = 140,
+                    //XRefPath = 1,
+                    //XTextString = 300,
+                    //XXInt16 = 270,
+                    //YCoordinate = 20,
+                    //ZCoordinate = 30
+                    #endregion
+                    //过滤器
+                    TypedValueList typedValues = new TypedValueList()
+                {
+                    //类型
+                    new TypedValue((int)DxfCode.Start,"Polyline"),
+                    //图层名称
+                    //new TypedValue((int)DxfCode.LayerName,""),
+                    //块名
+                    //new TypedValue((int)DxfCode.BlockName,"")
+                };
+
+                    SelectionSet selectionSet = editor.GetSelectionSet(SelectString.GetSelection, promptSelectionOptions, typedValues, null);
+                    Polyline polyline = transaction.GetObject(selectionSet.GetObjectIds().FirstOrDefault(), OpenMode.ForRead) as Polyline;
+                    if (polyline == null) return;
+                    FireAlarmWindowViewModel.instance.FloorAreaLayerName = polyline.Layer;
+                    transaction.Commit();
+                }
+                catch
+                {
+                    transaction.Abort();
+                }
+            }
+        }
+        #endregion
+
+        #region _FF_GetRoomAreaLayerName
+        [CommandMethod("_FF_GetRoomAreaLayerName")]
+        public void _FF_GetRoomAreaLayerName()
+        {
+            Document document = Application.DocumentManager.CurrentDocument;
+            Database database = document.Database;
+            Editor editor = document.Editor;
+
+            using (Transaction transaction = database.TransactionManager.StartTransaction())
+            {
+                try
+                {
+                    //获取块表
+                    BlockTable blockTable = transaction.GetObject(database.BlockTableId, OpenMode.ForRead) as BlockTable;
+                    //获取模型空间
+                    BlockTableRecord modelSpace = transaction.GetObject(blockTable[BlockTableRecord.ModelSpace], OpenMode.ForRead) as BlockTableRecord;
+                    //获取图纸空间
+                    BlockTableRecord paperSpace = transaction.GetObject(blockTable[BlockTableRecord.PaperSpace], OpenMode.ForRead) as BlockTableRecord;
+
+                    //选择选项
+                    PromptSelectionOptions promptSelectionOptions = new PromptSelectionOptions();
+                    promptSelectionOptions.SingleOnly = true;
+                    promptSelectionOptions.RejectObjectsOnLockedLayers = true;
+                    promptSelectionOptions.MessageForAdding = $"选择表示房间区域的闭合多段线";
+
+                    #region DxfCode                
+                    //Alpha = 440,32位整数值，用于真彩色时，表示透明度值
+                    //Angle = 50,角度
+                    //ArbitraryHandle = 320,任意对象句柄；“按原样”获取的句柄值。它们在 INSERT 和 XREF 操作期间不进行转换
+                    //AttributePrompt = 3,其他文字或名称值
+                    //AttributeTag = 2,名称（属性标记、块名等）
+                    //BinaryChunk = 310,具有相同表示和 1004 组码限制的任意二进制块：用最大长度为 254 个字符的十六进制字符串表示最大长度为 127 个字节的数据块
+                    //BlockName = 2,名称（属性标记、块名等）
+                    //Bool = 290,布尔标志值
+                    //CircleSides = 0x48,
+                    //CLShapeName = 4,其他文字或名称值
+                    //CLShapeText = 9,DXF：变量名称标识符（仅在 DXF 文件的 HEADER 段中使用）
+                    //Color = 0x3e,
+                    //ColorName = 430,字符串；用于真彩色时，则为表示颜色名称的字符串
+                    //ColorRgb = 420,
+                    //Comment = 0x3e7,
+                    //ControlString = 0x66,
+                    //DashLength = 0x31,
+                    //Description = 3,其他文字或名称值
+                    //DimBlk1 = 6,线型名（固定）
+                    //DimBlk2 = 7,文字样式名（固定）
+                    //DimensionAlternativePrefixSuffix = 4,其他文字或名称值
+                    //DimensionBlock = 5,图元句柄；最多 16 个十六进制数字的字符串（固定）
+                    //DimPostString = 3,其他文字或名称值
+                    //DimStyleName = 3,其他文字或名称值
+                    //DimVarHandle = 0x69,
+                    //Elevation = 0x26,
+                    //EmbeddedObjectStart = 0x65,
+                    //End = -1,APP：图元名。每次打开图形时，图元名都会发生变化，从不保存（固定）
+                    //ExtendedDataAsciiString = 0x3e8,
+                    //ExtendedDataBinaryChunk = 0x3ec,
+                    //ExtendedDataControlString = 0x3ea,
+                    //ExtendedDataDist = 0x411,
+                    //ExtendedDataHandle = 0x3ed,
+                    //ExtendedDataInteger16 = 0x42e,
+                    //ExtendedDataInteger32 = 0x42f,
+                    //ExtendedDataLayerName = 0x3eb,
+                    //ExtendedDataReal = 0x410,
+                    //ExtendedDataRegAppName = 0x3e9,
+                    //ExtendedDataScale = 0x412,
+                    //ExtendedDataWorldXCoordinate = 0x3f3,
+                    //ExtendedDataWorldXDir = 0x3f5,
+                    //ExtendedDataWorldXDisp = 0x3f4,
+                    //ExtendedDataWorldYCoordinate = 0x3fd,
+                    //ExtendedDataWorldYDir = 0x3ff,
+                    //ExtendedDataWorldYDisp = 0x3fe,
+                    //ExtendedDataWorldZCoordinate = 0x407,
+                    //ExtendedDataWorldZDir = 0x409,
+                    //ExtendedDataWorldZDisp = 0x408,
+                    //ExtendedDataXCoordinate = 0x3f2,
+                    //ExtendedDataYCoordinate = 0x3fc,
+                    //ExtendedDataZCoordinate = 0x406,
+                    //ExtendedInt16 = 400,16 位整数
+                    //FirstEntityId = -2,APP：图元名参照（固定）
+                    //GradientAngle = 460,双精度浮点值
+                    //GradientColCount = 0x1c5,
+                    //GradientColVal = 0x1cf,
+                    //GradientName = 470,字符串
+                    //GradientObjType = 450,长整数
+                    //GradientPatType = 0x1c3,
+                    //GradientShift = 0x1cd,
+                    //GradientTintType = 0x1c4,
+                    //GradientTintVal = 0x1ce,
+                    //Handle = 5,图元句柄；最多 16 个十六进制数字的字符串（固定）
+                    //HardOwnershipId = 360,硬所有者句柄；指向同一个 DXF 文件或图形中的其他对象的任意硬所有者指针。在 INSERT 和 XREF 操作期间进行转换
+                    //HardPointerId = 340,硬指针句柄；指向同一个 DXF 文件或图形中的其他对象的任意硬指针。在 INSERT 和 XREF 操作期间进行转换
+                    //HasSubentities = 0x42,
+                    //HeaderId = -2,APP：图元名参照（固定）
+                    //Int16 = 70,
+                    //Int32 = 90,
+                    //Int64 = 160,
+                    //Int8 = 280,
+                    //Invalid = -9999,
+                    //LayerLinetype = 0x3d,
+                    //LayerName = 8,图层名（固定）
+                    //LayoutName = 410,
+                    //LinetypeAlign = 0x48,
+                    //LinetypeElement = 0x31,
+                    //LinetypeName = 6,线型名（固定）
+                    //LinetypePdc = 0x49,
+                    //LinetypeProse = 3,其他文字或名称值
+                    //LinetypeScale = 0x30,
+                    //LineWeight = 370,
+                    //MlineOffset = 0x31,
+                    //MlineStyleName = 2,
+                    //NormalX = 210,
+                    //NormalY = 220,
+                    //NormalZ = 230,
+                    //Operator = -4,APP：条件运算符（仅与 ssget 一起使用）
+                    //PixelScale = 0x2f,
+                    //PlotStyleNameId = 390,
+                    //PlotStyleNameType = 380,
+                    //PReactors = -5,APP：永久反应器链
+                    //Real = 40,
+                    //RegAppFlags = 0x47,
+                    //RenderMode = 0x119,
+                    //ShapeName = 2,
+                    //ShapeScale = 0x2e,
+                    //ShapeXOffset = 0x2c,
+                    //ShapeYOffset = 0x2d,
+                    //SoftOwnershipId = 350,
+                    //SoftPointerId = 330,
+                    //Start = 0,表示图元类型的字符串（固定）
+                    //Subclass = 100,
+                    //SymbolTableName = 2,
+                    //SymbolTableRecordComments = 4,
+                    //SymbolTableRecordName = 2,
+                    //Text = 1,
+                    //TextBigFontFile = 4,
+                    //TextFontFile = 3,
+                    //TextStyleName = 7,文字样式名（固定）
+                    //Thickness = 0x27,
+                    //TxtSize = 40,
+                    //TxtStyleFlags = 0x47,
+                    //TxtStylePSize = 0x2a,
+                    //TxtStyleXScale = 0x29,
+                    //UcsOrg = 110,
+                    //UcsOrientationX = 0x6f,
+                    //UcsOrientationY = 0x70,
+                    //ViewBackClip = 0x2c,
+                    //ViewBrightness = 0x8d,
+                    //ViewContrast = 0x8e,
+                    //ViewFrontClip = 0x2b,
+                    //ViewHeight = 0x2d,
+                    //ViewLensLength = 0x2a,
+                    //ViewMode = 0x47,
+                    //ViewportActive = 0x44,
+                    //ViewportAspect = 0x29,
+                    //ViewportGrid = 0x4c,
+                    //ViewportHeight = 40,
+                    //ViewportIcon = 0x4a,
+                    //ViewportNumber = 0x45,
+                    //ViewportSnap = 0x4b,
+                    //ViewportSnapAngle = 50,
+                    //ViewportSnapPair = 0x4e,
+                    //ViewportSnapStyle = 0x4d,
+                    //ViewportTwist = 0x33,
+                    //ViewportVisibility = 0x43,
+                    //ViewportZoom = 0x49,
+                    //ViewWidth = 0x29,
+                    //Visibility = 60,
+                    //XCoordinate = 10,
+                    //XDataStart = -3,
+                    //XDictionary = -6,
+                    //XInt16 = 170,
+                    //XReal = 140,
+                    //XRefPath = 1,
+                    //XTextString = 300,
+                    //XXInt16 = 270,
+                    //YCoordinate = 20,
+                    //ZCoordinate = 30
+                    #endregion
+                    //过滤器
+                    TypedValueList typedValues = new TypedValueList()
+                {
+                    //类型
+                    new TypedValue((int)DxfCode.Start,"Polyline"),
+                    //图层名称
+                    //new TypedValue((int)DxfCode.LayerName,""),
+                    //块名
+                    //new TypedValue((int)DxfCode.BlockName,"")
+                };
+
+                    SelectionSet selectionSet = editor.GetSelectionSet(SelectString.GetSelection, promptSelectionOptions, typedValues, null);
+                    Polyline polyline = transaction.GetObject(selectionSet.GetObjectIds().FirstOrDefault(), OpenMode.ForRead) as Polyline;
+                    if (polyline == null) return;
+                    FireAlarmWindowViewModel.instance.FloorAreaLayerName = polyline.Layer;
+                    transaction.Commit();
+                }
+                catch
+                {
+                    transaction.Abort();
+                }
+            }
+        }
+        #endregion
+
+        #region _FF_GetFloorArea
+        [CommandMethod("_FF_GetFloorArea")]
+        public void _FF_GetFloorArea()
+        {
+            Document document = Application.DocumentManager.CurrentDocument;
+            Database database = document.Database;
+            Editor editor = document.Editor;
+
+            using (Transaction transaction = database.TransactionManager.StartTransaction())
+            {
+                try
+                {
+                    //获取块表
+                    BlockTable blockTable = transaction.GetObject(database.BlockTableId, OpenMode.ForRead) as BlockTable;
+                    //获取模型空间
+                    BlockTableRecord modelSpace = transaction.GetObject(blockTable[BlockTableRecord.ModelSpace], OpenMode.ForRead) as BlockTableRecord;
+                    //获取图纸空间
+                    BlockTableRecord paperSpace = transaction.GetObject(blockTable[BlockTableRecord.PaperSpace], OpenMode.ForRead) as BlockTableRecord;
+
+                    //选择选项
+                    PromptEntityOptions promptEntityOptions = new PromptEntityOptions("\n选择楼层");
+                    PromptEntityResult result = editor.GetEntity(promptEntityOptions);
+                    if (result.Status != PromptStatus.OK) return;
+                    Polyline polyline = transaction.GetObject(result.ObjectId, OpenMode.ForRead) as Polyline;
+                    if (polyline == null) return;
+                    FireAlarmWindowViewModel.instance.SelectedAreaFloor.X = polyline.GeometricExtents.MinPoint.X;
+                    FireAlarmWindowViewModel.instance.SelectedAreaFloor.Y = polyline.GeometricExtents.MinPoint.Y;
+                    FireAlarmWindowViewModel.instance.SelectedAreaFloor.Z = polyline.GeometricExtents.MinPoint.Z;
+
+                    //过滤器
+                    TypedValueList typedValues = new TypedValueList()
+                    {
+                        //类型
+                        new TypedValue((int)DxfCode.Start,"DBText"),
+                        //图层名称
+                        new TypedValue((int)DxfCode.LayerName,FireAlarmWindowViewModel.instance.FloorAreaLayerName),
+                        //块名
+                        //new TypedValue((int)DxfCode.BlockName,"")
+                    };
+
+                    SelectionSet selectionSet = editor.GetSelectionSet(SelectString.SelectWindowPolygon, null, typedValues, polyline.GetPoint3DCollection());
+                    if (selectionSet.Count != 1) return;
+                    DBText dBText = transaction.GetObject(selectionSet.GetObjectIds()[0], OpenMode.ForRead) as DBText;
+                    if (dBText == null) return;
+                    FireAlarmWindowViewModel.instance.SelectedAreaFloor.Name = dBText.TextString;
+                    Model.Area area = new Model.Area
+                    {
+                        Floor = FireAlarmWindowViewModel.instance.SelectedAreaFloor,
+                        Kind = 0,
+                        X = polyline.GetXValues(),
+                        Y = polyline.GetYValues(),
+                        Z = polyline.GetZValues()
+                    };
+                    FireAlarmWindowViewModel.instance.Areas.Add(area);
+                    transaction.Commit();
+                }
+                catch
+                {
+                    transaction.Abort();
+                }
+            }
+        }
+        #endregion
+
+        #region _FF_GetBasePoint
+        [CommandMethod("_FF_GetBasePoint")]
+        public void _FF_GetBasePoint()
+        {
+            Document document = Application.DocumentManager.CurrentDocument;
+            Database database = document.Database;
+            Editor editor = document.Editor;
+
+            using (Transaction transaction = database.TransactionManager.StartTransaction())
+            {
+                try
+                {
+                    if (FireAlarmWindowViewModel.instance.SelectedAreaFloor == null)
+                    {
+                        System.Windows.Forms.MessageBox.Show("未选择基点对应的楼层！");
+                        transaction.Abort();
+                    }
+                    var ydbConn = new SQLiteConnection($"Data Source={FireAlarmWindowViewModel.instance.YdbFileName}");
+
+                    //查询梁
+                    string sqlBeam = "SELECT b.ID,f.ID,f.LevelB,f.Height,bs.ID,bs.kind,bs.ShapeVal,bs.ShapeVal1,g.ID,j1.ID,j1.X,j1.Y,j2.ID,j2.X,j2.Y " +
+                        "FROM tblBeamSeg AS b " +
+                        "INNER JOIN tblFloor AS f on f.StdFlrID = b.StdFlrID " +
+                        "INNER JOIN tblBeamSect AS bs on bs.ID = b.SectID " +
+                        "INNER JOIN tblGrid AS g on g.ID = b.GridId " +
+                        "INNER JOIN tblJoint AS j1 on g.Jt1ID = j1.ID " +
+                        "INNER JOIN tblJoint AS j2 on g.Jt2ID = j2.ID " +
+                        "WHERE f.LevelB = @LevelB"; // add a WHERE clause to filter by f.LevelB
+
+                    Func<Beam, Floor, BeamSect, Grid, Joint, Joint, Beam> mappingBeam =
+                        (beam, floor, beamSect, grid, j1, j2) =>
+                        {
+                            grid.Joint1 = j1;
+                            grid.Joint2 = j2;
+                            beam.Grid = grid;
+                            beam.Floor = floor;
+                            beam.BeamSect = beamSect;
+                            return beam;
+                        };
+
+                    List<Beam> beams = ydbConn.Query(sqlBeam, mappingBeam, new { LevelB = FireAlarmWindowViewModel.instance.SelectedAreaFloor.Level }).ToList();
+
+                    //查询墙
+                    string sqlWall = "SELECT w.ID,f.ID,f.LevelB,f.Height,ws.ID,ws.kind,ws.B,g.ID,j1.ID,j1.X,j1.Y,j2.ID,j2.X,j2.Y " +
+                        "FROM tblWallSeg AS w " +
+                        "INNER JOIN tblFloor AS f on f.StdFlrID = w.StdFlrID " +
+                        "INNER JOIN tblWallSect AS ws on ws.ID = w.SectID " +
+                        "INNER JOIN tblGrid AS g on g.ID = w.GridId " +
+                        "INNER JOIN tblJoint AS j1 on g.Jt1ID = j1.ID " +
+                        "INNER JOIN tblJoint AS j2 on g.Jt2ID = j2.ID" +
+                        "WHERE f.LevelB = @LevelB";
+
+                    Func<Wall, Floor, WallSect, Grid, Joint, Joint, Wall> mappingWall =
+                        (wall, floor, wallSect, grid, j1, j2) =>
+                        {
+                            grid.Joint1 = j1;
+                            grid.Joint2 = j2;
+                            wall.Grid = grid;
+                            wall.Floor = floor;
+                            wall.WallSect = wallSect;
+                            return wall;
+                        };
+                    List<Wall> walls = ydbConn.Query(sqlWall, mappingWall, new { LevelB = FireAlarmWindowViewModel.instance.SelectedAreaFloor.Level }).ToList();
+                    //关闭数据库
+                    ydbConn.Close();
+
+                    //获取块表
+                    BlockTable blockTable = transaction.GetObject(database.BlockTableId, OpenMode.ForRead) as BlockTable;
+                    //获取模型空间
+                    BlockTableRecord modelSpace = transaction.GetObject(blockTable[BlockTableRecord.ModelSpace], OpenMode.ForRead) as BlockTableRecord;
+                    //获取图纸空间
+                    BlockTableRecord paperSpace = transaction.GetObject(blockTable[BlockTableRecord.PaperSpace], OpenMode.ForRead) as BlockTableRecord;
+
+
+                    List<Polyline> polylines = new List<Polyline>();
+                    #region 生成梁
+                    foreach (var beam in beams)
+                    {
+                        Point2d p1 = new Point2d(beam.Grid.Joint1.X, beam.Grid.Joint1.Y);
+                        Point2d p2 = new Point2d(beam.Grid.Joint2.X, beam.Grid.Joint2.Y);
+                        double startWidth = 0;
+                        double endWidth = 0;
+                        double height = 0;
+
+                        Polyline polyline = new Polyline();
+                        switch (beam.BeamSect.Kind)
+                        {
+                            case 1:
+                                startWidth = endWidth = double.Parse(beam.BeamSect.ShapeVal.Split(',')[1]);
+                                height = double.Parse(beam.BeamSect.ShapeVal.Split(',')[2]);
+
+                                polyline.AddVertexAt(0, p1, 0, startWidth, endWidth);
+                                polyline.AddVertexAt(1, p2, 0, startWidth, endWidth);
+                                break;
+                            case 2:
+                                startWidth = endWidth = double.Parse(beam.BeamSect.ShapeVal.Split(',')[3]);
+                                height = double.Parse(beam.BeamSect.ShapeVal.Split(',')[2]);
+
+                                polyline.AddVertexAt(0, p1, 0, startWidth, endWidth);
+                                polyline.AddVertexAt(1, p2, 0, startWidth, endWidth);
+                                break;
+                            case 7:
+                                startWidth = endWidth = double.Parse(beam.BeamSect.ShapeVal.Split(',')[1]);
+                                height = double.Parse(beam.BeamSect.ShapeVal.Split(',')[2]);
+
+                                polyline.AddVertexAt(0, p1, 0, startWidth, endWidth);
+                                polyline.AddVertexAt(1, p2, 0, startWidth, endWidth);
+                                break;
+                            case 13:
+                                startWidth = endWidth = double.Parse(beam.BeamSect.ShapeVal.Split(',')[1]);
+                                height = double.Parse(beam.BeamSect.ShapeVal.Split(',')[2]);
+
+                                polyline.AddVertexAt(0, p1, 0, startWidth, endWidth);
+                                polyline.AddVertexAt(1, p2, 0, startWidth, endWidth);
+                                break;
+                            case 22:
+                                startWidth = endWidth = double.Parse(beam.BeamSect.ShapeVal.Split(',')[1]);
+                                height = Math.Min(double.Parse(beam.BeamSect.ShapeVal.Split(',')[3]), double.Parse(beam.BeamSect.ShapeVal.Split(',')[4]));
+
+                                polyline.AddVertexAt(0, p1, 0, startWidth, endWidth);
+                                polyline.AddVertexAt(1, p2, 0, startWidth, endWidth);
+                                break;
+                            case 26:
+                                startWidth = endWidth = double.Parse(beam.BeamSect.ShapeVal.Split(',')[5]);
+                                height = double.Parse(beam.BeamSect.ShapeVal.Split(',')[3]);
+
+                                polyline.AddVertexAt(0, p1, 0, startWidth, endWidth);
+                                polyline.AddVertexAt(1, p2, 0, startWidth, endWidth);
+                                break;
+
+                            default:
+                                startWidth = endWidth = double.Parse(beam.BeamSect.ShapeVal.Split(',')[1]);
+                                height = double.Parse(beam.BeamSect.ShapeVal.Split(',')[2]);
+
+                                polyline.AddVertexAt(0, p1, 0, startWidth, endWidth);
+                                polyline.AddVertexAt(1, p2, 0, startWidth, endWidth);
+                                break;
+                        }
+                        polylines.Add(polyline);
+                    }
+                    #endregion
+
+                    #region 生成墙
+                    foreach (var wall in walls)
+                    {
+                        Point2d p1 = new Point2d(wall.Grid.Joint1.X, wall.Grid.Joint1.Y);
+                        Point2d p2 = new Point2d(wall.Grid.Joint2.X, wall.Grid.Joint2.Y);
+                        int startWidth = wall.WallSect.B;
+                        int endWidth = wall.WallSect.B;
+
+                        Polyline polyline = new Polyline();
+                        polyline.AddVertexAt(0, p1, 0, startWidth, endWidth);
+                        polyline.AddVertexAt(1, p2, 0, startWidth, endWidth);
+                        polylines.Add(polyline);
+                    }
+                    #endregion
+
+                    BasePointJig basePointJig = new BasePointJig(polylines);
+                    PromptResult promptResult = editor.Drag(basePointJig);
+                    if (promptResult.Status == PromptStatus.OK)
+                    {
+                        FireAlarmWindowViewModel.instance.ReferenceBasePoint = basePointJig._point;
+                    }
+                    transaction.Commit();
+                }
+                catch
+                {
+                    transaction.Abort();
+                }
+            }
+        }
+        #endregion
+
+        #region _FF_SaveAreaFile
+        [CommandMethod("_FF_SaveAreaFile")]
+        public void _FF_SaveAreaFile()
+        {
+            Document document = Application.DocumentManager.CurrentDocument;
+            Database database = document.Database;
+            Editor editor = document.Editor;
+
+            using (Transaction transaction = database.TransactionManager.StartTransaction())
+            {
+                try
+                {
+                    //获取块表
+                    BlockTable blockTable = transaction.GetObject(database.BlockTableId, OpenMode.ForRead) as BlockTable;
+                    //获取模型空间
+                    BlockTableRecord modelSpace = transaction.GetObject(blockTable[BlockTableRecord.ModelSpace], OpenMode.ForRead) as BlockTableRecord;
+                    //获取图纸空间
+                    BlockTableRecord paperSpace = transaction.GetObject(blockTable[BlockTableRecord.PaperSpace], OpenMode.ForRead) as BlockTableRecord;
+
+                    if (File.Exists(FireAlarmWindowViewModel.instance.AreaFileName))
+                    {
+                        File.Delete(FireAlarmWindowViewModel.instance.AreaFileName);
+
+                    }
+                    SQLiteConnection.CreateFile(FireAlarmWindowViewModel.instance.AreaFileName);
+                    SQLiteHelper helper = new SQLiteHelper($"Data Source={FireAlarmWindowViewModel.instance.AreaFileName};Version=3;");
+                    helper.Execute(@"
+                        CREATE TABLE IF NOT EXISTS Floor (
+                            ID INTEGER PRIMARY KEY,
+                            Name TEXT,
+                            Level REAL NOT NULL,
+                            X REAL NOT NULL,
+                            Y REAL NOT NULL,
+                            Z REAL NOT NULL
+                        )
+                    ");
+
+                    helper.Execute(@"
+                        CREATE TABLE IF NOT EXISTS Area (
+                            ID INTEGER PRIMARY KEY,
+                            FloorID INTEGER NOT NULL,
+                            VertexX TEXT NOT NULL,
+                            VertexY TEXT NOT NULL,
+                            VertexZ TEXT NOT NULL,
+                            Kind INTEGER NOT NULL,
+                            Note TEXT,
+                            FOREIGN KEY(FloorID) REFERENCES Floor(ID)
+                        )
+                    ");
+
+                    helper.Execute(@"
+                        CREATE TABLE IF NOT EXISTS BasePoint (
+                            ID INTEGER PRIMARY KEY,
+                            Name TEXT,
+                            Level REAL NOT NULL,
+                            X REAL NOT NULL,
+                            Y REAL NOT NULL,
+                            Z REAL NOT NULL
+                        )
+                    ");
+
+                    helper.Insert<int>("INSERT INTO BasePoint (Name,Level,X, Y, Z) VALUES ( @name,@level,@x, @y, @z)",
+                        new
+                        {
+                            FireAlarmWindowViewModel.instance.SelectedAreaFloor.Name,
+                            FireAlarmWindowViewModel.instance.SelectedAreaFloor.Level,
+                            FireAlarmWindowViewModel.instance.ReferenceBasePoint.X,
+                            FireAlarmWindowViewModel.instance.ReferenceBasePoint.Y,
+                            FireAlarmWindowViewModel.instance.ReferenceBasePoint.Z
+                        });
+
+
+                    foreach (var areaFloor in FireAlarmWindowViewModel.instance.AreaFloors)
+                    {
+                        helper.Insert<int>("Floor", areaFloor);
+                    }
+
+                    foreach (var area in FireAlarmWindowViewModel.instance.Areas)
+                    {
+                        // 从Floor表中查询对应的FloorID
+                        int floorId = helper.Query<int>("SELECT ID FROM Floor WHERE Level = @level", new { level = area.Floor.Level }).FirstOrDefault();
+
+                        if (floorId > 0)
+                        {
+                            // 构建插入语句并插入到Area表中
+                            string insertSql = "INSERT INTO Area (FloorID, VertexX, VertexY, VertexZ, Kind, Note) VALUES (@floorId, @x, @y, @z, @kind, @note)";
+                            helper.Execute(insertSql, new { floorId, area.X, area.Y, area.Z, area.Kind, area.Note });
+                        }
+
+                        //过滤器
+                        TypedValueList typedValues = new TypedValueList()
+                        {
+                            //类型
+                            new TypedValue((int)DxfCode.Start,"Polyline"),
+                            //图层名称
+                            new TypedValue((int)DxfCode.LayerName,FireAlarmWindowViewModel.instance.FireAreaLayerName),
+                            new TypedValue((int)DxfCode.LayerName,FireAlarmWindowViewModel.instance.RoomAreaLayerName),
+                            //块名
+                            //new TypedValue((int)DxfCode.BlockName,"")
+                        };
+
+                        SelectionSet selectionSet = editor.GetSelectionSet(SelectString.SelectAll, null, typedValues, area.Point3dCollection);
+                        foreach (var id in selectionSet.GetObjectIds())
+                        {
+                            Polyline polyline = transaction.GetObject(id, OpenMode.ForRead) as Polyline;
+                            if (polyline == null) continue;
+                            if (polyline.Layer == FireAlarmWindowViewModel.instance.FireAreaLayerName)
+                            {
+                                //过滤器
+                                TypedValueList dbTextTypedValues = new TypedValueList()
+                                {
+                                    //类型
+                                    new TypedValue((int)DxfCode.Start,"DBText"),
+                                    //图层名称
+                                    new TypedValue((int)DxfCode.LayerName,FireAlarmWindowViewModel.instance.FireAreaLayerName),
+                                    //块名
+                                    //new TypedValue((int)DxfCode.BlockName,"")
+                                };
+
+                                SelectionSet dbTextSelectionSet = editor.GetSelectionSet(SelectString.SelectWindowPolygon, null, dbTextTypedValues, polyline.GetPoint3DCollection());
+                                DBText dBText = transaction.GetObject(dbTextSelectionSet.GetObjectIds()[0], OpenMode.ForRead) as DBText;
+                                if (dBText == null) return;
+                                Model.Area fireArea = new Model.Area
+                                {
+                                    Kind = 1,
+                                    Note = dBText.ToString(),
+                                    X = polyline.GetXValues(),
+                                    Y = polyline.GetYValues(),
+                                    Z = polyline.GetZValues()
+                                };
+                                string insertSql = "INSERT INTO Area (FloorID, VertexX, VertexY, VertexZ, Kind, Note) VALUES (@floorId, @x, @y, @z, @kind, @note)";
+                                helper.Execute(insertSql, new { floorId, fireArea.X, fireArea.Y, fireArea.Z, fireArea.Kind, fireArea.Note });
+                            }
+                            else if (polyline.Layer == FireAlarmWindowViewModel.instance.RoomAreaLayerName)
+                            {
+                                //过滤器
+                                TypedValueList dbTextTypedValues = new TypedValueList()
+                                {
+                                    //类型
+                                    new TypedValue((int)DxfCode.Start,"DBText"),
+                                    //图层名称
+                                    new TypedValue((int)DxfCode.LayerName,FireAlarmWindowViewModel.instance.RoomAreaLayerName),
+                                    //块名
+                                    //new TypedValue((int)DxfCode.BlockName,"")
+                                };
+
+                                SelectionSet dbTextSelectionSet = editor.GetSelectionSet(SelectString.SelectWindowPolygon, null, dbTextTypedValues, polyline.GetPoint3DCollection());
+                                DBText dBText = transaction.GetObject(dbTextSelectionSet.GetObjectIds()[0], OpenMode.ForRead) as DBText;
+                                if (dBText == null) return;
+                                Model.Area roomArea = new Model.Area
+                                {
+                                    Kind = 2,
+                                    Note = dBText.ToString(),
+                                    X = polyline.GetXValues(),
+                                    Y = polyline.GetYValues(),
+                                    Z = polyline.GetZValues()
+                                };
+                                string insertSql = "INSERT INTO Area (FloorID, VertexX, VertexY, VertexZ, Kind, Note) VALUES (@floorId, @x, @y, @z, @kind, @note)";
+                                helper.Execute(insertSql, new { floorId, roomArea.X, roomArea.Y, roomArea.Z, roomArea.Kind, roomArea.Note });
+                            }
+                            //// 插入一条记录
+                            //var newId = helper.Insert<int>("INSERT INTO MyTable (Name) VALUES (@Name)", new { Name = "John" });
+
+                            //// 更新一条记录
+                            //var rowsAffected = helper.Update("UPDATE MyTable SET Name = @Name WHERE Id = @Id", new { Id = newId, Name = "Jack" });
+
+                            //// 查询记录
+                            //var result = helper.Query<MyModel>("SELECT * FROM MyTable WHERE Name = @Name", new { Name = "Jack" });
+
+                            //// 删除记录
+                            //var rowsDeleted = helper.Delete("DELETE FROM MyTable WHERE Id = @Id", new { Id = newId });
+                        }
+                    }
+                    transaction.Commit();
+                }
+                catch
+                {
+                    transaction.Abort();
+                }
+            }
+        }
+        #endregion
+
+        #region _FF_GeneratingEquipment
+
+        [CommandMethod("_FF_GeneratingEquipment")]
+        public void _FF_GeneratingEquipment()
+        {
+            Document document = Application.DocumentManager.CurrentDocument;
+            Database database = document.Database;
+            Editor editor = document.Editor;
+
+            //NTS
+            NetTopologySuite.NtsGeometryServices.Instance = new NetTopologySuite.NtsGeometryServices
+                (
+                NetTopologySuite.Geometries.Implementation.CoordinateArraySequenceFactory.Instance,
+                new PrecisionModel(0.001d),
+                4326
+                );
+            GeometryFactory geometryFactory = NtsGeometryServices.Instance.CreateGeometryFactory();
+
             //载入YDB数据库
-            string ydbDB = GetFilePath();
+            string ydbDB = GetYdbFilePath();
             if (ydbDB == null) return;
             string directoryName = Path.GetDirectoryName(ydbDB);
             editor.WriteMessage("\n文件名：" + ydbDB);
 
             //载入区域数据库
-            string areaDB = GetFilePath();
+            string areaDB = GetAreaFilePath();
             if (areaDB == null) return;
             editor.WriteMessage("\n文件名：" + areaDB);
 
             #region YDB数据查询
-            var YDBConn = new SQLiteConnection($"Data Source={ydbDB}");
+            var ydbConn = new SQLiteConnection($"Data Source={ydbDB}");
 
             //查询标高
-            string sqlFloor = "SELECT f.ID,f.LevelB,f.Height FROM tblFloor AS f WHERE f.Height != 0";
-            var floors = YDBConn.Query<Floor>(sqlFloor);
+            string sqlFloor = "SELECT f.ID,f.Name,f.LevelB,f.Height FROM tblFloor AS f WHERE f.Height != 0";
+            var floors = ydbConn.Query<Floor>(sqlFloor);
 
             //查询梁
             string sqlBeam = "SELECT b.ID,f.ID,f.LevelB,f.Height,bs.ID,bs.kind,bs.ShapeVal,bs.ShapeVal1,g.ID,j1.ID,j1.X,j1.Y,j2.ID,j2.X,j2.Y " +
@@ -985,7 +2228,7 @@ namespace TimeIsLife.CADCommand
                     return beam;
                 };
 
-            var beams = YDBConn.Query(sqlBeam, mappingBeam);
+            var beams = ydbConn.Query(sqlBeam, mappingBeam).ToList();
 
             //查询板
             string sqlSlab = "SELECT s.ID,s.GridsID,s.VertexX,s.VertexY,s.VertexZ,s.Thickness,f.ID,f.LevelB,f.Height FROM tblSlab  AS s INNER JOIN tblFloor AS f on f.StdFlrID = s.StdFlrID";
@@ -995,7 +2238,7 @@ namespace TimeIsLife.CADCommand
                     slab.Floor = floor;
                     return slab;
                 };
-            var slabs = YDBConn.Query(sqlSlab, mappingSlab);
+            var slabs = ydbConn.Query(sqlSlab, mappingSlab);
 
             //查询墙
             string sqlWall = "SELECT w.ID,f.ID,f.LevelB,f.Height,ws.ID,ws.kind,ws.B,g.ID,j1.ID,j1.X,j1.Y,j2.ID,j2.X,j2.Y " +
@@ -1016,22 +2259,35 @@ namespace TimeIsLife.CADCommand
                     wall.WallSect = wallSect;
                     return wall;
                 };
-            var walls = YDBConn.Query(sqlWall, mappingWall);
+            var walls = ydbConn.Query(sqlWall, mappingWall);
             //关闭数据库
-            YDBConn.Close();
+            ydbConn.Close();
 
             #endregion
 
             #region 区域数据查询
             var areaConn = new SQLiteConnection($"Data Source={areaDB}");
-
             //查询标高
-            string sqlFloorArea = "SELECT a.ID,a.Tag1,a.Tag2,a.LevelB,a.Height,a.kind,a.X,a.Y FROM tbArea AS a WHERE kind=0";
-            string sqlFireArea = "SELECT a.ID,a.Tag1,a.Tag2,a.LevelB,a.Height,a.kind,a.X,a.Y FROM tbArea AS a WHERE kind=1";
-            string sqlRoomArea = "SELECT a.ID,a.Tag1,a.Tag2,a.LevelB,a.Height,a.kind,a.X,a.Y FROM tbArea AS a WHERE kind=2";
-            var floorAreas = areaConn.Query<Area>(sqlFloorArea);
-            var fireAreas = areaConn.Query<Area>(sqlFireArea);
-            var roomAreas = areaConn.Query<Area>(sqlRoomArea);
+            string sqlFloorArea = "SELECT a.ID,a.FloorID,a.VertexX,a.VertexY,a.VertexY,a.kind,a.Note,f.ID,f.Name,f.Level,f.X,f.Y,f.Z" +
+                "FROM Area AS a " +
+                "INNER JOIN Floor As f " +
+                "WHERE kind=0";
+            string sqlFireArea = "SELECT a.ID,a.FloorID,a.VertexX,a.VertexY,a.VertexY,a.kind,a.Note,f.ID,f.Name,f.Level,f.X,f.Y,f.Z" +
+                "FROM Area AS a " +
+                "INNER JOIN Floor As f " +
+                "WHERE kind=1";
+            string sqlRoomArea = "SELECT a.ID,a.FloorID,a.VertexX,a.VertexY,a.VertexY,a.kind,a.Note,f.ID,f.Name,f.Level,f.X,f.Y,f.Z" +
+                "FROM Area AS a " +
+                "INNER JOIN Floor As f " +
+                "WHERE kind=2";
+            Func<Model.Area, AreaFloor, Model.Area> mappingArea = (area, areaFloor) =>
+            {
+                area.Floor = areaFloor;
+                return area;
+            };
+            var floorAreas = areaConn.Query<Model.Area>(sqlFloorArea, mappingArea);
+            var fireAreas = areaConn.Query<Model.Area>(sqlFireArea, mappingArea);
+            var roomAreas = areaConn.Query<Model.Area>(sqlRoomArea, mappingArea);
             areaConn.Close();
             #endregion
 
@@ -1043,7 +2299,7 @@ namespace TimeIsLife.CADCommand
                     string codeBase = Assembly.GetExecutingAssembly().CodeBase;
                     UriBuilder uri = new UriBuilder(codeBase);
                     string path = Uri.UnescapeDataString(uri.Path);
-                    
+
                     //载入感烟探测器块
                     string smokeDetectorPath = Path.Combine(Path.GetDirectoryName(path), "Block", "FA-08-智能型点型感烟探测器.dwg");
                     string temperatureDetectorPath = Path.Combine(Path.GetDirectoryName(path), "Block", "FA-09-智能型点型感温探测器.dwg");
@@ -1065,235 +2321,332 @@ namespace TimeIsLife.CADCommand
                                 ObjectId smokeDetectorID = newDatabase.Insert(smokeDetector, tempDb, true);
                                 ObjectId temperatureDetectorID = newDatabase.Insert(temperatureDetector, tempDb, true);
 
+
                                 #region 根据房间边界及板轮廓生成烟感
                                 foreach (var roomArea in roomAreas)
                                 {
-                                    if (roomArea.LevelB != floor.LevelB) continue;
-                                    string areaType =roomArea.Tag;
-                                    if (areaType.IsNullOrWhiteSpace() || areaType.Contains("A1H1") || areaType.Contains("A2H1") || areaType.Contains("A4")) continue;
-                                    if(areaType.Contains("A1H2"))
+                                    //筛选本层房间，true继续，false跳过
+                                    if (roomArea.Level != floor.LevelB) continue;
+                                    //判断房间类型
+                                    string areaNote = roomArea.Note;
+                                    if (areaNote.IsNullOrWhiteSpace() || areaNote.Contains("A1H1") || areaNote.Contains("A2H1") || areaNote.Contains("A4")) continue;
+                                    DetectorInfo detectorInfo = new DetectorInfo();
+                                    switch (areaNote)
                                     {
-                                        DetectorInfo detectorInfo = new DetectorInfo
+                                        case "A1H2":
+                                            detectorInfo.Radius = 6700;
+                                            detectorInfo.Area1 = 16;
+                                            detectorInfo.Area2 = 24;
+                                            detectorInfo.Area3 = 32;
+                                            detectorInfo.Area4 = 48;
+                                            break;
+                                        case "A1H3":
+                                            detectorInfo.Radius = 5800;
+                                            detectorInfo.Area1 = 12;
+                                            detectorInfo.Area2 = 18;
+                                            detectorInfo.Area3 = 24;
+                                            detectorInfo.Area4 = 36;
+                                            break;
+                                        case "A2H2":
+                                            detectorInfo.Radius = 4400;
+                                            detectorInfo.Area1 = 6;
+                                            detectorInfo.Area2 = 9;
+                                            detectorInfo.Area3 = 12;
+                                            detectorInfo.Area4 = 18;
+                                            break;
+                                        case "A2H3":
+                                            detectorInfo.Radius = 3600;
+                                            detectorInfo.Area1 = 4;
+                                            detectorInfo.Area2 = 6;
+                                            detectorInfo.Area3 = 8;
+                                            detectorInfo.Area4 = 12;
+                                            break;
+                                    }
+
+                                    Coordinate[] roomCoordinates = GetRoomCoordinates(roomArea);
+                                    Polygon roomPolygon = geometryFactory.CreatePolygon(roomCoordinates);
+                                    //Polyline roomPolyline = new Polyline();
+                                    //roomPolyline.CreatePolyline(roomCoordinates);
+                                    //房间外形轮廓
+                                    //Extents3d roomExtents3d = roomPolyline.GeometricExtents;
+
+                                    //房间范围内的闭合区域
+                                    //List<Polyline> polylines = new List<Polyline>();
+                                    //房间范围关联的板
+                                    //List<Slab> slabs1 = new List<Slab>();
+                                    Dictionary<Geometry, double> geometries = new Dictionary<Geometry, double>();
+                                    foreach (var slab in slabs)
+                                    {
+                                        //筛选本层板，true继续，false跳过
+                                        if (slab.Floor.LevelB != floor.LevelB) continue;
+                                        Coordinate[] slabCoordinates = GetSlabCoordinates(slab);
+                                        Polygon slabPolygon = geometryFactory.CreatePolygon(slabCoordinates);
+                                        //Polyline slabPolyline = new Polyline();
+                                        //slabPolyline.CreatePolyline(slabPoint2Ds);
+                                        //板外形轮廓
+                                        //Extents3d slabExtents3d = slabPolyline.GeometricExtents;
+                                        //判断多段线的矩形轮廓是否相交，相交继续，不相交跳过
+                                        //if (!CheckCross(roomExtents3d, slabExtents3d)) continue;
+
+
+                                        //不相交或相邻，相交，包含，属于
+                                        if (roomPolygon.Intersects(slabPolygon))
                                         {
-                                            Radius = 6700,
-                                            Area1 = 16,
-                                            Area2 = 24,
-                                            Area3 = 32,
-                                            Area4 = 48
-                                        };
-
-                                        Point2dCollection roomPoint2Ds = GetRoomPoint2Ds(roomArea);
-                                        Polyline roomPolyline = new Polyline();
-                                        roomPolyline.CreatePolyline(roomPoint2Ds);
-                                        //房间外形轮廓
-                                        Extents3d roomExtents3d = roomPolyline.GeometricExtents;
-
-                                        //房间范围内的闭合区域
-                                        List<Polyline> polylines = new List<Polyline>();
-                                        //房间范围关联的板
-                                        List<Slab> slabs1 = new List<Slab>();
-
-                                        foreach (var slab in slabs)
-                                        {
-                                            if (slab.Floor.LevelB != floor.LevelB) continue;
-                                            Point2dCollection slabPoint2Ds = GetSlabPoint2Ds(slab);
-                                            Polyline slabPolyline = new Polyline();
-                                            slabPolyline.CreatePolyline(slabPoint2Ds);
-                                            //板外形轮廓
-                                            Extents3d slabExtents3d = slabPolyline.GeometricExtents; 
-                                            //判断多段线的矩形轮廓是否相交，相交继续，不相交跳过
-                                            if (!CheckCross(roomExtents3d,slabExtents3d)) continue;
-                                            //判断房间区域与板是否相交
-                                            Point3dCollection IntersectPoint3DCollection = GetIntersectPoint3d(roomPolyline, slabPolyline);
-                                            if (IntersectPoint3DCollection.Count>0)
+                                            Geometry geometry = roomPolygon.Intersection(slabPolygon);
+                                            if (geometry.OgcGeometryType == OgcGeometryType.Polygon)
                                             {
-                                                //房间区域与板相交,获取相交区域轮廓线
-                                                //获取房间轮廓在板轮廓内的点
-                                                for (int i = 0; i < roomPolyline.NumberOfVertices; i++)
-                                                {
-                                                    if (i < roomPolyline.NumberOfVertices - 1 && roomPolyline.Closed)
-                                                    {
-                                                        if (roomPolyline.GetPoint2dAt(i).IsInPolygon1(slabPolyline.GetPoint2Ds()))
-                                                        {
-                                                            IntersectPoint3DCollection.Add(roomPolyline.GetPoint3dAt(i));
-                                                        }
-                                                    }
-                                                }
-                                                //获取板轮廓在房间轮廓内的点
-                                                for (int i = 0; i < slabPolyline.NumberOfVertices; i++)
-                                                {
-                                                    if (i < slabPolyline.NumberOfVertices - 1 && slabPolyline.Closed)
-                                                    {
-                                                        if (slabPolyline.GetPoint2dAt(i).IsInPolygon1(roomPolyline.GetPoint2Ds()))
-                                                        {
-                                                            IntersectPoint3DCollection.Add(slabPolyline.GetPoint3dAt(i));
-                                                        }
-                                                    }
-                                                }
+                                                geometries.Add(geometry, slab.Thickness);
+                                            }
+                                        }
+                                        else if (roomPolygon.Contains(slabPolygon))
+                                        {
+                                            geometries.Add((Geometry)slabPolygon, slab.Thickness);
+                                        }
+                                        else if (roomPolygon.Within(slabPolygon))
+                                        {
+                                            geometries.Add((Geometry)roomPolygon, slab.Thickness);
+                                        }
+                                    }
 
-                                                SortPolyPoints(IntersectPoint3DCollection);
-                                                Polyline polyline = new Polyline();
-                                                polyline.CreatePolyline(IntersectPoint3DCollection);
-                                                newDatabase.AddToModelSpace(polyline);
-                                                polylines.Add(polyline);
+                                    SetLayer(newDatabase, $"E-EQUIP", 4);
+
+                                    //对多段线集合按照面积进行排序
+                                    geometries.OrderByDescending(g => g.Key.Area);
+                                    List<Point> points = new List<Point>();
+                                    List<Geometry> tempGeometries = new List<Geometry>();
+                                    //根据多段线集合生成探测器
+                                    foreach (var geometry in geometries)
+                                    {
+                                        if (tempGeometries.Contains(geometry.Key)) continue;
+                                        //多边形内布置一个或多个点位
+                                        if (geometry.Key.Area > detectorInfo.Area4)
+                                        {
+                                            //如果为假，超出保护范围，需要切分为n个子区域
+                                            if (IsProtected(geometry.Key, detectorInfo.Radius, geometryFactory, beams, floor))
+                                            {
+                                                points.Add(geometry.Key.Centroid);
                                             }
                                             else
                                             {
-                                                //获取多段线的重心
-                                                //Point2d roomCenterPoint = getCenterOfGravityPoint(GetRoomPoint2Ds(roomArea));
-                                                //Point2d slabCenterPoint = getCenterOfGravityPoint(GetSlabPoint2Ds(slab));
-
-                                                if (roomPolyline.IsPolylineInPolyline(slabPolyline))
+                                                int n = 2;
+                                                while (true)
                                                 {
-                                                    //房间区域被板包含,房间内放置一个探测器
-                                                    polylines.Add(roomPolyline);
-                                                }
-                                                else
-                                                {
-                                                    //房间区域包含板
-                                                    polylines.Add(slabPolyline);
-                                                }
-                                            }
-
-                                            //对多段线集合按照面积进行排序
-                                            polylines.OrderByDescending(p => p.Area);
-                                            //根据多段线集合生成探测器
-                                            foreach (var polyline in polylines)
-                                            {
-                                                //多边形内布置一个或多个点位
-                                                if (polyline.Area> detectorInfo.Area4)
-                                                {
-                                                    Point2d centerPoint = getCenterOfGravityPoint(polyline.GetPoint2DCollection());
-                                                    //Circle circle = new Circle(centerPoint.ToPoint3d(), new Vector3d(0, 0, 1), detectorInfo.Radius);
-                                                    bool b = false;
-                                                    for (int i = 0; i < polyline.NumberOfVertices; i++)
+                                                    List<Geometry> splitGeometries = SplitPolygon(geometryFactory, geometry.Key, n, 100);
+                                                    bool b = true;
+                                                    foreach (var item in splitGeometries)
                                                     {
-                                                        if (i < polyline.NumberOfVertices - 1 && polyline.Closed)
+                                                        if (!IsProtected(item, detectorInfo.Radius, geometryFactory, beams, floor))
                                                         {
-                                                            double d =centerPoint.GetDistanceTo(polyline.GetPoint2dAt(i));
-                                                            if (d>detectorInfo.Radius)
-                                                            {
-                                                                b = true;
-                                                            }
+                                                            b = false;
+                                                            break;
                                                         }
                                                     }
-                                                    //如果为真，超出保护范围，需要切分为n个子区域
-                                                    if (b) 
+                                                    if (b)
                                                     {
-                                                        int n = 2;
-                                                        while (true)
+                                                        foreach (var item in splitGeometries)
                                                         {
-                                                            //
-
-
-
-
-
-                                                            n++;
+                                                            points.Add(item.Centroid);
+                                                            //BlockReference blockReference = new BlockReference(item.Centroid.ToPoint3d(), smokeDetectorID)
+                                                            //{
+                                                            //    ScaleFactors = new Scale3d(100)
+                                                            //};
+                                                            //newDatabase.AddToModelSpace(blockReference);
                                                         }
+                                                        break;
                                                     }
                                                     else
                                                     {
-                                                        BlockReference blockReference = new BlockReference(centerPoint.ToPoint3d(), smokeDetectorID)
+                                                        n++;
+                                                        continue;
+                                                    }
+                                                }
+                                            }
+                                            tempGeometries.Add(geometry.Key);
+                                        }
+                                        else
+                                        {
+                                            //如果为假，超出保护范围，需要切分为n个子区域
+                                            if (IsProtected(geometry.Key, detectorInfo.Radius, geometryFactory, beams, floor))
+                                            {
+                                                List<Geometry> beam600 = new List<Geometry>();
+                                                List<Geometry> beam200 = new List<Geometry>();
+                                                //保护范围内是否有其他区域
+                                                foreach (var item in geometries)
+                                                {
+                                                    if (tempGeometries.Contains(item.Key)) continue;
+                                                    if (!IsProtected(geometry.Key, detectorInfo.Radius, item.Key)) continue;
+                                                    if (!(geometry.Key.Intersection(item.Key) is LineString lineString)) continue;
+
+                                                    //foreach (var wall in walls)
+                                                    //{
+                                                    //    if (wall.Floor.LevelB != floor.LevelB) continue;
+                                                    //    if (wall.ToLineString().Contains(lineString) || wall.ToLineString().Equals(lineString))
+                                                    //    {
+                                                    //        break;
+                                                    //    }
+                                                    //}
+
+                                                    foreach (var beam in beams)
+                                                    {
+                                                        if (beam.Floor.LevelB != floor.LevelB) continue;
+                                                        if (beam.ToLineString().Contains(lineString) || beam.ToLineString().Equals(lineString))
                                                         {
-                                                            ScaleFactors = new Scale3d(100)
-                                                        };
-                                                        newDatabase.AddToModelSpace(blockReference);
+                                                            double height = 0;
+                                                            if (beam.IsConcrete)
+                                                            {
+                                                                height = beam.Height - item.Value;
+                                                            }
+                                                            else
+                                                            {
+                                                                height = beam.Height;
+                                                            }
+
+                                                            if (height > 600)
+                                                            {
+                                                                break;
+                                                            }
+                                                            else if (height >= 200 && height <= 600)
+                                                            {
+                                                                beam600.Add(item.Key);
+                                                                break;
+                                                            }
+                                                            else if (height < 200)
+                                                            {
+                                                                beam200.Add(item.Key);
+                                                                break;
+                                                            }
+                                                        }
+                                                    }
+                                                }
+
+                                                double area = geometry.Key.Area;
+                                                if (beam200.Count > 0)
+                                                {
+                                                    foreach (var item in beam200)
+                                                    {
+                                                        area += item.Area;
+                                                        tempGeometries.Add(item);
+                                                    }
+                                                }
+
+                                                if (detectorInfo.Area3 < area && area <= detectorInfo.Area4)
+                                                {
+                                                    int count = 2;
+                                                    if (beam600.Count > 0)
+                                                    {
+                                                        beam600.OrderByDescending(a => a.Area);
+                                                        for (int i = 0; i < count; i++)
+                                                        {
+                                                            tempGeometries.Add(beam600[i]);
+                                                        }
+                                                    }
+                                                }
+                                                else if (detectorInfo.Area2 < area && area <= detectorInfo.Area3)
+                                                {
+                                                    int count = 3;
+                                                    if (beam600.Count > 0)
+                                                    {
+                                                        beam600.OrderByDescending(a => a.Area);
+                                                        for (int i = 0; i < count; i++)
+                                                        {
+                                                            tempGeometries.Add(beam600[i]);
+                                                        }
                                                     }
 
                                                 }
-                                                else if (detectorInfo.Area3 < polyline.Area && polyline.Area <= detectorInfo.Area4)
+                                                else if (detectorInfo.Area1 < area && area <= detectorInfo.Area2)
                                                 {
+                                                    int count = 4;
+                                                    if (beam600.Count > 0)
+                                                    {
+                                                        beam600.OrderByDescending(a => a.Area);
+                                                        for (int i = 0; i < count; i++)
+                                                        {
+                                                            tempGeometries.Add(beam600[i]);
+                                                        }
+                                                    }
 
                                                 }
-                                                else if (detectorInfo.Area2 < polyline.Area && polyline.Area <= detectorInfo.Area3)
+                                                else if (area < detectorInfo.Area1)
                                                 {
+                                                    int count = 5;
+                                                    if (beam600.Count > 0)
+                                                    {
+                                                        beam600.OrderByDescending(a => a.Area);
+                                                        for (int i = 0; i < count; i++)
+                                                        {
+                                                            tempGeometries.Add(beam600[i]);
+                                                        }
+                                                    }
 
                                                 }
-                                                else if (detectorInfo.Area1 < polyline.Area && polyline.Area <= detectorInfo.Area2)
-                                                {
+                                                points.Add(geometry.Key.Centroid);
 
-                                                }
-                                                else if (polyline.Area < detectorInfo.Area1)
+                                            }
+                                            else
+                                            {
+                                                int n = 2;
+                                                while (true)
                                                 {
-
+                                                    List<Geometry> splitGeometries = SplitPolygon(geometryFactory, geometry.Key, n, 100);
+                                                    bool b = true;
+                                                    foreach (var item in splitGeometries)
+                                                    {
+                                                        if (!IsProtected(item, detectorInfo.Radius, geometryFactory, beams, floor))
+                                                        {
+                                                            b = false; break;
+                                                        }
+                                                    }
+                                                    if (b)
+                                                    {
+                                                        foreach (var item in splitGeometries)
+                                                        {
+                                                            points.Add(item.Centroid);
+                                                        }
+                                                        break;
+                                                    }
+                                                    else
+                                                    {
+                                                        n++;
+                                                        continue;
+                                                    }
                                                 }
                                             }
-
-
-
+                                            tempGeometries.Add(geometry.Key);
                                         }
-
                                     }
-                                    if (areaType.Contains("A1H3"))
-                                    {
-                                        DetectorInfo detectorInfo = new DetectorInfo
-                                        {
-                                            Radius = 5800,
-                                            Area1 = 12,
-                                            Area2 = 18,
-                                            Area3 = 24,
-                                            Area4 = 36
-                                        };
-                                    }
-                                    if (areaType.Contains("A2H2"))
-                                    {
-                                        DetectorInfo detectorInfo = new DetectorInfo
-                                        {
-                                            Radius = 4400,
-                                            Area1 = 6,
-                                            Area2 = 9,
-                                            Area3 = 12,
-                                            Area4 = 18
-                                        };
-                                    }
-                                    if (areaType.Contains("A2H3"))
-                                    {
-                                        DetectorInfo detectorInfo = new DetectorInfo
-                                        {
-                                            Radius = 3600,
-                                            Area1 = 4,
-                                            Area2 = 6,
-                                            Area3 = 8,
-                                            Area4 = 12
-                                        };
-                                    }
+                                    //去除距梁边小于500mm的布置点
                                 }
 
+                                //foreach (var slab in slabs)
+                                //{
+                                //    bool bo = true;
+                                //    if (slab.Floor.LevelB != floor.LevelB) continue;
 
+                                //    SetLayer(newDatabase, $"slab-{slab.Thickness.ToString()}mm", 7);
 
+                                //    Polyline polyline = new Polyline();
+                                //    Point2dCollection point2Ds = GetSlabCoordinates(slab);
+                                //    polyline.CreatePolyline(point2Ds);
+                                //    newDatabase.AddToModelSpace(polyline);
 
+                                //    if (slab.Thickness == 0)
+                                //    {
+                                //        if (!ElectricalViewModel.electricalViewModel.IsLayoutAtHole) bo = false;
+                                //    }
+                                //    if (!bo) continue;
+                                //    //在板的重心添加感烟探测器
+                                //    SetLayer(newDatabase, $"E-EQUIP-{slab.Thickness.ToString()}", 4);
 
+                                //    Point2d p = getCenterOfGravityPoint(point2Ds);
+                                //    BlockTable bt = (BlockTable)newTransaction.GetObject(newDatabase.BlockTableId, OpenMode.ForRead);
+                                //    BlockReference blockReference = new BlockReference(p.ToPoint3d(), smokeDetectorID);
+                                //    blockReference.ScaleFactors = new Scale3d(100);
+                                //    newDatabase.AddToModelSpace(blockReference);
 
-                                foreach (var slab in slabs)
-                                {
-                                    bool bo = true;
-                                    if (slab.Floor.LevelB != floor.LevelB) continue;
-
-                                    SetLayer(newDatabase, $"slab-{slab.Thickness.ToString()}mm", 7);
-
-                                    Polyline polyline = new Polyline();
-                                    Point2dCollection point2Ds = GetSlabPoint2Ds(slab);
-                                    polyline.CreatePolyline(point2Ds);
-                                    newDatabase.AddToModelSpace(polyline);
-
-                                    if (slab.Thickness == 0)
-                                    {
-                                        if (!ElectricalViewModel.electricalViewModel.IsLayoutAtHole) bo = false;
-                                    }
-                                    if (!bo) continue;
-                                    //在板的重心添加感烟探测器
-                                    SetLayer(newDatabase, $"E-EQUIP-{slab.Thickness.ToString()}", 4);
-
-                                    Point2d p = getCenterOfGravityPoint(point2Ds);
-                                    BlockTable bt = (BlockTable)newTransaction.GetObject(newDatabase.BlockTableId, OpenMode.ForRead);
-                                    BlockReference blockReference = new BlockReference(p.ToPoint3d(), smokeDetectorID);
-                                    blockReference.ScaleFactors = new Scale3d(100);
-                                    newDatabase.AddToModelSpace(blockReference);
-
-                                    //设置块参照图层错误
-                                    //blockReference.Layer = layerName;
-                                }
+                                //    //设置块参照图层错误
+                                //    //blockReference.Layer = layerName;
+                                //}
 
 
                                 #endregion
@@ -1419,6 +2772,228 @@ namespace TimeIsLife.CADCommand
             editor.WriteMessage("\n结束");
         }
 
+        private string GetAreaFilePath()
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog
+            {
+                Filter = "区域数据库(*.area)|*.area|所有文件|*.*",
+                Title = "选择区域数据库文件",
+                ValidateNames = true,
+                CheckFileExists = true,
+                CheckPathExists = true,
+                Multiselect = false
+            };
+
+            string name;
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                name = openFileDialog.FileName;
+            }
+            else
+            {
+                return null;
+            }
+            return name;
+        }
+
+
+        /// <summary>
+        /// 判断几何是否在指定半径及以几何质心为圆心的圆的保护范围内
+        /// </summary>
+        /// <param name="geometry">几何</param>
+        /// <param name="radius">半径</param>
+        /// <returns>true：在保护范围内；false:不在保护范围内</returns>
+        private bool IsProtected(Geometry geometry, double radius, GeometryFactory geometryFactory, List<Beam> beams, Floor floor)
+        {
+            Point centerPoint = geometry.Centroid;
+            bool b = true;
+            if (geometry is Polygon polygon)
+            {
+                //缓冲区参数
+
+                var bufferParam = new BufferParameters
+                {
+                    IsSingleSided = true,
+                    JoinStyle = NetTopologySuite.Operation.Buffer.JoinStyle.Mitre,
+                };
+
+                int n = polygon.NumPoints;
+                LineString[] list = new LineString[n];
+                for (int i = 0; i < n; i++)
+                {
+
+                    double d = centerPoint.Coordinate.Distance(polygon.Coordinates[i]);
+                    if (d > radius)
+                    {
+                        b = false;
+                        break;
+                    }
+                    LineString lineString = (LineString)geometryFactory.CreateLineString
+                        (new[] { polygon.Coordinates[i % n], polygon.Coordinates[(i + 1) % n] });
+                    foreach (var beam in beams)
+                    {
+                        if (beam.Floor.LevelB != floor.LevelB) continue;
+                        if (beam.ToLineString().Contains(lineString) || beam.ToLineString().Equals(lineString))
+                        {
+                            list[i] = (LineString)lineString.Buffer(-beam.Width / 2, bufferParam);
+                            break;
+                        }
+                    }
+                }
+
+                double distance = -500;
+                GeometryCollection geometryCollection = new GeometryCollection(list, geometryFactory);
+                geometryCollection.Union();
+                Polygonizer polygonizer = new Polygonizer();
+                foreach (var item in geometryCollection)
+                {
+                    polygonizer.Add(item);
+                }
+                var polygons = polygonizer.GetPolygons();
+                switch (polygons.Count)
+                {
+                    case 0:
+                        b = false;
+                        break;
+                    case 1:
+                        break;
+                    default:
+                        Geometry g = polygons.OrderByDescending(p => p.Area).FirstOrDefault().Buffer(distance, bufferParam);
+                        if (g.IsValid)
+                        {
+                            break;
+                        }
+                        else
+                        {
+                            b = false;
+                            break;
+                        }
+                }
+            }
+            return b;
+        }
+
+        public Geometry Validate(Geometry geom)
+        {
+            if (geom.OgcGeometryType == OgcGeometryType.Polygon)
+            {
+                if (geom.IsValid)
+                {
+                    geom.Normalize();
+                    return geom;
+                }
+                Polygonizer polygonizer = new Polygonizer();
+                AddPolygon((Polygon)geom, polygonizer);
+                return ToPolygonGeometry(polygonizer.GetPolygons(), geom.Factory);
+            }
+            else if (geom.OgcGeometryType == OgcGeometryType.MultiPolygon)
+            {
+                if (geom.IsValid)
+                {
+                    geom.Normalize(); // validate does not pick up rings in the wrong order - this will fix that
+                    return geom; // If the multipolygon is valid just return it
+                }
+                Polygonizer polygonizer = new Polygonizer();
+                for (int i = 0; i < geom.NumGeometries; i++)
+                {
+                    AddPolygon((Polygon)geom.GetGeometryN(i), polygonizer);
+                }
+
+                return ToPolygonGeometry(polygonizer.GetPolygons(), geom.Factory);
+            }
+            else
+            {
+                return geom; // In my case, I only care about polygon / multipolygon geometries
+            }
+        }
+
+        /**
+          * Add all line strings from the polygon given to the polygonizer given
+          * @param polygon polygon from which to extract line strings
+          * @param polygonizer polygonizer
+          */
+        private void AddPolygon(Polygon polygon, Polygonizer polygonizer)
+        {
+            //添加外边界线
+            AddLineString(polygon.ExteriorRing, polygonizer);
+            //添加内边界线
+            foreach (var line in polygon.InteriorRings)
+            {
+                AddLineString(line, polygonizer);
+            }
+        }
+
+        /**
+         * Add the linestring given to the polygonizer
+         * @param linestring line string
+         * @param polygonizer polygonizer
+         */
+        private void AddLineString(LineString lineString, Polygonizer polygonizer)
+        {
+            // LinearRings are treated differently to line strings : we need a LineString NOT a LinearRing
+            lineString = lineString.Factory.CreateLineString(lineString.CoordinateSequence);
+            // unioning the linestring with the point makes any self intersections explicit.
+
+            Geometry toAdd = null;
+            Point point = lineString.Factory.CreatePoint(lineString.GetCoordinateN(0));
+            toAdd = lineString.Union(point);
+            //for (int i = 0; i < lineString.NumPoints; i++)
+            //{
+            //    IPoint point = lineString.Factory.CreatePoint(lineString.GetCoordinateN(i));
+            //    toAdd = lineString.Union(point);
+            //}
+
+            //Add result to polygonizer
+            polygonizer.Add(toAdd);
+
+            return;
+
+        }
+
+        /**
+         * Get a geometry from a collection of polygons.
+         * 
+         * @param polygons collection
+         * @param factory factory to generate MultiPolygon if required
+         * @return null if there were no polygons, the polygon if there was only one, or a MultiPolygon containing all polygons otherwise
+         */
+        private Geometry ToPolygonGeometry(ICollection<Geometry> polygons, GeometryFactory factory)
+        {
+            switch (polygons.Count)
+            {
+                case 0:
+                    return null; // No valid polygons!
+                case 1:
+                    return polygons.ElementAt(0); // single polygon - no need to wrap
+                default:
+                    return factory.CreateMultiPolygon(polygons.Select(p => p as Polygon).ToArray()); // multiple polygons - wrap them
+            }
+        }
+
+
+        /// <summary>
+        /// 判断区域是否在相邻区域探测器的保护范围内
+        /// </summary>
+        /// <param name="geometry">相邻的区域</param>
+        /// <param name="radius">保护半径</param>
+        /// <param name="touchGeometry">被判断的区域</param>
+        /// <returns>true：在保护范围内；false:不在保护范围内</returns>
+        private bool IsProtected(Geometry geometry, double radius, Geometry touchGeometry)
+        {
+            Point centerPoint = geometry.Centroid;
+            bool b = true;
+            for (int i = 0; i < touchGeometry.NumPoints; i++)
+            {
+
+                double d = centerPoint.Coordinate.Distance(touchGeometry.Coordinates[i]);
+                if (d > radius)
+                {
+                    b = false;
+                }
+            }
+            return b;
+        }
+
         private void SetLayer(Database db, string layerName, int colorIndex)
         {
             db.AddLayer(layerName);
@@ -1457,23 +3032,23 @@ namespace TimeIsLife.CADCommand
         /// </summary>
         /// <param name="slab">板</param>
         /// <returns>点集合</returns>
-        private Point2dCollection GetSlabPoint2Ds(Slab slab)
+        private Coordinate[] GetSlabCoordinates(Slab slab)
         {
-            Point2dCollection points = new Point2dCollection();
             int n = slab.VertexX.Split(',').Length;
+            Coordinate[] coordinates = new Coordinate[n];
             for (int i = 0; i < n; i++)
             {
-                points.Add(new Point2d(double.Parse(slab.VertexX.Split(',')[i % (n - 1)]), double.Parse(slab.VertexY.Split(',')[i % (n - 1)])));
+                coordinates[i] = new Coordinate(double.Parse(slab.VertexX.Split(',')[i % (n - 1)]), double.Parse(slab.VertexY.Split(',')[i % (n - 1)]));
             }
 
-            return points;
+            return coordinates;
         }
 
         /// <summary>
         /// 获取YDB文件
         /// </summary>
         /// <returns>返回文件路径</returns>
-        private string GetFilePath()
+        private string GetYdbFilePath()
         {
             //List<string> list = new List<string>();
             string name = null;
@@ -1496,21 +3071,21 @@ namespace TimeIsLife.CADCommand
             return name;
         }
 
-        
+
         /// <summary>
         /// 获取房间轮廓线点的集合
         /// </summary>
         /// <param name="slab">板</param>
         /// <returns>点集合</returns>
-        private Point2dCollection GetRoomPoint2Ds(Area area)
+        private Coordinate[] GetRoomCoordinates(Model.Area roomAear)
         {
-            Point2dCollection points = new Point2dCollection();
-            int n = area.X.Split(',').Length;
+            int n = roomAear.X.Split(',').Length;
+            Coordinate[] coordinates = new Coordinate[n];
             for (int i = 0; i < n; i++)
             {
-                points.Add(new Point2d(double.Parse(area.X.Split(',')[i % (n - 1)]), double.Parse(area.Y.Split(',')[i % (n - 1)])));
+                coordinates[i] = new Coordinate(double.Parse(roomAear.X.Split(',')[i % (n - 1)]), double.Parse(roomAear.Y.Split(',')[i % (n - 1)]));
             }
-            return points;
+            return coordinates;
         }
 
         /// <summary>
@@ -1527,8 +3102,8 @@ namespace TimeIsLife.CADCommand
             Point2d slabMaxPoint = slabExtents3d.MaxPoint.ToPoint2d();
             Point2d slabMinPoint = slabExtents3d.MinPoint.ToPoint2d();
 
-            return((Math.Abs(roomMaxPoint.X + roomMinPoint.X - slabMaxPoint.X - slabMinPoint.X) < roomMaxPoint.X - roomMinPoint.X + slabMaxPoint.X - slabMinPoint.X) 
-                && Math.Abs(roomMaxPoint.Y + roomMinPoint.Y - slabMaxPoint.Y - slabMinPoint.Y) < roomMaxPoint.Y - roomMinPoint.Y + slabMaxPoint.Y - slabMinPoint.Y);            
+            return ((Math.Abs(roomMaxPoint.X + roomMinPoint.X - slabMaxPoint.X - slabMinPoint.X) < roomMaxPoint.X - roomMinPoint.X + slabMaxPoint.X - slabMinPoint.X)
+                && Math.Abs(roomMaxPoint.Y + roomMinPoint.Y - slabMaxPoint.Y - slabMinPoint.Y) < roomMaxPoint.Y - roomMinPoint.Y + slabMaxPoint.Y - slabMinPoint.Y);
         }
 
         /// <summary>
@@ -1542,7 +3117,7 @@ namespace TimeIsLife.CADCommand
             Point3dCollection intPoints3d = new Point3dCollection();
             for (int i = 0; i < slabPolyline.NumberOfVertices; i++)
             {
-                if (i< slabPolyline.NumberOfVertices-1 || slabPolyline.Closed)
+                if (i < slabPolyline.NumberOfVertices - 1 || slabPolyline.Closed)
                 {
                     SegmentType slabSegmentType = slabPolyline.GetSegmentType(i);
                     if (slabSegmentType == SegmentType.Line)
@@ -1550,7 +3125,7 @@ namespace TimeIsLife.CADCommand
                         LineSegment2d slabLine = slabPolyline.GetLineSegment2dAt(i);
                         PolyIntersectWithLine(roomPolyline, slabLine, 0.0001, ref intPoints3d);
                     }
-                    else if(slabSegmentType == SegmentType.Arc)
+                    else if (slabSegmentType == SegmentType.Arc)
                     {
 
                     }
@@ -1620,7 +3195,7 @@ namespace TimeIsLife.CADCommand
             }
         }
 
-        
+
         // 点是否在集合中
         private int FindPointIn(Point2dCollection points, Point2d pt, double tol)
         {
@@ -1715,34 +3290,32 @@ namespace TimeIsLife.CADCommand
         /// <summary>
         /// 按照指定数量切分多边形
         /// </summary>
-        /// <param name="polyline">多边形</param>
+        /// <param name="geometry">多边形</param>
         /// <param name="count">平分份数</param>
         /// <param name="n">点集数量（kmeans算法用，越多越精确但速度越慢）</param>
         /// <param name="detectorInfo">探测器</param>
         /// <returns>符合条件的平分多边形的质心点集</returns>
-        MultiPolygon SplitPolyline(Polyline polyline, int count, int n)
+        List<Geometry> SplitPolygon(GeometryFactory geometryFactory, Geometry geometry, int count, int n)
         {
             Random random = new Random();
             //质心点集
             //List<Point2d> Points = new List<Point2d>();
-
-            Extents3d Extents3d = polyline.GeometricExtents;
-            Point2d maxPoint = Extents3d.MaxPoint.ToPoint2d();
-            Point2d minPoint = Extents3d.MinPoint.ToPoint2d();
+            Coordinate maxPoint = geometry.Max();
+            Coordinate minPoint = geometry.Min();
 
             //构建随机点并判断点是否在多边形内部
-            double[][] randomPoints = new double[n][];            
+            double[][] randomPoints = new double[n][];
             for (int i = 0; i < n; i++)
             {
                 while (true)
                 {
                     double x = minPoint.X + random.NextDouble() * (maxPoint.X - minPoint.X);
                     double y = minPoint.Y + random.NextDouble() * (maxPoint.Y - minPoint.Y);
-                    Point2d point2D = new Point2d(x,y);
+                    Point point2D = new Point(x, y);
 
-                    if (point2D.IsInPolygon1(polyline.GetPoint2Ds()))
+                    if (point2D.Within(geometry))
                     {
-                        randomPoints[i] = new double[2] { x, y };                        
+                        randomPoints[i] = new double[2] { x, y };
                         break;
                     }
                     else
@@ -1757,34 +3330,26 @@ namespace TimeIsLife.CADCommand
             KMeans kMeans = new KMeans(count);
             KMeansClusterCollection clusters = kMeans.Learn(randomPoints);
             double[][] centerPoints = clusters.Centroids;
-
-            //构建泰森多边形
             List<Coordinate> coords = new List<Coordinate>();
             foreach (var c in centerPoints)
             {
-                //Points.Add(new Point2d(c[0], c[1]));
                 coords.Add(new Coordinate(c[0], c[1]));
             }
-
-            GeometryFactory geometryFactory = new GeometryFactory();
-            Envelope clipEnvelpoe = new Envelope();
+            //构建泰森多边形
             VoronoiDiagramBuilder voronoiDiagramBuilder = new VoronoiDiagramBuilder();
+            Envelope clipEnvelpoe = new Envelope(minPoint, maxPoint);
             voronoiDiagramBuilder.ClipEnvelope = clipEnvelpoe;
             voronoiDiagramBuilder.SetSites(coords);
-            GeometryCollection geometryCollection = voronoiDiagramBuilder.GetDiagram(GeometryFactory.Floating);
+            GeometryCollection geometryCollection = voronoiDiagramBuilder.GetDiagram(geometryFactory);
 
             // 4. 利用封闭面切割泰森多边形
-            
-            Polygon polygon = geometryFactory.CreatePolygon(polyline.GetCoordinates().ToArray());
             List<Geometry> geometries = new List<Geometry>();
-            for (int i = 0; i < geometryCollection.Length; i++)
+            for (int i = 0; i < geometryCollection.NumGeometries; i++)
             {
-                Geometry geometry = geometryCollection.GetGeometryN(i);
-                geometries.Add(polygon.Intersection(geometry));
+                Geometry vorGeometry = geometryCollection.GetGeometryN(i);
+                geometries.Add(vorGeometry.Intersection(geometry));
             }
-            MultiPolygon multiPolygon = geometryFactory.CreateMultiPolygon((Polygon[])geometries.ToArray());
-
-            return multiPolygon;
+            return geometries;
         }
 
 
@@ -1792,18 +3357,11 @@ namespace TimeIsLife.CADCommand
         public class Floor
         {
             public int ID { get; set; }
+            public string Name { get; set; }
             public double LevelB { get; set; }
             public double Height { get; set; }
         }
 
-        public class BeamSect
-        {
-            public int ID { get; set; }
-            public int Kind { get; set; }
-            public string ShapeVal { get; set; }
-            public string ShapeVal1 { get; set; }
-
-        }
         public class Grid
         {
             public int ID { get; set; }
@@ -1824,6 +3382,64 @@ namespace TimeIsLife.CADCommand
             public Floor Floor { get; set; }
             public BeamSect BeamSect { get; set; }
             public Grid Grid { get; set; }
+
+            public bool IsConcrete
+            {
+                get
+                {
+                    if (BeamSect.Kind == 1)
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                }
+            }
+            public double Height
+            {
+                get
+                {
+                    var height = BeamSect.Kind switch
+                    {
+                        1 => double.Parse(this.BeamSect.ShapeVal.Split(',')[2]),
+                        2 => double.Parse(this.BeamSect.ShapeVal.Split(',')[2]),
+                        7 => double.Parse(this.BeamSect.ShapeVal.Split(',')[2]),
+                        13 => double.Parse(this.BeamSect.ShapeVal.Split(',')[2]),
+                        22 => Math.Min(double.Parse(this.BeamSect.ShapeVal.Split(',')[3]),
+                                                        double.Parse(this.BeamSect.ShapeVal.Split(',')[4])),
+                        26 => double.Parse(this.BeamSect.ShapeVal.Split(',')[3]),
+                        _ => double.Parse(this.BeamSect.ShapeVal.Split(',')[2]),
+                    };
+                    return height;
+                }
+            }
+            public LineString ToLineString()
+            {
+                Coordinate[] coordinates = new Coordinate[] { new Coordinate(this.Grid.Joint1.X, this.Grid.Joint1.Y), new Coordinate(this.Grid.Joint2.X, this.Grid.Joint2.Y) };
+                return new LineString(coordinates);
+            }
+
+            public double Width
+            {
+                get
+                {
+                    var width = BeamSect.Kind switch
+                    {
+                        1 => double.Parse(this.BeamSect.ShapeVal.Split(',')[1]),
+                        _ => 0.0,
+                    };
+                    return width;
+                }
+            }
+        }
+        public class BeamSect
+        {
+            public int ID { get; set; }
+            public int Kind { get; set; }
+            public string ShapeVal { get; set; }
+            public string ShapeVal1 { get; set; }
 
         }
 
@@ -1851,147 +3467,23 @@ namespace TimeIsLife.CADCommand
             public Floor Floor { get; set; }
             public WallSect WallSect { get; set; }
             public Grid Grid { get; set; }
-        }
 
-        public class Area
-        {
-            public int ID { get; set; }
-            public string Tag { get; set; }
-            public double LevelB { get; set; }
-            public double Height { get; set; }
-            //0为楼层区域，1为防火分区，2为房间区域
-            public int Kind { get; set; }
-            public string X { get; set; }
-            public string Y { get; set; }
+            public LineString ToLineString()
+            {
+                Coordinate[] coordinates = new Coordinate[] { new Coordinate(this.Grid.Joint1.X, this.Grid.Joint1.Y), new Coordinate(this.Grid.Joint2.X, this.Grid.Joint2.Y) };
+                return new LineString(coordinates);
+            }
         }
 
         public class DetectorInfo
         {
             public int Radius { get; set; }
-            public int Area1 { get; set; }
-            public int Area2 { get; set; }
-            public int Area3 { get; set; }
-            public int Area4 { get; set; }
+            public double Area1 { get; set; }
+            public double Area2 { get; set; }
+            public double Area3 { get; set; }
+            public double Area4 { get; set; }
         }
         #endregion
-
-        #endregion
-
-        #region FF_ToHydrantAlarmButtonCommand
-        [CommandMethod("FF_ToHydrantAlarmButton")]
-        public void FF_ToHydrantAlarmButton()
-        {
-            // Put your command code here
-            Document document = Application.DocumentManager.CurrentDocument;
-            Database database = document.Database;
-            Editor editor = document.Editor;
-
-            using (Database tempDatabase = new Database(false, true))
-            using (Transaction transaction = database.TransactionManager.StartTransaction())
-            {
-                try
-                {
-                    BlockTable blockTable = transaction.GetObject(database.BlockTableId, OpenMode.ForRead) as BlockTable;
-                    BlockTableRecord modelSpace = transaction.GetObject(blockTable[BlockTableRecord.ModelSpace], OpenMode.ForWrite) as BlockTableRecord;
-                    Matrix3d matrixd = Application.DocumentManager.MdiActiveDocument.Editor.CurrentUserCoordinateSystem;
-
-                    #region 获取文件路径，载入消火栓起泵按钮块
-                    string blockFullName = "FA-07-消火栓起泵按钮.dwg";
-                    ObjectId btrId = InsertBlock(database, tempDatabase, blockFullName);
-                    #endregion
-
-                    string name = "";
-
-                    PromptSelectionOptions promptSelectionOptions1 = new PromptSelectionOptions()
-                    {
-                        SingleOnly = true,
-                        RejectObjectsOnLockedLayers = true,
-                    };
-                    TypedValueList typedValues1 = new TypedValueList();
-                    typedValues1.Add(typeof(BlockReference));
-                    SelectionFilter selectionFilter = new SelectionFilter(typedValues1);
-
-                    PromptSelectionResult promptSelectionResult1 = editor.GetSelection(promptSelectionOptions1, selectionFilter);
-                    if (promptSelectionResult1.Status == PromptStatus.OK)
-                    {
-                        SelectionSet selectionSet1 = promptSelectionResult1.Value;
-                        foreach (var id in selectionSet1.GetObjectIds())
-                        {
-                            BlockReference blockReference1 = transaction.GetObject(id, OpenMode.ForRead) as BlockReference;
-                            if (blockReference1 == null) continue;
-                            name = blockReference1.Name;
-                        }
-                    }
-
-                    if (name.IsNullOrWhiteSpace()) return;
-
-                    List<BlockReference> blockReferences = new List<BlockReference>();
-
-                    TypedValueList typedValues = new TypedValueList();
-                    typedValues.Add(typeof(BlockReference));
-                    SelectionFilter blockReferenceSelectionFilter = new SelectionFilter(typedValues);
-                    PromptSelectionResult promptSelectionResult = editor.SelectAll(blockReferenceSelectionFilter);
-                    SelectionSet selectionSet = promptSelectionResult.Value;
-
-                    foreach (ObjectId blockReferenceId in selectionSet.GetObjectIds())
-                    {
-                        BlockReference blockReference = transaction.GetObject(blockReferenceId, OpenMode.ForRead) as BlockReference;
-                        if (blockReference.Name != name || blockReference == null) continue;
-                        blockReference.UpgradeOpen();
-                        Scale3d scale3D = blockReference.ScaleFactors;
-                        blockReference.ScaleFactors = blockReference.GetUnitScale3d(100);
-                        Matrix3d blockreferenceMatrix = blockReference.BlockTransform;
-                        blockReference.ScaleFactors = scale3D;
-                        blockReference.DowngradeOpen();
-
-                        SetLayer(database, $"E-EQUIP", 4);
-                        BlockReference newBlockReference = new BlockReference(Point3d.Origin, btrId);
-                        newBlockReference.TransformBy(blockreferenceMatrix);
-                        database.AddToModelSpace(newBlockReference);
-                    }
-                }
-                catch
-                {
-                    transaction.Abort();
-                    return;
-                }
-
-                transaction.Commit();
-            }
-                
-
-            //Matrix3d GetBlockReferenceMatrix3d(BlockReference blockReference)
-            //{
-            //    Matrix3d blockreferenceMatrix = blockReference.BlockTransform;
-            //    ObjectId ownerId = blockReference.OwnerId;
-            //    if (ownerId.GetBlockName() != BlockTableRecord.ModelSpace)
-            //    {
-            //        BlockReference ownerBlockReference = transaction.GetObject(ownerId, OpenMode.ForRead) as BlockReference;
-            //        Matrix3d ownerBlockreferenceMatrix = GetBlockReferenceMatrix3d(ownerBlockReference);
-            //        Matrix3d matrix3D = blockreferenceMatrix.
-
-            //    }
-            //    return blockreferenceMatrix;
-            //}
-        }
-
-        private static ObjectId InsertBlock(Database database, Database tempDatabase, string blockFullName)
-        {
-            string codeBase = Assembly.GetExecutingAssembly().CodeBase;
-            UriBuilder uri = new UriBuilder(codeBase);
-            string path = Uri.UnescapeDataString(uri.Path);
-
-            string blockPath = Path.Combine(Path.GetDirectoryName(path), "Block", blockFullName);
-            string blockName = SymbolUtilityServices.GetSymbolNameFromPathName(blockPath, "dwg");
-
-            ObjectId btrId = ObjectId.Null;
-            tempDatabase.ReadDwgFile(blockPath, FileOpenMode.OpenForReadAndReadShare, allowCPConversion: true, null);
-            tempDatabase.CloseInput(true);
-
-            btrId = database.Insert(blockName, tempDatabase, true);
-            return btrId;
-        }
-
 
         #endregion
     }
