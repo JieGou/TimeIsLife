@@ -176,10 +176,10 @@
           "lib/net47/acdbmgdbrep.dll": {}
         }
       },
-      "CommunityToolkit.Mvvm/8.0.0": {
+      "CommunityToolkit.Mvvm/8.1.0": {
         "type": "package",
         "dependencies": {
-          "Microsoft.Bcl.AsyncInterfaces": "6.0.0",
+          "Microsoft.Bcl.AsyncInterfaces": "7.0.0",
           "System.ComponentModel.Annotations": "5.0.0",
           "System.Memory": "4.5.5",
           "System.Runtime.CompilerServices.Unsafe": "6.0.0"
@@ -237,29 +237,23 @@
           "buildTransitive/EntityFramework.targets": {}
         }
       },
-      "geometry3Sharp/1.0.324": {
-        "type": "package",
-        "compile": {
-          "lib/net45/geometry3Sharp.dll": {}
-        },
-        "runtime": {
-          "lib/net45/geometry3Sharp.dll": {}
-        }
-      },
-      "Microsoft.Bcl.AsyncInterfaces/6.0.0": {
+      "Microsoft.Bcl.AsyncInterfaces/7.0.0": {
         "type": "package",
         "dependencies": {
           "System.Threading.Tasks.Extensions": "4.5.4"
         },
         "compile": {
-          "lib/net461/Microsoft.Bcl.AsyncInterfaces.dll": {
+          "lib/net462/Microsoft.Bcl.AsyncInterfaces.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/net461/Microsoft.Bcl.AsyncInterfaces.dll": {
+          "lib/net462/Microsoft.Bcl.AsyncInterfaces.dll": {
             "related": ".xml"
           }
+        },
+        "build": {
+          "buildTransitive/net462/_._": {}
         }
       },
       "Microsoft.Xaml.Behaviors.Wpf/1.1.39": {
@@ -632,10 +626,10 @@
           "lib/net47/acdbmgdbrep.dll": {}
         }
       },
-      "CommunityToolkit.Mvvm/8.0.0": {
+      "CommunityToolkit.Mvvm/8.1.0": {
         "type": "package",
         "dependencies": {
-          "Microsoft.Bcl.AsyncInterfaces": "6.0.0",
+          "Microsoft.Bcl.AsyncInterfaces": "7.0.0",
           "System.ComponentModel.Annotations": "5.0.0",
           "System.Memory": "4.5.5",
           "System.Runtime.CompilerServices.Unsafe": "6.0.0"
@@ -693,29 +687,23 @@
           "buildTransitive/EntityFramework.targets": {}
         }
       },
-      "geometry3Sharp/1.0.324": {
-        "type": "package",
-        "compile": {
-          "lib/net45/geometry3Sharp.dll": {}
-        },
-        "runtime": {
-          "lib/net45/geometry3Sharp.dll": {}
-        }
-      },
-      "Microsoft.Bcl.AsyncInterfaces/6.0.0": {
+      "Microsoft.Bcl.AsyncInterfaces/7.0.0": {
         "type": "package",
         "dependencies": {
           "System.Threading.Tasks.Extensions": "4.5.4"
         },
         "compile": {
-          "lib/net461/Microsoft.Bcl.AsyncInterfaces.dll": {
+          "lib/net462/Microsoft.Bcl.AsyncInterfaces.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/net461/Microsoft.Bcl.AsyncInterfaces.dll": {
+          "lib/net462/Microsoft.Bcl.AsyncInterfaces.dll": {
             "related": ".xml"
           }
+        },
+        "build": {
+          "buildTransitive/net462/_._": {}
         }
       },
       "Microsoft.Xaml.Behaviors.Wpf/1.1.39": {
@@ -1088,10 +1076,10 @@
           "lib/net47/acdbmgdbrep.dll": {}
         }
       },
-      "CommunityToolkit.Mvvm/8.0.0": {
+      "CommunityToolkit.Mvvm/8.1.0": {
         "type": "package",
         "dependencies": {
-          "Microsoft.Bcl.AsyncInterfaces": "6.0.0",
+          "Microsoft.Bcl.AsyncInterfaces": "7.0.0",
           "System.ComponentModel.Annotations": "5.0.0",
           "System.Memory": "4.5.5",
           "System.Runtime.CompilerServices.Unsafe": "6.0.0"
@@ -1149,29 +1137,23 @@
           "buildTransitive/EntityFramework.targets": {}
         }
       },
-      "geometry3Sharp/1.0.324": {
-        "type": "package",
-        "compile": {
-          "lib/net45/geometry3Sharp.dll": {}
-        },
-        "runtime": {
-          "lib/net45/geometry3Sharp.dll": {}
-        }
-      },
-      "Microsoft.Bcl.AsyncInterfaces/6.0.0": {
+      "Microsoft.Bcl.AsyncInterfaces/7.0.0": {
         "type": "package",
         "dependencies": {
           "System.Threading.Tasks.Extensions": "4.5.4"
         },
         "compile": {
-          "lib/net461/Microsoft.Bcl.AsyncInterfaces.dll": {
+          "lib/net462/Microsoft.Bcl.AsyncInterfaces.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/net461/Microsoft.Bcl.AsyncInterfaces.dll": {
+          "lib/net462/Microsoft.Bcl.AsyncInterfaces.dll": {
             "related": ".xml"
           }
+        },
+        "build": {
+          "buildTransitive/net462/_._": {}
         }
       },
       "Microsoft.Xaml.Behaviors.Wpf/1.1.39": {
@@ -1544,10 +1526,10 @@
           "lib/net47/acdbmgdbrep.dll": {}
         }
       },
-      "CommunityToolkit.Mvvm/8.0.0": {
+      "CommunityToolkit.Mvvm/8.1.0": {
         "type": "package",
         "dependencies": {
-          "Microsoft.Bcl.AsyncInterfaces": "6.0.0",
+          "Microsoft.Bcl.AsyncInterfaces": "7.0.0",
           "System.ComponentModel.Annotations": "5.0.0",
           "System.Memory": "4.5.5",
           "System.Runtime.CompilerServices.Unsafe": "6.0.0"
@@ -1605,29 +1587,23 @@
           "buildTransitive/EntityFramework.targets": {}
         }
       },
-      "geometry3Sharp/1.0.324": {
-        "type": "package",
-        "compile": {
-          "lib/net45/geometry3Sharp.dll": {}
-        },
-        "runtime": {
-          "lib/net45/geometry3Sharp.dll": {}
-        }
-      },
-      "Microsoft.Bcl.AsyncInterfaces/6.0.0": {
+      "Microsoft.Bcl.AsyncInterfaces/7.0.0": {
         "type": "package",
         "dependencies": {
           "System.Threading.Tasks.Extensions": "4.5.4"
         },
         "compile": {
-          "lib/net461/Microsoft.Bcl.AsyncInterfaces.dll": {
+          "lib/net462/Microsoft.Bcl.AsyncInterfaces.dll": {
             "related": ".xml"
           }
         },
         "runtime": {
-          "lib/net461/Microsoft.Bcl.AsyncInterfaces.dll": {
+          "lib/net462/Microsoft.Bcl.AsyncInterfaces.dll": {
             "related": ".xml"
           }
+        },
+        "build": {
+          "buildTransitive/net462/_._": {}
         }
       },
       "Microsoft.Xaml.Behaviors.Wpf/1.1.39": {
@@ -2051,10 +2027,10 @@
         "tools/install.ps1"
       ]
     },
-    "CommunityToolkit.Mvvm/8.0.0": {
-      "sha512": "Jiu2g5WUdXRwzhJkHB+B4JBKP5A5+fp8xKiW/ZQo5PI+DruI7MbPEcK9K/Aw0YzTiWRuG6CBluzYIWN5Eo7BkQ==",
+    "CommunityToolkit.Mvvm/8.1.0": {
+      "sha512": "xxOt7lu9a5kB5Fs9RfcxzVlKnhuuPe+w7AXHtmCFtS3oldrsUhEMxHfNulluXSscUUoGxZ0jh55Om12ZP6abHA==",
       "type": "package",
-      "path": "communitytoolkit.mvvm/8.0.0",
+      "path": "communitytoolkit.mvvm/8.1.0",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -2062,11 +2038,12 @@
         "License.md",
         "ThirdPartyNotices.txt",
         "analyzers/dotnet/roslyn4.0/cs/CommunityToolkit.Mvvm.SourceGenerators.dll",
+        "analyzers/dotnet/roslyn4.3/cs/CommunityToolkit.Mvvm.SourceGenerators.dll",
         "build/netstandard2.0/CommunityToolkit.Mvvm.targets",
         "build/netstandard2.1/CommunityToolkit.Mvvm.targets",
         "buildTransitive/netstandard2.0/CommunityToolkit.Mvvm.targets",
         "buildTransitive/netstandard2.1/CommunityToolkit.Mvvm.targets",
-        "communitytoolkit.mvvm.8.0.0.nupkg.sha512",
+        "communitytoolkit.mvvm.8.1.0.nupkg.sha512",
         "communitytoolkit.mvvm.nuspec",
         "lib/net6.0/CommunityToolkit.Mvvm.dll",
         "lib/net6.0/CommunityToolkit.Mvvm.pdb",
@@ -2154,36 +2131,25 @@
         "tools/netcoreapp3.0/any/ef6.runtimeconfig.json"
       ]
     },
-    "geometry3Sharp/1.0.324": {
-      "sha512": "vdEC1zaX6lV8LI9BvqizplraEJ6zFE98rMM+hDZqVPXMtwDIIY/RpTQQtxe043E9gsSdx0Xyz1TbSqIYQnBPaw==",
+    "Microsoft.Bcl.AsyncInterfaces/7.0.0": {
+      "sha512": "3aeMZ1N0lJoSyzqiP03hqemtb1BijhsJADdobn/4nsMJ8V1H+CrpuduUe4hlRdx+ikBQju1VGjMD1GJ3Sk05Eg==",
       "type": "package",
-      "path": "geometry3sharp/1.0.324",
-      "files": [
-        ".nupkg.metadata",
-        ".signature.p7s",
-        "geometry3sharp.1.0.324.nupkg.sha512",
-        "geometry3sharp.nuspec",
-        "lib/net45/geometry3Sharp.dll",
-        "lib/netstandard2.0/geometry3Sharp.dll"
-      ]
-    },
-    "Microsoft.Bcl.AsyncInterfaces/6.0.0": {
-      "sha512": "UcSjPsst+DfAdJGVDsu346FX0ci0ah+lw3WRtn18NUwEqRt70HaOQ7lI72vy3+1LxtqI3T5GWwV39rQSrCzAeg==",
-      "type": "package",
-      "path": "microsoft.bcl.asyncinterfaces/6.0.0",
+      "path": "microsoft.bcl.asyncinterfaces/7.0.0",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
         "Icon.png",
         "LICENSE.TXT",
         "THIRD-PARTY-NOTICES.TXT",
-        "lib/net461/Microsoft.Bcl.AsyncInterfaces.dll",
-        "lib/net461/Microsoft.Bcl.AsyncInterfaces.xml",
+        "buildTransitive/net461/Microsoft.Bcl.AsyncInterfaces.targets",
+        "buildTransitive/net462/_._",
+        "lib/net462/Microsoft.Bcl.AsyncInterfaces.dll",
+        "lib/net462/Microsoft.Bcl.AsyncInterfaces.xml",
         "lib/netstandard2.0/Microsoft.Bcl.AsyncInterfaces.dll",
         "lib/netstandard2.0/Microsoft.Bcl.AsyncInterfaces.xml",
         "lib/netstandard2.1/Microsoft.Bcl.AsyncInterfaces.dll",
         "lib/netstandard2.1/Microsoft.Bcl.AsyncInterfaces.xml",
-        "microsoft.bcl.asyncinterfaces.6.0.0.nupkg.sha512",
+        "microsoft.bcl.asyncinterfaces.7.0.0.nupkg.sha512",
         "microsoft.bcl.asyncinterfaces.nuspec",
         "useSharedDesignerContext.txt"
       ]
@@ -2616,12 +2582,11 @@
     ".NETFramework,Version=v4.8": [
       "Accord.MachineLearning >= 3.8.0",
       "AutoCAD.NET >= 24.2.0",
-      "CommunityToolkit.Mvvm >= 8.0.0",
+      "CommunityToolkit.Mvvm >= 8.1.0",
       "Dapper >= 2.0.123",
       "Microsoft.Xaml.Behaviors.Wpf >= 1.1.39",
       "NetTopologySuite >= 2.5.0",
-      "System.Data.SQLite >= 1.0.117",
-      "geometry3Sharp >= 1.0.324"
+      "System.Data.SQLite >= 1.0.117"
     ]
   },
   "packageFolders": {
@@ -2667,7 +2632,7 @@
           },
           "CommunityToolkit.Mvvm": {
             "target": "Package",
-            "version": "[8.0.0, )"
+            "version": "[8.1.0, )"
           },
           "Dapper": {
             "target": "Package",
@@ -2684,10 +2649,6 @@
           "System.Data.SQLite": {
             "target": "Package",
             "version": "[1.0.117, )"
-          },
-          "geometry3Sharp": {
-            "target": "Package",
-            "version": "[1.0.324, )"
           }
         }
       }

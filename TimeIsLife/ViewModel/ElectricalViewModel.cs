@@ -12,6 +12,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using Application = Autodesk.AutoCAD.ApplicationServices.Application;
+using TimeIsLife.View;
 
 namespace TimeIsLife.ViewModel
 {
@@ -32,7 +33,7 @@ namespace TimeIsLife.ViewModel
             LoadYdbFileCommand = new RelayCommand(LoadYdbFile);
             FasCommand = new RelayCommand(Fas);
             ToHydrantAlarmButtonCommand = new RelayCommand(ToHydrantAlarmButton);
-
+            OpenFireAlarmWindowCommand = new RelayCommand(OpenFireAlarmWindow);
 
             //工具
             QuickUcsCommand = new RelayCommand(QuickUcs);
@@ -60,6 +61,7 @@ namespace TimeIsLife.ViewModel
             KongJianLiYongXiShu = 0.5;
             WeiHuXiShu = 0.8;
             IlluminanceCalculateCommand = new RelayCommand(IlluminanceCalculate);
+
         }
 
         private void Initialize()
@@ -193,6 +195,13 @@ namespace TimeIsLife.ViewModel
         void ToHydrantAlarmButton()
         {
             Application.DocumentManager.MdiActiveDocument.SendStringToExecute("FF_ToHydrantAlarmButton\n", true, false, false);
+        }
+
+        public IRelayCommand OpenFireAlarmWindowCommand { get; }
+        void OpenFireAlarmWindow()
+        {
+            FireAlarmWindow fireAlarmWindow = new FireAlarmWindow();
+            fireAlarmWindow.ShowDialog();
         }
         #endregion
 

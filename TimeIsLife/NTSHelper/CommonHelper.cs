@@ -1,14 +1,11 @@
 ﻿using Autodesk.AutoCAD.Geometry;
-
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace TimeIsLife.NTSHelper
 {
-    internal class CommonHelper
+    public class CommonHelper
     {
         /// <summary>
         /// 返回由起点、中点、终点定义的圆弧的凸度

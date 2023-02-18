@@ -204,6 +204,10 @@
                         Command="{Binding ToHydrantAlarmButtonCommand}"
                         Content="消防栓转消防栓报警按钮"
                         Template="{StaticResource ButtonTemplate}" />
+                    <Button
+                        Command="{Binding OpenFireAlarmWindowCommand}"
+                        Content="自动布置感烟、感温探测器"
+                        Template="{StaticResource ButtonTemplate}" />
                 </StackPanel>
             </Expander>
             <Expander Header="工具" Template="{StaticResource ExpanderTemplate}">

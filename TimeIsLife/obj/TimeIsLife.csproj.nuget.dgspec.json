@@ -44,7 +44,7 @@
             },
             "CommunityToolkit.Mvvm": {
               "target": "Package",
-              "version": "[8.0.0, )"
+              "version": "[8.1.0, )"
             },
             "Dapper": {
               "target": "Package",
@@ -61,10 +61,6 @@
             "System.Data.SQLite": {
               "target": "Package",
               "version": "[1.0.117, )"
-            },
-            "geometry3Sharp": {
-              "target": "Package",
-              "version": "[1.0.324, )"
             }
           }
         }

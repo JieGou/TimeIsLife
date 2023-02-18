@@ -98,5 +98,38 @@ namespace TimeIsLife.Helper
             }
             return bo;
         }
+
+        public static string GetXValues(this Polyline polyline)
+        {
+            List<double> xValues = new List<double>();
+            for (int i = 0; i < polyline.NumberOfVertices; i++)
+            {
+
+                xValues.Add(polyline.GetPoint3dAt(i).X);
+            }
+            return string.Join(",", xValues.ToArray());
+        }
+
+        public static string GetYValues(this Polyline polyline)
+        {
+            List<double> xValues = new List<double>();
+            for (int i = 0; i < polyline.NumberOfVertices; i++)
+            {
+
+                xValues.Add(polyline.GetPoint3dAt(i).Y);
+            }
+            return string.Join(",", xValues.ToArray());
+        }
+
+        public static string GetZValues(this Polyline polyline)
+        {
+            List<double> xValues = new List<double>();
+            for (int i = 0; i < polyline.NumberOfVertices; i++)
+            {
+
+                xValues.Add(polyline.GetPoint3dAt(i).Z);
+            }
+            return string.Join(",", xValues.ToArray());
+        }
     }
 }

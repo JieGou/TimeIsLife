@@ -12,10 +12,15 @@ using AcadApp = Autodesk.AutoCAD.ApplicationServices.Application;
 using System;
 using System.Windows;
 using Autodesk.AutoCAD.ApplicationServices;
+using TimeIsLife.CADCommand;
 
 
 // 该行不是必需的，但是可以提高加载性能
 [assembly: ExtensionApplication(typeof(TimeIsLife.MyPlugin))]
+[assembly: CommandClass(typeof(ElectricalCommand))]
+[assembly: CommandClass(typeof(FireAlarmCommnad))]
+[assembly: CommandClass(typeof(LightingCommand))]
+[assembly: CommandClass(typeof(ToolCommand))]
 
 namespace TimeIsLife
 {
@@ -39,7 +44,7 @@ namespace TimeIsLife
             // 在此处初始化您的插件应用程序+
             Autodesk.Windows.ComponentManager.ItemInitialized += ComponentManager_ItemInitialized;
 
-            
+
 
         }
 
