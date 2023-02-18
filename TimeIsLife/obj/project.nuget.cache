@@ -1,7 +1,11 @@
 {
   "version": 2,
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
   "dgSpecHash": "u+zlqBbwTLMNMku1LMbe17iS3uAexLOavOzWFXEna6wmXRCUFGQofoSdSZNf6qSnf8dDALfE+3NCaNUMyXZcBw==",
+=======
+  "dgSpecHash": "vehgZQFlyTKOwY24hu3Ob02KiUSWPCRyibaeXiQ+KfsVvAO6mWczueloiigrTtWV8yiOo5WrPUd3MrpYgnbwug==",
+>>>>>>> Stashed changes
 =======
   "dgSpecHash": "vehgZQFlyTKOwY24hu3Ob02KiUSWPCRyibaeXiQ+KfsVvAO6mWczueloiigrTtWV8yiOo5WrPUd3MrpYgnbwug==",
 >>>>>>> Stashed changes
@@ -16,16 +20,22 @@
     "C:\\Users\\liu18\\.nuget\\packages\\autocad.net.core\\24.2.0\\autocad.net.core.24.2.0.nupkg.sha512",
     "C:\\Users\\liu18\\.nuget\\packages\\autocad.net.model\\24.2.0\\autocad.net.model.24.2.0.nupkg.sha512",
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
     "C:\\Users\\liu18\\.nuget\\packages\\communitytoolkit.mvvm\\8.0.0\\communitytoolkit.mvvm.8.0.0.nupkg.sha512",
     "C:\\Users\\liu18\\.nuget\\packages\\dapper\\2.0.123\\dapper.2.0.123.nupkg.sha512",
     "C:\\Users\\liu18\\.nuget\\packages\\entityframework\\6.4.4\\entityframework.6.4.4.nupkg.sha512",
     "C:\\Users\\liu18\\.nuget\\packages\\geometry3sharp\\1.0.324\\geometry3sharp.1.0.324.nupkg.sha512",
     "C:\\Users\\liu18\\.nuget\\packages\\microsoft.bcl.asyncinterfaces\\6.0.0\\microsoft.bcl.asyncinterfaces.6.0.0.nupkg.sha512",
 =======
+=======
+>>>>>>> Stashed changes
     "C:\\Users\\liu18\\.nuget\\packages\\communitytoolkit.mvvm\\8.1.0\\communitytoolkit.mvvm.8.1.0.nupkg.sha512",
     "C:\\Users\\liu18\\.nuget\\packages\\dapper\\2.0.123\\dapper.2.0.123.nupkg.sha512",
     "C:\\Users\\liu18\\.nuget\\packages\\entityframework\\6.4.4\\entityframework.6.4.4.nupkg.sha512",
     "C:\\Users\\liu18\\.nuget\\packages\\microsoft.bcl.asyncinterfaces\\7.0.0\\microsoft.bcl.asyncinterfaces.7.0.0.nupkg.sha512",
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
     "C:\\Users\\liu18\\.nuget\\packages\\microsoft.xaml.behaviors.wpf\\1.1.39\\microsoft.xaml.behaviors.wpf.1.1.39.nupkg.sha512",
     "C:\\Users\\liu18\\.nuget\\packages\\nettopologysuite\\2.5.0\\nettopologysuite.2.5.0.nupkg.sha512",

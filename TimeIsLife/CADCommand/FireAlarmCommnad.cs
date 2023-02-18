@@ -961,8 +961,6 @@ namespace TimeIsLife.CADCommand
         #region FF_CreateAreaDb
         [CommandMethod("FF_CreateAreaDb")]
         public void FF_CreateAreaDb()
-<<<<<<< Updated upstream
-=======
         {
             Document document = Application.DocumentManager.CurrentDocument;
             Database database = document.Database;
@@ -1131,6 +1129,1170 @@ namespace TimeIsLife.CADCommand
         }
         #endregion
 
+
+        #region FF_ToHydrantAlarmButtonCommand
+        [CommandMethod("FF_ToHydrantAlarmButton")]
+        public void FF_ToHydrantAlarmButton()
+        {
+            // Put your command code here
+            Document document = Application.DocumentManager.CurrentDocument;
+            Database database = document.Database;
+            Editor editor = document.Editor;
+
+            //载入YDB数据库
+            string ydbDB = GetYdbFilePath();
+            if (ydbDB == null) return;
+            string directoryName = Path.GetDirectoryName(ydbDB);
+            editor.WriteMessage("\n文件名：" + ydbDB);
+
+            //载入区域数据库
+            string areaDB = GetAreaFilePath();
+            if (areaDB == null) return;
+            editor.WriteMessage("\n文件名：" + areaDB);
+
+            #region YDB数据查询
+            var ydbConn = new SQLiteConnection($"Data Source={ydbDB}");
+
+            //查询标高
+            string sqlFloor = "SELECT f.ID,f.Name,f.LevelB,f.Height FROM tblFloor AS f WHERE f.Height != 0";
+            var floors = ydbConn.Query<Floor>(sqlFloor);
+
+            //查询梁
+            string sqlBeam = "SELECT b.ID,f.ID,f.LevelB,f.Height,bs.ID,bs.kind,bs.ShapeVal,bs.ShapeVal1,g.ID,j1.ID,j1.X,j1.Y,j2.ID,j2.X,j2.Y " +
+                "FROM tblBeamSeg AS b " +
+                "INNER JOIN tblFloor AS f on f.StdFlrID = b.StdFlrID " +
+                "INNER JOIN tblBeamSect AS bs on bs.ID = b.SectID " +
+                "INNER JOIN tblGrid AS g on g.ID = b.GridId " +
+                "INNER JOIN tblJoint AS j1 on g.Jt1ID = j1.ID " +
+                "INNER JOIN tblJoint AS j2 on g.Jt2ID = j2.ID";
+
+            Func<Beam, Floor, BeamSect, Grid, Joint, Joint, Beam> mappingBeam =
+                (beam, floor, beamSect, grid, j1, j2) =>
+                {
+                    grid.Joint1 = j1;
+                    grid.Joint2 = j2;
+                    beam.Grid = grid;
+                    beam.Floor = floor;
+                    beam.BeamSect = beamSect;
+                    return beam;
+                };
+
+            var beams = ydbConn.Query(sqlBeam, mappingBeam).ToList();
+
+            //查询板
+            string sqlSlab = "SELECT s.ID,s.GridsID,s.VertexX,s.VertexY,s.VertexZ,s.Thickness,f.ID,f.LevelB,f.Height FROM tblSlab  AS s INNER JOIN tblFloor AS f on f.StdFlrID = s.StdFlrID";
+            Func<Slab, Floor, Slab> mappingSlab =
+                (slab, floor) =>
+                {
+                    slab.Floor = floor;
+                    return slab;
+                };
+            var slabs = ydbConn.Query(sqlSlab, mappingSlab);
+
+            //查询墙
+            string sqlWall = "SELECT w.ID,f.ID,f.LevelB,f.Height,ws.ID,ws.kind,ws.B,g.ID,j1.ID,j1.X,j1.Y,j2.ID,j2.X,j2.Y " +
+                "FROM tblWallSeg AS w " +
+                "INNER JOIN tblFloor AS f on f.StdFlrID = w.StdFlrID " +
+                "INNER JOIN tblWallSect AS ws on ws.ID = w.SectID " +
+                "INNER JOIN tblGrid AS g on g.ID = w.GridId " +
+                "INNER JOIN tblJoint AS j1 on g.Jt1ID = j1.ID " +
+                "INNER JOIN tblJoint AS j2 on g.Jt2ID = j2.ID";
+
+            Func<Wall, Floor, WallSect, Grid, Joint, Joint, Wall> mappingWall =
+                (wall, floor, wallSect, grid, j1, j2) =>
+                {
+                    grid.Joint1 = j1;
+                    grid.Joint2 = j2;
+                    wall.Grid = grid;
+                    wall.Floor = floor;
+                    wall.WallSect = wallSect;
+                    return wall;
+                };
+            var walls = ydbConn.Query(sqlWall, mappingWall);
+            //关闭数据库
+            ydbConn.Close();
+
+            #endregion
+
+            #region 区域数据查询
+            var areaConn = new SQLiteConnection($"Data Source={areaDB}");
+            //查询标高
+            string sqlFloorArea = "SELECT a.ID,a.FloorID,a.VertexX,a.VertexY,a.VertexY,a.kind,a.Note,f.ID,f.Name,f.Level,f.X,f.Y,f.Z" +
+                "FROM Area AS a " +
+                "INNER JOIN Floor As f " +
+                "WHERE kind=0";
+            string sqlFireArea = "SELECT a.ID,a.FloorID,a.VertexX,a.VertexY,a.VertexY,a.kind,a.Note,f.ID,f.Name,f.Level,f.X,f.Y,f.Z" +
+                "FROM Area AS a " +
+                "INNER JOIN Floor As f " +
+                "WHERE kind=1";
+            string sqlRoomArea = "SELECT a.ID,a.FloorID,a.VertexX,a.VertexY,a.VertexY,a.kind,a.Note,f.ID,f.Name,f.Level,f.X,f.Y,f.Z" +
+                "FROM Area AS a " +
+                "INNER JOIN Floor As f " +
+                "WHERE kind=2";
+            Func<Model.Area, AreaFloor, Model.Area> mappingArea = (area, areaFloor) =>
+            {
+                area.Floor = areaFloor;
+                return area;
+            };
+            var floorAreas = areaConn.Query<Model.Area>(sqlFloorArea, mappingArea);
+            var fireAreas = areaConn.Query<Model.Area>(sqlFireArea, mappingArea);
+            var roomAreas = areaConn.Query<Model.Area>(sqlRoomArea, mappingArea);
+            areaConn.Close();
+            #endregion
+
+            using (Database tempDb = new Database(false, true))
+            using (Transaction tempTransaction = tempDb.TransactionManager.StartTransaction())
+            {
+                try
+                {
+                    string codeBase = Assembly.GetExecutingAssembly().CodeBase;
+                    UriBuilder uri = new UriBuilder(codeBase);
+                    string path = Uri.UnescapeDataString(uri.Path);
+
+                    //载入感烟探测器块
+                    string smokeDetectorPath = Path.Combine(Path.GetDirectoryName(path), "Block", "FA-08-智能型点型感烟探测器.dwg");
+                    string temperatureDetectorPath = Path.Combine(Path.GetDirectoryName(path), "Block", "FA-09-智能型点型感温探测器.dwg");
+                    string smokeDetector = SymbolUtilityServices.GetSymbolNameFromPathName(smokeDetectorPath, "dwg");
+                    string temperatureDetector = SymbolUtilityServices.GetSymbolNameFromPathName(temperatureDetectorPath, "dwg");
+
+                    tempDb.ReadDwgFile(smokeDetectorPath, FileOpenMode.OpenForReadAndReadShare, allowCPConversion: true, null);
+                    tempDb.ReadDwgFile(temperatureDetectorPath, FileOpenMode.OpenForReadAndReadShare, allowCPConversion: true, null);
+                    tempDb.CloseInput(true);
+
+                    //根据标高生成梁图
+                    foreach (var floor in floors)
+                    {
+                        using (Database newDatabase = new Database())
+                        using (Transaction newTransaction = newDatabase.TransactionManager.StartTransaction())
+                        {
+                            try
+                            {
+                                ObjectId smokeDetectorID = newDatabase.Insert(smokeDetector, tempDb, true);
+                                ObjectId temperatureDetectorID = newDatabase.Insert(temperatureDetector, tempDb, true);
+
+
+                                #region 根据房间边界及板轮廓生成烟感
+                                foreach (var roomArea in roomAreas)
+                                {
+                                    if (roomArea.LevelB != floor.LevelB) continue;
+                                    string areaType =roomArea.Tag;
+                                    if (areaType.IsNullOrWhiteSpace() || areaType.Contains("A1H1") || areaType.Contains("A2H1") || areaType.Contains("A4")) continue;
+                                    if(areaType.Contains("A1H2"))
+                                    {
+                                        DetectorInfo detectorInfo = new DetectorInfo
+                                        {
+                                            Radius = 6700,
+                                            Area1 = 16,
+                                            Area2 = 24,
+                                            Area3 = 32,
+                                            Area4 = 48
+                                        };
+
+                                    Coordinate[] roomCoordinates = GetRoomCoordinates(roomArea);
+                                    Polygon roomPolygon = geometryFactory.CreatePolygon(roomCoordinates);
+                                    //Polyline roomPolyline = new Polyline();
+                                    //roomPolyline.CreatePolyline(roomCoordinates);
+                                    //房间外形轮廓
+                                    //Extents3d roomExtents3d = roomPolyline.GeometricExtents;
+
+                                        //房间范围内的闭合区域
+                                        List<Polyline> polylines = new List<Polyline>();
+                                        //房间范围关联的板
+                                        List<Slab> slabs1 = new List<Slab>();
+
+                                        foreach (var slab in slabs)
+                                        {
+                                            if (slab.Floor.LevelB != floor.LevelB) continue;
+                                            Point2dCollection slabPoint2Ds = GetSlabPoint2Ds(slab);
+                                            Polyline slabPolyline = new Polyline();
+                                            slabPolyline.CreatePolyline(slabPoint2Ds);
+                                            //板外形轮廓
+                                            Extents3d slabExtents3d = slabPolyline.GeometricExtents; 
+                                            //判断多段线的矩形轮廓是否相交，相交继续，不相交跳过
+                                            if (!CheckCross(roomExtents3d,slabExtents3d)) continue;
+                                            //判断房间区域与板是否相交
+                                            Point3dCollection IntersectPoint3DCollection = GetIntersectPoint3d(roomPolyline, slabPolyline);
+                                            if (IntersectPoint3DCollection.Count>0)
+                                            {
+                                                //房间区域与板相交,获取相交区域轮廓线
+                                                //获取房间轮廓在板轮廓内的点
+                                                for (int i = 0; i < roomPolyline.NumberOfVertices; i++)
+                                                {
+                                                    if (i < roomPolyline.NumberOfVertices - 1 && roomPolyline.Closed)
+                                                    {
+                                                        if (roomPolyline.GetPoint2dAt(i).IsInPolygon1(slabPolyline.GetPoint2Ds()))
+                                                        {
+                                                            IntersectPoint3DCollection.Add(roomPolyline.GetPoint3dAt(i));
+                                                        }
+                                                    }
+                                                }
+                                                //获取板轮廓在房间轮廓内的点
+                                                for (int i = 0; i < slabPolyline.NumberOfVertices; i++)
+                                                {
+                                                    if (i < slabPolyline.NumberOfVertices - 1 && slabPolyline.Closed)
+                                                    {
+                                                        if (slabPolyline.GetPoint2dAt(i).IsInPolygon1(roomPolyline.GetPoint2Ds()))
+                                                        {
+                                                            IntersectPoint3DCollection.Add(slabPolyline.GetPoint3dAt(i));
+                                                        }
+                                                    }
+                                                }
+
+                                                SortPolyPoints(IntersectPoint3DCollection);
+                                                Polyline polyline = new Polyline();
+                                                polyline.CreatePolyline(IntersectPoint3DCollection);
+                                                newDatabase.AddToModelSpace(polyline);
+                                                polylines.Add(polyline);
+                                            }
+                                            else
+                                            {
+                                                //获取多段线的重心
+                                                //Point2d roomCenterPoint = getCenterOfGravityPoint(GetRoomPoint2Ds(roomArea));
+                                                //Point2d slabCenterPoint = getCenterOfGravityPoint(GetSlabPoint2Ds(slab));
+
+                                                if (roomPolyline.IsPolylineInPolyline(slabPolyline))
+                                                {
+                                                    //房间区域被板包含,房间内放置一个探测器
+                                                    polylines.Add(roomPolyline);
+                                                }
+                                                else
+                                                {
+                                                    //房间区域包含板
+                                                    polylines.Add(slabPolyline);
+                                                }
+                                            }
+
+                                            //对多段线集合按照面积进行排序
+                                            polylines.OrderByDescending(p => p.Area);
+                                            //根据多段线集合生成探测器
+                                            foreach (var polyline in polylines)
+                                            {
+                                                //多边形内布置一个或多个点位
+                                                if (polyline.Area> detectorInfo.Area4)
+                                                {
+                                                    Point2d centerPoint = getCenterOfGravityPoint(polyline.GetPoint2DCollection());
+                                                    //Circle circle = new Circle(centerPoint.ToPoint3d(), new Vector3d(0, 0, 1), detectorInfo.Radius);
+                                                    bool b = false;
+                                                    for (int i = 0; i < polyline.NumberOfVertices; i++)
+                                                    {
+                                                        if (i < polyline.NumberOfVertices - 1 && polyline.Closed)
+                                                        {
+                                                            double d =centerPoint.GetDistanceTo(polyline.GetPoint2dAt(i));
+                                                            if (d>detectorInfo.Radius)
+                                                            {
+                                                                b = true;
+                                                            }
+                                                        }
+                                                    }
+                                                    //如果为真，超出保护范围，需要切分为n个子区域
+                                                    if (b) 
+                                                    {
+                                                        int n = 2;
+                                                        while (true)
+                                                        {
+                                                            //
+
+
+
+
+
+                                                            n++;
+                                                        }
+                                                    }
+                                                    else
+                                                    {
+                                                        BlockReference blockReference = new BlockReference(centerPoint.ToPoint3d(), smokeDetectorID)
+                                                        {
+                                                            ScaleFactors = new Scale3d(100)
+                                                        };
+                                                        newDatabase.AddToModelSpace(blockReference);
+                                                    }
+
+                                                }
+                                                else if (detectorInfo.Area3 < polyline.Area && polyline.Area <= detectorInfo.Area4)
+                                                {
+
+                                                }
+                                                else if (detectorInfo.Area2 < polyline.Area && polyline.Area <= detectorInfo.Area3)
+                                                {
+
+                                                }
+                                                else if (detectorInfo.Area1 < polyline.Area && polyline.Area <= detectorInfo.Area2)
+                                                {
+
+                                                }
+                                                else if (polyline.Area < detectorInfo.Area1)
+                                                {
+
+                                                }
+                                            }
+
+                                                }
+                                                points.Add(geometry.Key.Centroid);
+
+                                            }
+                                            else
+                                            {
+                                                int n = 2;
+                                                while (true)
+                                                {
+                                                    List<Geometry> splitGeometries = SplitPolygon(geometryFactory, geometry.Key, n, 100);
+                                                    bool b = true;
+                                                    foreach (var item in splitGeometries)
+                                                    {
+                                                        if (!IsProtected(item, detectorInfo.Radius, geometryFactory, beams, floor))
+                                                        {
+                                                            b = false; break;
+                                                        }
+                                                    }
+                                                    if (b)
+                                                    {
+                                                        foreach (var item in splitGeometries)
+                                                        {
+                                                            points.Add(item.Centroid);
+                                                        }
+                                                        break;
+                                                    }
+                                                    else
+                                                    {
+                                                        n++;
+                                                        continue;
+                                                    }
+                                                }
+                                            }
+                                            tempGeometries.Add(geometry.Key);
+                                        }
+                                    }
+                                    //去除距梁边小于500mm的布置点
+                                }
+
+                                //foreach (var slab in slabs)
+                                //{
+                                //    bool bo = true;
+                                //    if (slab.Floor.LevelB != floor.LevelB) continue;
+
+                                //    SetLayer(newDatabase, $"slab-{slab.Thickness.ToString()}mm", 7);
+
+                                //    Polyline polyline = new Polyline();
+                                //    Point2dCollection point2Ds = GetSlabCoordinates(slab);
+                                //    polyline.CreatePolyline(point2Ds);
+                                //    newDatabase.AddToModelSpace(polyline);
+
+                                //    if (slab.Thickness == 0)
+                                //    {
+                                //        if (!ElectricalViewModel.electricalViewModel.IsLayoutAtHole) bo = false;
+                                //    }
+                                //    if (!bo) continue;
+                                //    //在板的重心添加感烟探测器
+                                //    SetLayer(newDatabase, $"E-EQUIP-{slab.Thickness.ToString()}", 4);
+
+                                //    Point2d p = getCenterOfGravityPoint(point2Ds);
+                                //    BlockTable bt = (BlockTable)newTransaction.GetObject(newDatabase.BlockTableId, OpenMode.ForRead);
+                                //    BlockReference blockReference = new BlockReference(p.ToPoint3d(), smokeDetectorID);
+                                //    blockReference.ScaleFactors = new Scale3d(100);
+                                //    newDatabase.AddToModelSpace(blockReference);
+
+                                //    //设置块参照图层错误
+                                //    //blockReference.Layer = layerName;
+                                //}
+
+
+                                #endregion
+
+                                #region 生成梁
+                                foreach (var beam in beams)
+                                {
+                                    if (beam.Floor.LevelB != floor.LevelB) continue;
+
+                                    Point2d p1 = new Point2d(beam.Grid.Joint1.X, beam.Grid.Joint1.Y);
+                                    Point2d p2 = new Point2d(beam.Grid.Joint2.X, beam.Grid.Joint2.Y);
+                                    double startWidth = 0;
+                                    double endWidth = 0;
+                                    double height = 0;
+
+                                    Polyline polyline = new Polyline();
+
+                                    switch (beam.BeamSect.Kind)
+                                    {
+                                        case 1:
+                                            startWidth = endWidth = double.Parse(beam.BeamSect.ShapeVal.Split(',')[1]);
+                                            height = double.Parse(beam.BeamSect.ShapeVal.Split(',')[2]);
+
+                                            polyline.AddVertexAt(0, p1, 0, startWidth, endWidth);
+                                            polyline.AddVertexAt(1, p2, 0, startWidth, endWidth);
+                                            SetLayer(newDatabase, $"beam-concrete-{height.ToString()}mm", 7);
+                                            break;
+                                        case 2:
+                                            startWidth = endWidth = double.Parse(beam.BeamSect.ShapeVal.Split(',')[3]);
+                                            height = double.Parse(beam.BeamSect.ShapeVal.Split(',')[2]);
+
+                                            polyline.AddVertexAt(0, p1, 0, startWidth, endWidth);
+                                            polyline.AddVertexAt(1, p2, 0, startWidth, endWidth);
+                                            SetLayer(newDatabase, $"beam-steel-{beam.BeamSect.Kind.ToString()}-{height.ToString()}mm", 7);
+                                            break;
+                                        case 7:
+                                            startWidth = endWidth = double.Parse(beam.BeamSect.ShapeVal.Split(',')[1]);
+                                            height = double.Parse(beam.BeamSect.ShapeVal.Split(',')[2]);
+
+                                            polyline.AddVertexAt(0, p1, 0, startWidth, endWidth);
+                                            polyline.AddVertexAt(1, p2, 0, startWidth, endWidth);
+                                            SetLayer(newDatabase, $"beam-steel-{beam.BeamSect.Kind.ToString()}-{height.ToString()}mm", 7);
+                                            break;
+                                        case 13:
+                                            startWidth = endWidth = double.Parse(beam.BeamSect.ShapeVal.Split(',')[1]);
+                                            height = double.Parse(beam.BeamSect.ShapeVal.Split(',')[2]);
+
+                                            polyline.AddVertexAt(0, p1, 0, startWidth, endWidth);
+                                            polyline.AddVertexAt(1, p2, 0, startWidth, endWidth);
+                                            SetLayer(newDatabase, $"beam-steel-{beam.BeamSect.Kind.ToString()}-{height.ToString()}mm", 7);
+                                            break;
+                                        case 22:
+                                            startWidth = endWidth = double.Parse(beam.BeamSect.ShapeVal.Split(',')[1]);
+                                            height = Math.Min(double.Parse(beam.BeamSect.ShapeVal.Split(',')[3]), double.Parse(beam.BeamSect.ShapeVal.Split(',')[4]));
+
+                                            polyline.AddVertexAt(0, p1, 0, startWidth, endWidth);
+                                            polyline.AddVertexAt(1, p2, 0, startWidth, endWidth);
+                                            SetLayer(newDatabase, $"beam-steel-{beam.BeamSect.Kind.ToString()}-{height.ToString()}mm", 7);
+                                            break;
+                                        case 26:
+                                            startWidth = endWidth = double.Parse(beam.BeamSect.ShapeVal.Split(',')[5]);
+                                            height = double.Parse(beam.BeamSect.ShapeVal.Split(',')[3]);
+
+                                            polyline.AddVertexAt(0, p1, 0, startWidth, endWidth);
+                                            polyline.AddVertexAt(1, p2, 0, startWidth, endWidth);
+                                            SetLayer(newDatabase, $"beam-steel-{beam.BeamSect.Kind.ToString()}-{height.ToString()}mm", 7);
+                                            break;
+
+                                        default:
+                                            startWidth = endWidth = double.Parse(beam.BeamSect.ShapeVal.Split(',')[1]);
+                                            height = double.Parse(beam.BeamSect.ShapeVal.Split(',')[2]);
+
+                                            polyline.AddVertexAt(0, p1, 0, startWidth, endWidth);
+                                            polyline.AddVertexAt(1, p2, 0, startWidth, endWidth);
+                                            SetLayer(newDatabase, $"beam-steel-{beam.BeamSect.Kind.ToString()}-{height.ToString()}mm", 7);
+                                            break;
+                                    }
+
+                                    newDatabase.AddToModelSpace(polyline);
+                                }
+                                #endregion
+
+                                #region 生成墙
+                                foreach (var wall in walls)
+                                {
+                                    if (wall.Floor.LevelB != floor.LevelB) continue;
+
+                                    SetLayer(newDatabase, "wall", 53);
+
+                                    Point2d p1 = new Point2d(wall.Grid.Joint1.X, wall.Grid.Joint1.Y);
+                                    Point2d p2 = new Point2d(wall.Grid.Joint2.X, wall.Grid.Joint2.Y);
+                                    int startWidth = wall.WallSect.B;
+                                    int endWidth = wall.WallSect.B;
+
+                                    Polyline polyline = new Polyline();
+                                    polyline.AddVertexAt(0, p1, 0, startWidth, endWidth);
+                                    polyline.AddVertexAt(1, p2, 0, startWidth, endWidth);
+                                    newDatabase.AddToModelSpace(polyline);
+                                }
+                                #endregion
+
+
+                                string dwgName = Path.Combine(directoryName, floor.LevelB.ToString() + ".dwg");
+                                newDatabase.SaveAs(dwgName, DwgVersion.Current);
+                                newTransaction.Commit();
+                                editor.WriteMessage($"\n{dwgName}");
+                            }
+                            catch
+                            {
+                                newTransaction.Abort();
+                                editor.WriteMessage("\n发生错误1");
+                            }
+                        }
+                    }
+                    tempTransaction.Commit();
+                }
+                catch
+                {
+                    tempTransaction.Abort();
+                    editor.WriteMessage("\n发生错误2");
+                }
+            }
+            editor.WriteMessage("\n结束");
+        }
+
+        private string GetAreaFilePath()
+        {
+            OpenFileDialog openFileDialog = new OpenFileDialog
+            {
+                Filter = "区域数据库(*.area)|*.area|所有文件|*.*",
+                Title = "选择区域数据库文件",
+                ValidateNames = true,
+                CheckFileExists = true,
+                CheckPathExists = true,
+                Multiselect = false
+            };
+
+            string name;
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                name = openFileDialog.FileName;
+            }
+            else
+            {
+                return null;
+            }
+            return name;
+        }
+
+
+        /// <summary>
+        /// 判断几何是否在指定半径及以几何质心为圆心的圆的保护范围内
+        /// </summary>
+        /// <param name="geometry">几何</param>
+        /// <param name="radius">半径</param>
+        /// <returns>true：在保护范围内；false:不在保护范围内</returns>
+        private bool IsProtected(Geometry geometry, double radius, GeometryFactory geometryFactory, List<Beam> beams, Floor floor)
+        {
+            Point centerPoint = geometry.Centroid;
+            bool b = true;
+            if (geometry is Polygon polygon)
+            {
+                //缓冲区参数
+
+                var bufferParam = new BufferParameters
+                {
+                    IsSingleSided = true,
+                    JoinStyle = NetTopologySuite.Operation.Buffer.JoinStyle.Mitre,
+                };
+
+                int n = polygon.NumPoints;
+                LineString[] list = new LineString[n];
+                for (int i = 0; i < n; i++)
+                {
+
+                    double d = centerPoint.Coordinate.Distance(polygon.Coordinates[i]);
+                    if (d > radius)
+                    {
+                        b = false;
+                        break;
+                    }
+                    LineString lineString = (LineString)geometryFactory.CreateLineString
+                        (new[] { polygon.Coordinates[i % n], polygon.Coordinates[(i + 1) % n] });
+                    foreach (var beam in beams)
+                    {
+                        if (beam.Floor.LevelB != floor.LevelB) continue;
+                        if (beam.ToLineString().Contains(lineString) || beam.ToLineString().Equals(lineString))
+                        {
+                            list[i] = (LineString)lineString.Buffer(-beam.Width / 2, bufferParam);
+                            break;
+                        }
+                    }
+                }
+
+                double distance = -500;
+                GeometryCollection geometryCollection = new GeometryCollection(list, geometryFactory);
+                geometryCollection.Union();
+                Polygonizer polygonizer = new Polygonizer();
+                foreach (var item in geometryCollection)
+                {
+                    polygonizer.Add(item);
+                }
+                var polygons = polygonizer.GetPolygons();
+                switch (polygons.Count)
+                {
+                    case 0:
+                        b = false;
+                        break;
+                    case 1:
+                        break;
+                    default:
+                        Geometry g = polygons.OrderByDescending(p => p.Area).FirstOrDefault().Buffer(distance, bufferParam);
+                        if (g.IsValid)
+                        {
+                            break;
+                        }
+                        else
+                        {
+                            b = false;
+                            break;
+                        }
+                }
+            }
+            return b;
+        }
+
+        public Geometry Validate(Geometry geom)
+        {
+            if (geom.OgcGeometryType == OgcGeometryType.Polygon)
+            {
+                if (geom.IsValid)
+                {
+                    geom.Normalize();
+                    return geom;
+                }
+                Polygonizer polygonizer = new Polygonizer();
+                AddPolygon((Polygon)geom, polygonizer);
+                return ToPolygonGeometry(polygonizer.GetPolygons(), geom.Factory);
+            }
+            else if (geom.OgcGeometryType == OgcGeometryType.MultiPolygon)
+            {
+                if (geom.IsValid)
+                {
+                    geom.Normalize(); // validate does not pick up rings in the wrong order - this will fix that
+                    return geom; // If the multipolygon is valid just return it
+                }
+                Polygonizer polygonizer = new Polygonizer();
+                for (int i = 0; i < geom.NumGeometries; i++)
+                {
+                    AddPolygon((Polygon)geom.GetGeometryN(i), polygonizer);
+                }
+
+                return ToPolygonGeometry(polygonizer.GetPolygons(), geom.Factory);
+            }
+            else
+            {
+                return geom; // In my case, I only care about polygon / multipolygon geometries
+            }
+        }
+
+        /**
+          * Add all line strings from the polygon given to the polygonizer given
+          * @param polygon polygon from which to extract line strings
+          * @param polygonizer polygonizer
+          */
+        private void AddPolygon(Polygon polygon, Polygonizer polygonizer)
+        {
+            //添加外边界线
+            AddLineString(polygon.ExteriorRing, polygonizer);
+            //添加内边界线
+            foreach (var line in polygon.InteriorRings)
+            {
+                AddLineString(line, polygonizer);
+            }
+        }
+
+        /**
+         * Add the linestring given to the polygonizer
+         * @param linestring line string
+         * @param polygonizer polygonizer
+         */
+        private void AddLineString(LineString lineString, Polygonizer polygonizer)
+        {
+            // LinearRings are treated differently to line strings : we need a LineString NOT a LinearRing
+            lineString = lineString.Factory.CreateLineString(lineString.CoordinateSequence);
+            // unioning the linestring with the point makes any self intersections explicit.
+
+            Geometry toAdd = null;
+            Point point = lineString.Factory.CreatePoint(lineString.GetCoordinateN(0));
+            toAdd = lineString.Union(point);
+            //for (int i = 0; i < lineString.NumPoints; i++)
+            //{
+            //    IPoint point = lineString.Factory.CreatePoint(lineString.GetCoordinateN(i));
+            //    toAdd = lineString.Union(point);
+            //}
+
+            //Add result to polygonizer
+            polygonizer.Add(toAdd);
+
+            return;
+
+        }
+
+        /**
+         * Get a geometry from a collection of polygons.
+         * 
+         * @param polygons collection
+         * @param factory factory to generate MultiPolygon if required
+         * @return null if there were no polygons, the polygon if there was only one, or a MultiPolygon containing all polygons otherwise
+         */
+        private Geometry ToPolygonGeometry(ICollection<Geometry> polygons, GeometryFactory factory)
+        {
+            switch (polygons.Count)
+            {
+                case 0:
+                    return null; // No valid polygons!
+                case 1:
+                    return polygons.ElementAt(0); // single polygon - no need to wrap
+                default:
+                    return factory.CreateMultiPolygon(polygons.Select(p => p as Polygon).ToArray()); // multiple polygons - wrap them
+            }
+        }
+
+
+        /// <summary>
+        /// 判断区域是否在相邻区域探测器的保护范围内
+        /// </summary>
+        /// <param name="geometry">相邻的区域</param>
+        /// <param name="radius">保护半径</param>
+        /// <param name="touchGeometry">被判断的区域</param>
+        /// <returns>true：在保护范围内；false:不在保护范围内</returns>
+        private bool IsProtected(Geometry geometry, double radius, Geometry touchGeometry)
+        {
+            Point centerPoint = geometry.Centroid;
+            bool b = true;
+            for (int i = 0; i < touchGeometry.NumPoints; i++)
+            {
+
+        private void SetLayer(Database db, string layerName, int colorIndex)
+        {
+            db.AddLayer(layerName);
+            db.SetLayerColor(layerName, (short)colorIndex);
+            db.SetCurrentLayer(layerName);
+        }
+
+
+        /// <summary>
+        /// 根据已知点集合求重心
+        /// </summary>
+        /// <param name="mPoints">点集合</param>
+        /// <returns>重心</returns>
+        public Point2d getCenterOfGravityPoint(Point2dCollection mPoints)
+        {
+            double area = 0;//多边形面积  
+            double Gx = 0, Gy = 0;// 重心的x、y  
+            for (int i = 1; i <= mPoints.Count; i++)
+            {
+                double iLat = mPoints[i % mPoints.Count].X;
+                double iLng = mPoints[i % mPoints.Count].Y;
+                double nextLat = mPoints[(i - 1)].X;
+                double nextLng = mPoints[(i - 1)].Y;
+                double temp = (iLat * nextLng - iLng * nextLat) / 2;
+                area += temp;
+                Gx += temp * (iLat + nextLat) / 3;
+                Gy += temp * (iLng + nextLng) / 3;
+            }
+            Gx = Gx / area;
+            Gy = Gy / area;
+            return new Point2d(Gx, Gy);
+        }
+
+        /// <summary>
+        /// 获取板轮廓线点的集合
+        /// </summary>
+        /// <param name="slab">板</param>
+        /// <returns>点集合</returns>
+        private Coordinate[] GetSlabCoordinates(Slab slab)
+        {
+            int n = slab.VertexX.Split(',').Length;
+            Coordinate[] coordinates = new Coordinate[n];
+            for (int i = 0; i < n; i++)
+            {
+                coordinates[i] = new Coordinate(double.Parse(slab.VertexX.Split(',')[i % (n - 1)]), double.Parse(slab.VertexY.Split(',')[i % (n - 1)]));
+            }
+
+            return coordinates;
+        }
+
+        /// <summary>
+        /// 获取YDB文件
+        /// </summary>
+        /// <returns>返回文件路径</returns>
+        private string GetYdbFilePath()
+        {
+            //List<string> list = new List<string>();
+            string name = null;
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            openFileDialog.Filter = "盈建科数据库(*.ydb)|*.ydb|所有文件|*.*";
+            openFileDialog.Title = "选择结构模型数据库文件";
+            openFileDialog.ValidateNames = true;
+            openFileDialog.CheckFileExists = true;
+            openFileDialog.CheckPathExists = true;
+            openFileDialog.Multiselect = false;
+            if (openFileDialog.ShowDialog() == DialogResult.OK)
+            {
+                name = openFileDialog.FileName;
+                //list.AddRange(dbPaths);
+            }
+            else
+            {
+                return null;
+            }
+            return name;
+        }
+
+
+        /// <summary>
+        /// 获取房间轮廓线点的集合
+        /// </summary>
+        /// <param name="slab">板</param>
+        /// <returns>点集合</returns>
+        private Coordinate[] GetRoomCoordinates(Model.Area roomAear)
+        {
+            int n = roomAear.X.Split(',').Length;
+            Coordinate[] coordinates = new Coordinate[n];
+            for (int i = 0; i < n; i++)
+            {
+                coordinates[i] = new Coordinate(double.Parse(roomAear.X.Split(',')[i % (n - 1)]), double.Parse(roomAear.Y.Split(',')[i % (n - 1)]));
+            }
+            return coordinates;
+        }
+
+        /// <summary>
+        /// 判断两个矩形是否相交和包含
+        /// </summary>
+        /// <param name="roomExtents3d">房间外轮廓</param>
+        /// <param name="slabExtents3d">板外轮廓</param>
+        /// <returns></returns>
+        private bool CheckCross(Extents3d roomExtents3d, Extents3d slabExtents3d)
+        {
+            Point2d roomMaxPoint = roomExtents3d.MaxPoint.ToPoint2d();
+            Point2d roomMinPoint = roomExtents3d.MinPoint.ToPoint2d();
+
+            Point2d slabMaxPoint = slabExtents3d.MaxPoint.ToPoint2d();
+            Point2d slabMinPoint = slabExtents3d.MinPoint.ToPoint2d();
+
+            return ((Math.Abs(roomMaxPoint.X + roomMinPoint.X - slabMaxPoint.X - slabMinPoint.X) < roomMaxPoint.X - roomMinPoint.X + slabMaxPoint.X - slabMinPoint.X)
+                && Math.Abs(roomMaxPoint.Y + roomMinPoint.Y - slabMaxPoint.Y - slabMinPoint.Y) < roomMaxPoint.Y - roomMinPoint.Y + slabMaxPoint.Y - slabMinPoint.Y);
+        }
+
+        /// <summary>
+        /// 判断两个多边形是否有交点
+        /// </summary>
+        /// <param name="roomPolyline"></param>
+        /// <param name="slabPolyline"></param>
+        /// <returns></returns>
+        private Point3dCollection GetIntersectPoint3d(Polyline roomPolyline, Polyline slabPolyline)
+        {
+            Point3dCollection intPoints3d = new Point3dCollection();
+            for (int i = 0; i < slabPolyline.NumberOfVertices; i++)
+            {
+                if (i < slabPolyline.NumberOfVertices - 1 || slabPolyline.Closed)
+                {
+                    SegmentType slabSegmentType = slabPolyline.GetSegmentType(i);
+                    if (slabSegmentType == SegmentType.Line)
+                    {
+                        LineSegment2d slabLine = slabPolyline.GetLineSegment2dAt(i);
+                        PolyIntersectWithLine(roomPolyline, slabLine, 0.0001, ref intPoints3d);
+                    }
+                    else if (slabSegmentType == SegmentType.Arc)
+                    {
+
+                    }
+                }
+            }
+            return intPoints3d;
+        }
+
+
+        /// <summary>
+        /// 多段线和直线求交点
+        /// </summary>
+        /// <param name="poly"></param>
+        /// <param name="geLine"></param>
+        /// <param name="tol"></param>
+        /// <param name="points"></param>
+        private void PolyIntersectWithLine(Polyline poly, LineSegment2d geLine, double tol, ref Point3dCollection points)
+        {
+            Point2dCollection intPoints2d = new Point2dCollection();
+
+            // 获得直线对应的几何类
+            //LineSegment2d geLine = new LineSegment2d(ToPoint2d(line.StartPoint), ToPoint2d(line.EndPoint));
+
+            // 每一段分别计算交点
+            Tolerance tolerance = new Tolerance(tol, tol);
+            for (int i = 0; i < poly.NumberOfVertices; i++)
+            {
+                if (i < poly.NumberOfVertices - 1 && poly.Closed)
+                {
+                    SegmentType st = poly.GetSegmentType(i);
+                    if (st == SegmentType.Line)
+                    {
+                        LineSegment2d geLineSeg = poly.GetLineSegment2dAt(i);
+                        Point2d[] pts = geLineSeg.IntersectWith(geLine, tolerance);
+                        if (pts != null)
+                        {
+                            for (int j = 0; j < pts.Length; j++)
+                            {
+                                if (FindPointIn(intPoints2d, pts[j], tol) < 0)
+                                {
+                                    intPoints2d.Add(pts[j]);
+                                }
+                            }
+                        }
+                    }
+                    else if (st == SegmentType.Arc)
+                    {
+                        CircularArc2d geArcSeg = poly.GetArcSegment2dAt(i);
+                        Point2d[] pts = geArcSeg.IntersectWith(geLine, tolerance);
+                        if (pts != null)
+                        {
+                            for (int j = 0; j < pts.Length; j++)
+                            {
+                                if (FindPointIn(intPoints2d, pts[j], tol) < 0)
+                                {
+                                    intPoints2d.Add(pts[j]);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            for (int i = 0; i < intPoints2d.Count; i++)
+            {
+                points.Add(ToPoint3d(intPoints2d[i]));
+            }
+        }
+
+
+        // 点是否在集合中
+        private int FindPointIn(Point2dCollection points, Point2d pt, double tol)
+        {
+            for (int i = 0; i < points.Count; i++)
+            {
+                if (Math.Abs(points[i].X - pt.X) < tol && Math.Abs(points[i].Y - pt.Y) < tol)
+                {
+                    return i;
+                }
+            }
+
+            return -1;
+        }
+
+        // 三维点转二维点
+        private static Point2d ToPoint2d(Point3d point3d)
+        {
+            return new Point2d(point3d.X, point3d.Y);
+        }
+
+        // 二维点转三维点
+        private static Point3d ToPoint3d(Point2d point2d)
+        {
+            return new Point3d(point2d.X, point2d.Y, 0);
+        }
+
+        private static Point3d ToPoint3d(Point2d point2d, double elevation)
+        {
+            return new Point3d(point2d.X, point2d.Y, elevation);
+        }
+
+
+        /// <summary>
+        /// 多边形点集排序
+        /// </summary>
+        /// <param name="points"></param>
+        /// <returns></returns>
+        public Point3dCollection SortPolyPoints(Point3dCollection points)
+        {
+
+            if (points == null || points.Count == 0) return null;
+            //计算重心
+            Point3d center = new Point3d();
+            double X = 0, Y = 0;
+            for (int i = 0; i < points.Count; i++)
+            {
+                X += points[i].X;
+                Y += points[i].Y;
+            }
+            center = new Point3d((int)X / points.Count, (int)Y / points.Count, points[0].Z);
+            //冒泡排序
+            for (int i = 0; i < points.Count - 1; i++)
+            {
+                for (int j = 0; j < points.Count - i - 1; j++)
+                {
+                    if (PointCmp(points[j], points[j + 1], center))
+                    {
+                        Point3d tmp = points[j];
+                        points[j] = points[j + 1];
+                        points[j + 1] = tmp;
+                    }
+                }
+            }
+            return points;
+        }
+
+        /// <summary>
+        /// 若点a大于点b,即点a在点b顺时针方向,返回true,否则返回false
+        /// </summary>
+        /// <param name="a"></param>
+        /// <param name="b"></param>
+        /// <param name="center"></param>
+        /// <returns></returns>
+        private bool PointCmp(Point3d a, Point3d b, Point3d center)
+        {
+            if (a.X >= 0 && b.X < 0)
+                return true;
+            else if (a.X == 0 && b.X == 0)
+                return a.Y > b.Y;
+            //向量OA和向量OB的叉积
+            double det = (a.X - center.X) * (b.Y - center.Y) - (b.X - center.X) * (a.Y - center.Y);
+            if (det < 0)
+                return true;
+            if (det > 0)
+                return false;
+            //向量OA和向量OB共线，以距离判断大小
+            double d1 = (a.X - center.X) * (a.X - center.X) + (a.Y - center.Y) * (a.Y - center.Y);
+            double d2 = (b.X - center.X) * (b.X - center.X) + (b.Y - center.Y) * (b.Y - center.Y);
+            return d1 > d2;
+        }
+
+        /// <summary>
+        /// 按照指定数量切分多边形
+        /// </summary>
+        /// <param name="geometry">多边形</param>
+        /// <param name="count">平分份数</param>
+        /// <param name="n">点集数量（kmeans算法用，越多越精确但速度越慢）</param>
+        /// <param name="detectorInfo">探测器</param>
+        /// <returns>符合条件的平分多边形的质心点集</returns>
+        List<Geometry> SplitPolygon(GeometryFactory geometryFactory, Geometry geometry, int count, int n)
+        {
+            Random random = new Random();
+            //质心点集
+            //List<Point2d> Points = new List<Point2d>();
+
+            Extents3d Extents3d = polyline.GeometricExtents;
+            Point2d maxPoint = Extents3d.MaxPoint.ToPoint2d();
+            Point2d minPoint = Extents3d.MinPoint.ToPoint2d();
+
+            //构建随机点并判断点是否在多边形内部
+            double[][] randomPoints = new double[n][];
+            for (int i = 0; i < n; i++)
+            {
+                while (true)
+                {
+                    double x = minPoint.X + random.NextDouble() * (maxPoint.X - minPoint.X);
+                    double y = minPoint.Y + random.NextDouble() * (maxPoint.Y - minPoint.Y);
+                    Point point2D = new Point(x, y);
+
+                    if (point2D.Within(geometry))
+                    {
+                        randomPoints[i] = new double[2] { x, y };
+                        break;
+                    }
+                    else
+                    {
+                        continue;
+                    }
+                }
+            }
+
+            //利用EKmeans 获取分组和簇的质心
+            Accord.Math.Random.Generator.Seed = 0;
+            KMeans kMeans = new KMeans(count);
+            KMeansClusterCollection clusters = kMeans.Learn(randomPoints);
+            double[][] centerPoints = clusters.Centroids;
+            List<Coordinate> coords = new List<Coordinate>();
+            foreach (var c in centerPoints)
+            {
+                coords.Add(new Coordinate(c[0], c[1]));
+            }
+            //构建泰森多边形
+            VoronoiDiagramBuilder voronoiDiagramBuilder = new VoronoiDiagramBuilder();
+            Envelope clipEnvelpoe = new Envelope(minPoint, maxPoint);
+            voronoiDiagramBuilder.ClipEnvelope = clipEnvelpoe;
+            voronoiDiagramBuilder.SetSites(coords);
+            GeometryCollection geometryCollection = voronoiDiagramBuilder.GetDiagram(geometryFactory);
+
+            // 4. 利用封闭面切割泰森多边形
+            List<Geometry> geometries = new List<Geometry>();
+            for (int i = 0; i < geometryCollection.NumGeometries; i++)
+            {
+                Geometry vorGeometry = geometryCollection.GetGeometryN(i);
+                geometries.Add(vorGeometry.Intersection(geometry));
+            }
+            return geometries;
+        }
+
+
+        #region 结构类
+        public class Floor
+        {
+            public int ID { get; set; }
+            public string Name { get; set; }
+            public double LevelB { get; set; }
+            public double Height { get; set; }
+        }
+
+        public class Grid
+        {
+            public int ID { get; set; }
+            public Joint Joint1 { get; set; }
+            public Joint Joint2 { get; set; }
+        }
+
+        public class Joint
+        {
+            public int ID { get; set; }
+            public double X { get; set; }
+            public double Y { get; set; }
+        }
+
+        public class Beam
+        {
+            public int ID { get; set; }
+            public Floor Floor { get; set; }
+            public BeamSect BeamSect { get; set; }
+            public Grid Grid { get; set; }
+
+        }
+
+            public double Width
+            {
+                get
+                {
+                    var width = BeamSect.Kind switch
+                    {
+                        1 => double.Parse(this.BeamSect.ShapeVal.Split(',')[1]),
+                        _ => 0.0,
+                    };
+                    return width;
+                }
+            }
+        }
+        public class BeamSect
+        {
+            public int ID { get; set; }
+            public int Kind { get; set; }
+            public string ShapeVal { get; set; }
+            public string ShapeVal1 { get; set; }
+
+        }
+
+        public class Slab
+        {
+            public int ID { get; set; }
+            public string GridsID { get; set; }
+            public string VertexX { get; set; }
+            public string VertexY { get; set; }
+            public string VertexZ { get; set; }
+            public int Thickness { get; set; }
+            public Floor Floor { get; set; }
+        }
+
+        public class WallSect
+        {
+            public int ID { get; set; }
+            public int Kind { get; set; }
+            public int B { get; set; }
+        }
+
+        public class Wall
+        {
+            public int ID { get; set; }
+            public Floor Floor { get; set; }
+            public WallSect WallSect { get; set; }
+            public Grid Grid { get; set; }
+
+            public LineString ToLineString()
+            {
+                Coordinate[] coordinates = new Coordinate[] { new Coordinate(this.Grid.Joint1.X, this.Grid.Joint1.Y), new Coordinate(this.Grid.Joint2.X, this.Grid.Joint2.Y) };
+                return new LineString(coordinates);
+            }
+        }
+
+        public class DetectorInfo
+        {
+            public int Radius { get; set; }
+            public double Area1 { get; set; }
+            public double Area2 { get; set; }
+            public double Area3 { get; set; }
+            public double Area4 { get; set; }
+        }
+        #endregion
+
+        #endregion
+<<<<<<< Updated upstream
+=======
 
         #region FF_ToHydrantAlarmButtonCommand
         [CommandMethod("FF_ToHydrantAlarmButton")]
@@ -2078,6 +3240,7 @@ namespace TimeIsLife.CADCommand
         }
         #endregion
 
+
         #region _FF_SaveAreaFile
         [CommandMethod("_FF_SaveAreaFile")]
         public void _FF_SaveAreaFile()
@@ -2142,8 +3305,6 @@ namespace TimeIsLife.CADCommand
                     helper.Insert<int>("INSERT INTO BasePoint (Name,Level,X, Y, Z) VALUES ( @name,@level,@x, @y, @z)",
                         new
                         {
-                            FireAlarmWindowViewModel.instance.SelectedAreaFloor.Name,
-                            FireAlarmWindowViewModel.instance.SelectedAreaFloor.Level,
                             FireAlarmWindowViewModel.instance.ReferenceBasePoint.X,
                             FireAlarmWindowViewModel.instance.ReferenceBasePoint.Y,
                             FireAlarmWindowViewModel.instance.ReferenceBasePoint.Z
@@ -2259,1428 +3420,6 @@ namespace TimeIsLife.CADCommand
                 }
             }
         }
-        #endregion
-
-        #region _FF_GeneratingEquipment
-
-        [CommandMethod("_FF_GeneratingEquipment")]
-        public void _FF_GeneratingEquipment()
-        {
-            Document document = Application.DocumentManager.CurrentDocument;
-            Database database = document.Database;
-            Editor editor = document.Editor;
-
-=======
->>>>>>> Stashed changes
-            //NTS
-            NetTopologySuite.NtsGeometryServices.Instance = new NetTopologySuite.NtsGeometryServices
-                (
-                NetTopologySuite.Geometries.Implementation.CoordinateArraySequenceFactory.Instance,
-                new PrecisionModel(0.001d),
-                4326
-                );
-            GeometryFactory geometryFactory = NtsGeometryServices.Instance.CreateGeometryFactory();
-
-            //载入YDB数据库
-            string ydbDB = GetYdbFilePath();
-            if (ydbDB == null) return;
-            string directoryName = Path.GetDirectoryName(ydbDB);
-            editor.WriteMessage("\n文件名：" + ydbDB);
-
-            //载入区域数据库
-            string areaDB = GetAreaFilePath();
-            if (areaDB == null) return;
-            editor.WriteMessage("\n文件名：" + areaDB);
-
-            #region YDB数据查询
-            var ydbConn = new SQLiteConnection($"Data Source={ydbDB}");
-
-            //查询标高
-            string sqlFloor = "SELECT f.ID,f.Name,f.LevelB,f.Height FROM tblFloor AS f WHERE f.Height != 0";
-            var floors = ydbConn.Query<Floor>(sqlFloor);
-
-            //查询梁
-            string sqlBeam = "SELECT b.ID,f.ID,f.LevelB,f.Height,bs.ID,bs.kind,bs.ShapeVal,bs.ShapeVal1,g.ID,j1.ID,j1.X,j1.Y,j2.ID,j2.X,j2.Y " +
-                "FROM tblBeamSeg AS b " +
-                "INNER JOIN tblFloor AS f on f.StdFlrID = b.StdFlrID " +
-                "INNER JOIN tblBeamSect AS bs on bs.ID = b.SectID " +
-                "INNER JOIN tblGrid AS g on g.ID = b.GridId " +
-                "INNER JOIN tblJoint AS j1 on g.Jt1ID = j1.ID " +
-                "INNER JOIN tblJoint AS j2 on g.Jt2ID = j2.ID";
-
-            Func<Beam, Floor, BeamSect, Grid, Joint, Joint, Beam> mappingBeam =
-                (beam, floor, beamSect, grid, j1, j2) =>
-                {
-                    grid.Joint1 = j1;
-                    grid.Joint2 = j2;
-                    beam.Grid = grid;
-                    beam.Floor = floor;
-                    beam.BeamSect = beamSect;
-                    return beam;
-                };
-
-            var beams = ydbConn.Query(sqlBeam, mappingBeam).ToList();
-
-            //查询板
-            string sqlSlab = "SELECT s.ID,s.GridsID,s.VertexX,s.VertexY,s.VertexZ,s.Thickness,f.ID,f.LevelB,f.Height FROM tblSlab  AS s INNER JOIN tblFloor AS f on f.StdFlrID = s.StdFlrID";
-            Func<Slab, Floor, Slab> mappingSlab =
-                (slab, floor) =>
-                {
-                    slab.Floor = floor;
-                    return slab;
-                };
-            var slabs = ydbConn.Query(sqlSlab, mappingSlab);
-
-            //查询墙
-            string sqlWall = "SELECT w.ID,f.ID,f.LevelB,f.Height,ws.ID,ws.kind,ws.B,g.ID,j1.ID,j1.X,j1.Y,j2.ID,j2.X,j2.Y " +
-                "FROM tblWallSeg AS w " +
-                "INNER JOIN tblFloor AS f on f.StdFlrID = w.StdFlrID " +
-                "INNER JOIN tblWallSect AS ws on ws.ID = w.SectID " +
-                "INNER JOIN tblGrid AS g on g.ID = w.GridId " +
-                "INNER JOIN tblJoint AS j1 on g.Jt1ID = j1.ID " +
-                "INNER JOIN tblJoint AS j2 on g.Jt2ID = j2.ID";
-
-            Func<Wall, Floor, WallSect, Grid, Joint, Joint, Wall> mappingWall =
-                (wall, floor, wallSect, grid, j1, j2) =>
-                {
-                    grid.Joint1 = j1;
-                    grid.Joint2 = j2;
-                    wall.Grid = grid;
-                    wall.Floor = floor;
-                    wall.WallSect = wallSect;
-                    return wall;
-                };
-            var walls = ydbConn.Query(sqlWall, mappingWall);
-            //关闭数据库
-            ydbConn.Close();
-
-            #endregion
-
-            #region 区域数据查询
-            var areaConn = new SQLiteConnection($"Data Source={areaDB}");
-            //查询标高
-            string sqlFloorArea = "SELECT a.ID,a.FloorID,a.VertexX,a.VertexY,a.VertexY,a.kind,a.Note,f.ID,f.Name,f.Level,f.X,f.Y,f.Z" +
-                "FROM Area AS a " +
-                "INNER JOIN Floor As f " +
-                "WHERE kind=0";
-            string sqlFireArea = "SELECT a.ID,a.FloorID,a.VertexX,a.VertexY,a.VertexY,a.kind,a.Note,f.ID,f.Name,f.Level,f.X,f.Y,f.Z" +
-                "FROM Area AS a " +
-                "INNER JOIN Floor As f " +
-                "WHERE kind=1";
-            string sqlRoomArea = "SELECT a.ID,a.FloorID,a.VertexX,a.VertexY,a.VertexY,a.kind,a.Note,f.ID,f.Name,f.Level,f.X,f.Y,f.Z" +
-                "FROM Area AS a " +
-                "INNER JOIN Floor As f " +
-                "WHERE kind=2";
-            Func<Model.Area, AreaFloor, Model.Area> mappingArea = (area, areaFloor) =>
-            {
-                area.Floor = areaFloor;
-                return area;
-            };
-            var floorAreas = areaConn.Query<Model.Area>(sqlFloorArea, mappingArea);
-            var fireAreas = areaConn.Query<Model.Area>(sqlFireArea, mappingArea);
-            var roomAreas = areaConn.Query<Model.Area>(sqlRoomArea, mappingArea);
-            areaConn.Close();
-            #endregion
-
-            using (Database tempDb = new Database(false, true))
-            using (Transaction tempTransaction = tempDb.TransactionManager.StartTransaction())
-            {
-                try
-                {
-                    string codeBase = Assembly.GetExecutingAssembly().CodeBase;
-                    UriBuilder uri = new UriBuilder(codeBase);
-                    string path = Uri.UnescapeDataString(uri.Path);
-
-                    //载入感烟探测器块
-                    string smokeDetectorPath = Path.Combine(Path.GetDirectoryName(path), "Block", "FA-08-智能型点型感烟探测器.dwg");
-                    string temperatureDetectorPath = Path.Combine(Path.GetDirectoryName(path), "Block", "FA-09-智能型点型感温探测器.dwg");
-                    string smokeDetector = SymbolUtilityServices.GetSymbolNameFromPathName(smokeDetectorPath, "dwg");
-                    string temperatureDetector = SymbolUtilityServices.GetSymbolNameFromPathName(temperatureDetectorPath, "dwg");
-
-                    tempDb.ReadDwgFile(smokeDetectorPath, FileOpenMode.OpenForReadAndReadShare, allowCPConversion: true, null);
-                    tempDb.ReadDwgFile(temperatureDetectorPath, FileOpenMode.OpenForReadAndReadShare, allowCPConversion: true, null);
-                    tempDb.CloseInput(true);
-
-                    //根据标高生成梁图
-                    foreach (var floor in floors)
-                    {
-                        using (Database newDatabase = new Database())
-                        using (Transaction newTransaction = newDatabase.TransactionManager.StartTransaction())
-                        {
-                            try
-                            {
-                                ObjectId smokeDetectorID = newDatabase.Insert(smokeDetector, tempDb, true);
-                                ObjectId temperatureDetectorID = newDatabase.Insert(temperatureDetector, tempDb, true);
-
-
-                                #region 根据房间边界及板轮廓生成烟感
-                                foreach (var roomArea in roomAreas)
-                                {
-                                    //筛选本层房间，true继续，false跳过
-                                    if (roomArea.Level != floor.LevelB) continue;
-                                    //判断房间类型
-                                    string areaNote = roomArea.Note;
-                                    if (areaNote.IsNullOrWhiteSpace() || areaNote.Contains("A1H1") || areaNote.Contains("A2H1") || areaNote.Contains("A4")) continue;
-                                    DetectorInfo detectorInfo = new DetectorInfo();
-                                    switch (areaNote)
-                                    {
-                                        case "A1H2":
-                                            detectorInfo.Radius = 6700;
-                                            detectorInfo.Area1 = 16;
-                                            detectorInfo.Area2 = 24;
-                                            detectorInfo.Area3 = 32;
-                                            detectorInfo.Area4 = 48;
-                                            break;
-                                        case "A1H3":
-                                            detectorInfo.Radius = 5800;
-                                            detectorInfo.Area1 = 12;
-                                            detectorInfo.Area2 = 18;
-                                            detectorInfo.Area3 = 24;
-                                            detectorInfo.Area4 = 36;
-                                            break;
-                                        case "A2H2":
-                                            detectorInfo.Radius = 4400;
-                                            detectorInfo.Area1 = 6;
-                                            detectorInfo.Area2 = 9;
-                                            detectorInfo.Area3 = 12;
-                                            detectorInfo.Area4 = 18;
-                                            break;
-                                        case "A2H3":
-                                            detectorInfo.Radius = 3600;
-                                            detectorInfo.Area1 = 4;
-                                            detectorInfo.Area2 = 6;
-                                            detectorInfo.Area3 = 8;
-                                            detectorInfo.Area4 = 12;
-                                            break;
-                                    }
-
-                                    Coordinate[] roomCoordinates = GetRoomCoordinates(roomArea);
-                                    Polygon roomPolygon = geometryFactory.CreatePolygon(roomCoordinates);
-                                    //Polyline roomPolyline = new Polyline();
-                                    //roomPolyline.CreatePolyline(roomCoordinates);
-                                    //房间外形轮廓
-                                    //Extents3d roomExtents3d = roomPolyline.GeometricExtents;
-
-                                    //房间范围内的闭合区域
-                                    //List<Polyline> polylines = new List<Polyline>();
-                                    //房间范围关联的板
-                                    //List<Slab> slabs1 = new List<Slab>();
-                                    Dictionary<Geometry, double> geometries = new Dictionary<Geometry, double>();
-                                    foreach (var slab in slabs)
-                                    {
-                                        //筛选本层板，true继续，false跳过
-                                        if (slab.Floor.LevelB != floor.LevelB) continue;
-                                        Coordinate[] slabCoordinates = GetSlabCoordinates(slab);
-                                        Polygon slabPolygon = geometryFactory.CreatePolygon(slabCoordinates);
-                                        //Polyline slabPolyline = new Polyline();
-                                        //slabPolyline.CreatePolyline(slabPoint2Ds);
-                                        //板外形轮廓
-                                        //Extents3d slabExtents3d = slabPolyline.GeometricExtents;
-                                        //判断多段线的矩形轮廓是否相交，相交继续，不相交跳过
-                                        //if (!CheckCross(roomExtents3d, slabExtents3d)) continue;
-
-
-                                        //不相交或相邻，相交，包含，属于
-                                        if (roomPolygon.Intersects(slabPolygon))
-                                        {
-                                            Geometry geometry = roomPolygon.Intersection(slabPolygon);
-                                            if (geometry.OgcGeometryType == OgcGeometryType.Polygon)
-                                            {
-                                                geometries.Add(geometry, slab.Thickness);
-                                            }
-                                        }
-                                        else if (roomPolygon.Contains(slabPolygon))
-                                        {
-                                            geometries.Add((Geometry)slabPolygon, slab.Thickness);
-                                        }
-                                        else if (roomPolygon.Within(slabPolygon))
-                                        {
-                                            geometries.Add((Geometry)roomPolygon, slab.Thickness);
-                                        }
-                                    }
-
-                                    SetLayer(newDatabase, $"E-EQUIP", 4);
-
-                                    //对多段线集合按照面积进行排序
-                                    geometries.OrderByDescending(g => g.Key.Area);
-                                    List<Point> points = new List<Point>();
-                                    List<Geometry> tempGeometries = new List<Geometry>();
-                                    //根据多段线集合生成探测器
-                                    foreach (var geometry in geometries)
-                                    {
-                                        if (tempGeometries.Contains(geometry.Key)) continue;
-                                        //多边形内布置一个或多个点位
-                                        if (geometry.Key.Area > detectorInfo.Area4)
-                                        {
-                                            //如果为假，超出保护范围，需要切分为n个子区域
-                                            if (IsProtected(geometry.Key, detectorInfo.Radius, geometryFactory, beams, floor))
-                                            {
-                                                points.Add(geometry.Key.Centroid);
-                                            }
-                                            else
-                                            {
-                                                int n = 2;
-                                                while (true)
-                                                {
-                                                    List<Geometry> splitGeometries = SplitPolygon(geometryFactory, geometry.Key, n, 100);
-                                                    bool b = true;
-                                                    foreach (var item in splitGeometries)
-                                                    {
-                                                        if (!IsProtected(item, detectorInfo.Radius, geometryFactory, beams, floor))
-                                                        {
-                                                            b = false;
-                                                            break;
-                                                        }
-                                                    }
-                                                    if (b)
-                                                    {
-                                                        foreach (var item in splitGeometries)
-                                                        {
-                                                            points.Add(item.Centroid);
-                                                            //BlockReference blockReference = new BlockReference(item.Centroid.ToPoint3d(), smokeDetectorID)
-                                                            //{
-                                                            //    ScaleFactors = new Scale3d(100)
-                                                            //};
-                                                            //newDatabase.AddToModelSpace(blockReference);
-                                                        }
-                                                        break;
-                                                    }
-                                                    else
-                                                    {
-                                                        n++;
-                                                        continue;
-                                                    }
-                                                }
-                                            }
-                                            tempGeometries.Add(geometry.Key);
-                                        }
-                                        else
-                                        {
-                                            //如果为假，超出保护范围，需要切分为n个子区域
-                                            if (IsProtected(geometry.Key, detectorInfo.Radius, geometryFactory, beams, floor))
-                                            {
-                                                List<Geometry> beam600 = new List<Geometry>();
-                                                List<Geometry> beam200 = new List<Geometry>();
-                                                //保护范围内是否有其他区域
-                                                foreach (var item in geometries)
-                                                {
-                                                    if (tempGeometries.Contains(item.Key)) continue;
-                                                    if (!IsProtected(geometry.Key, detectorInfo.Radius, item.Key)) continue;
-                                                    if (!(geometry.Key.Intersection(item.Key) is LineString lineString)) continue;
-
-                                                    //foreach (var wall in walls)
-                                                    //{
-                                                    //    if (wall.Floor.LevelB != floor.LevelB) continue;
-                                                    //    if (wall.ToLineString().Contains(lineString) || wall.ToLineString().Equals(lineString))
-                                                    //    {
-                                                    //        break;
-                                                    //    }
-                                                    //}
-
-                                                    foreach (var beam in beams)
-                                                    {
-                                                        if (beam.Floor.LevelB != floor.LevelB) continue;
-                                                        if (beam.ToLineString().Contains(lineString) || beam.ToLineString().Equals(lineString))
-                                                        {
-                                                            double height = 0;
-                                                            if (beam.IsConcrete)
-                                                            {
-                                                                height = beam.Height - item.Value;
-                                                            }
-                                                            else
-                                                            {
-                                                                height = beam.Height;
-                                                            }
-
-                                                            if (height > 600)
-                                                            {
-                                                                break;
-                                                            }
-                                                            else if (height >= 200 && height <= 600)
-                                                            {
-                                                                beam600.Add(item.Key);
-                                                                break;
-                                                            }
-                                                            else if (height < 200)
-                                                            {
-                                                                beam200.Add(item.Key);
-                                                                break;
-                                                            }
-                                                        }
-                                                    }
-                                                }
-
-                                                double area = geometry.Key.Area;
-                                                if (beam200.Count > 0)
-                                                {
-                                                    foreach (var item in beam200)
-                                                    {
-                                                        area += item.Area;
-                                                        tempGeometries.Add(item);
-                                                    }
-                                                }
-
-                                                if (detectorInfo.Area3 < area && area <= detectorInfo.Area4)
-                                                {
-                                                    int count = 2;
-                                                    if (beam600.Count > 0)
-                                                    {
-                                                        beam600.OrderByDescending(a => a.Area);
-                                                        for (int i = 0; i < count; i++)
-                                                        {
-                                                            tempGeometries.Add(beam600[i]);
-                                                        }
-                                                    }
-                                                }
-                                                else if (detectorInfo.Area2 < area && area <= detectorInfo.Area3)
-                                                {
-                                                    int count = 3;
-                                                    if (beam600.Count > 0)
-                                                    {
-                                                        beam600.OrderByDescending(a => a.Area);
-                                                        for (int i = 0; i < count; i++)
-                                                        {
-                                                            tempGeometries.Add(beam600[i]);
-                                                        }
-                                                    }
-
-                                                }
-                                                else if (detectorInfo.Area1 < area && area <= detectorInfo.Area2)
-                                                {
-                                                    int count = 4;
-                                                    if (beam600.Count > 0)
-                                                    {
-                                                        beam600.OrderByDescending(a => a.Area);
-                                                        for (int i = 0; i < count; i++)
-                                                        {
-                                                            tempGeometries.Add(beam600[i]);
-                                                        }
-                                                    }
-
-                                                }
-                                                else if (area < detectorInfo.Area1)
-                                                {
-                                                    int count = 5;
-                                                    if (beam600.Count > 0)
-                                                    {
-                                                        beam600.OrderByDescending(a => a.Area);
-                                                        for (int i = 0; i < count; i++)
-                                                        {
-                                                            tempGeometries.Add(beam600[i]);
-                                                        }
-                                                    }
-
-                                                }
-                                                points.Add(geometry.Key.Centroid);
-
-                                            }
-                                            else
-                                            {
-                                                int n = 2;
-                                                while (true)
-                                                {
-                                                    List<Geometry> splitGeometries = SplitPolygon(geometryFactory, geometry.Key, n, 100);
-                                                    bool b = true;
-                                                    foreach (var item in splitGeometries)
-                                                    {
-                                                        if (!IsProtected(item, detectorInfo.Radius, geometryFactory, beams, floor))
-                                                        {
-                                                            b = false; break;
-                                                        }
-                                                    }
-                                                    if (b)
-                                                    {
-                                                        foreach (var item in splitGeometries)
-                                                        {
-                                                            points.Add(item.Centroid);
-                                                        }
-                                                        break;
-                                                    }
-                                                    else
-                                                    {
-                                                        n++;
-                                                        continue;
-                                                    }
-                                                }
-                                            }
-                                            tempGeometries.Add(geometry.Key);
-                                        }
-                                    }
-                                    //去除距梁边小于500mm的布置点
-                                }
-
-                                //foreach (var slab in slabs)
-                                //{
-                                //    bool bo = true;
-                                //    if (slab.Floor.LevelB != floor.LevelB) continue;
-
-                                //    SetLayer(newDatabase, $"slab-{slab.Thickness.ToString()}mm", 7);
-
-                                //    Polyline polyline = new Polyline();
-                                //    Point2dCollection point2Ds = GetSlabCoordinates(slab);
-                                //    polyline.CreatePolyline(point2Ds);
-                                //    newDatabase.AddToModelSpace(polyline);
-
-                                //    if (slab.Thickness == 0)
-                                //    {
-                                //        if (!ElectricalViewModel.electricalViewModel.IsLayoutAtHole) bo = false;
-                                //    }
-                                //    if (!bo) continue;
-                                //    //在板的重心添加感烟探测器
-                                //    SetLayer(newDatabase, $"E-EQUIP-{slab.Thickness.ToString()}", 4);
-
-                                //    Point2d p = getCenterOfGravityPoint(point2Ds);
-                                //    BlockTable bt = (BlockTable)newTransaction.GetObject(newDatabase.BlockTableId, OpenMode.ForRead);
-                                //    BlockReference blockReference = new BlockReference(p.ToPoint3d(), smokeDetectorID);
-                                //    blockReference.ScaleFactors = new Scale3d(100);
-                                //    newDatabase.AddToModelSpace(blockReference);
-
-                                //    //设置块参照图层错误
-                                //    //blockReference.Layer = layerName;
-                                //}
-
-
-                                #endregion
-
-                                #region 生成梁
-                                foreach (var beam in beams)
-                                {
-                                    if (beam.Floor.LevelB != floor.LevelB) continue;
-
-                                    Point2d p1 = new Point2d(beam.Grid.Joint1.X, beam.Grid.Joint1.Y);
-                                    Point2d p2 = new Point2d(beam.Grid.Joint2.X, beam.Grid.Joint2.Y);
-                                    double startWidth = 0;
-                                    double endWidth = 0;
-                                    double height = 0;
-
-                                    Polyline polyline = new Polyline();
-
-                                    switch (beam.BeamSect.Kind)
-                                    {
-                                        case 1:
-                                            startWidth = endWidth = double.Parse(beam.BeamSect.ShapeVal.Split(',')[1]);
-                                            height = double.Parse(beam.BeamSect.ShapeVal.Split(',')[2]);
-
-                                            polyline.AddVertexAt(0, p1, 0, startWidth, endWidth);
-                                            polyline.AddVertexAt(1, p2, 0, startWidth, endWidth);
-                                            SetLayer(newDatabase, $"beam-concrete-{height.ToString()}mm", 7);
-                                            break;
-                                        case 2:
-                                            startWidth = endWidth = double.Parse(beam.BeamSect.ShapeVal.Split(',')[3]);
-                                            height = double.Parse(beam.BeamSect.ShapeVal.Split(',')[2]);
-
-                                            polyline.AddVertexAt(0, p1, 0, startWidth, endWidth);
-                                            polyline.AddVertexAt(1, p2, 0, startWidth, endWidth);
-                                            SetLayer(newDatabase, $"beam-steel-{beam.BeamSect.Kind.ToString()}-{height.ToString()}mm", 7);
-                                            break;
-                                        case 7:
-                                            startWidth = endWidth = double.Parse(beam.BeamSect.ShapeVal.Split(',')[1]);
-                                            height = double.Parse(beam.BeamSect.ShapeVal.Split(',')[2]);
-
-                                            polyline.AddVertexAt(0, p1, 0, startWidth, endWidth);
-                                            polyline.AddVertexAt(1, p2, 0, startWidth, endWidth);
-                                            SetLayer(newDatabase, $"beam-steel-{beam.BeamSect.Kind.ToString()}-{height.ToString()}mm", 7);
-                                            break;
-                                        case 13:
-                                            startWidth = endWidth = double.Parse(beam.BeamSect.ShapeVal.Split(',')[1]);
-                                            height = double.Parse(beam.BeamSect.ShapeVal.Split(',')[2]);
-
-                                            polyline.AddVertexAt(0, p1, 0, startWidth, endWidth);
-                                            polyline.AddVertexAt(1, p2, 0, startWidth, endWidth);
-                                            SetLayer(newDatabase, $"beam-steel-{beam.BeamSect.Kind.ToString()}-{height.ToString()}mm", 7);
-                                            break;
-                                        case 22:
-                                            startWidth = endWidth = double.Parse(beam.BeamSect.ShapeVal.Split(',')[1]);
-                                            height = Math.Min(double.Parse(beam.BeamSect.ShapeVal.Split(',')[3]), double.Parse(beam.BeamSect.ShapeVal.Split(',')[4]));
-
-                                            polyline.AddVertexAt(0, p1, 0, startWidth, endWidth);
-                                            polyline.AddVertexAt(1, p2, 0, startWidth, endWidth);
-                                            SetLayer(newDatabase, $"beam-steel-{beam.BeamSect.Kind.ToString()}-{height.ToString()}mm", 7);
-                                            break;
-                                        case 26:
-                                            startWidth = endWidth = double.Parse(beam.BeamSect.ShapeVal.Split(',')[5]);
-                                            height = double.Parse(beam.BeamSect.ShapeVal.Split(',')[3]);
-
-                                            polyline.AddVertexAt(0, p1, 0, startWidth, endWidth);
-                                            polyline.AddVertexAt(1, p2, 0, startWidth, endWidth);
-                                            SetLayer(newDatabase, $"beam-steel-{beam.BeamSect.Kind.ToString()}-{height.ToString()}mm", 7);
-                                            break;
-
-                                        default:
-                                            startWidth = endWidth = double.Parse(beam.BeamSect.ShapeVal.Split(',')[1]);
-                                            height = double.Parse(beam.BeamSect.ShapeVal.Split(',')[2]);
-
-                                            polyline.AddVertexAt(0, p1, 0, startWidth, endWidth);
-                                            polyline.AddVertexAt(1, p2, 0, startWidth, endWidth);
-                                            SetLayer(newDatabase, $"beam-steel-{beam.BeamSect.Kind.ToString()}-{height.ToString()}mm", 7);
-                                            break;
-                                    }
-
-                                    newDatabase.AddToModelSpace(polyline);
-                                }
-                                #endregion
-
-                                #region 生成墙
-                                foreach (var wall in walls)
-                                {
-                                    if (wall.Floor.LevelB != floor.LevelB) continue;
-
-                                    SetLayer(newDatabase, "wall", 53);
-
-                                    Point2d p1 = new Point2d(wall.Grid.Joint1.X, wall.Grid.Joint1.Y);
-                                    Point2d p2 = new Point2d(wall.Grid.Joint2.X, wall.Grid.Joint2.Y);
-                                    int startWidth = wall.WallSect.B;
-                                    int endWidth = wall.WallSect.B;
-
-                                    Polyline polyline = new Polyline();
-                                    polyline.AddVertexAt(0, p1, 0, startWidth, endWidth);
-                                    polyline.AddVertexAt(1, p2, 0, startWidth, endWidth);
-                                    newDatabase.AddToModelSpace(polyline);
-                                }
-                                #endregion
-
-
-                                string dwgName = Path.Combine(directoryName, floor.LevelB.ToString() + ".dwg");
-                                newDatabase.SaveAs(dwgName, DwgVersion.Current);
-                                newTransaction.Commit();
-                                editor.WriteMessage($"\n{dwgName}");
-                            }
-                            catch
-                            {
-                                newTransaction.Abort();
-                                editor.WriteMessage("\n发生错误1");
-                            }
-                        }
-                    }
-                    tempTransaction.Commit();
-                }
-                catch
-                {
-                    tempTransaction.Abort();
-                    editor.WriteMessage("\n发生错误2");
-                }
-            }
-            editor.WriteMessage("\n结束");
-        }
-
-        private string GetAreaFilePath()
-        {
-            OpenFileDialog openFileDialog = new OpenFileDialog
-            {
-                Filter = "区域数据库(*.area)|*.area|所有文件|*.*",
-                Title = "选择区域数据库文件",
-                ValidateNames = true,
-                CheckFileExists = true,
-                CheckPathExists = true,
-                Multiselect = false
-            };
-
-            string name;
-            if (openFileDialog.ShowDialog() == DialogResult.OK)
-            {
-                name = openFileDialog.FileName;
-            }
-            else
-            {
-                return null;
-            }
-            return name;
-        }
-
-
-        /// <summary>
-        /// 判断几何是否在指定半径及以几何质心为圆心的圆的保护范围内
-        /// </summary>
-        /// <param name="geometry">几何</param>
-        /// <param name="radius">半径</param>
-        /// <returns>true：在保护范围内；false:不在保护范围内</returns>
-        private bool IsProtected(Geometry geometry, double radius, GeometryFactory geometryFactory, List<Beam> beams, Floor floor)
-        {
-            Point centerPoint = geometry.Centroid;
-            bool b = true;
-            if (geometry is Polygon polygon)
-            {
-                //缓冲区参数
-
-                var bufferParam = new BufferParameters
-                {
-                    IsSingleSided = true,
-                    JoinStyle = NetTopologySuite.Operation.Buffer.JoinStyle.Mitre,
-                };
-
-                int n = polygon.NumPoints;
-                LineString[] list = new LineString[n];
-                for (int i = 0; i < n; i++)
-                {
-
-                    double d = centerPoint.Coordinate.Distance(polygon.Coordinates[i]);
-                    if (d > radius)
-                    {
-                        b = false;
-                        break;
-                    }
-                    LineString lineString = (LineString)geometryFactory.CreateLineString
-                        (new[] { polygon.Coordinates[i % n], polygon.Coordinates[(i + 1) % n] });
-                    foreach (var beam in beams)
-                    {
-                        if (beam.Floor.LevelB != floor.LevelB) continue;
-                        if (beam.ToLineString().Contains(lineString) || beam.ToLineString().Equals(lineString))
-                        {
-                            list[i] = (LineString)lineString.Buffer(-beam.Width / 2, bufferParam);
-                            break;
-                        }
-                    }
-                }
-
-                double distance = -500;
-                GeometryCollection geometryCollection = new GeometryCollection(list, geometryFactory);
-                geometryCollection.Union();
-                Polygonizer polygonizer = new Polygonizer();
-                foreach (var item in geometryCollection)
-                {
-                    polygonizer.Add(item);
-                }
-                var polygons = polygonizer.GetPolygons();
-                switch (polygons.Count)
-                {
-                    case 0:
-                        b = false;
-                        break;
-                    case 1:
-                        break;
-                    default:
-                        Geometry g = polygons.OrderByDescending(p => p.Area).FirstOrDefault().Buffer(distance, bufferParam);
-                        if (g.IsValid)
-                        {
-                            break;
-                        }
-                        else
-                        {
-                            b = false;
-                            break;
-                        }
-                }
-            }
-            return b;
-        }
-
-        public Geometry Validate(Geometry geom)
-        {
-            if (geom.OgcGeometryType == OgcGeometryType.Polygon)
-            {
-                if (geom.IsValid)
-                {
-                    geom.Normalize();
-                    return geom;
-                }
-                Polygonizer polygonizer = new Polygonizer();
-                AddPolygon((Polygon)geom, polygonizer);
-                return ToPolygonGeometry(polygonizer.GetPolygons(), geom.Factory);
-            }
-            else if (geom.OgcGeometryType == OgcGeometryType.MultiPolygon)
-            {
-                if (geom.IsValid)
-                {
-                    geom.Normalize(); // validate does not pick up rings in the wrong order - this will fix that
-                    return geom; // If the multipolygon is valid just return it
-                }
-                Polygonizer polygonizer = new Polygonizer();
-                for (int i = 0; i < geom.NumGeometries; i++)
-                {
-                    AddPolygon((Polygon)geom.GetGeometryN(i), polygonizer);
-                }
-
-                return ToPolygonGeometry(polygonizer.GetPolygons(), geom.Factory);
-            }
-            else
-            {
-                return geom; // In my case, I only care about polygon / multipolygon geometries
-            }
-        }
-
-        /**
-          * Add all line strings from the polygon given to the polygonizer given
-          * @param polygon polygon from which to extract line strings
-          * @param polygonizer polygonizer
-          */
-        private void AddPolygon(Polygon polygon, Polygonizer polygonizer)
-        {
-            //添加外边界线
-            AddLineString(polygon.ExteriorRing, polygonizer);
-            //添加内边界线
-            foreach (var line in polygon.InteriorRings)
-            {
-                AddLineString(line, polygonizer);
-            }
-        }
-
-        /**
-         * Add the linestring given to the polygonizer
-         * @param linestring line string
-         * @param polygonizer polygonizer
-         */
-        private void AddLineString(LineString lineString, Polygonizer polygonizer)
-        {
-            // LinearRings are treated differently to line strings : we need a LineString NOT a LinearRing
-            lineString = lineString.Factory.CreateLineString(lineString.CoordinateSequence);
-            // unioning the linestring with the point makes any self intersections explicit.
-
-            Geometry toAdd = null;
-            Point point = lineString.Factory.CreatePoint(lineString.GetCoordinateN(0));
-            toAdd = lineString.Union(point);
-            //for (int i = 0; i < lineString.NumPoints; i++)
-            //{
-            //    IPoint point = lineString.Factory.CreatePoint(lineString.GetCoordinateN(i));
-            //    toAdd = lineString.Union(point);
-            //}
-
-            //Add result to polygonizer
-            polygonizer.Add(toAdd);
-
-            return;
-
-        }
-
-        /**
-         * Get a geometry from a collection of polygons.
-         * 
-         * @param polygons collection
-         * @param factory factory to generate MultiPolygon if required
-         * @return null if there were no polygons, the polygon if there was only one, or a MultiPolygon containing all polygons otherwise
-         */
-        private Geometry ToPolygonGeometry(ICollection<Geometry> polygons, GeometryFactory factory)
-        {
-            switch (polygons.Count)
-            {
-                case 0:
-                    return null; // No valid polygons!
-                case 1:
-                    return polygons.ElementAt(0); // single polygon - no need to wrap
-                default:
-                    return factory.CreateMultiPolygon(polygons.Select(p => p as Polygon).ToArray()); // multiple polygons - wrap them
-            }
-        }
-
-
-        /// <summary>
-        /// 判断区域是否在相邻区域探测器的保护范围内
-        /// </summary>
-        /// <param name="geometry">相邻的区域</param>
-        /// <param name="radius">保护半径</param>
-        /// <param name="touchGeometry">被判断的区域</param>
-        /// <returns>true：在保护范围内；false:不在保护范围内</returns>
-        private bool IsProtected(Geometry geometry, double radius, Geometry touchGeometry)
-        {
-            Point centerPoint = geometry.Centroid;
-            bool b = true;
-            for (int i = 0; i < touchGeometry.NumPoints; i++)
-            {
-
-                double d = centerPoint.Coordinate.Distance(touchGeometry.Coordinates[i]);
-                if (d > radius)
-                {
-                    b = false;
-                }
-            }
-            return b;
-        }
-
-        private void SetLayer(Database db, string layerName, int colorIndex)
-        {
-            db.AddLayer(layerName);
-            db.SetLayerColor(layerName, (short)colorIndex);
-            db.SetCurrentLayer(layerName);
-        }
-
-
-        /// <summary>
-        /// 根据已知点集合求重心
-        /// </summary>
-        /// <param name="mPoints">点集合</param>
-        /// <returns>重心</returns>
-        public Point2d getCenterOfGravityPoint(Point2dCollection mPoints)
-        {
-            double area = 0;//多边形面积  
-            double Gx = 0, Gy = 0;// 重心的x、y  
-            for (int i = 1; i <= mPoints.Count; i++)
-            {
-                double iLat = mPoints[i % mPoints.Count].X;
-                double iLng = mPoints[i % mPoints.Count].Y;
-                double nextLat = mPoints[(i - 1)].X;
-                double nextLng = mPoints[(i - 1)].Y;
-                double temp = (iLat * nextLng - iLng * nextLat) / 2;
-                area += temp;
-                Gx += temp * (iLat + nextLat) / 3;
-                Gy += temp * (iLng + nextLng) / 3;
-            }
-            Gx = Gx / area;
-            Gy = Gy / area;
-            return new Point2d(Gx, Gy);
-        }
-
-        /// <summary>
-        /// 获取板轮廓线点的集合
-        /// </summary>
-        /// <param name="slab">板</param>
-        /// <returns>点集合</returns>
-        private Coordinate[] GetSlabCoordinates(Slab slab)
-        {
-            int n = slab.VertexX.Split(',').Length;
-            Coordinate[] coordinates = new Coordinate[n];
-            for (int i = 0; i < n; i++)
-            {
-                coordinates[i] = new Coordinate(double.Parse(slab.VertexX.Split(',')[i % (n - 1)]), double.Parse(slab.VertexY.Split(',')[i % (n - 1)]));
-            }
-
-            return coordinates;
-        }
-
-        /// <summary>
-        /// 获取YDB文件
-        /// </summary>
-        /// <returns>返回文件路径</returns>
-        private string GetYdbFilePath()
-        {
-            //List<string> list = new List<string>();
-            string name = null;
-            OpenFileDialog openFileDialog = new OpenFileDialog();
-            openFileDialog.Filter = "盈建科数据库(*.ydb)|*.ydb|所有文件|*.*";
-            openFileDialog.Title = "选择结构模型数据库文件";
-            openFileDialog.ValidateNames = true;
-            openFileDialog.CheckFileExists = true;
-            openFileDialog.CheckPathExists = true;
-            openFileDialog.Multiselect = false;
-            if (openFileDialog.ShowDialog() == DialogResult.OK)
-            {
-                name = openFileDialog.FileName;
-                //list.AddRange(dbPaths);
-            }
-            else
-            {
-                return null;
-            }
-            return name;
-        }
-
-
-        /// <summary>
-        /// 获取房间轮廓线点的集合
-        /// </summary>
-        /// <param name="slab">板</param>
-        /// <returns>点集合</returns>
-        private Coordinate[] GetRoomCoordinates(Model.Area roomAear)
-        {
-            int n = roomAear.X.Split(',').Length;
-            Coordinate[] coordinates = new Coordinate[n];
-            for (int i = 0; i < n; i++)
-            {
-                coordinates[i] = new Coordinate(double.Parse(roomAear.X.Split(',')[i % (n - 1)]), double.Parse(roomAear.Y.Split(',')[i % (n - 1)]));
-            }
-            return coordinates;
-        }
-
-        /// <summary>
-        /// 判断两个矩形是否相交和包含
-        /// </summary>
-        /// <param name="roomExtents3d">房间外轮廓</param>
-        /// <param name="slabExtents3d">板外轮廓</param>
-        /// <returns></returns>
-        private bool CheckCross(Extents3d roomExtents3d, Extents3d slabExtents3d)
-        {
-            Point2d roomMaxPoint = roomExtents3d.MaxPoint.ToPoint2d();
-            Point2d roomMinPoint = roomExtents3d.MinPoint.ToPoint2d();
-
-            Point2d slabMaxPoint = slabExtents3d.MaxPoint.ToPoint2d();
-            Point2d slabMinPoint = slabExtents3d.MinPoint.ToPoint2d();
-
-            return ((Math.Abs(roomMaxPoint.X + roomMinPoint.X - slabMaxPoint.X - slabMinPoint.X) < roomMaxPoint.X - roomMinPoint.X + slabMaxPoint.X - slabMinPoint.X)
-                && Math.Abs(roomMaxPoint.Y + roomMinPoint.Y - slabMaxPoint.Y - slabMinPoint.Y) < roomMaxPoint.Y - roomMinPoint.Y + slabMaxPoint.Y - slabMinPoint.Y);
-        }
-
-        /// <summary>
-        /// 判断两个多边形是否有交点
-        /// </summary>
-        /// <param name="roomPolyline"></param>
-        /// <param name="slabPolyline"></param>
-        /// <returns></returns>
-        private Point3dCollection GetIntersectPoint3d(Polyline roomPolyline, Polyline slabPolyline)
-        {
-            Point3dCollection intPoints3d = new Point3dCollection();
-            for (int i = 0; i < slabPolyline.NumberOfVertices; i++)
-            {
-                if (i < slabPolyline.NumberOfVertices - 1 || slabPolyline.Closed)
-                {
-                    SegmentType slabSegmentType = slabPolyline.GetSegmentType(i);
-                    if (slabSegmentType == SegmentType.Line)
-                    {
-                        LineSegment2d slabLine = slabPolyline.GetLineSegment2dAt(i);
-                        PolyIntersectWithLine(roomPolyline, slabLine, 0.0001, ref intPoints3d);
-                    }
-                    else if (slabSegmentType == SegmentType.Arc)
-                    {
-
-                    }
-                }
-            }
-            return intPoints3d;
-        }
-
-
-        /// <summary>
-        /// 多段线和直线求交点
-        /// </summary>
-        /// <param name="poly"></param>
-        /// <param name="geLine"></param>
-        /// <param name="tol"></param>
-        /// <param name="points"></param>
-        private void PolyIntersectWithLine(Polyline poly, LineSegment2d geLine, double tol, ref Point3dCollection points)
-        {
-            Point2dCollection intPoints2d = new Point2dCollection();
-
-            // 获得直线对应的几何类
-            //LineSegment2d geLine = new LineSegment2d(ToPoint2d(line.StartPoint), ToPoint2d(line.EndPoint));
-
-            // 每一段分别计算交点
-            Tolerance tolerance = new Tolerance(tol, tol);
-            for (int i = 0; i < poly.NumberOfVertices; i++)
-            {
-                if (i < poly.NumberOfVertices - 1 && poly.Closed)
-                {
-                    SegmentType st = poly.GetSegmentType(i);
-                    if (st == SegmentType.Line)
-                    {
-                        LineSegment2d geLineSeg = poly.GetLineSegment2dAt(i);
-                        Point2d[] pts = geLineSeg.IntersectWith(geLine, tolerance);
-                        if (pts != null)
-                        {
-                            for (int j = 0; j < pts.Length; j++)
-                            {
-                                if (FindPointIn(intPoints2d, pts[j], tol) < 0)
-                                {
-                                    intPoints2d.Add(pts[j]);
-                                }
-                            }
-                        }
-                    }
-                    else if (st == SegmentType.Arc)
-                    {
-                        CircularArc2d geArcSeg = poly.GetArcSegment2dAt(i);
-                        Point2d[] pts = geArcSeg.IntersectWith(geLine, tolerance);
-                        if (pts != null)
-                        {
-                            for (int j = 0; j < pts.Length; j++)
-                            {
-                                if (FindPointIn(intPoints2d, pts[j], tol) < 0)
-                                {
-                                    intPoints2d.Add(pts[j]);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            for (int i = 0; i < intPoints2d.Count; i++)
-            {
-                points.Add(ToPoint3d(intPoints2d[i]));
-            }
-        }
-
-
-        // 点是否在集合中
-        private int FindPointIn(Point2dCollection points, Point2d pt, double tol)
-        {
-            for (int i = 0; i < points.Count; i++)
-            {
-                if (Math.Abs(points[i].X - pt.X) < tol && Math.Abs(points[i].Y - pt.Y) < tol)
-                {
-                    return i;
-                }
-            }
-
-            return -1;
-        }
-
-        // 三维点转二维点
-        private static Point2d ToPoint2d(Point3d point3d)
-        {
-            return new Point2d(point3d.X, point3d.Y);
-        }
-
-        // 二维点转三维点
-        private static Point3d ToPoint3d(Point2d point2d)
-        {
-            return new Point3d(point2d.X, point2d.Y, 0);
-        }
-
-        private static Point3d ToPoint3d(Point2d point2d, double elevation)
-        {
-            return new Point3d(point2d.X, point2d.Y, elevation);
-        }
-
-
-        /// <summary>
-        /// 多边形点集排序
-        /// </summary>
-        /// <param name="points"></param>
-        /// <returns></returns>
-        public Point3dCollection SortPolyPoints(Point3dCollection points)
-        {
-
-            if (points == null || points.Count == 0) return null;
-            //计算重心
-            Point3d center = new Point3d();
-            double X = 0, Y = 0;
-            for (int i = 0; i < points.Count; i++)
-            {
-                X += points[i].X;
-                Y += points[i].Y;
-            }
-            center = new Point3d((int)X / points.Count, (int)Y / points.Count, points[0].Z);
-            //冒泡排序
-            for (int i = 0; i < points.Count - 1; i++)
-            {
-                for (int j = 0; j < points.Count - i - 1; j++)
-                {
-                    if (PointCmp(points[j], points[j + 1], center))
-                    {
-                        Point3d tmp = points[j];
-                        points[j] = points[j + 1];
-                        points[j + 1] = tmp;
-                    }
-                }
-            }
-            return points;
-        }
-
-        /// <summary>
-        /// 若点a大于点b,即点a在点b顺时针方向,返回true,否则返回false
-        /// </summary>
-        /// <param name="a"></param>
-        /// <param name="b"></param>
-        /// <param name="center"></param>
-        /// <returns></returns>
-        private bool PointCmp(Point3d a, Point3d b, Point3d center)
-        {
-            if (a.X >= 0 && b.X < 0)
-                return true;
-            else if (a.X == 0 && b.X == 0)
-                return a.Y > b.Y;
-            //向量OA和向量OB的叉积
-            double det = (a.X - center.X) * (b.Y - center.Y) - (b.X - center.X) * (a.Y - center.Y);
-            if (det < 0)
-                return true;
-            if (det > 0)
-                return false;
-            //向量OA和向量OB共线，以距离判断大小
-            double d1 = (a.X - center.X) * (a.X - center.X) + (a.Y - center.Y) * (a.Y - center.Y);
-            double d2 = (b.X - center.X) * (b.X - center.X) + (b.Y - center.Y) * (b.Y - center.Y);
-            return d1 > d2;
-        }
-
-        /// <summary>
-        /// 按照指定数量切分多边形
-        /// </summary>
-        /// <param name="geometry">多边形</param>
-        /// <param name="count">平分份数</param>
-        /// <param name="n">点集数量（kmeans算法用，越多越精确但速度越慢）</param>
-        /// <param name="detectorInfo">探测器</param>
-        /// <returns>符合条件的平分多边形的质心点集</returns>
-        List<Geometry> SplitPolygon(GeometryFactory geometryFactory, Geometry geometry, int count, int n)
-        {
-            Random random = new Random();
-            //质心点集
-            //List<Point2d> Points = new List<Point2d>();
-            Coordinate maxPoint = geometry.Max();
-            Coordinate minPoint = geometry.Min();
-
-            //构建随机点并判断点是否在多边形内部
-            double[][] randomPoints = new double[n][];
-            for (int i = 0; i < n; i++)
-            {
-                while (true)
-                {
-                    double x = minPoint.X + random.NextDouble() * (maxPoint.X - minPoint.X);
-                    double y = minPoint.Y + random.NextDouble() * (maxPoint.Y - minPoint.Y);
-                    Point point2D = new Point(x, y);
-
-                    if (point2D.Within(geometry))
-                    {
-                        randomPoints[i] = new double[2] { x, y };
-                        break;
-                    }
-                    else
-                    {
-                        continue;
-                    }
-                }
-            }
-
-            //利用EKmeans 获取分组和簇的质心
-            Accord.Math.Random.Generator.Seed = 0;
-            KMeans kMeans = new KMeans(count);
-            KMeansClusterCollection clusters = kMeans.Learn(randomPoints);
-            double[][] centerPoints = clusters.Centroids;
-            List<Coordinate> coords = new List<Coordinate>();
-            foreach (var c in centerPoints)
-            {
-                coords.Add(new Coordinate(c[0], c[1]));
-            }
-            //构建泰森多边形
-            VoronoiDiagramBuilder voronoiDiagramBuilder = new VoronoiDiagramBuilder();
-            Envelope clipEnvelpoe = new Envelope(minPoint, maxPoint);
-            voronoiDiagramBuilder.ClipEnvelope = clipEnvelpoe;
-            voronoiDiagramBuilder.SetSites(coords);
-            GeometryCollection geometryCollection = voronoiDiagramBuilder.GetDiagram(geometryFactory);
-
-            // 4. 利用封闭面切割泰森多边形
-            List<Geometry> geometries = new List<Geometry>();
-            for (int i = 0; i < geometryCollection.NumGeometries; i++)
-            {
-                Geometry vorGeometry = geometryCollection.GetGeometryN(i);
-                geometries.Add(vorGeometry.Intersection(geometry));
-            }
-            return geometries;
-        }
-
-
-        #region 结构类
-        public class Floor
-        {
-            public int ID { get; set; }
-            public string Name { get; set; }
-            public double LevelB { get; set; }
-            public double Height { get; set; }
-        }
-
-        public class Grid
-        {
-            public int ID { get; set; }
-            public Joint Joint1 { get; set; }
-            public Joint Joint2 { get; set; }
-        }
-
-        public class Joint
-        {
-            public int ID { get; set; }
-            public double X { get; set; }
-            public double Y { get; set; }
-        }
-
-        public class Beam
-        {
-            public int ID { get; set; }
-            public Floor Floor { get; set; }
-            public BeamSect BeamSect { get; set; }
-            public Grid Grid { get; set; }
-
-            public bool IsConcrete
-            {
-                get
-                {
-                    if (BeamSect.Kind == 1)
-                    {
-                        return true;
-                    }
-                    else
-                    {
-                        return false;
-                    }
-                }
-            }
-            public double Height
-            {
-                get
-                {
-                    var height = BeamSect.Kind switch
-                    {
-                        1 => double.Parse(this.BeamSect.ShapeVal.Split(',')[2]),
-                        2 => double.Parse(this.BeamSect.ShapeVal.Split(',')[2]),
-                        7 => double.Parse(this.BeamSect.ShapeVal.Split(',')[2]),
-                        13 => double.Parse(this.BeamSect.ShapeVal.Split(',')[2]),
-                        22 => Math.Min(double.Parse(this.BeamSect.ShapeVal.Split(',')[3]),
-                                                        double.Parse(this.BeamSect.ShapeVal.Split(',')[4])),
-                        26 => double.Parse(this.BeamSect.ShapeVal.Split(',')[3]),
-                        _ => double.Parse(this.BeamSect.ShapeVal.Split(',')[2]),
-                    };
-                    return height;
-                }
-            }
-            public LineString ToLineString()
-            {
-                Coordinate[] coordinates = new Coordinate[] { new Coordinate(this.Grid.Joint1.X, this.Grid.Joint1.Y), new Coordinate(this.Grid.Joint2.X, this.Grid.Joint2.Y) };
-                return new LineString(coordinates);
-            }
-
-            public double Width
-            {
-                get
-                {
-                    var width = BeamSect.Kind switch
-                    {
-                        1 => double.Parse(this.BeamSect.ShapeVal.Split(',')[1]),
-                        _ => 0.0,
-                    };
-                    return width;
-                }
-            }
-        }
-        public class BeamSect
-        {
-            public int ID { get; set; }
-            public int Kind { get; set; }
-            public string ShapeVal { get; set; }
-            public string ShapeVal1 { get; set; }
-
-        }
-
-        public class Slab
-        {
-            public int ID { get; set; }
-            public string GridsID { get; set; }
-            public string VertexX { get; set; }
-            public string VertexY { get; set; }
-            public string VertexZ { get; set; }
-            public int Thickness { get; set; }
-            public Floor Floor { get; set; }
-        }
-
-        public class WallSect
-        {
-            public int ID { get; set; }
-            public int Kind { get; set; }
-            public int B { get; set; }
-        }
-
-        public class Wall
-        {
-            public int ID { get; set; }
-            public Floor Floor { get; set; }
-            public WallSect WallSect { get; set; }
-            public Grid Grid { get; set; }
-
-            public LineString ToLineString()
-            {
-                Coordinate[] coordinates = new Coordinate[] { new Coordinate(this.Grid.Joint1.X, this.Grid.Joint1.Y), new Coordinate(this.Grid.Joint2.X, this.Grid.Joint2.Y) };
-                return new LineString(coordinates);
-            }
-        }
-
-        public class DetectorInfo
-        {
-            public int Radius { get; set; }
-            public double Area1 { get; set; }
-            public double Area2 { get; set; }
-            public double Area3 { get; set; }
-            public double Area4 { get; set; }
-        }
-        #endregion
-
-        #endregion
-<<<<<<< Updated upstream
-=======
-
-        #region FF_ToHydrantAlarmButtonCommand
-        [CommandMethod("FF_ToHydrantAlarmButton")]
-        public void FF_ToHydrantAlarmButton()
-        {
-            // Put your command code here
-            Document document = Application.DocumentManager.CurrentDocument;
-            Database database = document.Database;
-            Editor editor = document.Editor;
-
-            using (Database tempDatabase = new Database(false, true))
-            using (Transaction transaction = database.TransactionManager.StartTransaction())
-            {
-                try
-                {
-                    BlockTable blockTable = transaction.GetObject(database.BlockTableId, OpenMode.ForRead) as BlockTable;
-                    BlockTableRecord modelSpace = transaction.GetObject(blockTable[BlockTableRecord.ModelSpace], OpenMode.ForWrite) as BlockTableRecord;
-                    Matrix3d matrixd = Application.DocumentManager.MdiActiveDocument.Editor.CurrentUserCoordinateSystem;
-
-                    #region 获取文件路径，载入消火栓起泵按钮块
-                    string blockFullName = "FA-07-消火栓起泵按钮.dwg";
-                    ObjectId btrId = InsertBlock(database, tempDatabase, blockFullName);
-                    #endregion
-
-                    string name = "";
-
-                    PromptSelectionOptions promptSelectionOptions1 = new PromptSelectionOptions()
-                    {
-                        SingleOnly = true,
-                        RejectObjectsOnLockedLayers = true,
-                    };
-                    TypedValueList typedValues1 = new TypedValueList();
-                    typedValues1.Add(typeof(BlockReference));
-                    SelectionFilter selectionFilter = new SelectionFilter(typedValues1);
-
-                    PromptSelectionResult promptSelectionResult1 = editor.GetSelection(promptSelectionOptions1, selectionFilter);
-                    if (promptSelectionResult1.Status == PromptStatus.OK)
-                    {
-                        SelectionSet selectionSet1 = promptSelectionResult1.Value;
-                        foreach (var id in selectionSet1.GetObjectIds())
-                        {
-                            BlockReference blockReference1 = transaction.GetObject(id, OpenMode.ForRead) as BlockReference;
-                            if (blockReference1 == null) continue;
-                            name = blockReference1.Name;
-                        }
-                    }
-
-                    if (name.IsNullOrWhiteSpace()) return;
-
-                    List<BlockReference> blockReferences = new List<BlockReference>();
-
-                    TypedValueList typedValues = new TypedValueList();
-                    typedValues.Add(typeof(BlockReference));
-                    SelectionFilter blockReferenceSelectionFilter = new SelectionFilter(typedValues);
-                    PromptSelectionResult promptSelectionResult = editor.SelectAll(blockReferenceSelectionFilter);
-                    SelectionSet selectionSet = promptSelectionResult.Value;
-
-                    foreach (ObjectId blockReferenceId in selectionSet.GetObjectIds())
-                    {
-                        BlockReference blockReference = transaction.GetObject(blockReferenceId, OpenMode.ForRead) as BlockReference;
-                        if (blockReference.Name != name || blockReference == null) continue;
-                        blockReference.UpgradeOpen();
-                        Scale3d scale3D = blockReference.ScaleFactors;
-                        blockReference.ScaleFactors = blockReference.GetUnitScale3d(100);
-                        Matrix3d blockreferenceMatrix = blockReference.BlockTransform;
-                        blockReference.ScaleFactors = scale3D;
-                        blockReference.DowngradeOpen();
-
-                        SetLayer(database, $"E-EQUIP", 4);
-                        BlockReference newBlockReference = new BlockReference(Point3d.Origin, btrId);
-                        newBlockReference.TransformBy(blockreferenceMatrix);
-                        database.AddToModelSpace(newBlockReference);
-                    }
-                }
-                catch
-                {
-                    transaction.Abort();
-                    return;
-                }
-
-                transaction.Commit();
-            }
-        }
-
-        private static ObjectId InsertBlock(Database database, Database tempDatabase, string blockFullName)
-        {
-            string codeBase = Assembly.GetExecutingAssembly().CodeBase;
-            UriBuilder uri = new UriBuilder(codeBase);
-            string path = Uri.UnescapeDataString(uri.Path);
-
-            string blockPath = Path.Combine(Path.GetDirectoryName(path), "Block", blockFullName);
-            string blockName = SymbolUtilityServices.GetSymbolNameFromPathName(blockPath, "dwg");
-
-            ObjectId btrId = ObjectId.Null;
-            tempDatabase.ReadDwgFile(blockPath, FileOpenMode.OpenForReadAndReadShare, allowCPConversion: true, null);
-            tempDatabase.CloseInput(true);
-
-            btrId = database.Insert(blockName, tempDatabase, true);
-            return btrId;
-        }
-
-
         #endregion
 
         #region _FF_GetFloorAreaName
