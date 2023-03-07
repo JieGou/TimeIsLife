@@ -16,7 +16,7 @@ using TimeIsLife.View;
 
 namespace TimeIsLife.ViewModel
 {
-    class ElectricalViewModel:ObservableObject
+    class ElectricalViewModel : ObservableObject
     {
         public static ElectricalViewModel electricalViewModel;
         public ElectricalViewModel()
@@ -142,7 +142,7 @@ namespace TimeIsLife.ViewModel
         {
             if (pe == 0 || kx == 0 || cosø == 0) return;
 
-            Ic = Math.Round((pe * kx) / (0.38*Math.Sqrt(3) * cosø), 2);
+            Ic = Math.Round((pe * kx) / (0.38 * Math.Sqrt(3) * cosø), 2);
         }
 
         public IRelayCommand SumPowerCommand { get; }
@@ -189,7 +189,7 @@ namespace TimeIsLife.ViewModel
             Application.DocumentManager.MdiActiveDocument.SendStringToExecute("FF_FAS\n", true, false, false);
         }
 
-        
+
 
         public IRelayCommand ToHydrantAlarmButtonCommand { get; }
         void ToHydrantAlarmButton()
@@ -253,7 +253,7 @@ namespace TimeIsLife.ViewModel
         {
             Application.DocumentManager.MdiActiveDocument.SendStringToExecute("FF_ModifyTextStyle\n", true, false, true);
         }
-        
+
 
 
         #endregion
@@ -420,7 +420,7 @@ namespace TimeIsLife.ViewModel
 
         //空间利用系数
         private double kongJianLiYongXiShu;
-        public double KongJianLiYongXiShu 
+        public double KongJianLiYongXiShu
         {
             get => kongJianLiYongXiShu;
             set => SetProperty(ref kongJianLiYongXiShu, value);
@@ -444,7 +444,7 @@ namespace TimeIsLife.ViewModel
 
         //灯具光通量
         private double dengJuGuangTongLiang;
-        public double DengJuGuangTongLiang 
+        public double DengJuGuangTongLiang
         {
             get => dengJuGuangTongLiang;
             set => SetProperty(ref dengJuGuangTongLiang, value);
@@ -469,7 +469,7 @@ namespace TimeIsLife.ViewModel
         public IRelayCommand IlluminanceCalculateCommand { get; }
         void IlluminanceCalculate()
         {
-            if (KongJianLiYongXiShu > 0 && WeiHuXiShu > 0 && DengJuShuLiang > 0 && DengJuGuangTongLiang > 0 && ZhaoDu>0 && LightingArea>0)
+            if (KongJianLiYongXiShu > 0 && WeiHuXiShu > 0 && DengJuShuLiang > 0 && DengJuGuangTongLiang > 0 && ZhaoDu > 0 && LightingArea > 0)
             {
                 double a = Math.Round((Math.Round(KongJianLiYongXiShu * WeiHuXiShu * DengJuShuLiang * DengJuGuangTongLiang / LightingArea, 2) - ZhaoDu) / ZhaoDu, 2);
                 ZhaoDuPianCha = $"{a:P0}";
