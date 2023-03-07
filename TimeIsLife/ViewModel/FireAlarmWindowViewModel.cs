@@ -128,22 +128,22 @@ namespace TimeIsLife.ViewModel
         #region 方法
         public void GetFloorAreaLayerName()
         {
+            string cmd = "_FF_GetFloorAreaLayerName\n";
+            Application.DocumentManager.MdiActiveDocument.SendStringToExecute(cmd, true, false, true);
             FireAlarmWindow.instance.Hide();
-            Application.DocumentManager.MdiActiveDocument.SendStringToExecute("_FF_GetFloorAreaLayerName\n", true, false, true);
-            FireAlarmWindow.instance.ShowDialog();
         }
 
         public void GetFireAreaLayerName()
         {
+            string cmd = "_FF_GetFireAreaLayerName\n";
+            Application.DocumentManager.MdiActiveDocument.SendStringToExecute(cmd, true, false, true);
             FireAlarmWindow.instance.Hide();
-            Application.DocumentManager.MdiActiveDocument.SendStringToExecute("_FF_GetFireAreaLayerName\n", true, false, true);
-            FireAlarmWindow.instance.ShowDialog();
         }
         public void GetRoomAreaLayerName()
         {
+            string cmd = "_FF_GetRoomAreaLayerName\n";
+            Application.DocumentManager.MdiActiveDocument.SendStringToExecute(cmd, true, false, true);
             FireAlarmWindow.instance.Hide();
-            Application.DocumentManager.MdiActiveDocument.SendStringToExecute("_FF_GetRoomAreaLayerName\n", true, false, true);
-            FireAlarmWindow.instance.ShowDialog();
         }
 
         public void GetYdbFileName()
@@ -169,18 +169,19 @@ namespace TimeIsLife.ViewModel
             //查询标高
             string sqlFloor = "SELECT f.ID,f.Name,f.LevelB,f.Height FROM tblFloor AS f WHERE f.Height != 0";
             IEnumerable<Floor> floors = ydbConn.Query<Floor>(sqlFloor);
+                AreaFloors = new ObservableCollection<AreaFloor> ();
             foreach (var floor in floors)
             {
-                AreaFloors.Add(new AreaFloor { Level = floor.LevelB, Name = floor.Name });
+                AreaFloor area = new AreaFloor
+                {
+                    Name = floor.Name,
+                    Level = floor.LevelB
+                };
+                AreaFloors.Add(area);
             }
             FireAlarmWindow.instance.ShowDialog();
         }
-        private void GetBasePoint()
-        {
-            FireAlarmWindow.instance.Hide();
-            Application.DocumentManager.MdiActiveDocument.SendStringToExecute("_FF_GetBasePoint\n", true, false, true);
-            FireAlarmWindow.instance.ShowDialog();
-        }
+
 
         private void GetFloorArea()
         {
@@ -190,12 +191,18 @@ namespace TimeIsLife.ViewModel
             }
             else
             {
-                FireAlarmWindow.instance.Hide();
                 Application.DocumentManager.MdiActiveDocument.SendStringToExecute("_FF_GetFloorArea\n", true, false, true);
-                FireAlarmWindow.instance.ShowDialog();
-            }
-            
+                FireAlarmWindow.instance.Hide();
+            }            
         }
+
+        private void GetBasePoint()
+        {
+            string cmd = "_FF_GetBasePoint\n";
+            Application.DocumentManager.MdiActiveDocument.SendStringToExecute(cmd, true, false, true);
+            FireAlarmWindow.instance.Hide();
+        }
+
         public void SaveAreaFile()
         {
             FireAlarmWindow.instance.Hide();

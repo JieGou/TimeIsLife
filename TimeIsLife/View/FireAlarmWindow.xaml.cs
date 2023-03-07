@@ -24,7 +24,7 @@ namespace TimeIsLife.View
         public FireAlarmWindow()
         {
             InitializeComponent();
-            DataContext = FireAlarmWindowViewModel.instance;
+            DataContext = new FireAlarmWindowViewModel();
             instance = this;
         }
     }

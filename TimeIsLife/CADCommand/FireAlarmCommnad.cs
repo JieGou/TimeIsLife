@@ -1401,10 +1401,11 @@ namespace TimeIsLife.CADCommand
 
         #endregion
 
-        #region _FF_GetFloorAreaName
+        #region _FF_GetFloorAreaLayerName
         [CommandMethod("_FF_GetFloorAreaLayerName")]
-        public void _FF_GetFloorAreaName()
+        public void _FF_GetFloorAreaLayerName()
         {
+            //FireAlarmWindow.instance.Hide();
             Document document = Application.DocumentManager.CurrentDocument;
             Database database = document.Database;
             Editor editor = document.Editor;
@@ -1430,7 +1431,7 @@ namespace TimeIsLife.CADCommand
                     TypedValueList typedValues = new TypedValueList()
                 {
                     //类型
-                    new TypedValue((int)DxfCode.Start,"Polyline"),
+                    new TypedValue((int)DxfCode.Start,"LWPOLYLINE"),
                     //图层名称
                     //new TypedValue((int)DxfCode.LayerName,""),
                     //块名
@@ -1448,6 +1449,7 @@ namespace TimeIsLife.CADCommand
                     transaction.Abort();
                 }
             }
+            FireAlarmWindow.instance.ShowDialog();
         }
         #endregion
 
@@ -1480,7 +1482,7 @@ namespace TimeIsLife.CADCommand
                     TypedValueList typedValues = new TypedValueList()
                 {
                     //类型
-                    new TypedValue((int)DxfCode.Start,"Polyline"),
+                    new TypedValue((int)DxfCode.Start,"LWPOLYLINE"),
                     //图层名称
                     //new TypedValue((int)DxfCode.LayerName,""),
                     //块名
@@ -1490,7 +1492,7 @@ namespace TimeIsLife.CADCommand
                     SelectionSet selectionSet = editor.GetSelectionSet(SelectString.GetSelection, promptSelectionOptions, typedValues, null);
                     Polyline polyline = transaction.GetObject(selectionSet.GetObjectIds().FirstOrDefault(), OpenMode.ForRead) as Polyline;
                     if (polyline == null) return;
-                    FireAlarmWindowViewModel.instance.FloorAreaLayerName = polyline.Layer;
+                    FireAlarmWindowViewModel.instance.FireAreaLayerName = polyline.Layer;
                     transaction.Commit();
                 }
                 catch
@@ -1498,6 +1500,7 @@ namespace TimeIsLife.CADCommand
                     transaction.Abort();
                 }
             }
+            FireAlarmWindow.instance.ShowDialog();
         }
         #endregion
 
@@ -1530,7 +1533,7 @@ namespace TimeIsLife.CADCommand
                     TypedValueList typedValues = new TypedValueList()
                 {
                     //类型
-                    new TypedValue((int)DxfCode.Start,"Polyline"),
+                    new TypedValue((int)DxfCode.Start,"LWPOLYLINE"),
                     //图层名称
                     //new TypedValue((int)DxfCode.LayerName,""),
                     //块名
@@ -1540,7 +1543,7 @@ namespace TimeIsLife.CADCommand
                     SelectionSet selectionSet = editor.GetSelectionSet(SelectString.GetSelection, promptSelectionOptions, typedValues, null);
                     Polyline polyline = transaction.GetObject(selectionSet.GetObjectIds().FirstOrDefault(), OpenMode.ForRead) as Polyline;
                     if (polyline == null) return;
-                    FireAlarmWindowViewModel.instance.FloorAreaLayerName = polyline.Layer;
+                    FireAlarmWindowViewModel.instance.RoomAreaLayerName = polyline.Layer;
                     transaction.Commit();
                 }
                 catch
@@ -1548,6 +1551,7 @@ namespace TimeIsLife.CADCommand
                     transaction.Abort();
                 }
             }
+            FireAlarmWindow.instance.ShowDialog();
         }
         #endregion
 
@@ -1612,6 +1616,7 @@ namespace TimeIsLife.CADCommand
                     transaction.Abort();
                 }
             }
+            FireAlarmWindow.instance.ShowDialog();
         }
         #endregion
 
@@ -1785,6 +1790,7 @@ namespace TimeIsLife.CADCommand
                     transaction.Abort();
                 }
             }
+            FireAlarmWindow.instance.ShowDialog();
         }
         #endregion
 

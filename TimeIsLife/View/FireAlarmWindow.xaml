@@ -161,6 +161,7 @@
             </DockPanel>
             <DataGrid
                 Margin="3"
+                AutoGenerateColumns="False"
                 d:ItemsSource="{d:SampleData ItemCount=5}"
                 BorderBrush="{DynamicResource {x:Static SystemColors.HotTrackBrushKey}}"
                 ItemsSource="{Binding AreaFloors}"

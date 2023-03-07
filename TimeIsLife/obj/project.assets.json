@@ -2590,20 +2590,25 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\liu18\\.nuget\\packages\\": {}
+    "C:\\Users\\53-liu-yq\\.nuget\\packages\\": {},
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "D:\\GitHub\\TimeIsLife\\TimeIsLife\\TimeIsLife.csproj",
+      "projectUniqueName": "D:\\github\\TimeIsLife\\TimeIsLife\\TimeIsLife.csproj",
       "projectName": "TimeIsLife",
-      "projectPath": "D:\\GitHub\\TimeIsLife\\TimeIsLife\\TimeIsLife.csproj",
-      "packagesPath": "C:\\Users\\liu18\\.nuget\\packages\\",
-      "outputPath": "D:\\GitHub\\TimeIsLife\\TimeIsLife\\obj\\",
+      "projectPath": "D:\\github\\TimeIsLife\\TimeIsLife\\TimeIsLife.csproj",
+      "packagesPath": "C:\\Users\\53-liu-yq\\.nuget\\packages\\",
+      "outputPath": "D:\\github\\TimeIsLife\\TimeIsLife\\obj\\",
       "projectStyle": "PackageReference",
       "skipContentFileWrite": true,
+      "fallbackFolders": [
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+      ],
       "configFilePaths": [
-        "C:\\Users\\liu18\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\53-liu-yq\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [

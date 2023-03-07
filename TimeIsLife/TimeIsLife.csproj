@@ -390,6 +390,7 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="TestDwg\" />
     <Folder Include="Tools\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

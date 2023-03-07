@@ -51,6 +51,8 @@ namespace TimeIsLife.CADCommand
                 paletteSet.DockEnabled = DockSides.Left;
                 paletteSet.TitleBarLocation = PaletteSetTitleBarLocation.Left;
                 paletteSet.Dock = DockSides.Left;
+                
+                
 
                 ElementHost host = new ElementHost();
                 host.AutoSize = true;
