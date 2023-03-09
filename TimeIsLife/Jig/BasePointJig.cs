@@ -25,12 +25,6 @@ namespace TimeIsLife.Jig
 
         protected override SamplerStatus Sampler(JigPrompts prompts)
         {
-            Document document = Application.DocumentManager.CurrentDocument;
-            Database database = document.Database;
-            Editor editor = document.Editor;
-
-            Matrix3d matrix = editor.CurrentUserCoordinateSystem;
-
             JigPromptPointOptions promptOptions = new JigPromptPointOptions("\n选择对齐基点:");
             promptOptions.UserInputControls = UserInputControls.Accept3dCoordinates | UserInputControls.NoZeroResponseAccepted | UserInputControls.NoNegativeResponseAccepted;
             promptOptions.Cursor = CursorType.Crosshair;
@@ -46,16 +40,6 @@ namespace TimeIsLife.Jig
             if (_point != tempPoint)
             {
                 _point = tempPoint;
-                Point3d ucsPoint3d = _point.TransformBy(matrix.Inverse());
-                Vector3d vector3D = ucsPoint3d.GetVectorTo(Point3d.Origin);
-                Matrix3d matrix3D = Matrix3d.Displacement(vector3D);
-
-                foreach (var polyline in polylines)
-                {
-                    polyline.TransformBy(matrix);
-                    polyline.TransformBy(matrix3D);
-                }
-
                 return SamplerStatus.OK;
             }
             else
@@ -66,9 +50,21 @@ namespace TimeIsLife.Jig
 
         protected override bool WorldDraw(WorldDraw draw)
         {
+            Document document = Application.DocumentManager.CurrentDocument;
+            Database database = document.Database;
+            Editor editor = document.Editor;
+            Matrix3d matrix = editor.CurrentUserCoordinateSystem;
+
+            //Point3d ucsPoint3d = _point.TransformBy(matrix.Inverse());
+            Vector3d vector3D = Point3d.Origin.TransformBy(matrix).GetVectorTo(_point);
+            Matrix3d matrix3D = Matrix3d.Displacement(vector3D);
             foreach (var polyline in polylines)
             {
+                polyline.TransformBy(matrix);
+                polyline.TransformBy(matrix3D);
                 draw.Geometry.Draw(polyline);
+                polyline.TransformBy(matrix3D.Inverse());
+                polyline.TransformBy(matrix.Inverse());
             }
             return true;
         }

@@ -196,14 +196,14 @@ namespace TimeIsLife.CADCommand
 
             //E-配电箱-竖向干线
             string blockName1 = "E-配电箱-竖向干线";
-            //E-配电箱-电气火灾监控器
-            string blockName2 = "E-配电箱-电气火灾监控器";
-            Point3d point3D2 = new Point3d();
-            //E-配电箱-消防设备电源监控系统图
-            string blockName3 = "E-配电箱-消防设备电源监控系统图";
-            Point3d point3D3 = new Point3d();
-            //E-配电箱-电力能量监控系统
-            string blockName4 = "E-配电箱-电力能量监控系统";
+            ////E-配电箱-电气火灾监控器
+            //string blockName2 = "E-配电箱-电气火灾监控器";
+            //Point3d point3D2 = new Point3d();
+            ////E-配电箱-消防设备电源监控系统图
+            //string blockName3 = "E-配电箱-消防设备电源监控系统图";
+            //Point3d point3D3 = new Point3d();
+            ////E-配电箱-电力能量监控系统
+            //string blockName4 = "E-配电箱-电力能量监控系统";
             PromptPointOptions pointOptions = new PromptPointOptions("\n请选择起始点：");
             PromptPointResult pointResult = editor.GetPoint(pointOptions);
             if (pointResult.Status != PromptStatus.OK) return;

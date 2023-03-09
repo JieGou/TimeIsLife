@@ -1697,7 +1697,8 @@ namespace TimeIsLife.CADCommand
                             return beam;
                         };
 
-                    List<Beam> beams = ydbConn.Query(sqlBeam, mappingBeam, new { LevelB = FireAlarmWindowViewModel.instance.SelectedAreaFloor.Level }).ToList();
+                    List<Beam> beams = ydbConn.Query(sqlBeam, mappingBeam, 
+                        new { LevelB = FireAlarmWindowViewModel.instance.SelectedAreaFloor.Level }).ToList();
 
                     //查询墙
                     string sqlWall = "SELECT w.ID,f.ID,f.LevelB,f.Height,ws.ID,ws.kind,ws.B,g.ID,j1.ID,j1.X,j1.Y,j2.ID,j2.X,j2.Y " +
@@ -1706,7 +1707,7 @@ namespace TimeIsLife.CADCommand
                         "INNER JOIN tblWallSect AS ws on ws.ID = w.SectID " +
                         "INNER JOIN tblGrid AS g on g.ID = w.GridId " +
                         "INNER JOIN tblJoint AS j1 on g.Jt1ID = j1.ID " +
-                        "INNER JOIN tblJoint AS j2 on g.Jt2ID = j2.ID" +
+                        "INNER JOIN tblJoint AS j2 on g.Jt2ID = j2.ID " +
                         "WHERE f.LevelB = @LevelB";
 
                     Func<Wall, Floor, WallSect, Grid, Joint, Joint, Wall> mappingWall =
@@ -1719,7 +1720,8 @@ namespace TimeIsLife.CADCommand
                             wall.WallSect = wallSect;
                             return wall;
                         };
-                    List<Wall> walls = ydbConn.Query(sqlWall, mappingWall, new { LevelB = FireAlarmWindowViewModel.instance.SelectedAreaFloor.Level }).ToList();
+                    List<Wall> walls = ydbConn.Query(sqlWall, mappingWall, 
+                        new { LevelB = FireAlarmWindowViewModel.instance.SelectedAreaFloor.Level }).ToList();
                     //关闭数据库
                     ydbConn.Close();
 
@@ -1835,6 +1837,16 @@ namespace TimeIsLife.CADCommand
         [CommandMethod("_FF_SaveAreaFile")]
         public void _FF_SaveAreaFile()
         {
+            foreach (var areaFloor in FireAlarmWindowViewModel.instance.AreaFloors)
+            {
+                if (areaFloor.Name.IsNullOrWhiteSpace())
+                {
+                    MessageBox.Show("楼层信息缺失！");
+                    FireAlarmWindow.instance.ShowDialog();
+                    return;
+                }
+            }
+
             Document document = Application.DocumentManager.CurrentDocument;
             Database database = document.Database;
             Editor editor = document.Editor;
