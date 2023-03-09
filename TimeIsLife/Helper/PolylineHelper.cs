@@ -10,7 +10,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using System.Windows.Media.Media3D;
 
 namespace TimeIsLife.Helper
 {
@@ -21,7 +20,7 @@ namespace TimeIsLife.Helper
         /// </summary>
         /// <param name="polyline"></param>
         /// <returns></returns>
-        public static Point3dCollection GetPoint3DCollection(this Polyline polyline)
+        public static Point3dCollection GetPoint3dCollection(this Polyline polyline)
         {
             Point3dCollection points = new Point3dCollection();
 

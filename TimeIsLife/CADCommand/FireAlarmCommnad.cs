@@ -33,7 +33,6 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Windows.Media;
-using System.Windows.Media.Media3D;
 
 using TimeIsLife.Helper;
 using TimeIsLife.NTSHelper;
@@ -59,6 +58,7 @@ using Polyline = Autodesk.AutoCAD.DatabaseServices.Polyline;
 using TimeIsLife.View;
 using Point = NetTopologySuite.Geometries.Point;
 using TimeIsLife.Jig;
+using MessageBox = System.Windows.Forms.MessageBox;
 
 [assembly: CommandClass(typeof(TimeIsLife.CADCommand.FireAlarmCommnad))]
 
@@ -1405,7 +1405,6 @@ namespace TimeIsLife.CADCommand
         [CommandMethod("_FF_GetFloorAreaLayerName")]
         public void _FF_GetFloorAreaLayerName()
         {
-            //FireAlarmWindow.instance.Hide();
             Document document = Application.DocumentManager.CurrentDocument;
             Database database = document.Database;
             Editor editor = document.Editor;
@@ -1429,18 +1428,23 @@ namespace TimeIsLife.CADCommand
 
                     //过滤器
                     TypedValueList typedValues = new TypedValueList()
-                {
-                    //类型
-                    new TypedValue((int)DxfCode.Start,"LWPOLYLINE"),
-                    //图层名称
-                    //new TypedValue((int)DxfCode.LayerName,""),
-                    //块名
-                    //new TypedValue((int)DxfCode.BlockName,"")
-                };
+                    {
+                        //类型
+                        new TypedValue((int)DxfCode.Start,"LWPOLYLINE"),
+                        //图层名称
+                        //new TypedValue((int)DxfCode.LayerName,""),
+                        //块名
+                        //new TypedValue((int)DxfCode.BlockName,"")
+                    };
 
                     SelectionSet selectionSet = editor.GetSelectionSet(SelectString.GetSelection, promptSelectionOptions, typedValues, null);
                     Polyline polyline = transaction.GetObject(selectionSet.GetObjectIds().FirstOrDefault(), OpenMode.ForRead) as Polyline;
-                    if (polyline == null) return;
+                    if (polyline == null) 
+                    {
+                        MessageBox.Show("选择的对象不是多段线！");
+                        FireAlarmWindow.instance.ShowDialog();
+                        return; 
+                    }
                     FireAlarmWindowViewModel.instance.FloorAreaLayerName = polyline.Layer;
                     transaction.Commit();
                 }
@@ -1491,7 +1495,12 @@ namespace TimeIsLife.CADCommand
 
                     SelectionSet selectionSet = editor.GetSelectionSet(SelectString.GetSelection, promptSelectionOptions, typedValues, null);
                     Polyline polyline = transaction.GetObject(selectionSet.GetObjectIds().FirstOrDefault(), OpenMode.ForRead) as Polyline;
-                    if (polyline == null) return;
+                    if (polyline == null)
+                    {
+                        MessageBox.Show("选择的对象不是多段线！");
+                        FireAlarmWindow.instance.ShowDialog();
+                        return;
+                    }
                     FireAlarmWindowViewModel.instance.FireAreaLayerName = polyline.Layer;
                     transaction.Commit();
                 }
@@ -1542,7 +1551,12 @@ namespace TimeIsLife.CADCommand
 
                     SelectionSet selectionSet = editor.GetSelectionSet(SelectString.GetSelection, promptSelectionOptions, typedValues, null);
                     Polyline polyline = transaction.GetObject(selectionSet.GetObjectIds().FirstOrDefault(), OpenMode.ForRead) as Polyline;
-                    if (polyline == null) return;
+                    if (polyline == null)
+                    {
+                        MessageBox.Show("选择的对象不是多段线！");
+                        FireAlarmWindow.instance.ShowDialog();
+                        return;
+                    }
                     FireAlarmWindowViewModel.instance.RoomAreaLayerName = polyline.Layer;
                     transaction.Commit();
                 }
@@ -1563,6 +1577,13 @@ namespace TimeIsLife.CADCommand
             Database database = document.Database;
             Editor editor = document.Editor;
 
+            if (FireAlarmWindowViewModel.instance.FloorAreaLayerName.IsNullOrWhiteSpace())
+            {
+                MessageBox.Show("请先完成楼层图层的选择！");
+                FireAlarmWindow.instance.ShowDialog();
+                return;
+            }
+
             using (Transaction transaction = database.TransactionManager.StartTransaction())
             {
                 try
@@ -1577,28 +1598,43 @@ namespace TimeIsLife.CADCommand
                     //选择选项
                     PromptEntityOptions promptEntityOptions = new PromptEntityOptions("\n选择楼层");
                     PromptEntityResult result = editor.GetEntity(promptEntityOptions);
-                    if (result.Status != PromptStatus.OK) return;
+                    if (result.Status != PromptStatus.OK)
+                    {
+                        MessageBox.Show("重新选择楼层！");
+                        FireAlarmWindow.instance.ShowDialog();
+                        return;
+                    }
                     Polyline polyline = transaction.GetObject(result.ObjectId, OpenMode.ForRead) as Polyline;
-                    if (polyline == null) return;
+                    if (polyline == null)
+                    {
+                        MessageBox.Show("选择对象不是多段线！");
+                        FireAlarmWindow.instance.ShowDialog();
+                        return;
+                    }
                     FireAlarmWindowViewModel.instance.SelectedAreaFloor.X = polyline.GeometricExtents.MinPoint.X;
                     FireAlarmWindowViewModel.instance.SelectedAreaFloor.Y = polyline.GeometricExtents.MinPoint.Y;
                     FireAlarmWindowViewModel.instance.SelectedAreaFloor.Z = polyline.GeometricExtents.MinPoint.Z;
 
                     //过滤器
-                    TypedValueList typedValues = new TypedValueList()
-                    {
-                        //类型
-                        new TypedValue((int)DxfCode.Start,"DBText"),
-                        //图层名称
-                        new TypedValue((int)DxfCode.LayerName,FireAlarmWindowViewModel.instance.FloorAreaLayerName),
-                        //块名
-                        //new TypedValue((int)DxfCode.BlockName,"")
-                    };
+                    TypedValueList typedValues = new TypedValueList();
+                    typedValues.Add(DxfCode.LayerName, FireAlarmWindowViewModel.instance.FloorAreaLayerName);
+                    typedValues.Add(typeof(DBText));
 
-                    SelectionSet selectionSet = editor.GetSelectionSet(SelectString.SelectWindowPolygon, null, typedValues, polyline.GetPoint3DCollection());
-                    if (selectionSet.Count != 1) return;
+                    SelectionSet selectionSet = editor.GetSelectionSet(SelectString.SelectWindowPolygon, null, 
+                        new SelectionFilter(typedValues), polyline.GetPoint3dCollection());
+                    if (selectionSet.Count != 1)
+                    {
+                        MessageBox.Show("包含多个楼层名称！");
+                        FireAlarmWindow.instance.ShowDialog();
+                        return;
+                    }
                     DBText dBText = transaction.GetObject(selectionSet.GetObjectIds()[0], OpenMode.ForRead) as DBText;
-                    if (dBText == null) return;
+                    if (dBText == null)
+                    {
+                        MessageBox.Show("未包含楼层名称！");
+                        FireAlarmWindow.instance.ShowDialog();
+                        return;
+                    }
                     FireAlarmWindowViewModel.instance.SelectedAreaFloor.Name = dBText.TextString;
                     Model.Area area = new Model.Area
                     {
@@ -1635,6 +1671,7 @@ namespace TimeIsLife.CADCommand
                     if (FireAlarmWindowViewModel.instance.SelectedAreaFloor == null)
                     {
                         System.Windows.Forms.MessageBox.Show("未选择基点对应的楼层！");
+                        FireAlarmWindow.instance.ShowDialog();
                         transaction.Abort();
                     }
                     var ydbConn = new SQLiteConnection($"Data Source={FireAlarmWindowViewModel.instance.YdbFileName}");
@@ -1865,7 +1902,7 @@ namespace TimeIsLife.CADCommand
                             FireAlarmWindowViewModel.instance.ReferenceBasePoint.Z
                         });
 
-
+                    //插入的值不能为空
                     foreach (var areaFloor in FireAlarmWindowViewModel.instance.AreaFloors)
                     {
                         helper.Insert<int>("Floor", areaFloor);
@@ -1913,7 +1950,7 @@ namespace TimeIsLife.CADCommand
                                     //new TypedValue((int)DxfCode.BlockName,"")
                                 };
 
-                                SelectionSet dbTextSelectionSet = editor.GetSelectionSet(SelectString.SelectWindowPolygon, null, dbTextTypedValues, polyline.GetPoint3DCollection());
+                                SelectionSet dbTextSelectionSet = editor.GetSelectionSet(SelectString.SelectWindowPolygon, null, dbTextTypedValues, polyline.GetPoint3dCollection());
                                 DBText dBText = transaction.GetObject(dbTextSelectionSet.GetObjectIds()[0], OpenMode.ForRead) as DBText;
                                 if (dBText == null) return;
                                 Model.Area fireArea = new Model.Area
@@ -1940,7 +1977,7 @@ namespace TimeIsLife.CADCommand
                                     //new TypedValue((int)DxfCode.BlockName,"")
                                 };
 
-                                SelectionSet dbTextSelectionSet = editor.GetSelectionSet(SelectString.SelectWindowPolygon, null, dbTextTypedValues, polyline.GetPoint3DCollection());
+                                SelectionSet dbTextSelectionSet = editor.GetSelectionSet(SelectString.SelectWindowPolygon, null, dbTextTypedValues, polyline.GetPoint3dCollection());
                                 DBText dBText = transaction.GetObject(dbTextSelectionSet.GetObjectIds()[0], OpenMode.ForRead) as DBText;
                                 if (dBText == null) return;
                                 Model.Area roomArea = new Model.Area

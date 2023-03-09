@@ -41,6 +41,8 @@ namespace TimeIsLife.ViewModel
         private void Initialize()
         {
             instance = this;
+            AreaFloors = new ObservableCollection<AreaFloor>();
+            Areas = new ObservableCollection<Area>();
         }
 
         #region 属性
@@ -90,18 +92,19 @@ namespace TimeIsLife.ViewModel
             set => SetProperty(ref areaFloors, value);
         }
 
-        private ObservableCollection<Area> areas;
-        public ObservableCollection<Area> Areas
-        {
-            get => areas;
-            set => SetProperty(ref areas, value);
-        }
 
         private AreaFloor selectedAreaFloor;
         public AreaFloor SelectedAreaFloor
         {
             get => selectedAreaFloor;
             set => SetProperty(ref selectedAreaFloor, value);
+        }
+
+        private ObservableCollection<Area> areas;
+        public ObservableCollection<Area> Areas
+        {
+            get => areas;
+            set => SetProperty(ref areas, value);
         }
 
         private Point3d referenceBasePoint;
@@ -131,6 +134,7 @@ namespace TimeIsLife.ViewModel
             string cmd = "_FF_GetFloorAreaLayerName\n";
             Application.DocumentManager.MdiActiveDocument.SendStringToExecute(cmd, true, false, true);
             FireAlarmWindow.instance.Hide();
+
         }
 
         public void GetFireAreaLayerName()
@@ -138,17 +142,20 @@ namespace TimeIsLife.ViewModel
             string cmd = "_FF_GetFireAreaLayerName\n";
             Application.DocumentManager.MdiActiveDocument.SendStringToExecute(cmd, true, false, true);
             FireAlarmWindow.instance.Hide();
+
         }
         public void GetRoomAreaLayerName()
         {
             string cmd = "_FF_GetRoomAreaLayerName\n";
             Application.DocumentManager.MdiActiveDocument.SendStringToExecute(cmd, true, false, true);
             FireAlarmWindow.instance.Hide();
+
         }
 
         public void GetYdbFileName()
         {
             FireAlarmWindow.instance.Hide();
+            if (AreaFloors.Count>0) AreaFloors.Clear();
             OpenFileDialog openFileDialog = new OpenFileDialog
             {
                 Filter = "盈建科数据库(*.ydb)|*.ydb|所有文件|*.*",
@@ -164,12 +171,16 @@ namespace TimeIsLife.ViewModel
             }
 
             //载入YDB数据库
-            if (YdbFileName == null) return;
+            if (YdbFileName == null)
+            {
+                MessageBox.Show("请重新选择YDB文件！");
+                FireAlarmWindow.instance.ShowDialog();
+                return;
+            }
             SQLiteConnection ydbConn = new SQLiteConnection($"Data Source={YdbFileName}");
             //查询标高
             string sqlFloor = "SELECT f.ID,f.Name,f.LevelB,f.Height FROM tblFloor AS f WHERE f.Height != 0";
             IEnumerable<Floor> floors = ydbConn.Query<Floor>(sqlFloor);
-                AreaFloors = new ObservableCollection<AreaFloor> ();
             foreach (var floor in floors)
             {
                 AreaFloor area = new AreaFloor
@@ -193,7 +204,8 @@ namespace TimeIsLife.ViewModel
             {
                 Application.DocumentManager.MdiActiveDocument.SendStringToExecute("_FF_GetFloorArea\n", true, false, true);
                 FireAlarmWindow.instance.Hide();
-            }            
+
+            }
         }
 
         private void GetBasePoint()
@@ -201,6 +213,7 @@ namespace TimeIsLife.ViewModel
             string cmd = "_FF_GetBasePoint\n";
             Application.DocumentManager.MdiActiveDocument.SendStringToExecute(cmd, true, false, true);
             FireAlarmWindow.instance.Hide();
+
         }
 
         public void SaveAreaFile()
@@ -221,6 +234,7 @@ namespace TimeIsLife.ViewModel
         public void Apply()
         {
             Application.DocumentManager.MdiActiveDocument.SendStringToExecute("_FF_SaveAreaFile\n", true, false, true);
+            FireAlarmWindow.instance.Hide();
         }
 
         public void Confirm()

@@ -137,11 +137,14 @@
                     BorderThickness="1"
                     CornerRadius="5">
                     <StackPanel FlowDirection="LeftToRight" Orientation="Horizontal">
-                        <TextBlock Text="{Binding Path=ReferenceBasePoint, StringFormat='X:{0.X:F2} Y:{0.Y:F2} Z:{0.Z:F2}'}" TextAlignment="Center" />
-                        <TextBlock Text="{Binding SelectedAreaFloor, StringFormat=''}" />
+                        <TextBlock Text="X: " />
+                        <TextBlock Text="{Binding ReferenceBasePoint.X}" />
+                        <TextBlock Text="Y: " />
+                        <TextBlock Text="{Binding ReferenceBasePoint.Y}" />
+                        <TextBlock Text="Z: " />
+                        <TextBlock Text="{Binding ReferenceBasePoint.Z}" />
                     </StackPanel>
                 </Border>
-
             </DockPanel>
             <DockPanel Margin="3" DockPanel.Dock="Bottom">
                 <Button
@@ -156,36 +159,52 @@
                     BorderBrush="{DynamicResource {x:Static SystemColors.HotTrackBrushKey}}"
                     BorderThickness="1"
                     CornerRadius="5">
-                    <TextBlock Text="{Binding Path=SelectedAreaFloor, StringFormat='Level:{0.Level:F2}, Name:{0.Name}, X: {0.X:F2}, Y: {0.Y:F2}, Z: {0.Z:F2}'}" TextAlignment="Center" />
+                    <StackPanel FlowDirection="LeftToRight" Orientation="Horizontal">
+                        <TextBlock Text="Level: " />
+                        <TextBlock Text="{Binding SelectedAreaFloor.Level}" />
+                        <TextBlock Text="Name: " />
+                        <TextBlock Text="{Binding SelectedAreaFloor.Name}" />
+                        <TextBlock Text="X: " />
+                        <TextBlock Text="{Binding SelectedAreaFloor.X}" />
+                        <TextBlock Text="Y: " />
+                        <TextBlock Text="{Binding SelectedAreaFloor.Y}" />
+                        <TextBlock Text="Z: " />
+                        <TextBlock Text="{Binding SelectedAreaFloor.Z}" />
+                    </StackPanel>
                 </Border>
             </DockPanel>
             <DataGrid
                 Margin="3"
-                AutoGenerateColumns="False"
                 d:ItemsSource="{d:SampleData ItemCount=5}"
+                AutoGenerateColumns="False"
                 BorderBrush="{DynamicResource {x:Static SystemColors.HotTrackBrushKey}}"
                 ItemsSource="{Binding AreaFloors}"
                 SelectedItem="{Binding SelectedAreaFloor}">
                 <DataGrid.Columns>
                     <DataGridTextColumn
                         Binding="{Binding Level}"
+                        MinWidth="50"
                         Header="标高"
                         IsReadOnly="True" />
                     <DataGridTextColumn
                         Binding="{Binding Name}"
                         Header="名称"
+                        MinWidth="100"
                         IsReadOnly="False" />
                     <DataGridTextColumn
                         Binding="{Binding X}"
                         Header="X"
+                        MinWidth="50"
                         IsReadOnly="True" />
                     <DataGridTextColumn
                         Binding="{Binding Y}"
                         Header="Y"
+                        MinWidth="50"
                         IsReadOnly="True" />
                     <DataGridTextColumn
                         Binding="{Binding Z}"
                         Header="Z"
+                        MinWidth="50"
                         IsReadOnly="True" />
                 </DataGrid.Columns>
             </DataGrid>

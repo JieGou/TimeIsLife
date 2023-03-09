@@ -652,14 +652,14 @@ namespace TimeIsLife.CADCommand
             typedValues.Add(typeof(DBText));
             SelectionFilter selectionFilter = new SelectionFilter(typedValues);
 
-            PromptSelectionResult promptSelectionResult1 = editor.SelectWindowPolygon(polyline1.GetPoint3DCollection(), selectionFilter);
+            PromptSelectionResult promptSelectionResult1 = editor.SelectWindowPolygon(polyline1.GetPoint3dCollection(), selectionFilter);
             if (promptSelectionResult1.Status != PromptStatus.OK) return null;
             SelectionSet selectionSet1 = promptSelectionResult1.Value;
             DBText dBText1 = transaction.GetObject(selectionSet1.GetObjectIds()[0], OpenMode.ForRead) as DBText;
             if (dBText1 == null) return null;
             diagramPanel.Load = dBText1.TextString;
 
-            PromptSelectionResult promptSelectionResult2 = editor.SelectWindowPolygon(polyline2.GetPoint3DCollection(), selectionFilter);
+            PromptSelectionResult promptSelectionResult2 = editor.SelectWindowPolygon(polyline2.GetPoint3dCollection(), selectionFilter);
             if (promptSelectionResult2.Status != PromptStatus.OK) return null;
             SelectionSet selectionSet2 = promptSelectionResult2.Value;
             DBText dBText2 = transaction.GetObject(selectionSet2.GetObjectIds()[0], OpenMode.ForRead) as DBText;

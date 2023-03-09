@@ -201,7 +201,7 @@ namespace TimeIsLife.ViewModel
         void OpenFireAlarmWindow()
         {
             FireAlarmWindow fireAlarmWindow = new FireAlarmWindow();
-            fireAlarmWindow.ShowDialog();
+            fireAlarmWindow.Show();
         }
         #endregion
 
