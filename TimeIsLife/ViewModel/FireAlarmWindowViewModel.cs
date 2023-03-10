@@ -1,22 +1,32 @@
 ﻿using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
+
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+
 using Dapper;
+
 using DotNetARX;
+
+using Newtonsoft.Json;
+
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Data.SQLite;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+
 using TimeIsLife.Model;
 using TimeIsLife.View;
+
 using static TimeIsLife.CADCommand.FireAlarmCommnad;
+
 using Application = Autodesk.AutoCAD.ApplicationServices.Application;
 
 namespace TimeIsLife.ViewModel
@@ -35,8 +45,8 @@ namespace TimeIsLife.ViewModel
             GetFloorAreaCommand = new RelayCommand(GetFloorArea);
             SaveAreaFileCommand = new RelayCommand(SaveAreaFile);
             ApplyCommand = new RelayCommand(Apply);
-            ConfirmCommand= new RelayCommand(Confirm);
-            CancelCommand= new RelayCommand(Cancel);
+            ConfirmCommand = new RelayCommand(Confirm);
+            CancelCommand = new RelayCommand(Cancel);
         }
         private void Initialize()
         {
@@ -113,11 +123,13 @@ namespace TimeIsLife.ViewModel
             get => referenceBasePoint;
             set => SetProperty(ref referenceBasePoint, value);
         }
+
+        public FireAlarmWindowState CurrentState { get; set; } = new FireAlarmWindowState();
         #endregion
 
         #region 委托
         public IRelayCommand GetFloorAreaLayerNameCommand { get; }
-        public IRelayCommand GetFireAreaLayerNameCommand { get; } 
+        public IRelayCommand GetFireAreaLayerNameCommand { get; }
         public IRelayCommand GetRoomAreaLayerNameCommand { get; }
         public IRelayCommand GetYdbFileNameCommand { get; }
         public IRelayCommand SaveAreaFileCommand { get; }
@@ -155,7 +167,7 @@ namespace TimeIsLife.ViewModel
         public void GetYdbFileName()
         {
             FireAlarmWindow.instance.Hide();
-            if (AreaFloors.Count>0) AreaFloors.Clear();
+            if (AreaFloors.Count > 0) AreaFloors.Clear();
             OpenFileDialog openFileDialog = new OpenFileDialog
             {
                 Filter = "盈建科数据库(*.ydb)|*.ydb|所有文件|*.*",
@@ -221,7 +233,7 @@ namespace TimeIsLife.ViewModel
             FireAlarmWindow.instance.Hide();
             SaveFileDialog saveFileDialog = new SaveFileDialog
             {
-                Filter = "区域数据库文件 (*.area)|*.area|所有文件 (*.*)|*.*",
+                Filter = "区域数据库文件 (*.Area)|*.Area|所有文件 (*.*)|*.*",
                 Title = "文件另存为..."
             };
             if (saveFileDialog.ShowDialog() == DialogResult.OK)
@@ -247,6 +259,46 @@ namespace TimeIsLife.ViewModel
         {
             FireAlarmWindow.instance.Close();
         }
+
+        public void SaveState()
+        {
+            CurrentState.FloorLayerName = this.FloorAreaLayerName;
+            CurrentState.FireAlarmLayerName = this.FireAreaLayerName;
+            CurrentState.RoomLayerName = this.RoomAreaLayerName;
+            CurrentState.YdbFileName = this.YdbFileName;
+            CurrentState.AreaFileName = this.AreaFileName;
+            // 将CurrentState对象序列化为JSON字符串
+            string json = JsonConvert.SerializeObject(CurrentState);
+
+            // 将JSON字符串写入到本地文件中
+            string appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+            string directory = Path.Combine(appDataPath, "TimeIsLife", "UserData");
+            if (!Directory.Exists(directory))
+            {
+                Directory.CreateDirectory(directory);
+            }
+            string filePath = Path.Combine(directory, "FireAlarmWindowState.json");
+            File.WriteAllText(filePath, json);
+        }
+
+        public void LoadState()
+        {
+            // 读取本地文件中的JSON字符串
+            string appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
+            string directory = Path.Combine(appDataPath, "TimeIsLife", "UserData");
+            string filePath = Path.Combine(directory, "FireAlarmWindowState.json");
+            if (!File.Exists(filePath)) return;
+            string json = File.ReadAllText(filePath);
+
+            // 将JSON字符串反序列化为State对象
+            CurrentState = JsonConvert.DeserializeObject<FireAlarmWindowState>(json);
+            this.FloorAreaLayerName = CurrentState.FloorLayerName;
+            this.FireAreaLayerName = CurrentState.FireAlarmLayerName;
+            this.RoomAreaLayerName = CurrentState.RoomLayerName;
+            this.YdbFileName = CurrentState.YdbFileName;
+            this.AreaFileName = CurrentState.AreaFileName;
+        }
+
         #endregion
     }
 }

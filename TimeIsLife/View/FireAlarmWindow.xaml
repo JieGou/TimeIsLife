@@ -10,6 +10,8 @@
     Title="自动布置感烟、感温探测器"
     Width="500"
     Height="500"
+    Closing="Window_Closing"
+    Loaded="Window_Loaded"
     mc:Ignorable="d">
     <Window.Resources>
         <ResourceDictionary>
@@ -21,7 +23,6 @@
                 <ResourceDictionary Source="/TimeIsLife;component/Resources/TextBox.xaml" />
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
-
     </Window.Resources>
     <Grid>
         <DockPanel>
@@ -182,29 +183,29 @@
                 SelectedItem="{Binding SelectedAreaFloor}">
                 <DataGrid.Columns>
                     <DataGridTextColumn
-                        Binding="{Binding Level}"
                         MinWidth="50"
+                        Binding="{Binding Level}"
                         Header="标高"
                         IsReadOnly="True" />
                     <DataGridTextColumn
+                        MinWidth="100"
                         Binding="{Binding Name}"
                         Header="名称"
-                        MinWidth="100"
                         IsReadOnly="False" />
                     <DataGridTextColumn
+                        MinWidth="50"
                         Binding="{Binding X}"
                         Header="X"
-                        MinWidth="50"
                         IsReadOnly="True" />
                     <DataGridTextColumn
+                        MinWidth="50"
                         Binding="{Binding Y}"
                         Header="Y"
-                        MinWidth="50"
                         IsReadOnly="True" />
                     <DataGridTextColumn
+                        MinWidth="50"
                         Binding="{Binding Z}"
                         Header="Z"
-                        MinWidth="50"
                         IsReadOnly="True" />
                 </DataGrid.Columns>
             </DataGrid>

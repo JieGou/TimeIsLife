@@ -106,3 +106,4 @@ D:\GitHub\TimeIsLife\TimeIsLife\bin\Debug\NetTopologySuite.dll
 D:\GitHub\TimeIsLife\TimeIsLife\obj\Debug\View\FireAlarmWindow.g.cs
 D:\GitHub\TimeIsLife\TimeIsLife\obj\Debug\View\FireAlarmWindow.baml
 D:\GitHub\TimeIsLife\TimeIsLife\bin\Debug\Accord.dll.config
+D:\github\TimeIsLife\TimeIsLife\bin\Debug\Newtonsoft.Json.dll

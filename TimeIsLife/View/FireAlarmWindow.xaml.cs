@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,6 +12,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+
 using TimeIsLife.ViewModel;
 
 namespace TimeIsLife.View
@@ -21,11 +23,24 @@ namespace TimeIsLife.View
     public partial class FireAlarmWindow : Window
     {
         public static FireAlarmWindow instance;
+        private FireAlarmWindowViewModel viewModel;
         public FireAlarmWindow()
         {
             InitializeComponent();
-            DataContext = new FireAlarmWindowViewModel();
+            viewModel = new FireAlarmWindowViewModel();
+            DataContext = viewModel;
             instance = this;
         }
+
+        private void Window_Closing(object sender, CancelEventArgs e)
+        {
+            viewModel.SaveState();
+        }
+
+        private void Window_Loaded(object sender, RoutedEventArgs e)
+        {
+            viewModel.LoadState();
+        }
+
     }
 }

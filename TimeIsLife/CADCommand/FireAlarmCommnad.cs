@@ -1439,11 +1439,11 @@ namespace TimeIsLife.CADCommand
 
                     SelectionSet selectionSet = editor.GetSelectionSet(SelectString.GetSelection, promptSelectionOptions, typedValues, null);
                     Polyline polyline = transaction.GetObject(selectionSet.GetObjectIds().FirstOrDefault(), OpenMode.ForRead) as Polyline;
-                    if (polyline == null) 
+                    if (polyline == null)
                     {
                         MessageBox.Show("选择的对象不是多段线！");
                         FireAlarmWindow.instance.ShowDialog();
-                        return; 
+                        return;
                     }
                     FireAlarmWindowViewModel.instance.FloorAreaLayerName = polyline.Layer;
                     transaction.Commit();
@@ -1620,7 +1620,7 @@ namespace TimeIsLife.CADCommand
                     typedValues.Add(DxfCode.LayerName, FireAlarmWindowViewModel.instance.FloorAreaLayerName);
                     typedValues.Add(typeof(DBText));
 
-                    SelectionSet selectionSet = editor.GetSelectionSet(SelectString.SelectWindowPolygon, null, 
+                    SelectionSet selectionSet = editor.GetSelectionSet(SelectString.SelectWindowPolygon, null,
                         new SelectionFilter(typedValues), polyline.GetPoint3dCollection());
                     if (selectionSet.Count != 1)
                     {
@@ -1697,7 +1697,7 @@ namespace TimeIsLife.CADCommand
                             return beam;
                         };
 
-                    List<Beam> beams = ydbConn.Query(sqlBeam, mappingBeam, 
+                    List<Beam> beams = ydbConn.Query(sqlBeam, mappingBeam,
                         new { LevelB = FireAlarmWindowViewModel.instance.SelectedAreaFloor.Level }).ToList();
 
                     //查询墙
@@ -1720,7 +1720,7 @@ namespace TimeIsLife.CADCommand
                             wall.WallSect = wallSect;
                             return wall;
                         };
-                    List<Wall> walls = ydbConn.Query(sqlWall, mappingWall, 
+                    List<Wall> walls = ydbConn.Query(sqlWall, mappingWall,
                         new { LevelB = FireAlarmWindowViewModel.instance.SelectedAreaFloor.Level }).ToList();
                     //关闭数据库
                     ydbConn.Close();
@@ -1822,6 +1822,10 @@ namespace TimeIsLife.CADCommand
                     {
                         FireAlarmWindowViewModel.instance.ReferenceBasePoint = basePointJig._point;
                     }
+                    foreach (var item in polylines)
+                    {
+                        item.Erase();
+                    }
                     transaction.Commit();
                 }
                 catch
@@ -1837,16 +1841,6 @@ namespace TimeIsLife.CADCommand
         [CommandMethod("_FF_SaveAreaFile")]
         public void _FF_SaveAreaFile()
         {
-            foreach (var areaFloor in FireAlarmWindowViewModel.instance.AreaFloors)
-            {
-                if (areaFloor.Name.IsNullOrWhiteSpace())
-                {
-                    MessageBox.Show("楼层信息缺失！");
-                    FireAlarmWindow.instance.ShowDialog();
-                    return;
-                }
-            }
-
             Document document = Application.DocumentManager.CurrentDocument;
             Database database = document.Database;
             Editor editor = document.Editor;
@@ -1873,10 +1867,10 @@ namespace TimeIsLife.CADCommand
                         CREATE TABLE IF NOT EXISTS Floor (
                             ID INTEGER PRIMARY KEY,
                             Name TEXT,
-                            Level REAL NOT NULL,
-                            X REAL NOT NULL,
-                            Y REAL NOT NULL,
-                            Z REAL NOT NULL
+                            Level REAL,
+                            X REAL,
+                            Y REAL,
+                            Z REAL
                         )
                     ");
 
@@ -1933,16 +1927,10 @@ namespace TimeIsLife.CADCommand
                         }
 
                         //过滤器
-                        TypedValueList typedValues = new TypedValueList()
-                        {
-                            //类型
-                            new TypedValue((int)DxfCode.Start,"Polyline"),
-                            //图层名称
-                            new TypedValue((int)DxfCode.LayerName,FireAlarmWindowViewModel.instance.FireAreaLayerName),
-                            new TypedValue((int)DxfCode.LayerName,FireAlarmWindowViewModel.instance.RoomAreaLayerName),
-                            //块名
-                            //new TypedValue((int)DxfCode.BlockName,"")
-                        };
+                        TypedValueList typedValues = new TypedValueList();
+                        typedValues.Add(DxfCode.LayerName, FireAlarmWindowViewModel.instance.FireAreaLayerName);
+                        typedValues.Add(DxfCode.LayerName, FireAlarmWindowViewModel.instance.RoomAreaLayerName);
+                        typedValues.Add(typeof(Polyline));
 
                         SelectionSet selectionSet = editor.GetSelectionSet(SelectString.SelectAll, null, typedValues, area.Point3dCollection);
                         foreach (var id in selectionSet.GetObjectIds())
@@ -1952,15 +1940,9 @@ namespace TimeIsLife.CADCommand
                             if (polyline.Layer == FireAlarmWindowViewModel.instance.FireAreaLayerName)
                             {
                                 //过滤器
-                                TypedValueList dbTextTypedValues = new TypedValueList()
-                                {
-                                    //类型
-                                    new TypedValue((int)DxfCode.Start,"DBText"),
-                                    //图层名称
-                                    new TypedValue((int)DxfCode.LayerName,FireAlarmWindowViewModel.instance.FireAreaLayerName),
-                                    //块名
-                                    //new TypedValue((int)DxfCode.BlockName,"")
-                                };
+                                TypedValueList dbTextTypedValues = new TypedValueList();
+                                dbTextTypedValues.Add(DxfCode.LayerName, FireAlarmWindowViewModel.instance.FireAreaLayerName);
+                                dbTextTypedValues.Add(typeof(DBText));
 
                                 SelectionSet dbTextSelectionSet = editor.GetSelectionSet(SelectString.SelectWindowPolygon, null, dbTextTypedValues, polyline.GetPoint3dCollection());
                                 DBText dBText = transaction.GetObject(dbTextSelectionSet.GetObjectIds()[0], OpenMode.ForRead) as DBText;
@@ -1979,15 +1961,9 @@ namespace TimeIsLife.CADCommand
                             else if (polyline.Layer == FireAlarmWindowViewModel.instance.RoomAreaLayerName)
                             {
                                 //过滤器
-                                TypedValueList dbTextTypedValues = new TypedValueList()
-                                {
-                                    //类型
-                                    new TypedValue((int)DxfCode.Start,"DBText"),
-                                    //图层名称
-                                    new TypedValue((int)DxfCode.LayerName,FireAlarmWindowViewModel.instance.RoomAreaLayerName),
-                                    //块名
-                                    //new TypedValue((int)DxfCode.BlockName,"")
-                                };
+                                TypedValueList dbTextTypedValues = new TypedValueList();
+                                dbTextTypedValues.Add(DxfCode.LayerName, FireAlarmWindowViewModel.instance.RoomAreaLayerName);
+                                dbTextTypedValues.Add(typeof(DBText));
 
                                 SelectionSet dbTextSelectionSet = editor.GetSelectionSet(SelectString.SelectWindowPolygon, null, dbTextTypedValues, polyline.GetPoint3dCollection());
                                 DBText dBText = transaction.GetObject(dbTextSelectionSet.GetObjectIds()[0], OpenMode.ForRead) as DBText;
