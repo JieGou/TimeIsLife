@@ -87,6 +87,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Helper\BlockReferenceHelper.cs" />
+    <Compile Include="Helper\Point3dCollectionHelper.cs" />
     <Compile Include="Helper\SQLiteHelper.cs" />
     <Compile Include="Helper\DBTextHelper.cs" />
     <Compile Include="Helper\EditorHelper.cs" />

@@ -251,7 +251,7 @@ namespace TimeIsLife.ViewModel
 
         public void Confirm()
         {
-            Application.DocumentManager.MdiActiveDocument.SendStringToExecute("_FF_SaveAreaFile\n", true, false, true);
+            Application.DocumentManager.MdiActiveDocument.SendStringToExecute("_FF_LayoutEquipment\n", true, false, true);
             FireAlarmWindow.instance.Close();
         }
 

@@ -32,6 +32,22 @@ namespace TimeIsLife.Helper
         }
 
         /// <summary>
+        /// 获取三维点集
+        /// </summary>
+        /// <param name="polyline"></param>
+        /// <returns></returns>
+        public static Point3dCollection GetPoint3dCollection(this Polyline polyline,Matrix3d ucsToWcsMatrix3d)
+        {
+            Point3dCollection points = new Point3dCollection();
+
+            for (int i = 0; i < polyline.NumberOfVertices; i++)
+            {
+                points.Add(polyline.GetPoint3dAt(i).TransformBy(ucsToWcsMatrix3d.Inverse()));
+            }
+            return points;
+        }
+
+        /// <summary>
         /// 获取二维点集
         /// </summary>
         /// <param name="polyline"></param>
