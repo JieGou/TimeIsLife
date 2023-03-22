@@ -1,5 +1,7 @@
 ﻿using Autodesk.AutoCAD.Geometry;
+
 using NetTopologySuite.Geometries;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,6 +12,8 @@ namespace TimeIsLife.Model
 {
     public class Area
     {
+        private Point3d point3D;
+
         public int ID { get; }
         public double Level { get { return Floor.Level; } }
         public AreaFloor Floor { get; set; }
@@ -31,6 +35,14 @@ namespace TimeIsLife.Model
                     point3DCollection.Add(new Point3d(double.Parse(X.Split(',')[i % (n - 1)]), double.Parse(Y.Split(',')[i % (n - 1)]), double.Parse(Z.Split(',')[i % (n - 1)])));
                 }
                 return point3DCollection;
+            }
+        }
+
+        public Point3d BasePoint
+        {
+            get
+            {
+                return new Point3d(Floor.X, Floor.Y, Floor.Z);
             }
         }
     }

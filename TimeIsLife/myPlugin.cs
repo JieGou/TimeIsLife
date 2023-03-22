@@ -8,11 +8,10 @@ using Autodesk.AutoCAD.Runtime;
 using Autodesk.Windows;
 
 using WinApp = System.Windows.Application;
-using AcadApp = Autodesk.AutoCAD.ApplicationServices.Application;
 using System;
 using System.Windows;
-using Autodesk.AutoCAD.ApplicationServices;
 using TimeIsLife.CADCommand;
+using System.Windows.Input;
 
 
 // 该行不是必需的，但是可以提高加载性能
@@ -27,6 +26,7 @@ namespace TimeIsLife
     // 该类由AutoCAD实例化一次，并在会话期间保持有效。 如果您一次都没有进行初始化，则应删除此类。
     public class MyPlugin : IExtensionApplication
     {
+        private InputGestureCollection _gestures;
 
         void IExtensionApplication.Initialize()
         {
@@ -43,11 +43,14 @@ namespace TimeIsLife
 
             // 在此处初始化您的插件应用程序+
             Autodesk.Windows.ComponentManager.ItemInitialized += ComponentManager_ItemInitialized;
-
-
-
         }
 
+        void IExtensionApplication.Terminate()
+        {
+            // 在这里清理插件应用程序
+        }
+
+        //组件管理器初始化
         public void ComponentManager_ItemInitialized(object sender, RibbonItemEventArgs e)
         {
             if (Autodesk.Windows.ComponentManager.Ribbon != null)
@@ -57,6 +60,7 @@ namespace TimeIsLife
             }
         }
 
+        //根据XAML文件//添加ribbon菜单的函数
         public void CreateRibbon()
         {
             Uri uri = new Uri("/TimeIsLife;component/Resources/RibbonDictionary.xaml", UriKind.Relative);
@@ -83,34 +87,5 @@ namespace TimeIsLife
             ribbonControl.Tabs.Add(tab);//将选项卡添加到Ribbon界面中
             //ribbonControl.ActiveTab = tab;//设置当前活动选项卡
         }
-        void IExtensionApplication.Terminate()
-        {
-            // 在这里清理插件应用程序
-        }
-
-
-
     }
-
-    public class RibbonCommandHandler : System.Windows.Input.ICommand
-    {
-        public bool CanExecute(object parameter)
-        {
-            return true;//确定此命令可以在其当前状态下执行
-        }
-        //当出现影响是否应执行该命令的更改时发生
-        public event EventHandler CanExecuteChanged;
-
-        public void Execute(object parameter)
-        {
-            //获取发出命令的按钮对象
-            RibbonButton button = parameter as RibbonButton;
-            //如果发出命令的不是按钮或按钮未定义命令参数，则返回
-            if (button == null || button.CommandParameter == null) return;
-            //根据按钮的命令参数，执行对应的AutoCAD命令
-            Document doc = AcadApp.DocumentManager.MdiActiveDocument;
-            doc.SendStringToExecute($"{button.CommandParameter.ToString()}\n", true, false, true);
-        }
-    }
-
 }

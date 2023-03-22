@@ -94,8 +94,10 @@
     <Compile Include="Helper\PolylineHelper.cs" />
     <Compile Include="Helper\SelectString.cs" />
     <Compile Include="Jig\BasePointJig.cs" />
+    <Compile Include="KeyboardHookDemo.cs" />
     <Compile Include="Model\Area.cs" />
     <Compile Include="Model\AreaFloor.cs" />
+    <Compile Include="Model\BasePoint.cs" />
     <Compile Include="Model\DiagramPanel.cs" />
     <Compile Include="Model\FireAlarmWindowState.cs" />
     <Compile Include="Model\MonitoringSystemPanel.cs" />
@@ -125,6 +127,7 @@
     <Compile Include="NTSHelper\MultiPolygonHelper.cs" />
     <Compile Include="NTSHelper\MyCompare.cs" />
     <Compile Include="NTSHelper\PointHelper.cs" />
+    <Compile Include="RibbonCommandHandler.cs" />
     <Compile Include="ViewModel\FireAlarmWindowViewModel.cs" />
     <Compile Include="ViewModel\ViewModelBase.cs" />
     <Compile Include="View\ElectricaView.xaml.cs">

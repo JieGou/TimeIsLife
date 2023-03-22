@@ -35,6 +35,27 @@ namespace TimeIsLife.CADCommand
 {
     class ElectricalCommand
     {
+        private Document document;
+        private Database database;
+        private Editor editor;
+
+        void Initialize()
+        {
+            document = Application.DocumentManager.CurrentDocument;
+            database = document.Database;
+            editor = document.Editor;
+        }
+
+        #region FF_CircuitMonitoring
+
+
+
+
+
+
+
+        #endregion
+
         #region FF_Tools
         //创建面板
         static PaletteSet paletteSet;
@@ -51,8 +72,8 @@ namespace TimeIsLife.CADCommand
                 paletteSet.DockEnabled = DockSides.Left;
                 paletteSet.TitleBarLocation = PaletteSetTitleBarLocation.Left;
                 paletteSet.Dock = DockSides.Left;
-                
-                
+
+
 
                 ElementHost host = new ElementHost();
                 host.AutoSize = true;
@@ -63,7 +84,7 @@ namespace TimeIsLife.CADCommand
             }
             paletteSet.Visible = true;//面板可见
 
-            
+
         }
         #endregion
 
@@ -106,7 +127,7 @@ namespace TimeIsLife.CADCommand
                     double a = 0;
                     //消防平时负荷
                     double b = 0;
-                    
+
                     foreach (var item in list)
                     {
                         a += item[0];
@@ -228,7 +249,7 @@ namespace TimeIsLife.CADCommand
                 {
                     foreach (var objectId in selectionSet.GetObjectIds())
                     {
-                        BlockReference blockReference =transaction.GetObject(objectId, OpenMode.ForRead) as BlockReference;
+                        BlockReference blockReference = transaction.GetObject(objectId, OpenMode.ForRead) as BlockReference;
                         if (blockReference == null || blockReference.Name != blockName1) continue;
                         blockReferences1.Add(blockReference);
                     }
@@ -303,9 +324,9 @@ namespace TimeIsLife.CADCommand
             List<string> floors = tempFloors.Distinct().ToList();
             floors.Sort();
 
-            for (int i = 0; i < floors.Count-1; i++)
+            for (int i = 0; i < floors.Count - 1; i++)
             {
-                for (int j = i+1; j < floors.Count-i; j++)
+                for (int j = i + 1; j < floors.Count - i; j++)
                 {
                     string temp = null;
                     string a = floors[i];
@@ -327,13 +348,13 @@ namespace TimeIsLife.CADCommand
                                 b = temp;
                             }
                         }
-                        else if(string.IsNullOrEmpty(a1) && !string.IsNullOrEmpty(b1))
+                        else if (string.IsNullOrEmpty(a1) && !string.IsNullOrEmpty(b1))
                         {
                             temp = a;
                             a = b;
                             b = temp;
                         }
-                        else if(!string.IsNullOrEmpty(a2) && string.IsNullOrEmpty(b2))
+                        else if (!string.IsNullOrEmpty(a2) && string.IsNullOrEmpty(b2))
                         {
                             temp = a;
                             a = b;
@@ -346,13 +367,13 @@ namespace TimeIsLife.CADCommand
                             b = temp;
                         }
                     }
-                    else if(!a.Contains("B") && b.Contains("B"))
+                    else if (!a.Contains("B") && b.Contains("B"))
                     {
                         temp = a;
                         a = b;
                         b = temp;
                     }
-                    else if(!a.Contains("B") && !b.Contains("B"))
+                    else if (!a.Contains("B") && !b.Contains("B"))
                     {
                         string a1 = Regex.Match(a, "\\d*").Value;
                         string b1 = Regex.Match(b, "\\d*").Value;
@@ -392,7 +413,7 @@ namespace TimeIsLife.CADCommand
             LayerTableRecord layerTableRecord = new LayerTableRecord();
             if (!layerTable.Has(layerName))
             {
-                
+
                 layerTableRecord.Name = layerName;
                 layerTable.UpgradeOpen();
                 layerTable.Add(layerTableRecord);
@@ -400,9 +421,9 @@ namespace TimeIsLife.CADCommand
                 layerTable.DowngradeOpen();
             }
 
-            
+
             layerTableRecord.Color = Color.FromColorIndex(ColorMethod.ByAci, (short)colorIndex);
-            
+
 
             ObjectId layerId = layerTable[layerName];
             if (database.Clayer != layerId)
@@ -437,7 +458,7 @@ namespace TimeIsLife.CADCommand
                         if (areas[i] == Regex.Match(name, "^[0-9]").Value && floors[j] == Regex.Match(name, "[A][L]\\w*\\d*").Value.Substring(2))
                         {
                             Point3d tempPoint3d = floorStartPoint + new Vector3d(l * 2100, 0, 0);
-                            if (tempPoint3d.X> xMaxPoint3d.X)
+                            if (tempPoint3d.X > xMaxPoint3d.X)
                             {
                                 xMaxPoint3d = tempPoint3d;
                             }
@@ -545,7 +566,7 @@ namespace TimeIsLife.CADCommand
                 line.Linetype = "DASHED";
                 line.ColorIndex = 8;
                 modelSpace.AppendEntity(line);
-                transaction.AddNewlyCreatedDBObject(line,true); ;
+                transaction.AddNewlyCreatedDBObject(line, true); ;
             }
             modelSpace.DowngradeOpen();
 
@@ -565,7 +586,7 @@ namespace TimeIsLife.CADCommand
             }
         }
 
-        void AddPanel(Database database,Point3d point, string name, string file)
+        void AddPanel(Database database, Point3d point, string name, string file)
         {
             Matrix3d matrix3D = Matrix3d.Displacement(Point3d.Origin.GetVectorTo(point));
             using (Database tmepDatabase = new Database(false, true))
@@ -613,7 +634,7 @@ namespace TimeIsLife.CADCommand
             Database database = document.Database;
             Editor editor = document.Editor;
             using Transaction transaction = database.TransactionManager.StartOpenCloseTransaction();
-            
+
 
             DiagramPanel diagramPanel = new DiagramPanel();
 
