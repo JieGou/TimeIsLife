@@ -2170,11 +2170,12 @@ namespace TimeIsLife.CADCommand
             ObjectId temperatureDetectorID = database.Insert(temperatureDetector, tempDb, true);
 
             Model.Area baseArea = floorAreas.Where(f => f.Level == basePoint.Level).FirstOrDefault();
-            Vector3d baseVector = basePoint.Point3d.GetVectorTo(baseArea.BasePoint);
-            slabs.ForEach(s => s.TranslateVertices(basePoint.X, basePoint.Y, basePoint.Z));
+            Vector3d baseVector = baseArea.BasePoint.GetVectorTo(basePoint.Point3d);
+            //slabs.ForEach(s => s.TranslateVertices(basePoint.X, basePoint.Y, basePoint.Z));
 
             foreach (var floorArea in floorAreas)
             {
+                Vector3d vector3D = floorArea.BasePoint.GetVectorTo(Point3d.Origin) + baseVector;
                 try
                 {
                     #region 根据房间边界及板轮廓生成烟感
@@ -2225,6 +2226,7 @@ namespace TimeIsLife.CADCommand
                         {
                             //筛选本层板，true继续，false跳过
                             if (slab.Floor.LevelB != floorArea.Level) continue;
+                            slab.TranslateVertices(vector3D);
                             Coordinate[] slabCoordinates = GetSlabCoordinates(slab);
                             Polygon slabPolygon = geometryFactory.CreatePolygon(slabCoordinates);
 
@@ -2245,6 +2247,7 @@ namespace TimeIsLife.CADCommand
                             {
                                 geometries.Add((Geometry)roomPolygon, slab.Thickness);
                             }
+                            slab.TranslateVertices(-vector3D);
                         }
 
                         SetLayer(database, $"E-EQUIP", 4);
@@ -2527,7 +2530,7 @@ namespace TimeIsLife.CADCommand
                                 SetLayer(database, $"beam-steel-{beam.BeamSect.Kind.ToString()}-{height.ToString()}mm", 7);
                                 break;
                         }
-
+                        polyline.TransformBy(Matrix3d.Displacement(vector3D));
                         database.AddToModelSpace(polyline);
                     }
                     #endregion
@@ -2547,11 +2550,10 @@ namespace TimeIsLife.CADCommand
                         Polyline polyline = new Polyline();
                         polyline.AddVertexAt(0, p1, 0, startWidth, endWidth);
                         polyline.AddVertexAt(1, p2, 0, startWidth, endWidth);
+                        polyline.TransformBy(Matrix3d.Displacement(vector3D));
                         database.AddToModelSpace(polyline);
                     }
                     #endregion
-
-
                     //string dwgName = Path.Combine(directoryName, floor.LevelB.ToString() + ".dwg");
                     //newDatabase.SaveAs(dwgName, DwgVersion.Current);
                     transaction.Commit();
@@ -2794,13 +2796,16 @@ namespace TimeIsLife.CADCommand
         /// <returns>点集合</returns>
         private Coordinate[] GetSlabCoordinates(Slab slab)
         {
-            int n = slab.VertexX.Split(',').Length;
+            string[] vertexX = slab.VertexX.Split(',');
+            string[] vertexY = slab.VertexY.Split(',');
+            int n = vertexX.Length;
+            int lastIndex = n - 1;
             Coordinate[] coordinates = new Coordinate[n];
             for (int i = 0; i < n; i++)
             {
-                coordinates[i] = new Coordinate(double.Parse(slab.VertexX.Split(',')[i % (n - 1)]), double.Parse(slab.VertexY.Split(',')[i % (n - 1)]));
+                int index = i % lastIndex;
+                coordinates[i] = new Coordinate(double.Parse(vertexX[index]), double.Parse(vertexY[index]));
             }
-
             return coordinates;
         }
 
@@ -3213,15 +3218,15 @@ namespace TimeIsLife.CADCommand
             public int Thickness { get; set; }
             public Floor Floor { get; set; }
 
-            public void TranslateVertices(double translateX, double translateY, double translateZ)
+            public void TranslateVertices(Vector3d translationVector)
             {
                 List<double> xValues = ParseValues(VertexX);
                 List<double> yValues = ParseValues(VertexY);
                 List<double> zValues = ParseValues(VertexZ);
 
-                xValues = xValues.Select(x => x + translateX).ToList();
-                yValues = yValues.Select(y => y + translateY).ToList();
-                zValues = zValues.Select(z => z + translateZ).ToList();
+                xValues = xValues.Select(x => x + translationVector.X).ToList();
+                yValues = yValues.Select(y => y + translationVector.Y).ToList();
+                zValues = zValues.Select(z => z + translationVector.Z).ToList();
 
                 VertexX = FormatValues(xValues);
                 VertexY = FormatValues(yValues);
