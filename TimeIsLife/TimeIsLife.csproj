@@ -86,7 +86,16 @@
     <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Model\Beam.cs" />
+    <Compile Include="Model\BeamSect.cs" />
+    <Compile Include="Model\DetectorInfo.cs" />
     <Compile Include="CADCommand\FireAlarmCommand2.cs" />
+    <Compile Include="Model\Floor.cs" />
+    <Compile Include="Model\Grid.cs" />
+    <Compile Include="Model\Joint.cs" />
+    <Compile Include="Model\Slab.cs" />
+    <Compile Include="Model\Wall.cs" />
+    <Compile Include="Model\WallSect.cs" />
     <Compile Include="Helper\BlockReferenceHelper.cs" />
     <Compile Include="Helper\Point3dCollectionHelper.cs" />
     <Compile Include="Helper\SQLiteHelper.cs" />

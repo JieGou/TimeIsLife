@@ -12,8 +12,6 @@ namespace TimeIsLife.Model
 {
     public class Area
     {
-        private Point3d point3D;
-
         public int ID { get; }
         public double Level { get { return Floor.Level; } }
         public AreaFloor Floor { get; set; }

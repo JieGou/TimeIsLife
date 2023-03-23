@@ -10,8 +10,6 @@ namespace TimeIsLife.Model
 {
     public class BasePoint
     {
-        private Point3d point3d;
-
         public string Name { get; set; }
         public double Level { get; set; }
         public double X { get; set; }

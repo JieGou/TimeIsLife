@@ -26,8 +26,6 @@ namespace TimeIsLife
     // 该类由AutoCAD实例化一次，并在会话期间保持有效。 如果您一次都没有进行初始化，则应删除此类。
     public class MyPlugin : IExtensionApplication
     {
-        private InputGestureCollection _gestures;
-
         void IExtensionApplication.Initialize()
         {
             // 在此处添加一次初始化一种常见的情况是在此处设置一个回调函数，供非托管代码调用。
