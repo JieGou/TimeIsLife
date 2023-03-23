@@ -86,6 +86,7 @@
     <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CADCommand\FireAlarmCommand2.cs" />
     <Compile Include="Helper\BlockReferenceHelper.cs" />
     <Compile Include="Helper\Point3dCollectionHelper.cs" />
     <Compile Include="Helper\SQLiteHelper.cs" />
@@ -112,7 +113,7 @@
     <Compile Include="Jig\LightingLayoutJig.cs" />
     <Compile Include="Model\BlockScaleEnum.cs" />
     <Compile Include="CADCommand\ElectricalCommand.cs" />
-    <Compile Include="CADCommand\FireAlarmCommnad.cs" />
+    <Compile Include="CADCommand\FireAlarmCommand1.cs" />
     <Compile Include="CADCommand\ToolCommand.cs" />
     <Compile Include="Jig\UcsSelectJig.cs" />
     <Compile Include="Model\PoleEnum.cs" />

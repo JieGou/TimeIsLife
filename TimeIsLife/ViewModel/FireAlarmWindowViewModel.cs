@@ -25,7 +25,7 @@ using System.Windows.Forms;
 using TimeIsLife.Model;
 using TimeIsLife.View;
 
-using static TimeIsLife.CADCommand.FireAlarmCommnad;
+using static TimeIsLife.CADCommand.FireAlarmCommand1;
 
 using Application = Autodesk.AutoCAD.ApplicationServices.Application;
 

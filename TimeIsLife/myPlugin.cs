@@ -17,7 +17,7 @@ using System.Windows.Input;
 // 该行不是必需的，但是可以提高加载性能
 [assembly: ExtensionApplication(typeof(TimeIsLife.MyPlugin))]
 [assembly: CommandClass(typeof(ElectricalCommand))]
-[assembly: CommandClass(typeof(FireAlarmCommnad))]
+[assembly: CommandClass(typeof(FireAlarmCommand1))]
 [assembly: CommandClass(typeof(LightingCommand))]
 [assembly: CommandClass(typeof(ToolCommand))]
 

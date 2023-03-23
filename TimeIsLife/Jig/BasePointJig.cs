@@ -3,13 +3,16 @@ using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.GraphicsInterface;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Media;
-using static TimeIsLife.CADCommand.FireAlarmCommnad;
+
+using static TimeIsLife.CADCommand.FireAlarmCommand1;
+
 using Polyline = Autodesk.AutoCAD.DatabaseServices.Polyline;
 
 namespace TimeIsLife.Jig
