@@ -637,7 +637,7 @@ namespace TimeIsLife.CADCommand
                                     typeof(DBText)
                                 };
 
-                                SelectionSet dbTextSelectionSet = editor.GetSelectionSet(SelectString.SelectWindowPolygon, null, dbTextTypedValues, polyline.GetPoint3dCollection(ucsToWcsMatrix3d.Inverse()));
+                                SelectionSet dbTextSelectionSet = editor.GetSelectionSet(SelectString.SelectCrossingPolygon, null, dbTextTypedValues, polyline.GetPoint3dCollection(ucsToWcsMatrix3d.Inverse()));
                                 List<string> notes = new List<string>();
                                 foreach (var textId in dbTextSelectionSet.GetObjectIds())
                                 {
