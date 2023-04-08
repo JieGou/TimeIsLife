@@ -34,6 +34,10 @@ namespace TimeIsLife.CADCommand
 
             private List<double> ParseValues(string valueString)
             {
+                if (valueString.EndsWith(","))
+                {
+                    valueString = valueString.TrimEnd(',');
+                }
                 return valueString.Split(',').Select(double.Parse).ToList();
             }
 

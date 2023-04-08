@@ -195,6 +195,9 @@
     <None Include="Block\FA-08-智能型点型感烟探测器.dwg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="Block\FA-09-智能型点型感温探测器.dwg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="Block\多功能表2.dwg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

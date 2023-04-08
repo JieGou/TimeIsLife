@@ -327,9 +327,9 @@ namespace TimeIsLife.CADCommand
                     {
                         Floor = FireAlarmWindowViewModel.instance.SelectedAreaFloor,
                         Kind = 0,
-                        X = polyline.GetXValues(),
-                        Y = polyline.GetYValues(),
-                        Z = polyline.GetZValues()
+                        VertexX = polyline.GetXValues(),
+                        VertexY = polyline.GetYValues(),
+                        VertexZ = polyline.GetZValues()
                     };
                     FireAlarmWindowViewModel.instance.Areas.Add(area);
                     transaction.Commit();
@@ -509,10 +509,6 @@ namespace TimeIsLife.CADCommand
                     {
                         FireAlarmWindowViewModel.instance.ReferenceBasePoint = basePointJig._point;
                     }
-                    foreach (var item in polylines)
-                    {
-                        item.Erase();
-                    }
                     transaction.Abort();
                 }
                 catch
@@ -612,8 +608,8 @@ namespace TimeIsLife.CADCommand
 
                         if (floorId > 0)
                         {
-                            // 构建插入语句并插入到Area表中
-                            sqliteHelper.Execute(insertAreaSql, new { floorId, area.X, area.Y, area.Z, area.Kind, area.Note });
+                            // 构建插入语句并插入到Area表中                            
+                            sqliteHelper.Execute(insertAreaSql, new { FloorID = floorId, X = area.VertexX, Y = area.VertexY, Z = area.VertexZ, Kind = area.Kind, Note = area.Note });
                         }
 
                         //过滤器
@@ -621,8 +617,9 @@ namespace TimeIsLife.CADCommand
                         //typedValues.Add(DxfCode.LayerName, FireAlarmWindowViewModel.instance.FireAreaLayerName);
                         //typedValues.Add(DxfCode.LayerName, FireAlarmWindowViewModel.instance.RoomAreaLayerName);
                         typedValues.Add(typeof(Polyline));
-
-                        SelectionSet selectionSet = editor.GetSelectionSet(SelectString.SelectCrossingPolygon, null, new SelectionFilter(typedValues), area.Point3dCollection.TransformBy(ucsToWcsMatrix3d.Inverse()));
+                        SelectionFilter selectionFilter1 = new SelectionFilter(typedValues);
+                        Point3dCollection point3DCollection1 = area.Point3dCollection.TransformBy(ucsToWcsMatrix3d.Inverse());
+                        SelectionSet selectionSet = editor.GetSelectionSet(SelectString.SelectCrossingPolygon, null, selectionFilter1, point3DCollection1);
 
                         if (selectionSet.Count == 0) continue;
                         foreach (var id in selectionSet.GetObjectIds())
@@ -636,8 +633,8 @@ namespace TimeIsLife.CADCommand
                                     { DxfCode.LayerName, polyline.Layer },
                                     typeof(DBText)
                                 };
-
-                                SelectionSet dbTextSelectionSet = editor.GetSelectionSet(SelectString.SelectCrossingPolygon, null, dbTextTypedValues, polyline.GetPoint3dCollection(ucsToWcsMatrix3d.Inverse()));
+                                SelectionFilter selectionFilter2 = new SelectionFilter(dbTextTypedValues);
+                                SelectionSet dbTextSelectionSet = editor.GetSelectionSet(SelectString.SelectCrossingPolygon, null, selectionFilter2, polyline.GetPoint3dCollection(ucsToWcsMatrix3d.Inverse()));
                                 List<string> notes = new List<string>();
                                 foreach (var textId in dbTextSelectionSet.GetObjectIds())
                                 {
@@ -653,9 +650,9 @@ namespace TimeIsLife.CADCommand
                                     {
                                         Kind = 1,
                                         Note = string.Join(",", notes.ToArray()),
-                                        X = polyline.GetXValues(),
-                                        Y = polyline.GetYValues(),
-                                        Z = polyline.GetZValues()
+                                        VertexX = polyline.GetXValues(),
+                                        VertexY = polyline.GetYValues(),
+                                        VertexZ = polyline.GetZValues()
                                     };
                                 }
                                 else if (polyline.Layer == FireAlarmWindowViewModel.instance.RoomAreaLayerName)
@@ -664,14 +661,14 @@ namespace TimeIsLife.CADCommand
                                     {
                                         Kind = 2,
                                         Note = string.Join(",", notes.ToArray()),
-                                        X = polyline.GetXValues(),
-                                        Y = polyline.GetYValues(),
-                                        Z = polyline.GetZValues()
+                                        VertexX = polyline.GetXValues(),
+                                        VertexY = polyline.GetYValues(),
+                                        VertexZ = polyline.GetZValues()
                                     };
                                 }
                                 if (newArea != null)
                                 {
-                                    sqliteHelper.Execute(insertAreaSql, new { floorId, newArea.X, newArea.Y, newArea.Z, newArea.Kind, newArea.Note });
+                                    sqliteHelper.Execute(insertAreaSql, new { FloorID = floorId, X = newArea.VertexX, Y = newArea.VertexY, Z = newArea.VertexZ, Kind = newArea.Kind, Note = newArea.Note });
                                 }
                             }
                         }
@@ -696,6 +693,7 @@ namespace TimeIsLife.CADCommand
             Document document = Application.DocumentManager.CurrentDocument;
             Database database = document.Database;
             Editor editor = document.Editor;
+
             List<Beam> beams;
             List<Floor> floors;
             List<Slab> slabs;
@@ -703,7 +701,8 @@ namespace TimeIsLife.CADCommand
             List<Model.Area> floorAreas;
             List<Model.Area> fireAreas;
             List<Model.Area> roomAreas;
-            Database tempDb;
+            ObjectId smokeDetectorID;
+            ObjectId temperatureDetectorID;
             string smokeDetector = null;
             string temperatureDetector = null;
             BasePoint basePoint;
@@ -781,23 +780,15 @@ namespace TimeIsLife.CADCommand
                 string selectBasePointSql = "SELECT Name, Level, X, Y, Z FROM BasePoint";
                 basePoint = areaConn.Query<BasePoint>(selectBasePointSql).ToList().FirstOrDefault();
 
-                string sqlFloorArea = "SELECT a.ID,a.FloorID,a.VertexX,a.VertexY,a.VertexY,a.kind,a.Note,f.ID,f.Name,f.Level,f.X,f.Y,f.Z" +
-                        "FROM Area AS a " +
-                        "INNER JOIN Floor As f " +
-                        "WHERE kind=0";
-                string sqlFireArea = "SELECT a.ID,a.FloorID,a.VertexX,a.VertexY,a.VertexY,a.kind,a.Note,f.ID,f.Name,f.Level,f.X,f.Y,f.Z" +
-                        "FROM Area AS a " +
-                        "INNER JOIN Floor As f " +
-                        "WHERE kind=1";
-                string sqlRoomArea = "SELECT a.ID,a.FloorID,a.VertexX,a.VertexY,a.VertexY,a.kind,a.Note,f.ID,f.Name,f.Level,f.X,f.Y,f.Z" +
-                        "FROM Area AS a " +
-                        "INNER JOIN Floor As f " +
-                        "WHERE kind=2";
-                Func<Model.Area, AreaFloor, Model.Area> mappingArea = (area, areaFloor) =>
-                {
-                    area.Floor = areaFloor;
-                    return area;
-                };
+                string sqlFloorArea = "SELECT a.ID,a.FloorID,a.VertexX,a.VertexY,a.VertexZ,a.kind,a.Note,f.ID,f.Name,f.Level,f.X,f.Y,f.Z FROM Area AS a INNER JOIN Floor AS f on f.ID = a.FloorID WHERE kind=0";
+                string sqlFireArea = "SELECT a.ID,a.FloorID,a.VertexX,a.VertexY,a.VertexZ,a.kind,a.Note,f.ID,f.Name,f.Level,f.X,f.Y,f.Z FROM Area AS a INNER JOIN Floor AS f on f.ID = a.FloorID WHERE kind=1";
+                string sqlRoomArea = "SELECT a.ID,a.FloorID,a.VertexX,a.VertexY,a.VertexZ,a.kind,a.Note,f.ID,f.Name,f.Level,f.X,f.Y,f.Z FROM Area AS a INNER JOIN Floor AS f on f.ID = a.FloorID WHERE kind=2";
+                Func<Model.Area, AreaFloor, Model.Area> mappingArea =
+                    (area, areaFloor) =>
+                    {
+                        area.Floor = areaFloor;
+                        return area;
+                    };
                 floorAreas = areaConn.Query(sqlFloorArea, mappingArea).ToList();
                 fireAreas = areaConn.Query(sqlFireArea, mappingArea).ToList();
                 roomAreas = areaConn.Query(sqlRoomArea, mappingArea).ToList();
@@ -805,7 +796,7 @@ namespace TimeIsLife.CADCommand
             #endregion
 
             using Transaction transaction = database.TransactionManager.StartTransaction();
-            using (tempDb = new Database(false, true))
+            using (Database tempDb = new Database(false, true))
             using (Transaction tempTransaction = tempDb.TransactionManager.StartTransaction())
             {
                 try
@@ -822,6 +813,33 @@ namespace TimeIsLife.CADCommand
                     }
                     // 载入感烟探测器块
                     smokeDetector = LoadBlock("FA-08-智能型点型感烟探测器.dwg");
+                    tempDb.CloseInput(true);
+                    tempTransaction.Commit();
+                }
+                catch
+                {
+                    tempTransaction.Abort();
+                    editor.WriteMessage("\n加载AutoCAD图块发生错误");
+                }
+                smokeDetectorID = database.Insert(smokeDetector, tempDb, true);
+            }
+
+            using (Database tempDb = new Database(false, true))
+            using (Transaction tempTransaction = tempDb.TransactionManager.StartTransaction())
+            {
+                try
+                {
+                    string codeBase = Assembly.GetExecutingAssembly().CodeBase;
+                    UriBuilder uri = new UriBuilder(codeBase);
+                    string path = Uri.UnescapeDataString(uri.Path);
+                    string LoadBlock(string blockName)
+                    {
+                        string blockPath = Path.Combine(Path.GetDirectoryName(path), "Block", blockName);
+                        string blockSymbolName = SymbolUtilityServices.GetSymbolNameFromPathName(blockPath, "dwg");
+                        tempDb.ReadDwgFile(blockPath, FileOpenMode.OpenForReadAndReadShare, allowCPConversion: true, null);
+                        return blockSymbolName;
+                    }
+                    // 载入感烟探测器块
                     temperatureDetector = LoadBlock("FA-09-智能型点型感温探测器.dwg");
                     tempDb.CloseInput(true);
                     tempTransaction.Commit();
@@ -831,10 +849,9 @@ namespace TimeIsLife.CADCommand
                     tempTransaction.Abort();
                     editor.WriteMessage("\n加载AutoCAD图块发生错误");
                 }
+                temperatureDetectorID = database.Insert(temperatureDetector, tempDb, true);
             }
 
-            ObjectId smokeDetectorID = database.Insert(smokeDetector, tempDb, true);
-            ObjectId temperatureDetectorID = database.Insert(temperatureDetector, tempDb, true);
 
             Model.Area baseArea = floorAreas.Where(f => f.Level == basePoint.Level).FirstOrDefault();
             Vector3d baseVector = baseArea.BasePoint.GetVectorTo(basePoint.Point3d);
@@ -842,7 +859,7 @@ namespace TimeIsLife.CADCommand
 
             foreach (var floorArea in floorAreas)
             {
-                Vector3d vector3D = floorArea.BasePoint.GetVectorTo(Point3d.Origin) + baseVector;
+                Vector3d vector3D = Point3d.Origin.GetVectorTo(floorArea.BasePoint) + baseVector;
                 try
                 {
                     #region 根据房间边界及板轮廓生成烟感
@@ -1472,12 +1489,12 @@ namespace TimeIsLife.CADCommand
             string[] vertexX = slab.VertexX.Split(',');
             string[] vertexY = slab.VertexY.Split(',');
             int n = vertexX.Length;
-            int lastIndex = n - 1;
-            Coordinate[] coordinates = new Coordinate[n];
-            for (int i = 0; i < n; i++)
+
+            Coordinate[] coordinates = new Coordinate[n + 1];
+            for (int i = 0; i < n + 1; i++)
             {
-                int index = i % lastIndex;
-                coordinates[i] = new Coordinate(double.Parse(vertexX[index]), double.Parse(vertexY[index]));
+
+                coordinates[i] = new Coordinate(double.Parse(vertexX[i % n]), double.Parse(vertexY[i % n]));
             }
             return coordinates;
         }
@@ -1517,11 +1534,11 @@ namespace TimeIsLife.CADCommand
         /// <returns>点集合</returns>
         private Coordinate[] GetRoomCoordinates(Model.Area roomAear)
         {
-            int n = roomAear.X.Split(',').Length;
-            Coordinate[] coordinates = new Coordinate[n];
-            for (int i = 0; i < n; i++)
+            int n = roomAear.VertexX.Split(',').Length;
+            Coordinate[] coordinates = new Coordinate[n + 1];
+            for (int i = 0; i < n + 1; i++)
             {
-                coordinates[i] = new Coordinate(double.Parse(roomAear.X.Split(',')[i % (n - 1)]), double.Parse(roomAear.Y.Split(',')[i % (n - 1)]));
+                coordinates[i] = new Coordinate(double.Parse(roomAear.VertexX.Split(',')[i % (n)]), double.Parse(roomAear.VertexY.Split(',')[i % (n)]));
             }
             return coordinates;
         }
