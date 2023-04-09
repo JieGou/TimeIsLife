@@ -710,7 +710,7 @@ namespace TimeIsLife.CADCommand
             NetTopologySuite.NtsGeometryServices.Instance = new NetTopologySuite.NtsGeometryServices
                 (
                 NetTopologySuite.Geometries.Implementation.CoordinateArraySequenceFactory.Instance,
-                new PrecisionModel(0.001d),
+                new PrecisionModel(0.01d),
                 4326
                 );
             GeometryFactory geometryFactory = NtsGeometryServices.Instance.CreateGeometryFactory();
@@ -859,285 +859,275 @@ namespace TimeIsLife.CADCommand
 
             foreach (var floorArea in floorAreas)
             {
+
+                List<Beam> newBeams = beams.Where(beam => beam.Floor.LevelB == floorArea.Level).ToList();
+                List<Slab> newSlabs = slabs.Where(slab => slab.Floor.LevelB == floorArea.Level).ToList();
+                List<Wall> newWalls = walls.Where(wall => wall.Floor.LevelB == floorArea.Level).ToList();
+
                 Vector3d vector3D = Point3d.Origin.GetVectorTo(floorArea.BasePoint) + baseVector;
-                try
+
+                foreach (var roomArea in roomAreas)
                 {
-                    #region 根据房间边界及板轮廓生成烟感
-                    foreach (var roomArea in roomAreas)
+                    //筛选本层房间，true继续，false跳过
+                    if (roomArea.Level != floorArea.Level) continue;
+                    //判断房间类型
+                    string areaNote = roomArea.Note;
+                    if (areaNote.IsNullOrWhiteSpace() || areaNote.Contains("A1H1") || areaNote.Contains("A2H1") || areaNote.Contains("A4")) continue;
+                    DetectorInfo detectorInfo = new DetectorInfo();
+                    switch (areaNote)
                     {
-                        //筛选本层房间，true继续，false跳过
-                        if (roomArea.Level != floorArea.Level) continue;
-                        //判断房间类型
-                        string areaNote = roomArea.Note;
-                        if (areaNote.IsNullOrWhiteSpace() || areaNote.Contains("A1H1") || areaNote.Contains("A2H1") || areaNote.Contains("A4")) continue;
-                        DetectorInfo detectorInfo = new DetectorInfo();
-                        switch (areaNote)
+                        case "A1H2":
+                            detectorInfo.Radius = 6700;
+                            detectorInfo.Area1 = 16;
+                            detectorInfo.Area2 = 24;
+                            detectorInfo.Area3 = 32;
+                            detectorInfo.Area4 = 48;
+                            break;
+                        case "A1H3":
+                            detectorInfo.Radius = 5800;
+                            detectorInfo.Area1 = 12;
+                            detectorInfo.Area2 = 18;
+                            detectorInfo.Area3 = 24;
+                            detectorInfo.Area4 = 36;
+                            break;
+                        case "A2H2":
+                            detectorInfo.Radius = 4400;
+                            detectorInfo.Area1 = 6;
+                            detectorInfo.Area2 = 9;
+                            detectorInfo.Area3 = 12;
+                            detectorInfo.Area4 = 18;
+                            break;
+                        case "A2H3":
+                            detectorInfo.Radius = 3600;
+                            detectorInfo.Area1 = 4;
+                            detectorInfo.Area2 = 6;
+                            detectorInfo.Area3 = 8;
+                            detectorInfo.Area4 = 12;
+                            break;
+                    }
+
+                    Coordinate[] roomCoordinates = GetRoomCoordinates(roomArea);
+                    Polygon roomPolygon = geometryFactory.CreatePolygon(roomCoordinates);
+                    Dictionary<Geometry, double> geometriyDictionary = new Dictionary<Geometry, double>();
+                    foreach (var slab in newSlabs)
+                    {
+                        //筛选本层板，true继续，false跳过
+                        if (slab.Floor.LevelB != floorArea.Level) continue;
+                        slab.TranslateVertices(vector3D);
+                        Coordinate[] slabCoordinates = GetSlabCoordinates(slab);
+                        Polygon slabPolygon = geometryFactory.CreatePolygon(slabCoordinates);
+
+                        Geometry geometry = roomPolygon.Intersection(slabPolygon);
+                        if (geometry.OgcGeometryType == OgcGeometryType.Polygon)
                         {
-                            case "A1H2":
-                                detectorInfo.Radius = 6700;
-                                detectorInfo.Area1 = 16;
-                                detectorInfo.Area2 = 24;
-                                detectorInfo.Area3 = 32;
-                                detectorInfo.Area4 = 48;
-                                break;
-                            case "A1H3":
-                                detectorInfo.Radius = 5800;
-                                detectorInfo.Area1 = 12;
-                                detectorInfo.Area2 = 18;
-                                detectorInfo.Area3 = 24;
-                                detectorInfo.Area4 = 36;
-                                break;
-                            case "A2H2":
-                                detectorInfo.Radius = 4400;
-                                detectorInfo.Area1 = 6;
-                                detectorInfo.Area2 = 9;
-                                detectorInfo.Area3 = 12;
-                                detectorInfo.Area4 = 18;
-                                break;
-                            case "A2H3":
-                                detectorInfo.Radius = 3600;
-                                detectorInfo.Area1 = 4;
-                                detectorInfo.Area2 = 6;
-                                detectorInfo.Area3 = 8;
-                                detectorInfo.Area4 = 12;
-                                break;
+                            if (geometry.IsEmpty) continue;
+                            geometriyDictionary.Add(geometry, slab.Thickness);
                         }
+                        slab.TranslateVertices(-vector3D);
+                    }
 
-                        Coordinate[] roomCoordinates = GetRoomCoordinates(roomArea);
-                        Polygon roomPolygon = geometryFactory.CreatePolygon(roomCoordinates);
-                        Dictionary<Geometry, double> geometries = new Dictionary<Geometry, double>();
-                        foreach (var slab in slabs)
+                    SetLayer(database, $"E-EQUIP", 4);
+
+                    //对多段线集合按照面积进行排序
+                    geometriyDictionary.OrderByDescending(g => g.Key.Area);
+                    List<Point> points = new List<Point>();
+                    List<Geometry> tempGeometries = new List<Geometry>();
+                    //根据多段线集合生成探测器
+                    foreach (var geometryItem in geometriyDictionary)
+                    {
+                        if (tempGeometries.Contains(geometryItem.Key)) continue;
+                        tempGeometries.Add(geometryItem.Key);
+                        //多边形内布置一个或多个点位
+                        if ((geometryItem.Key.Area / 1000000) > detectorInfo.Area4)
                         {
-                            //筛选本层板，true继续，false跳过
-                            if (slab.Floor.LevelB != floorArea.Level) continue;
-                            slab.TranslateVertices(vector3D);
-                            Coordinate[] slabCoordinates = GetSlabCoordinates(slab);
-                            Polygon slabPolygon = geometryFactory.CreatePolygon(slabCoordinates);
-
-                            //不相交或相邻，相交，包含，属于
-                            if (roomPolygon.Intersects(slabPolygon))
+                            //如果为假，超出保护范围，需要切分为n个子区域
+                            if (IsProtected(geometryItem.Key, detectorInfo.Radius, geometryFactory, newBeams, floorArea))
                             {
-                                Geometry geometry = roomPolygon.Intersection(slabPolygon);
-                                if (geometry.OgcGeometryType == OgcGeometryType.Polygon)
-                                {
-                                    geometries.Add(geometry, slab.Thickness);
-                                }
-                            }
-                            else if (roomPolygon.Contains(slabPolygon))
-                            {
-                                geometries.Add((Geometry)slabPolygon, slab.Thickness);
-                            }
-                            else if (roomPolygon.Within(slabPolygon))
-                            {
-                                geometries.Add((Geometry)roomPolygon, slab.Thickness);
-                            }
-                            slab.TranslateVertices(-vector3D);
-                        }
-
-                        SetLayer(database, $"E-EQUIP", 4);
-
-                        //对多段线集合按照面积进行排序
-                        geometries.OrderByDescending(g => g.Key.Area);
-                        List<Point> points = new List<Point>();
-                        List<Geometry> tempGeometries = new List<Geometry>();
-                        //根据多段线集合生成探测器
-                        foreach (var geometry in geometries)
-                        {
-                            if (tempGeometries.Contains(geometry.Key)) continue;
-                            //多边形内布置一个或多个点位
-                            if (geometry.Key.Area > detectorInfo.Area4)
-                            {
-                                //如果为假，超出保护范围，需要切分为n个子区域
-                                if (IsProtected(geometry.Key, detectorInfo.Radius, geometryFactory, beams, floorArea))
-                                {
-                                    points.Add(geometry.Key.Centroid);
-                                }
-                                else
-                                {
-                                    int n = 2;
-                                    while (true)
-                                    {
-                                        List<Geometry> splitGeometries = SplitPolygon(geometryFactory, geometry.Key, n, 100);
-                                        bool b = true;
-                                        foreach (var item in splitGeometries)
-                                        {
-                                            if (!IsProtected(item, detectorInfo.Radius, geometryFactory, beams, floorArea))
-                                            {
-                                                b = false;
-                                                break;
-                                            }
-                                        }
-                                        if (b)
-                                        {
-                                            foreach (var item in splitGeometries)
-                                            {
-                                                points.Add(item.Centroid);
-                                            }
-                                            break;
-                                        }
-                                        else
-                                        {
-                                            n++;
-                                            continue;
-                                        }
-                                    }
-                                }
-                                tempGeometries.Add(geometry.Key);
+                                points.Add(geometryItem.Key.Centroid);
                             }
                             else
                             {
-                                //如果为假，超出保护范围，需要切分为n个子区域
-                                if (IsProtected(geometry.Key, detectorInfo.Radius, geometryFactory, beams, floorArea))
+                                int n = 2;
+                                while (true)
                                 {
-                                    List<Geometry> beam600 = new List<Geometry>();
-                                    List<Geometry> beam200 = new List<Geometry>();
-                                    //保护范围内是否有其他区域
-                                    foreach (var item in geometries)
+                                    List<Geometry> splitGeometries = SplitPolygon(geometryFactory, geometryItem.Key, n, 1000);
+                                    bool b = true;
+                                    foreach (var item in splitGeometries)
                                     {
-                                        if (tempGeometries.Contains(item.Key)) continue;
-                                        if (!IsProtected(geometry.Key, detectorInfo.Radius, item.Key)) continue;
-                                        if (!(geometry.Key.Intersection(item.Key) is LineString lineString)) continue;
-
-                                        //foreach (var wall in walls)
-                                        //{
-                                        //    if (wall.Floor.LevelB != floor.LevelB) continue;
-                                        //    if (wall.ToLineString().Contains(lineString) || wall.ToLineString().Equals(lineString))
-                                        //    {
-                                        //        break;
-                                        //    }
-                                        //}
-
-                                        foreach (var beam in beams)
+                                        if (!IsProtected(item, detectorInfo.Radius, geometryFactory, newBeams, floorArea))
                                         {
-                                            if (beam.Floor.LevelB != floorArea.Level) continue;
-                                            if (beam.ToLineString().Contains(lineString) || beam.ToLineString().Equals(lineString))
-                                            {
-                                                double height = 0;
-                                                if (beam.IsConcrete)
-                                                {
-                                                    height = beam.Height - item.Value;
-                                                }
-                                                else
-                                                {
-                                                    height = beam.Height;
-                                                }
-
-                                                if (height > 600)
-                                                {
-                                                    break;
-                                                }
-                                                else if (height >= 200 && height <= 600)
-                                                {
-                                                    beam600.Add(item.Key);
-                                                    break;
-                                                }
-                                                else if (height < 200)
-                                                {
-                                                    beam200.Add(item.Key);
-                                                    break;
-                                                }
-                                            }
-                                        }
-                                    }
-
-                                    double area = geometry.Key.Area;
-                                    if (beam200.Count > 0)
-                                    {
-                                        foreach (var item in beam200)
-                                        {
-                                            area += item.Area;
-                                            tempGeometries.Add(item);
-                                        }
-                                    }
-
-                                    if (detectorInfo.Area3 < area && area <= detectorInfo.Area4)
-                                    {
-                                        int count = 2;
-                                        if (beam600.Count > 0)
-                                        {
-                                            beam600.OrderByDescending(a => a.Area);
-                                            for (int i = 0; i < count; i++)
-                                            {
-                                                tempGeometries.Add(beam600[i]);
-                                            }
-                                        }
-                                    }
-                                    else if (detectorInfo.Area2 < area && area <= detectorInfo.Area3)
-                                    {
-                                        int count = 3;
-                                        if (beam600.Count > 0)
-                                        {
-                                            beam600.OrderByDescending(a => a.Area);
-                                            for (int i = 0; i < count; i++)
-                                            {
-                                                tempGeometries.Add(beam600[i]);
-                                            }
-                                        }
-
-                                    }
-                                    else if (detectorInfo.Area1 < area && area <= detectorInfo.Area2)
-                                    {
-                                        int count = 4;
-                                        if (beam600.Count > 0)
-                                        {
-                                            beam600.OrderByDescending(a => a.Area);
-                                            for (int i = 0; i < count; i++)
-                                            {
-                                                tempGeometries.Add(beam600[i]);
-                                            }
-                                        }
-
-                                    }
-                                    else if (area < detectorInfo.Area1)
-                                    {
-                                        int count = 5;
-                                        if (beam600.Count > 0)
-                                        {
-                                            beam600.OrderByDescending(a => a.Area);
-                                            for (int i = 0; i < count; i++)
-                                            {
-                                                tempGeometries.Add(beam600[i]);
-                                            }
-                                        }
-
-                                    }
-                                    points.Add(geometry.Key.Centroid);
-
-                                }
-                                else
-                                {
-                                    int n = 2;
-                                    while (true)
-                                    {
-                                        List<Geometry> splitGeometries = SplitPolygon(geometryFactory, geometry.Key, n, 100);
-                                        bool b = true;
-                                        foreach (var item in splitGeometries)
-                                        {
-                                            if (!IsProtected(item, detectorInfo.Radius, geometryFactory, beams, floorArea))
-                                            {
-                                                b = false; break;
-                                            }
-                                        }
-                                        if (b)
-                                        {
-                                            foreach (var item in splitGeometries)
-                                            {
-                                                points.Add(item.Centroid);
-                                            }
+                                            b = false;
                                             break;
                                         }
-                                        else
+                                    }
+                                    if (b)
+                                    {
+                                        foreach (var item in splitGeometries)
                                         {
-                                            n++;
-                                            continue;
+                                            points.Add(item.Centroid);
+                                        }
+                                        break;
+                                    }
+                                    else
+                                    {
+                                        n++;
+                                        continue;
+                                    }
+                                }
+                            }
+                        }
+                        else
+                        {
+                            //如果为假，超出保护范围，需要切分为n个子区域
+                            if (IsProtected(geometryItem.Key, detectorInfo.Radius, geometryFactory, newBeams, floorArea))
+                            {
+                                List<Geometry> beam600 = new List<Geometry>();
+                                List<Geometry> beam200 = new List<Geometry>();
+                                //保护范围内是否有其他区域
+                                foreach (var item in geometriyDictionary)
+                                {
+
+                                    if (tempGeometries.Contains(item.Key)) continue;
+                                    if (!IsProtected(geometryItem.Key, detectorInfo.Radius, item.Key)) continue;
+                                    if (!(geometryItem.Key.Intersection(item.Key) is LineString lineString)) continue;
+
+                                    foreach (var beam in newBeams)
+                                    {
+                                        if (beam.Floor.LevelB != floorArea.Level) continue;
+                                        LineString beamLineString = beam.ToLineString(geometryFactory);
+                                        bool bo1 = beamLineString.Contains(lineString);
+                                        bool bo2 = beamLineString.Equals(lineString);
+                                        if (bo1 || bo2)
+                                        {
+                                            double height = 0;
+                                            if (beam.IsConcrete)
+                                            {
+                                                height = beam.Height - item.Value;
+                                            }
+                                            else
+                                            {
+                                                height = beam.Height;
+                                            }
+
+                                            if (height > 600)
+                                            {
+                                                break;
+                                            }
+                                            else if (height >= 200 && height <= 600)
+                                            {
+                                                beam600.Add(item.Key);
+                                                break;
+                                            }
+                                            else if (0 < height && height < 200)
+                                            {
+                                                beam200.Add(item.Key);
+                                                break;
+                                            }
                                         }
                                     }
                                 }
-                                tempGeometries.Add(geometry.Key);
+
+                                double area = geometryItem.Key.Area;
+                                if (beam200.Count > 0)
+                                {
+                                    foreach (var item in beam200)
+                                    {
+                                        area += item.Area;
+                                        tempGeometries.Add(item);
+                                    }
+                                }
+
+                                if (detectorInfo.Area3 < area && area <= detectorInfo.Area4)
+                                {
+                                    int count = 2;
+                                    if (beam600.Count > 0)
+                                    {
+                                        beam600.OrderByDescending(a => a.Area);
+                                        for (int i = 0; i < count; i++)
+                                        {
+                                            tempGeometries.Add(beam600[i]);
+                                        }
+                                    }
+                                }
+                                else if (detectorInfo.Area2 < area && area <= detectorInfo.Area3)
+                                {
+                                    int count = 3;
+                                    if (beam600.Count > 0)
+                                    {
+                                        beam600.OrderByDescending(a => a.Area);
+                                        for (int i = 0; i < count; i++)
+                                        {
+                                            tempGeometries.Add(beam600[i]);
+                                        }
+                                    }
+
+                                }
+                                else if (detectorInfo.Area1 < area && area <= detectorInfo.Area2)
+                                {
+                                    int count = 4;
+                                    if (beam600.Count > 0)
+                                    {
+                                        beam600.OrderByDescending(a => a.Area);
+                                        for (int i = 0; i < count; i++)
+                                        {
+                                            tempGeometries.Add(beam600[i]);
+                                        }
+                                    }
+
+                                }
+                                else if (area < detectorInfo.Area1)
+                                {
+                                    int count = 5;
+                                    if (beam600.Count > 0)
+                                    {
+                                        beam600.OrderByDescending(a => a.Area);
+                                        for (int i = 0; i < count; i++)
+                                        {
+                                            tempGeometries.Add(beam600[i]);
+                                        }
+                                    }
+
+                                }
+                                points.Add(geometryItem.Key.Centroid);
+
+                            }
+                            else
+                            {
+                                int n = 2;
+                                while (true)
+                                {
+                                    List<Geometry> splitGeometries = SplitPolygon(geometryFactory, geometryItem.Key, n, 1000);
+                                    bool b = true;
+                                    foreach (var item in splitGeometries)
+                                    {
+                                        if (!IsProtected(item, detectorInfo.Radius, geometryFactory, newBeams, floorArea))
+                                        {
+                                            b = false; break;
+                                        }
+                                    }
+                                    if (b)
+                                    {
+                                        foreach (var item in splitGeometries)
+                                        {
+                                            points.Add(item.Centroid);
+                                        }
+                                        break;
+                                    }
+                                    else
+                                    {
+                                        n++;
+                                        continue;
+                                    }
+                                }
                             }
                         }
-                        //去除距梁边小于500mm的布置点
                     }
+                    //去除距梁边小于500mm的布置点
+                }
+                try
+                {
+                    #region 根据房间边界及板轮廓生成烟感
+
 
                     #endregion
 
@@ -1302,38 +1292,51 @@ namespace TimeIsLife.CADCommand
                     JoinStyle = NetTopologySuite.Operation.Buffer.JoinStyle.Mitre,
                 };
 
-                int n = polygon.NumPoints;
+                int n = polygon.NumPoints - 1;
                 LineString[] list = new LineString[n];
                 for (int i = 0; i < n; i++)
                 {
-
                     double d = centerPoint.Coordinate.Distance(polygon.Coordinates[i]);
                     if (d > radius)
                     {
                         b = false;
-                        break;
+                        return b;
                     }
-                    LineString lineString = (LineString)geometryFactory.CreateLineString
-                        (new[] { polygon.Coordinates[i % n], polygon.Coordinates[(i + 1) % n] });
+                    LineString lineString = geometryFactory.CreateLineString(new[] { polygon.Coordinates[i % n], polygon.Coordinates[(i + 1) % n] });
                     foreach (var beam in beams)
                     {
                         if (beam.Floor.LevelB != floor.Level) continue;
-                        if (beam.ToLineString().Contains(lineString) || beam.ToLineString().Equals(lineString))
+                        LineString beamLineString = beam.ToLineString(geometryFactory);
+                        if (beamLineString.Contains(lineString) || beamLineString.Equals(lineString))
                         {
-                            list[i] = (LineString)lineString.Buffer(-beam.Width / 2, bufferParam);
+                            OffsetCurveBuilder offsetCurveBuilder = new OffsetCurveBuilder(geometryFactory.PrecisionModel, bufferParam);
+                            LineString offsetLineString = geometryFactory.CreateLineString(offsetCurveBuilder.GetLineCurve(lineString.Coordinates, -beam.Width / 2));
+                            if (offsetLineString == null) continue;
+                            list[i] = offsetLineString;
                             break;
                         }
                     }
+                    if (list[i] == null) list[i] = lineString;
                 }
 
                 double distance = -500;
                 GeometryCollection geometryCollection = new GeometryCollection(list, geometryFactory);
-                geometryCollection.Union();
-                Polygonizer polygonizer = new Polygonizer();
-                foreach (var item in geometryCollection)
+                Geometry unionedGeometry = null;
+                foreach (var geometryItem in geometryCollection)
                 {
-                    polygonizer.Add(item);
+                    if (unionedGeometry == null)
+                    {
+                        unionedGeometry = geometryItem;
+                    }
+                    else
+                    {
+                        unionedGeometry = unionedGeometry.Union(geometryItem);
+                    }
                 }
+
+                Polygonizer polygonizer = new Polygonizer();
+                polygonizer.Add(unionedGeometry);
+
                 var polygons = polygonizer.GetPolygons();
                 switch (polygons.Count)
                 {
@@ -1538,7 +1541,7 @@ namespace TimeIsLife.CADCommand
             Coordinate[] coordinates = new Coordinate[n + 1];
             for (int i = 0; i < n + 1; i++)
             {
-                coordinates[i] = new Coordinate(double.Parse(roomAear.VertexX.Split(',')[i % (n)]), double.Parse(roomAear.VertexY.Split(',')[i % (n)]));
+                coordinates[i] = new Coordinate(double.Parse(roomAear.VertexX.Split(',')[i % n]), double.Parse(roomAear.VertexY.Split(',')[i % n]));
             }
             return coordinates;
         }

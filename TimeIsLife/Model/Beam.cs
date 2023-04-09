@@ -47,10 +47,10 @@ namespace TimeIsLife.CADCommand
                     return height;
                 }
             }
-            public LineString ToLineString()
+            public LineString ToLineString(GeometryFactory geometryFactory)
             {
-                Coordinate[] coordinates = new Coordinate[] { new Coordinate(this.Grid.Joint1.X, this.Grid.Joint1.Y), new Coordinate(this.Grid.Joint2.X, this.Grid.Joint2.Y) };
-                return new LineString(coordinates);
+                Coordinate[] coordinates = new Coordinate[] { new Coordinate(Math.Round(Grid.Joint1.X, 2), Math.Round(Grid.Joint1.Y, 2)), new Coordinate(Math.Round(Grid.Joint2.X, 2), Math.Round(Grid.Joint2.Y, 2)) };
+                return geometryFactory.CreateLineString(coordinates);
             }
 
             public double Width
