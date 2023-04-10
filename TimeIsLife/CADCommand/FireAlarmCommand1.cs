@@ -710,7 +710,7 @@ namespace TimeIsLife.CADCommand
             NetTopologySuite.NtsGeometryServices.Instance = new NetTopologySuite.NtsGeometryServices
                 (
                 NetTopologySuite.Geometries.Implementation.CoordinateArraySequenceFactory.Instance,
-                new PrecisionModel(0.01d),
+                new PrecisionModel(0.001d),
                 4326
                 );
             GeometryFactory geometryFactory = NtsGeometryServices.Instance.CreateGeometryFactory();
@@ -921,7 +921,15 @@ namespace TimeIsLife.CADCommand
                         if (geometry.OgcGeometryType == OgcGeometryType.Polygon)
                         {
                             if (geometry.IsEmpty) continue;
-                            geometriyDictionary.Add(geometry, slab.Thickness);
+                            if (slab.Thickness > 0 && slab.Thickness < 9999)
+                            {
+                                geometriyDictionary.Add(geometry, slab.Thickness);
+                            }
+                            else
+                            {
+                                geometriyDictionary.Add(geometry, 0);
+                            }
+
                         }
                         slab.TranslateVertices(-vector3D);
                     }
@@ -929,11 +937,11 @@ namespace TimeIsLife.CADCommand
                     SetLayer(database, $"E-EQUIP", 4);
 
                     //对多段线集合按照面积进行排序
-                    geometriyDictionary.OrderByDescending(g => g.Key.Area);
+                    var orderedGeometriyDictionary = geometriyDictionary.OrderByDescending(g => g.Key.Area).ToDictionary(x => x.Key, x => x.Value);
                     List<Point> points = new List<Point>();
                     List<Geometry> tempGeometries = new List<Geometry>();
                     //根据多段线集合生成探测器
-                    foreach (var geometryItem in geometriyDictionary)
+                    foreach (var geometryItem in orderedGeometriyDictionary)
                     {
                         if (tempGeometries.Contains(geometryItem.Key)) continue;
                         tempGeometries.Add(geometryItem.Key);
@@ -950,7 +958,7 @@ namespace TimeIsLife.CADCommand
                                 int n = 2;
                                 while (true)
                                 {
-                                    List<Geometry> splitGeometries = SplitPolygon(geometryFactory, geometryItem.Key, n, 1000);
+                                    List<Geometry> splitGeometries = SplitPolygon(geometryFactory, geometryItem.Key, n, 100);
                                     bool b = true;
                                     foreach (var item in splitGeometries)
                                     {
@@ -984,7 +992,7 @@ namespace TimeIsLife.CADCommand
                                 List<Geometry> beam600 = new List<Geometry>();
                                 List<Geometry> beam200 = new List<Geometry>();
                                 //保护范围内是否有其他区域
-                                foreach (var item in geometriyDictionary)
+                                foreach (var item in orderedGeometriyDictionary)
                                 {
 
                                     if (tempGeometries.Contains(item.Key)) continue;
@@ -1027,12 +1035,12 @@ namespace TimeIsLife.CADCommand
                                     }
                                 }
 
-                                double area = geometryItem.Key.Area;
+                                double area = geometryItem.Key.Area / 1000000;
                                 if (beam200.Count > 0)
                                 {
                                     foreach (var item in beam200)
                                     {
-                                        area += item.Area;
+                                        area += item.Area / 1000000;
                                         tempGeometries.Add(item);
                                     }
                                 }
@@ -1096,13 +1104,14 @@ namespace TimeIsLife.CADCommand
                                 int n = 2;
                                 while (true)
                                 {
-                                    List<Geometry> splitGeometries = SplitPolygon(geometryFactory, geometryItem.Key, n, 1000);
+                                    List<Geometry> splitGeometries = SplitPolygon(geometryFactory, geometryItem.Key, n, 50);
                                     bool b = true;
                                     foreach (var item in splitGeometries)
                                     {
                                         if (!IsProtected(item, detectorInfo.Radius, geometryFactory, newBeams, floorArea))
                                         {
-                                            b = false; break;
+                                            b = false;
+                                            break;
                                         }
                                     }
                                     if (b)
@@ -1123,6 +1132,12 @@ namespace TimeIsLife.CADCommand
                         }
                     }
                     //去除距梁边小于500mm的布置点
+                    foreach (var point in points)
+                    {
+                        BlockReference blockReference = new BlockReference(new Point3d(point.X, point.Y, 0), smokeDetectorID);
+                        blockReference.ScaleFactors = new Scale3d(100);
+                        database.AddToModelSpace(blockReference);
+                    }
                 }
                 try
                 {
@@ -1470,7 +1485,7 @@ namespace TimeIsLife.CADCommand
         {
             Point centerPoint = geometry.Centroid;
             bool b = true;
-            for (int i = 0; i < touchGeometry.NumPoints; i++)
+            for (int i = 0; i < touchGeometry.NumPoints - 1; i++)
             {
 
                 double d = centerPoint.Coordinate.Distance(touchGeometry.Coordinates[i]);
@@ -1497,7 +1512,7 @@ namespace TimeIsLife.CADCommand
             for (int i = 0; i < n + 1; i++)
             {
 
-                coordinates[i] = new Coordinate(double.Parse(vertexX[i % n]), double.Parse(vertexY[i % n]));
+                coordinates[i] = new Coordinate(Math.Round(double.Parse(vertexX[i % n]), 3), Math.Round(double.Parse(vertexY[i % n]), 3));
             }
             return coordinates;
         }
@@ -1541,7 +1556,7 @@ namespace TimeIsLife.CADCommand
             Coordinate[] coordinates = new Coordinate[n + 1];
             for (int i = 0; i < n + 1; i++)
             {
-                coordinates[i] = new Coordinate(double.Parse(roomAear.VertexX.Split(',')[i % n]), double.Parse(roomAear.VertexY.Split(',')[i % n]));
+                coordinates[i] = new Coordinate(Math.Round(double.Parse(roomAear.VertexX.Split(',')[i % n]), 3), Math.Round(double.Parse(roomAear.VertexY.Split(',')[i % n]), 3));
             }
             return coordinates;
         }
@@ -1769,7 +1784,7 @@ namespace TimeIsLife.CADCommand
                 {
                     double x = minPoint.X + random.NextDouble() * (maxPoint.X - minPoint.X);
                     double y = minPoint.Y + random.NextDouble() * (maxPoint.Y - minPoint.Y);
-                    Point point2D = new Point(x, y);
+                    Point point2D = geometryFactory.CreatePoint(new Coordinate(x, y));
 
                     if (point2D.Within(geometry))
                     {

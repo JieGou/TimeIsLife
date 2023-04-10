@@ -49,7 +49,7 @@ namespace TimeIsLife.CADCommand
             }
             public LineString ToLineString(GeometryFactory geometryFactory)
             {
-                Coordinate[] coordinates = new Coordinate[] { new Coordinate(Math.Round(Grid.Joint1.X, 2), Math.Round(Grid.Joint1.Y, 2)), new Coordinate(Math.Round(Grid.Joint2.X, 2), Math.Round(Grid.Joint2.Y, 2)) };
+                Coordinate[] coordinates = new Coordinate[] { new Coordinate(Math.Round(Grid.Joint1.X, 3), Math.Round(Grid.Joint1.Y, 3)), new Coordinate(Math.Round(Grid.Joint2.X, 3), Math.Round(Grid.Joint2.Y, 3)) };
                 return geometryFactory.CreateLineString(coordinates);
             }
 
