@@ -927,7 +927,7 @@ namespace TimeIsLife.CADCommand
                             }
                             else
                             {
-                                geometriyDictionary.Add(geometry, 0);
+                                geometriyDictionary.Add(geometry, 120);
                             }
 
                         }
@@ -938,7 +938,7 @@ namespace TimeIsLife.CADCommand
 
                     //对多段线集合按照面积进行排序
                     var orderedGeometriyDictionary = geometriyDictionary.OrderByDescending(g => g.Key.Area).ToDictionary(x => x.Key, x => x.Value);
-                    List<Point> points = new List<Point>();
+                    List<Coordinate> coordinates = new List<Coordinate>();
                     List<Geometry> tempGeometries = new List<Geometry>();
                     //根据多段线集合生成探测器
                     foreach (var geometryItem in orderedGeometriyDictionary)
@@ -951,7 +951,7 @@ namespace TimeIsLife.CADCommand
                             //如果为假，超出保护范围，需要切分为n个子区域
                             if (IsProtected(geometryItem.Key, detectorInfo.Radius, geometryFactory, newBeams, floorArea))
                             {
-                                points.Add(geometryItem.Key.Centroid);
+                                coordinates.Add(geometryItem.Key.Centroid.Coordinate);
                             }
                             else
                             {
@@ -972,7 +972,7 @@ namespace TimeIsLife.CADCommand
                                     {
                                         foreach (var item in splitGeometries)
                                         {
-                                            points.Add(item.Centroid);
+                                            coordinates.Add(item.Centroid.Coordinate);
                                         }
                                         break;
                                     }
@@ -989,8 +989,8 @@ namespace TimeIsLife.CADCommand
                             //如果为假，超出保护范围，需要切分为n个子区域
                             if (IsProtected(geometryItem.Key, detectorInfo.Radius, geometryFactory, newBeams, floorArea))
                             {
-                                List<Geometry> beam600 = new List<Geometry>();
-                                List<Geometry> beam200 = new List<Geometry>();
+                                List<Geometry> beam600Geometries = new List<Geometry>();
+                                List<Geometry> beam200Geometries = new List<Geometry>();
                                 //保护范围内是否有其他区域
                                 foreach (var item in orderedGeometriyDictionary)
                                 {
@@ -1023,12 +1023,12 @@ namespace TimeIsLife.CADCommand
                                             }
                                             else if (height >= 200 && height <= 600)
                                             {
-                                                beam600.Add(item.Key);
+                                                beam600Geometries.Add(item.Key);
                                                 break;
                                             }
                                             else if (0 < height && height < 200)
                                             {
-                                                beam200.Add(item.Key);
+                                                beam200Geometries.Add(item.Key);
                                                 break;
                                             }
                                         }
@@ -1036,9 +1036,9 @@ namespace TimeIsLife.CADCommand
                                 }
 
                                 double area = geometryItem.Key.Area / 1000000;
-                                if (beam200.Count > 0)
+                                if (beam200Geometries.Count > 0)
                                 {
-                                    foreach (var item in beam200)
+                                    foreach (var item in beam200Geometries)
                                     {
                                         area += item.Area / 1000000;
                                         tempGeometries.Add(item);
@@ -1048,55 +1048,25 @@ namespace TimeIsLife.CADCommand
                                 if (detectorInfo.Area3 < area && area <= detectorInfo.Area4)
                                 {
                                     int count = 2;
-                                    if (beam600.Count > 0)
-                                    {
-                                        beam600.OrderByDescending(a => a.Area);
-                                        for (int i = 0; i < count; i++)
-                                        {
-                                            tempGeometries.Add(beam600[i]);
-                                        }
-                                    }
+                                    IsProtectedByGeometry(tempGeometries, beam600Geometries, count);
                                 }
                                 else if (detectorInfo.Area2 < area && area <= detectorInfo.Area3)
                                 {
                                     int count = 3;
-                                    if (beam600.Count > 0)
-                                    {
-                                        beam600.OrderByDescending(a => a.Area);
-                                        for (int i = 0; i < count; i++)
-                                        {
-                                            tempGeometries.Add(beam600[i]);
-                                        }
-                                    }
-
+                                    IsProtectedByGeometry(tempGeometries, beam600Geometries, count);
                                 }
                                 else if (detectorInfo.Area1 < area && area <= detectorInfo.Area2)
                                 {
                                     int count = 4;
-                                    if (beam600.Count > 0)
-                                    {
-                                        beam600.OrderByDescending(a => a.Area);
-                                        for (int i = 0; i < count; i++)
-                                        {
-                                            tempGeometries.Add(beam600[i]);
-                                        }
-                                    }
-
+                                    IsProtectedByGeometry(tempGeometries, beam600Geometries, count);
                                 }
                                 else if (area < detectorInfo.Area1)
                                 {
                                     int count = 5;
-                                    if (beam600.Count > 0)
-                                    {
-                                        beam600.OrderByDescending(a => a.Area);
-                                        for (int i = 0; i < count; i++)
-                                        {
-                                            tempGeometries.Add(beam600[i]);
-                                        }
-                                    }
-
+                                    IsProtectedByGeometry(tempGeometries, beam600Geometries, count);
                                 }
-                                points.Add(geometryItem.Key.Centroid);
+                                Coordinate coordinate = geometryItem.Key.Centroid.Coordinate;
+                                coordinates.Add(coordinate);
 
                             }
                             else
@@ -1118,7 +1088,7 @@ namespace TimeIsLife.CADCommand
                                     {
                                         foreach (var item in splitGeometries)
                                         {
-                                            points.Add(item.Centroid);
+                                            coordinates.Add(item.Centroid.Coordinate);
                                         }
                                         break;
                                     }
@@ -1132,9 +1102,9 @@ namespace TimeIsLife.CADCommand
                         }
                     }
                     //去除距梁边小于500mm的布置点
-                    foreach (var point in points)
+                    foreach (var coordinate in coordinates)
                     {
-                        BlockReference blockReference = new BlockReference(new Point3d(point.X, point.Y, 0), smokeDetectorID);
+                        BlockReference blockReference = new BlockReference(new Point3d(coordinate.X, coordinate.Y, 0), smokeDetectorID);
                         blockReference.ScaleFactors = new Scale3d(100);
                         database.AddToModelSpace(blockReference);
                     }
@@ -1255,6 +1225,29 @@ namespace TimeIsLife.CADCommand
                 }
             }
             editor.WriteMessage("\n结束");
+        }
+
+        private static void IsProtectedByGeometry(List<Geometry> tempGeometries, List<Geometry> beam600Geometries, int count)
+        {
+            int n = beam600Geometries.Count;
+            if (n > 0)
+            {
+                var orderedBeam600Geometries = beam600Geometries.OrderByDescending(a => a.Area);
+                if (n >= count)
+                {
+                    for (int i = 0; i < count; i++)
+                    {
+                        tempGeometries.Add(beam600Geometries[i]);
+                    }
+                }
+                else
+                {
+                    for (int i = 0; i < n; i++)
+                    {
+                        tempGeometries.Add(beam600Geometries[i]);
+                    }
+                }
+            }
         }
 
         private string GetAreaFilePath()
