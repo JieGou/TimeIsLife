@@ -108,4 +108,3 @@ D:\github\TimeIsLife\TimeIsLife\obj\Debug\TimeIsLife.csproj.CopyComplete
 D:\github\TimeIsLife\TimeIsLife\obj\Debug\TimeIsLife.dll
 D:\github\TimeIsLife\TimeIsLife\obj\Debug\TimeIsLife.pdb
 D:\GitHub\TimeIsLife\TimeIsLife\bin\Debug\Block\FA-09-智能型点型感温探测器.dwg
-D:\github\TimeIsLife\TimeIsLife\bin\Debug\clipper_library.dll

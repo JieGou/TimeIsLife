@@ -47,9 +47,9 @@ namespace TimeIsLife.CADCommand
                     return height;
                 }
             }
-            public LineString ToLineString(GeometryFactory geometryFactory)
+            public LineString ToLineString(GeometryFactory geometryFactory, double d)
             {
-                Coordinate[] coordinates = new Coordinate[] { new Coordinate(Math.Round(Grid.Joint1.X, 3), Math.Round(Grid.Joint1.Y, 3)), new Coordinate(Math.Round(Grid.Joint2.X, 3), Math.Round(Grid.Joint2.Y, 3)) };
+                Coordinate[] coordinates = new Coordinate[] { new Coordinate(Math.Round(Grid.Joint1.X, 3) * d, Math.Round(Grid.Joint1.Y, 3) * d), new Coordinate(Math.Round(Grid.Joint2.X, 3) * d, Math.Round(Grid.Joint2.Y, 3) * d) };
                 return geometryFactory.CreateLineString(coordinates);
             }
 
