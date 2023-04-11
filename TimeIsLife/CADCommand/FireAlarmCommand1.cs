@@ -906,7 +906,9 @@ namespace TimeIsLife.CADCommand
                             break;
                     }
 
+
                     Coordinate[] roomCoordinates = GetRoomCoordinates(roomArea);
+                    roomCoordinates = ConvertCoordinatesToIntPoints(roomCoordinates, 1e3);
                     Polygon roomPolygon = geometryFactory.CreatePolygon(roomCoordinates);
                     Dictionary<Geometry, double> geometriyDictionary = new Dictionary<Geometry, double>();
                     foreach (var slab in newSlabs)
@@ -915,22 +917,42 @@ namespace TimeIsLife.CADCommand
                         if (slab.Floor.LevelB != floorArea.Level) continue;
                         slab.TranslateVertices(vector3D);
                         Coordinate[] slabCoordinates = GetSlabCoordinates(slab);
+                        slabCoordinates = ConvertCoordinatesToIntPoints(slabCoordinates, 1e3);
                         Polygon slabPolygon = geometryFactory.CreatePolygon(slabCoordinates);
 
-                        Geometry geometry = roomPolygon.Intersection(slabPolygon);
-                        if (geometry.OgcGeometryType == OgcGeometryType.Polygon)
+                        if (roomPolygon.Intersects(slabPolygon))
                         {
-                            if (geometry.IsEmpty) continue;
-                            if (slab.Thickness > 0 && slab.Thickness < 9999)
+                            if (roomPolygon.IsValid == false)
                             {
-                                geometriyDictionary.Add(geometry, slab.Thickness);
+                                roomPolygon = (Polygon)NetTopologySuite.Geometries.Utilities.GeometryFixer.Fix(roomPolygon);
                             }
-                            else
+                            if (slabPolygon.IsValid == false)
                             {
-                                geometriyDictionary.Add(geometry, 120);
+                                slabPolygon = (Polygon)NetTopologySuite.Geometries.Utilities.GeometryFixer.Fix(slabPolygon);
                             }
 
+                            //返回结果不正确
+                            var intersectionGeometry = roomPolygon.Intersection(slabPolygon);
+
+
+
+                            if (intersectionGeometry.OgcGeometryType == OgcGeometryType.Polygon)
+                            {
+                                if (intersectionGeometry.IsEmpty) continue;
+                                Coordinate[] coordinates1 = intersectionGeometry.Coordinates;
+                                coordinates1 = ConvertCoordinatesToIntPoints(coordinates1, 1e-3);
+                                Polygon resultGeometry = geometryFactory.CreatePolygon(coordinates1);
+                                if (slab.Thickness > 0 && slab.Thickness < 9999)
+                                {
+                                    geometriyDictionary.Add(resultGeometry, slab.Thickness);
+                                }
+                                else
+                                {
+                                    geometriyDictionary.Add(resultGeometry, 120);
+                                }
+                            }
                         }
+
                         slab.TranslateVertices(-vector3D);
                     }
 
@@ -1225,6 +1247,18 @@ namespace TimeIsLife.CADCommand
                 }
             }
             editor.WriteMessage("\n结束");
+        }
+
+        private static Coordinate[] ConvertCoordinatesToIntPoints(Coordinate[] coordinates, double coordinateConversionFactor)
+        {
+            Coordinate[] intPoints = new Coordinate[coordinates.Length];
+
+            for (int i = 0; i < coordinates.Length; i++)
+            {
+                intPoints[i] = new Coordinate((coordinates[i].X * coordinateConversionFactor), (coordinates[i].Y * coordinateConversionFactor));
+            }
+
+            return intPoints;
         }
 
         private static void IsProtectedByGeometry(List<Geometry> tempGeometries, List<Geometry> beam600Geometries, int count)
