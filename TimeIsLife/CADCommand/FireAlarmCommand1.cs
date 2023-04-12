@@ -64,6 +64,9 @@ using Database = Autodesk.AutoCAD.DatabaseServices.Database;
 using System.Windows.Shapes;
 using Polygon = NetTopologySuite.Geometries.Polygon;
 using Path = System.IO.Path;
+using NetTopologySuite.Operation.Valid;
+using NetTopologySuite.Utilities;
+using System.Windows.Media.Media3D;
 
 [assembly: CommandClass(typeof(TimeIsLife.CADCommand.FireAlarmCommand1))]
 
@@ -713,7 +716,7 @@ namespace TimeIsLife.CADCommand
             NetTopologySuite.NtsGeometryServices.Instance = new NetTopologySuite.NtsGeometryServices
                 (
                 NetTopologySuite.Geometries.Implementation.CoordinateArraySequenceFactory.Instance,
-                new PrecisionModel(1e-3),
+                new PrecisionModel(1000d),
                 4326
                 );
             GeometryFactory geometryFactory = NtsGeometryServices.Instance.CreateGeometryFactory();
@@ -911,7 +914,6 @@ namespace TimeIsLife.CADCommand
 
 
                     Coordinate[] roomCoordinates = GetRoomCoordinates(roomArea);
-                    roomCoordinates = ConvertCoordinatesToIntPoints(roomCoordinates, 1e3);
                     Polygon roomPolygon = geometryFactory.CreatePolygon(roomCoordinates);
                     Dictionary<Geometry, double> geometriyDictionary = new Dictionary<Geometry, double>();
                     foreach (var slab in newSlabs)
@@ -920,7 +922,6 @@ namespace TimeIsLife.CADCommand
                         if (slab.Floor.LevelB != floorArea.Level) continue;
                         slab.TranslateVertices(vector3D);
                         Coordinate[] slabCoordinates = GetSlabCoordinates(slab);
-                        slabCoordinates = ConvertCoordinatesToIntPoints(slabCoordinates, 1e3);
                         Polygon slabPolygon = geometryFactory.CreatePolygon(slabCoordinates);
 
                         if (roomPolygon.Intersects(slabPolygon))
@@ -942,16 +943,13 @@ namespace TimeIsLife.CADCommand
                             if (intersectionGeometry.OgcGeometryType == OgcGeometryType.Polygon)
                             {
                                 if (intersectionGeometry.IsEmpty) continue;
-                                Coordinate[] coordinates1 = intersectionGeometry.Coordinates;
-                                coordinates1 = ConvertCoordinatesToIntPoints(coordinates1, 1e-3);
-                                Polygon resultGeometry = geometryFactory.CreatePolygon(coordinates1);
                                 if (slab.Thickness > 0 && slab.Thickness < 9999)
                                 {
-                                    geometriyDictionary.Add(resultGeometry, slab.Thickness);
+                                    geometriyDictionary.Add(intersectionGeometry, slab.Thickness);
                                 }
                                 else
                                 {
-                                    geometriyDictionary.Add(resultGeometry, 120);
+                                    geometriyDictionary.Add(intersectionGeometry, 120);
                                 }
                             }
                         }
@@ -970,13 +968,14 @@ namespace TimeIsLife.CADCommand
                     {
                         if (tempGeometries.Contains(geometryItem.Key)) continue;
                         tempGeometries.Add(geometryItem.Key);
+                        if (!CanOffest500(geometryItem.Key)) continue;
                         //多边形内布置一个或多个点位
                         if ((geometryItem.Key.Area / 1000000) > detectorInfo.Area4)
                         {
                             //如果为假，超出保护范围，需要切分为n个子区域
-                            if (IsProtected(geometryItem.Key, detectorInfo.Radius, geometryFactory, newBeams, floorArea))
+                            if (IsProtected(geometryFactory, geometryItem.Key, detectorInfo.Radius, newBeams, floorArea))
                             {
-                                coordinates.Add(GetCoordinate(geometryFactory, geometryItem.Key, 1e3));
+                                coordinates.Add(geometryItem.Key.Centroid.Coordinate);
                             }
                             else
                             {
@@ -1012,7 +1011,7 @@ namespace TimeIsLife.CADCommand
                         else
                         {
                             //如果为假，超出保护范围，需要切分为n个子区域
-                            if (IsProtected(geometryItem.Key, detectorInfo.Radius, geometryFactory, newBeams, floorArea))
+                            if (IsProtected(geometryFactory, geometryItem.Key, detectorInfo.Radius, newBeams, floorArea))
                             {
                                 List<Geometry> beam600Geometries = new List<Geometry>();
                                 List<Geometry> beam200Geometries = new List<Geometry>();
@@ -1022,12 +1021,16 @@ namespace TimeIsLife.CADCommand
 
                                     if (tempGeometries.Contains(item.Key)) continue;
                                     if (!IsProtected(geometryFactory, geometryItem.Key, detectorInfo.Radius, item.Key)) continue;
+
+
+
+
                                     if (!(geometryItem.Key.Intersection(item.Key) is LineString lineString)) continue;
 
                                     foreach (var beam in newBeams)
                                     {
                                         if (beam.Floor.LevelB != floorArea.Level) continue;
-                                        LineString beamLineString = beam.ToLineString(geometryFactory, 1);
+                                        LineString beamLineString = beam.ToLineString(geometryFactory);
                                         bool bo1 = beamLineString.Contains(lineString);
                                         bool bo2 = beamLineString.Equals(lineString);
                                         if (bo1 || bo2)
@@ -1090,7 +1093,7 @@ namespace TimeIsLife.CADCommand
                                     int count = 5;
                                     IsProtectedByGeometry(tempGeometries, beam600Geometries, count);
                                 }
-                                Coordinate coordinate = GetCoordinate(geometryFactory, geometryItem.Key, 1e3);
+                                Coordinate coordinate = geometryItem.Key.Centroid.Coordinate;
                                 coordinates.Add(coordinate);
 
                             }
@@ -1252,25 +1255,32 @@ namespace TimeIsLife.CADCommand
             editor.WriteMessage("\n结束");
         }
 
-        private static Coordinate GetCoordinate(GeometryFactory geometryFactory, Geometry geometry, double d)
+        private bool CanOffest500(Geometry geometry)
         {
-            Coordinate[] coordinates = geometry.Coordinates;
-            coordinates = ConvertCoordinatesToIntPoints(coordinates, d);
-            Polygon polygon = geometryFactory.CreatePolygon(coordinates);
-            Point point = polygon.Centroid;
-            return new Coordinate(point.X / d, point.Y / d);
-        }
 
-        private static Coordinate[] ConvertCoordinatesToIntPoints(Coordinate[] coordinates, double coordinateConversionFactor)
-        {
-            Coordinate[] intPoints = new Coordinate[coordinates.Length];
+            double distance = -500;
 
-            for (int i = 0; i < coordinates.Length; i++)
+            //缓冲区参数
+            var bufferParam = new BufferParameters
             {
-                intPoints[i] = new Coordinate((coordinates[i].X * coordinateConversionFactor), (coordinates[i].Y * coordinateConversionFactor));
+                IsSingleSided = true,
+                JoinStyle = NetTopologySuite.Operation.Buffer.JoinStyle.Mitre,
+            };
+            int n = geometry.NumPoints - 1;
+
+            Geometry bufferGeometry = geometry.Buffer(distance, bufferParam);
+
+            if (bufferGeometry.IsValid)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
             }
 
-            return intPoints;
+
+
         }
 
         private static void IsProtectedByGeometry(List<Geometry> tempGeometries, List<Geometry> beam600Geometries, int count)
@@ -1333,12 +1343,9 @@ namespace TimeIsLife.CADCommand
         /// <param name="geometry">几何</param>
         /// <param name="radius">半径</param>
         /// <returns>true：在保护范围内；false:不在保护范围内</returns>
-        private bool IsProtected(Geometry geometry, double radius, GeometryFactory geometryFactory, List<Beam> beams, Model.Area floor)
+        private bool IsProtected(GeometryFactory geometryFactory, Geometry geometry, double radius, List<Beam> beams, Model.Area floor)
         {
-            Coordinate[] coordinates = geometry.Coordinates;
-            coordinates = ConvertCoordinatesToIntPoints(coordinates, 1e3);
-            Polygon polygon = geometryFactory.CreatePolygon(coordinates);
-            Point centerPoint = polygon.Centroid;
+            Point centerPoint = geometry.Centroid;
             bool b = true;
 
             //缓冲区参数
@@ -1348,25 +1355,25 @@ namespace TimeIsLife.CADCommand
                 JoinStyle = NetTopologySuite.Operation.Buffer.JoinStyle.Mitre,
             };
 
-            int n = polygon.NumPoints - 1;
+            int n = geometry.NumPoints - 1;
             LineString[] list = new LineString[n];
             for (int i = 0; i < n; i++)
             {
-                double d = centerPoint.Coordinate.Distance(polygon.Coordinates[i]);
-                if (d > radius * 1e3)
+                double d = centerPoint.Coordinate.Distance(geometry.Coordinates[i]);
+                if (d > radius)
                 {
                     b = false;
                     return b;
                 }
-                LineString lineString = geometryFactory.CreateLineString(new[] { polygon.Coordinates[i % n], polygon.Coordinates[(i + 1) % n] });
+                LineString lineString = geometryFactory.CreateLineString(new[] { geometry.Coordinates[i % n], geometry.Coordinates[(i + 1) % n] });
                 foreach (var beam in beams)
                 {
                     if (beam.Floor.LevelB != floor.Level) continue;
-                    LineString beamLineString = beam.ToLineString(geometryFactory, 1e3);
+                    LineString beamLineString = beam.ToLineString(geometryFactory);
                     if (beamLineString.Contains(lineString) || beamLineString.Equals(lineString))
                     {
                         OffsetCurveBuilder offsetCurveBuilder = new OffsetCurveBuilder(geometryFactory.PrecisionModel, bufferParam);
-                        LineString offsetLineString = geometryFactory.CreateLineString(offsetCurveBuilder.GetLineCurve(lineString.Coordinates, -beam.Width / 2 * 1e3));
+                        LineString offsetLineString = geometryFactory.CreateLineString(offsetCurveBuilder.GetLineCurve(lineString.Coordinates, -beam.Width / 2));
                         if (offsetLineString == null) continue;
                         list[i] = offsetLineString;
                         break;
@@ -1375,7 +1382,7 @@ namespace TimeIsLife.CADCommand
                 if (list[i] == null) list[i] = lineString;
             }
 
-            double distance = -500 * 1e3;
+            double distance = -500;
             GeometryCollection geometryCollection = new GeometryCollection(list, geometryFactory);
             Geometry unionedGeometry = null;
             foreach (var geometryItem in geometryCollection)
@@ -1536,22 +1543,13 @@ namespace TimeIsLife.CADCommand
         /// <returns>true：在保护范围内；false:不在保护范围内</returns>
         private bool IsProtected(GeometryFactory geometryFactory, Geometry geometry, double radius, Geometry touchGeometry)
         {
-
-            Coordinate[] coordinates = geometry.Coordinates;
-            coordinates = ConvertCoordinatesToIntPoints(coordinates, 1e3);
-            Polygon polygon = geometryFactory.CreatePolygon(coordinates);
-
-            Coordinate[] coordinates1 = touchGeometry.Coordinates;
-            coordinates1 = ConvertCoordinatesToIntPoints(coordinates1, 1e3);
-            Polygon polygon1 = geometryFactory.CreatePolygon(coordinates1);
-
-            Point centerPoint = polygon.Centroid;
+            Point centerPoint = geometry.Centroid;
             bool b = true;
-            for (int i = 0; i < polygon1.NumPoints - 1; i++)
+            for (int i = 0; i < touchGeometry.NumPoints - 1; i++)
             {
 
-                double d = centerPoint.Coordinate.Distance(polygon1.Coordinates[i]);
-                if (d > radius * 1e3)
+                double d = centerPoint.Coordinate.Distance(touchGeometry.Coordinates[i]);
+                if (d > radius)
                 {
                     b = false;
                 }
