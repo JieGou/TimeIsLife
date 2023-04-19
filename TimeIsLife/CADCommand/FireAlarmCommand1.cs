@@ -719,7 +719,7 @@ namespace TimeIsLife.CADCommand
                 new PrecisionModel(1000d),
                 4326
                 );
-            GeometryFactory geometryFactory = NtsGeometryServices.Instance.CreateGeometryFactory();
+            GeometryFactory geometryFactory = NtsGeometryServices.Instance.CreateGeometryFactory(new PrecisionModel(1000d));
 
             #region YDB数据查询
             // YDB数据查询
@@ -966,14 +966,18 @@ namespace TimeIsLife.CADCommand
                     //根据多段线集合生成探测器
                     foreach (var geometryItem in orderedGeometriyDictionary)
                     {
+                        if (CanOffest500(geometryItem.Key)) continue;
+                        tempGeometries.Add(geometryItem.Key);
+                    }
+                    foreach (var geometryItem in orderedGeometriyDictionary)
+                    {
                         if (tempGeometries.Contains(geometryItem.Key)) continue;
                         tempGeometries.Add(geometryItem.Key);
-                        if (!CanOffest500(geometryItem.Key)) continue;
                         //多边形内布置一个或多个点位
                         if ((geometryItem.Key.Area / 1000000) > detectorInfo.Area4)
                         {
                             //如果为假，超出保护范围，需要切分为n个子区域
-                            if (IsProtected(geometryFactory, geometryItem.Key, detectorInfo.Radius, newBeams, floorArea))
+                            if (IsProtected(geometryFactory, geometryItem.Key, detectorInfo.Radius, newBeams))
                             {
                                 coordinates.Add(geometryItem.Key.Centroid.Coordinate);
                             }
@@ -986,7 +990,7 @@ namespace TimeIsLife.CADCommand
                                     bool b = true;
                                     foreach (var item in splitGeometries)
                                     {
-                                        if (!IsProtected(item, detectorInfo.Radius, geometryFactory, newBeams, floorArea))
+                                        if (!IsProtected(geometryFactory, item, detectorInfo.Radius, newBeams))
                                         {
                                             b = false;
                                             break;
@@ -1011,25 +1015,18 @@ namespace TimeIsLife.CADCommand
                         else
                         {
                             //如果为假，超出保护范围，需要切分为n个子区域
-                            if (IsProtected(geometryFactory, geometryItem.Key, detectorInfo.Radius, newBeams, floorArea))
+                            if (IsProtected(geometryFactory, geometryItem.Key, detectorInfo.Radius, newBeams))
                             {
                                 List<Geometry> beam600Geometries = new List<Geometry>();
                                 List<Geometry> beam200Geometries = new List<Geometry>();
                                 //保护范围内是否有其他区域
                                 foreach (var item in orderedGeometriyDictionary)
                                 {
-
                                     if (tempGeometries.Contains(item.Key)) continue;
                                     if (!IsProtected(geometryFactory, geometryItem.Key, detectorInfo.Radius, item.Key)) continue;
-
-
-
-
                                     if (!(geometryItem.Key.Intersection(item.Key) is LineString lineString)) continue;
-
                                     foreach (var beam in newBeams)
                                     {
-                                        if (beam.Floor.LevelB != floorArea.Level) continue;
                                         LineString beamLineString = beam.ToLineString(geometryFactory);
                                         bool bo1 = beamLineString.Contains(lineString);
                                         bool bo2 = beamLineString.Equals(lineString);
@@ -1106,7 +1103,7 @@ namespace TimeIsLife.CADCommand
                                     bool b = true;
                                     foreach (var item in splitGeometries)
                                     {
-                                        if (!IsProtected(item, detectorInfo.Radius, geometryFactory, newBeams, floorArea))
+                                        if (!IsProtected(geometryFactory, item, detectorInfo.Radius, newBeams))
                                         {
                                             b = false;
                                             break;
@@ -1266,11 +1263,10 @@ namespace TimeIsLife.CADCommand
                 IsSingleSided = true,
                 JoinStyle = NetTopologySuite.Operation.Buffer.JoinStyle.Mitre,
             };
-            int n = geometry.NumPoints - 1;
 
             Geometry bufferGeometry = geometry.Buffer(distance, bufferParam);
 
-            if (bufferGeometry.IsValid)
+            if (bufferGeometry.Area > 0)
             {
                 return true;
             }
@@ -1343,20 +1339,20 @@ namespace TimeIsLife.CADCommand
         /// <param name="geometry">几何</param>
         /// <param name="radius">半径</param>
         /// <returns>true：在保护范围内；false:不在保护范围内</returns>
-        private bool IsProtected(GeometryFactory geometryFactory, Geometry geometry, double radius, List<Beam> beams, Model.Area floor)
+        private bool IsProtected(GeometryFactory geometryFactory, Geometry geometry, double radius, List<Beam> beams)
         {
             Point centerPoint = geometry.Centroid;
             bool b = true;
 
-            //缓冲区参数
-            var bufferParam = new BufferParameters
-            {
-                IsSingleSided = true,
-                JoinStyle = NetTopologySuite.Operation.Buffer.JoinStyle.Mitre,
-            };
+            ////缓冲区参数
+            //var bufferParam = new BufferParameters
+            //{
+            //    IsSingleSided = true,
+            //    JoinStyle = NetTopologySuite.Operation.Buffer.JoinStyle.Mitre,
+            //};
 
             int n = geometry.NumPoints - 1;
-            LineString[] list = new LineString[n];
+            //LineString[] list = new LineString[n];
             for (int i = 0; i < n; i++)
             {
                 double d = centerPoint.Coordinate.Distance(geometry.Coordinates[i]);
@@ -1365,74 +1361,73 @@ namespace TimeIsLife.CADCommand
                     b = false;
                     return b;
                 }
-                LineString lineString = geometryFactory.CreateLineString(new[] { geometry.Coordinates[i % n], geometry.Coordinates[(i + 1) % n] });
-                foreach (var beam in beams)
-                {
-                    if (beam.Floor.LevelB != floor.Level) continue;
-                    LineString beamLineString = beam.ToLineString(geometryFactory);
-                    if (beamLineString.Contains(lineString) || beamLineString.Equals(lineString))
-                    {
-                        OffsetCurveBuilder offsetCurveBuilder = new OffsetCurveBuilder(geometryFactory.PrecisionModel, bufferParam);
-                        LineString offsetLineString = geometryFactory.CreateLineString(offsetCurveBuilder.GetLineCurve(lineString.Coordinates, -beam.Width / 2));
-                        if (offsetLineString == null) continue;
-                        list[i] = offsetLineString;
-                        break;
-                    }
-                }
-                if (list[i] == null) list[i] = lineString;
+                //LineString lineString = geometryFactory.CreateLineString(new[] { geometry.Coordinates[i % n], geometry.Coordinates[(i + 1) % n] });
+                //foreach (var beam in beams)
+                //{
+                //    LineString beamLineString = beam.ToLineString(geometryFactory);
+                //    if (beamLineString.Contains(lineString) || beamLineString.Equals(lineString))
+                //    {
+                //        OffsetCurveBuilder offsetCurveBuilder = new OffsetCurveBuilder(geometryFactory.PrecisionModel, bufferParam);
+                //        LineString offsetLineString = geometryFactory.CreateLineString(offsetCurveBuilder.GetLineCurve(lineString.Coordinates, -beam.Width / 2));
+                //        if (offsetLineString == null) continue;
+                //        list[i] = offsetLineString;
+                //        break;
+                //    }
+                //}
+                //if (list[i] == null) list[i] = lineString;
             }
 
-            double distance = -500;
-            GeometryCollection geometryCollection = new GeometryCollection(list, geometryFactory);
-            Geometry unionedGeometry = null;
-            foreach (var geometryItem in geometryCollection)
-            {
-                if (unionedGeometry == null)
-                {
-                    unionedGeometry = geometryItem;
-                }
-                else
-                {
-                    unionedGeometry = unionedGeometry.Union(geometryItem);
-                }
-            }
+            //double distance = -500;
+            //GeometryCollection geometryCollection = new GeometryCollection(list, geometryFactory);
+            //Geometry unionedGeometry = null;
+            //foreach (var geometryItem in geometryCollection)
+            //{
+            //    if (unionedGeometry == null)
+            //    {
+            //        unionedGeometry = geometryItem;
+            //    }
+            //    else
+            //    {
+            //        unionedGeometry = unionedGeometry.Union(geometryItem);
+            //    }
+            //}
 
-            Polygonizer polygonizer = new Polygonizer();
-            polygonizer.Add(unionedGeometry);
+            //Polygonizer polygonizer = new Polygonizer();
+            //polygonizer.Add(unionedGeometry);
 
-            var polygons = polygonizer.GetPolygons();
-            switch (polygons.Count)
-            {
-                case 0:
-                    b = false;
-                    break;
-                case 1:
-                    Geometry geometry1 = polygons.First();
-                    Geometry geometry2 = geometry1.Buffer(distance, bufferParam);
-                    Geometry geometry3 = geometry1.Buffer(-distance, bufferParam);
-                    if (geometry2.IsValid && geometry3.IsValid)
-                    {
-                        break;
-                    }
-                    else
-                    {
-                        b = false;
-                        break;
-                    }
-                default:
-                    Geometry geometry4 = polygons.OrderByDescending(p => p.Area).FirstOrDefault();
-                    Geometry geometry5 = geometry4.Buffer(distance, bufferParam);
-                    Geometry geometry6 = geometry4.Buffer(-distance, bufferParam);
-                    if (geometry5.IsValid && geometry5.IsValid)
-                    {
-                        break;
-                    }
-                    else
-                    {
-                        b = false;
-                        break;
-                    }
-            }
+            //var polygons = polygonizer.GetPolygons();
+            //switch (polygons.Count)
+            //{
+            //    case 0:
+            //        b = false;
+            //        break;
+            //    case 1:
+            //        Geometry geometry1 = polygons.First();
+            //        Geometry geometry2 = geometry1.Buffer(distance, bufferParam);
+            //        Geometry geometry3 = geometry1.Buffer(-distance, bufferParam);
+            //        if (geometry2.IsValid && geometry3.IsValid)
+            //        {
+            //            break;
+            //        }
+            //        else
+            //        {
+            //            b = false;
+            //            break;
+            //        }
+            //    default:
+            //        Geometry geometry4 = polygons.OrderByDescending(p => p.Area).FirstOrDefault();
+            //        Geometry geometry5 = geometry4.Buffer(distance, bufferParam);
+            //        Geometry geometry6 = geometry4.Buffer(-distance, bufferParam);
+            //        if (geometry5.IsValid && geometry5.IsValid)
+            //        {
+            //            break;
+            //        }
+            //        else
+            //        {
+            //            b = false;
+            //            break;
+            //        }
+            //}
             return b;
         }
 
