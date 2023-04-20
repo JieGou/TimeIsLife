@@ -1032,15 +1032,8 @@ namespace TimeIsLife.CADCommand
                                     foreach (var beam in newBeams)
                                     {
                                         LineString beamLineString = beam.ToLineString(geometryFactory, precisionReducer);
-                                        //Point p1 = (Point)precisionReducer.Reduce(geometryFactory.CreatePoint(new Coordinate(6984.9116, -16643.2455)));
-                                        //Point p2 = (Point)precisionReducer.Reduce(geometryFactory.CreatePoint(new Coordinate(8236.4304, -20495.0244)));
-                                        //if (beamLineString.Contains(p1) || beamLineString.Contains(p2))
-                                        //{
-                                        //    bool bo = true;
-                                        //}
-                                        //bool bo1 = beamLineString.Contains(lineString);
-                                        //bool bo2 = beamLineString.Equals(lineString);
-                                        if (beamLineString.Intersection(lineString) is LineString)
+                                        var intersection = beamLineString.Intersection(lineString);
+                                        if (intersection.Length > 0)
                                         {
                                             double height = 0;
                                             if (beam.IsConcrete)
@@ -1072,6 +1065,7 @@ namespace TimeIsLife.CADCommand
 
                                 if (beam200Geometries.Count == 0 && beam600Geometries.Count == 0)
                                 {
+                                    coordinates.Add(geometryItem.Key.Centroid.Coordinate);
                                     continue;
                                 }
 

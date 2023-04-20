@@ -30,6 +30,7 @@ namespace TimeIsLife.CADCommand
                     }
                 }
             }
+
             public double Height
             {
                 get
@@ -48,6 +49,7 @@ namespace TimeIsLife.CADCommand
                     return height;
                 }
             }
+
             public LineString ToLineString(GeometryFactory geometryFactory, GeometryPrecisionReducer precisionReducer)
             {
                 Coordinate[] coordinates = new Coordinate[] { new Coordinate(Grid.Joint1.X, Grid.Joint1.Y), new Coordinate(Grid.Joint2.X, Grid.Joint2.Y) };
@@ -67,6 +69,8 @@ namespace TimeIsLife.CADCommand
                     return width;
                 }
             }
+
+
         }
         #endregion
 
