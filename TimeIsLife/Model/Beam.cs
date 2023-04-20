@@ -1,4 +1,5 @@
 ﻿using NetTopologySuite.Geometries;
+using NetTopologySuite.Precision;
 
 using System;
 
@@ -47,10 +48,11 @@ namespace TimeIsLife.CADCommand
                     return height;
                 }
             }
-            public LineString ToLineString(GeometryFactory geometryFactory)
+            public LineString ToLineString(GeometryFactory geometryFactory, GeometryPrecisionReducer precisionReducer)
             {
-                Coordinate[] coordinates = new Coordinate[] { new Coordinate(Math.Round(Grid.Joint1.X, 3), Math.Round(Grid.Joint1.Y, 3)), new Coordinate(Math.Round(Grid.Joint2.X, 3), Math.Round(Grid.Joint2.Y, 3)) };
-                return geometryFactory.CreateLineString(coordinates);
+                Coordinate[] coordinates = new Coordinate[] { new Coordinate(Grid.Joint1.X, Grid.Joint1.Y), new Coordinate(Grid.Joint2.X, Grid.Joint2.Y) };
+
+                return (LineString)precisionReducer.Reduce(geometryFactory.CreateLineString(coordinates));
             }
 
             public double Width

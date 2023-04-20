@@ -67,6 +67,8 @@ using Path = System.IO.Path;
 using NetTopologySuite.Operation.Valid;
 using NetTopologySuite.Utilities;
 using System.Windows.Media.Media3D;
+using System.Numerics;
+using NetTopologySuite.Precision;
 
 [assembly: CommandClass(typeof(TimeIsLife.CADCommand.FireAlarmCommand1))]
 
@@ -713,13 +715,15 @@ namespace TimeIsLife.CADCommand
             string temperatureDetector = null;
             BasePoint basePoint;
             //NTS
+            var precisionModel = new PrecisionModel(1000d);
+            GeometryPrecisionReducer precisionReducer = new GeometryPrecisionReducer(precisionModel);
             NetTopologySuite.NtsGeometryServices.Instance = new NetTopologySuite.NtsGeometryServices
                 (
                 NetTopologySuite.Geometries.Implementation.CoordinateArraySequenceFactory.Instance,
-                new PrecisionModel(1000d),
+                precisionModel,
                 4326
                 );
-            GeometryFactory geometryFactory = NtsGeometryServices.Instance.CreateGeometryFactory(new PrecisionModel(1000d));
+            GeometryFactory geometryFactory = NtsGeometryServices.Instance.CreateGeometryFactory(precisionModel);
 
             #region YDB数据查询
             // YDB数据查询
@@ -1027,10 +1031,16 @@ namespace TimeIsLife.CADCommand
                                     if (!(geometryItem.Key.Intersection(item.Key) is LineString lineString)) continue;
                                     foreach (var beam in newBeams)
                                     {
-                                        LineString beamLineString = beam.ToLineString(geometryFactory);
-                                        bool bo1 = beamLineString.Contains(lineString);
-                                        bool bo2 = beamLineString.Equals(lineString);
-                                        if (bo1 || bo2)
+                                        LineString beamLineString = beam.ToLineString(geometryFactory, precisionReducer);
+                                        //Point p1 = (Point)precisionReducer.Reduce(geometryFactory.CreatePoint(new Coordinate(6984.9116, -16643.2455)));
+                                        //Point p2 = (Point)precisionReducer.Reduce(geometryFactory.CreatePoint(new Coordinate(8236.4304, -20495.0244)));
+                                        //if (beamLineString.Contains(p1) || beamLineString.Contains(p2))
+                                        //{
+                                        //    bool bo = true;
+                                        //}
+                                        //bool bo1 = beamLineString.Contains(lineString);
+                                        //bool bo2 = beamLineString.Equals(lineString);
+                                        if (beamLineString.Intersection(lineString) is LineString)
                                         {
                                             double height = 0;
                                             if (beam.IsConcrete)
@@ -1058,6 +1068,11 @@ namespace TimeIsLife.CADCommand
                                             }
                                         }
                                     }
+                                }
+
+                                if (beam200Geometries.Count == 0 && beam600Geometries.Count == 0)
+                                {
+                                    continue;
                                 }
 
                                 double area = geometryItem.Key.Area / 1000000;
@@ -1251,6 +1266,33 @@ namespace TimeIsLife.CADCommand
             }
             editor.WriteMessage("\n结束");
         }
+
+        public static bool IsPointOnSegment(Coordinate point, Coordinate segmentStart, Coordinate segmentEnd, float tolerance)
+        {
+            Vector2 segment = new Vector2((float)(segmentEnd.X - segmentStart.X), (float)(segmentEnd.Y - segmentStart.Y));
+            Vector2 pointToStart = new Vector2((float)(point.X - segmentStart.X), (float)(point.Y - segmentStart.Y));
+            Vector2 pointToEnd = new Vector2((float)(point.X - segmentEnd.X), (float)(point.Y - segmentEnd.Y));
+
+            float dotProduct = Vector2.Dot(segment, pointToStart);
+            if (dotProduct < 0) return false;
+
+            float squaredLength = segment.LengthSquared();
+            if (dotProduct > squaredLength) return false;
+
+            float crossProduct = segment.X * pointToEnd.Y - segment.Y * pointToEnd.X;
+            return Math.Abs(crossProduct) <= tolerance;
+        }
+
+        public static bool IsSegmentAOverlappingOrPartOfSegmentB(LineString A, LineString B, double tolerance)
+        {
+            Coordinate AStart = A.CoordinateSequence.GetCoordinate(0);
+            Coordinate AEnd = A.CoordinateSequence.GetCoordinate(1);
+            Coordinate BStart = B.CoordinateSequence.GetCoordinate(0);
+            Coordinate BEnd = B.CoordinateSequence.GetCoordinate(1);
+
+            return (IsPointOnSegment(AStart, BStart, BEnd, (float)tolerance) && IsPointOnSegment(AEnd, BStart, BEnd, (float)tolerance));
+        }
+
 
         private bool CanOffest500(Geometry geometry)
         {
