@@ -1151,9 +1151,9 @@ namespace TimeIsLife.CADCommand
                     #endregion
 
                     #region 生成梁
-                    foreach (var beam in beams)
+                    foreach (var beam in newBeams)
                     {
-                        if (beam.Floor.LevelB != floorArea.Level) continue;
+                        //if (beam.Floor.LevelB != floorArea.Level) continue;
 
                         Point2d p1 = new Point2d(beam.Grid.Joint1.X, beam.Grid.Joint1.Y);
                         Point2d p2 = new Point2d(beam.Grid.Joint2.X, beam.Grid.Joint2.Y);
@@ -1229,9 +1229,9 @@ namespace TimeIsLife.CADCommand
                     #endregion
 
                     #region 生成墙
-                    foreach (var wall in walls)
+                    foreach (var wall in newWalls)
                     {
-                        if (wall.Floor.LevelB != floorArea.Level) continue;
+                        //if (wall.Floor.LevelB != floorArea.Level) continue;
 
                         SetLayer(database, "wall", 53);
 
