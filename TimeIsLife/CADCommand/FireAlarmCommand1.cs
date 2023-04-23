@@ -69,6 +69,9 @@ using NetTopologySuite.Utilities;
 using System.Windows.Media.Media3D;
 using System.Numerics;
 using NetTopologySuite.Precision;
+using Accord.Math.Geometry;
+using NetTopologySuite.Operation.Distance;
+using System.Drawing;
 
 [assembly: CommandClass(typeof(TimeIsLife.CADCommand.FireAlarmCommand1))]
 
@@ -990,7 +993,7 @@ namespace TimeIsLife.CADCommand
                                 int n = 2;
                                 while (true)
                                 {
-                                    List<Geometry> splitGeometries = SplitPolygon(geometryFactory, geometryItem.Key, n, 100);
+                                    List<Geometry> splitGeometries = SplitPolygon(geometryFactory, geometryItem.Key, n, 100.0);
                                     bool b = true;
                                     foreach (var item in splitGeometries)
                                     {
@@ -1029,11 +1032,15 @@ namespace TimeIsLife.CADCommand
                                     if (tempGeometries.Contains(item.Key)) continue;
                                     if (!IsProtected(geometryFactory, geometryItem.Key, detectorInfo.Radius, item.Key)) continue;
                                     if (!(geometryItem.Key.Intersection(item.Key) is LineString lineString)) continue;
+                                    List<LineString> lineStrings = new List<LineString>();
                                     foreach (var beam in newBeams)
                                     {
+
                                         LineString beamLineString = beam.ToLineString(geometryFactory, precisionReducer);
-                                        var intersection = beamLineString.Intersection(lineString);
-                                        if (intersection.Length > 0)
+
+                                        bool isPointOnLine1 = new DistanceOp(lineString.StartPoint, beamLineString).Distance() <= 1e-3;
+                                        bool isPointOnLine2 = new DistanceOp(lineString.EndPoint, beamLineString).Distance() <= 1e-3;
+                                        if (isPointOnLine1 && isPointOnLine2)
                                         {
                                             double height = 0;
                                             if (beam.IsConcrete)
@@ -1060,7 +1067,39 @@ namespace TimeIsLife.CADCommand
                                                 break;
                                             }
                                         }
+                                        //var intersection = beamLineString.Intersection(lineString);
+                                        //if (intersection.Length > 0)
+                                        //{
+                                        //    double height = 0;
+                                        //    if (beam.IsConcrete)
+                                        //    {
+                                        //        height = beam.Height - item.Value;
+                                        //    }
+                                        //    else
+                                        //    {
+                                        //        height = beam.Height;
+                                        //    }
+
+                                        //    if (height > 600)
+                                        //    {
+                                        //        break;
+                                        //    }
+                                        //    else if (height >= 200 && height <= 600)
+                                        //    {
+                                        //        beam600Geometries.Add(item.Key);
+                                        //        break;
+                                        //    }
+                                        //    else if (0 < height && height < 200)
+                                        //    {
+                                        //        beam200Geometries.Add(item.Key);
+                                        //        break;
+                                        //    }
+                                        //}
                                     }
+                                    //if (lineStrings.Count > 0)
+                                    //{
+                                    //    continue;
+                                    //}
                                 }
 
                                 if (beam200Geometries.Count == 0 && beam600Geometries.Count == 0)
@@ -1108,7 +1147,7 @@ namespace TimeIsLife.CADCommand
                                 int n = 2;
                                 while (true)
                                 {
-                                    List<Geometry> splitGeometries = SplitPolygon(geometryFactory, geometryItem.Key, n, 50);
+                                    List<Geometry> splitGeometries = SplitPolygon(geometryFactory, geometryItem.Key, n, 100.0);
                                     bool b = true;
                                     foreach (var item in splitGeometries)
                                     {
@@ -1603,7 +1642,7 @@ namespace TimeIsLife.CADCommand
             for (int i = 0; i < n + 1; i++)
             {
 
-                coordinates[i] = new Coordinate(Math.Round(double.Parse(vertexX[i % n]), 3), Math.Round(double.Parse(vertexY[i % n]), 3));
+                coordinates[i] = new Coordinate(double.Parse(vertexX[i % n]), double.Parse(vertexY[i % n]));
             }
             return coordinates;
         }
@@ -1915,6 +1954,56 @@ namespace TimeIsLife.CADCommand
             }
             return geometries;
         }
+
+        List<Geometry> SplitPolygon(GeometryFactory geometryFactory, Geometry geometry, int count, double interval)
+        {
+            // 质心点集
+            Coordinate maxPoint = geometry.Max();
+            Coordinate minPoint = geometry.Min();
+
+            // 构建网格点并判断点是否在多边形内部
+            List<double[]> gridPoints = new List<double[]>();
+            for (double x = minPoint.X; x <= maxPoint.X; x += interval)
+            {
+                for (double y = minPoint.Y; y <= maxPoint.Y; y += interval)
+                {
+                    Point point2D = geometryFactory.CreatePoint(new Coordinate(x, y));
+
+                    if (point2D.Within(geometry))
+                    {
+                        gridPoints.Add(new double[2] { x, y });
+                    }
+                }
+            }
+
+            // 利用EKmeans 获取分组和簇的质心
+            Accord.Math.Random.Generator.Seed = 0;
+            KMeans kMeans = new KMeans(count);
+            KMeansClusterCollection clusters = kMeans.Learn(gridPoints.ToArray());
+            double[][] centerPoints = clusters.Centroids;
+            List<Coordinate> coords = new List<Coordinate>();
+            foreach (var c in centerPoints)
+            {
+                coords.Add(new Coordinate(c[0], c[1]));
+            }
+
+            // 构建泰森多边形
+            VoronoiDiagramBuilder voronoiDiagramBuilder = new VoronoiDiagramBuilder();
+            Envelope clipEnvelpoe = new Envelope(minPoint, maxPoint);
+            voronoiDiagramBuilder.ClipEnvelope = clipEnvelpoe;
+            voronoiDiagramBuilder.SetSites(coords);
+            GeometryCollection geometryCollection = voronoiDiagramBuilder.GetDiagram(geometryFactory);
+
+            // 利用封闭面切割泰森多边形
+            List<Geometry> geometries = new List<Geometry>();
+            for (int i = 0; i < geometryCollection.NumGeometries; i++)
+            {
+                Geometry vorGeometry = geometryCollection.GetGeometryN(i);
+                geometries.Add(vorGeometry.Intersection(geometry));
+            }
+            return geometries;
+        }
+
         #endregion
     }
 }
