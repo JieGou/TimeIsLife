@@ -65,26 +65,35 @@ namespace TimeIsLife.CADCommand
         [CommandMethod("FF_Tools")]
         public static void FF_Tools()
         {
-            if (paletteSet == null)//如果面板没有被创建
+            if (paletteSet == null) // 如果面板没有被创建
             {
-
+                // 创建一个新的PaletteSet实例，并设置其标题为"TimeIsLife"
                 paletteSet = new PaletteSet("TimeIsLife");
+
+                // 设置PaletteSet的DockEnabled属性为DockSides.Left，使其可以停靠在窗口的左侧
                 paletteSet.DockEnabled = DockSides.Left;
+
+                // 设置标题栏位置
                 paletteSet.TitleBarLocation = PaletteSetTitleBarLocation.Left;
-                paletteSet.Dock = DockSides.Left;
 
-
-
+                // 创建一个ElementHost实例
                 ElementHost host = new ElementHost();
                 host.AutoSize = true;
                 host.Dock = DockStyle.Fill;
+
+                // 将ElectricalView实例分配给ElementHost的Child属性
                 host.Child = electricalView = new ElectricalView();
                 electricalViewModel = (ElectricalViewModel)electricalView.DataContext;
+
+                // 将ElementHost实例添加到PaletteSet中，并将其命名为"电气"
                 paletteSet.Add("电气", host);
             }
-            paletteSet.Visible = true;//面板可见
 
+            // 设置面板可见
+            paletteSet.Visible = true;
 
+            // 设置PaletteSet的Dock属性
+            paletteSet.Dock = DockSides.Left;
         }
         #endregion
 

@@ -1,4 +1,8 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿using Autodesk.AutoCAD.Geometry;
+
+using CommunityToolkit.Mvvm.ComponentModel;
+
+using NetTopologySuite.Geometries;
 
 using System;
 using System.Collections.Generic;
@@ -8,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace TimeIsLife.Model
 {
-    public class AreaFloor: ObservableObject
+    public class AreaFloor : ObservableObject
     {
         public int ID { get; set; }
 
@@ -32,7 +36,7 @@ namespace TimeIsLife.Model
             get => x;
             set => SetProperty(ref x, value);
         }
-        
+
         private double y;
         public double Y
         {
@@ -45,5 +49,19 @@ namespace TimeIsLife.Model
         {
             get => z; set => SetProperty(ref z, value);
         }
+
+        //private Point3d maxPoint3d;
+        //public Point3d MaxPoint3d
+        //{
+        //    get => maxPoint3d;
+        //    set => SetProperty(ref maxPoint3d, value);
+        //}
+
+        //private Point3d minPoint3d;
+        //public Point3d MinPoint3d
+        //{
+        //    get => minPoint3d;
+        //    set => SetProperty(ref minPoint3d, value);
+        //}
     }
 }

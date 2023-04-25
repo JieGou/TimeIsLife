@@ -125,6 +125,13 @@ namespace TimeIsLife.ViewModel
         }
 
         public FireAlarmWindowState CurrentState { get; set; } = new FireAlarmWindowState();
+
+        private int slabThickness;
+        public int SlabThickness
+        {
+            get => slabThickness;
+            set => SetProperty(ref slabThickness, value);
+        }
         #endregion
 
         #region 委托
@@ -267,6 +274,7 @@ namespace TimeIsLife.ViewModel
             CurrentState.RoomLayerName = this.RoomAreaLayerName;
             CurrentState.YdbFileName = this.YdbFileName;
             CurrentState.AreaFileName = this.AreaFileName;
+            CurrentState.SlabThickness = this.SlabThickness;
             // 将CurrentState对象序列化为JSON字符串
             string json = JsonConvert.SerializeObject(CurrentState);
 
@@ -297,6 +305,7 @@ namespace TimeIsLife.ViewModel
             this.RoomAreaLayerName = CurrentState.RoomLayerName;
             this.YdbFileName = CurrentState.YdbFileName;
             this.AreaFileName = CurrentState.AreaFileName;
+            this.SlabThickness = CurrentState.SlabThickness;
         }
 
         #endregion

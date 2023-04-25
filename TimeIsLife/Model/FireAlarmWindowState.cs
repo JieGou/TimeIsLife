@@ -13,5 +13,6 @@ namespace TimeIsLife.Model
         public string RoomLayerName { get; set; }
         public string YdbFileName { get; set; }
         public string AreaFileName { get; set; }
+        public int SlabThickness { get; set; }
     }
 }

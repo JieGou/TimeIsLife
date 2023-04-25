@@ -4,6 +4,10 @@ using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.GraphicsInterface;
 
+using NetTopologySuite;
+using NetTopologySuite.Geometries;
+using NetTopologySuite.Precision;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,10 +24,22 @@ namespace TimeIsLife.Jig
     internal class BasePointJig : DrawJig
     {
         public Point3d _point;
+        //PrecisionModel precisionModel;
+        //GeometryPrecisionReducer precisionReducer;
+        //GeometryFactory geometryFactory;
         private List<Polyline> polylines;
         public BasePointJig(List<Polyline> polylines)
         {
             this.polylines = polylines;
+            //this.precisionModel = new PrecisionModel(1000d);
+            //this.precisionReducer = new GeometryPrecisionReducer(precisionModel);
+            //NetTopologySuite.NtsGeometryServices.Instance = new NetTopologySuite.NtsGeometryServices
+            //    (
+            //    NetTopologySuite.Geometries.Implementation.CoordinateArraySequenceFactory.Instance,
+            //    precisionModel,
+            //    4326
+            //    );
+            //this.geometryFactory = NtsGeometryServices.Instance.CreateGeometryFactory(precisionModel);
         }
 
         protected override SamplerStatus Sampler(JigPrompts prompts)
@@ -43,6 +59,13 @@ namespace TimeIsLife.Jig
             if (_point != tempPoint)
             {
                 _point = tempPoint;
+                //Coordinate coordinate = new Coordinate(_point.X, _point.Y);
+                //Point point = geometryFactory.CreatePoint(coordinate);
+
+                //if (point.Within(geometry))
+                //{
+                //    gridPoints.Add(new double[2] { x, y });
+                //}
                 return SamplerStatus.OK;
             }
             else
