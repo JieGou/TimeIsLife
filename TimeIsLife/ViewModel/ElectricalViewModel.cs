@@ -32,6 +32,7 @@ namespace TimeIsLife.ViewModel
             //火灾自动报警
             LoadYdbFileCommand = new RelayCommand(LoadYdbFile);
             FasCommand = new RelayCommand(Fas);
+            AutomaticConnectionCommand = new RelayCommand(AutomaticConnection);
             ToHydrantAlarmButtonCommand = new RelayCommand(ToHydrantAlarmButton);
             OpenFireAlarmWindowCommand = new RelayCommand(OpenFireAlarmWindow);
 
@@ -190,6 +191,11 @@ namespace TimeIsLife.ViewModel
         }
 
 
+        public IRelayCommand AutomaticConnectionCommand { get; }
+        void AutomaticConnection()
+        {
+            Application.DocumentManager.MdiActiveDocument.SendStringToExecute("FF_AutomaticConnection\n", true, false, false);
+        }
 
         public IRelayCommand ToHydrantAlarmButtonCommand { get; }
         void ToHydrantAlarmButton()

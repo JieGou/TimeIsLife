@@ -752,8 +752,6 @@ namespace TimeIsLife.CADCommand
             List<Model.Area> roomAreas;
             ObjectId smokeDetectorID;
             ObjectId temperatureDetectorID;
-            string smokeDetector = null;
-            string temperatureDetector = null;
             BasePoint basePoint;
             //NTS
             var precisionModel = new PrecisionModel(1000d);
@@ -954,66 +952,13 @@ namespace TimeIsLife.CADCommand
                 }
                 #endregion
 
-                using (Database tempDb = new Database(false, true))
-                using (Transaction tempTransaction = tempDb.TransactionManager.StartTransaction())
-                {
-                    try
-                    {
-                        string codeBase = Assembly.GetExecutingAssembly().CodeBase;
-                        UriBuilder uri = new UriBuilder(codeBase);
-                        string path = Uri.UnescapeDataString(uri.Path);
-                        string LoadBlock(string blockName)
-                        {
-                            string blockPath = Path.Combine(Path.GetDirectoryName(path), "Block", blockName);
-                            string blockSymbolName = SymbolUtilityServices.GetSymbolNameFromPathName(blockPath, "dwg");
-                            tempDb.ReadDwgFile(blockPath, FileOpenMode.OpenForReadAndReadShare, allowCPConversion: true, null);
-                            return blockSymbolName;
-                        }
-                        // 载入感烟探测器块
-                        smokeDetector = LoadBlock("FA-08-智能型点型感烟探测器.dwg");
-                        tempDb.CloseInput(true);
-                        tempTransaction.Commit();
-                    }
-                    catch
-                    {
-                        tempTransaction.Abort();
-                        editor.WriteMessage("\n加载AutoCAD图块发生错误");
-                    }
-                    smokeDetectorID = database.Insert(smokeDetector, tempDb, true);
-                }
-
-                using (Database tempDb = new Database(false, true))
-                using (Transaction tempTransaction = tempDb.TransactionManager.StartTransaction())
-                {
-                    try
-                    {
-                        string codeBase = Assembly.GetExecutingAssembly().CodeBase;
-                        UriBuilder uri = new UriBuilder(codeBase);
-                        string path = Uri.UnescapeDataString(uri.Path);
-                        string LoadBlock(string blockName)
-                        {
-                            string blockPath = Path.Combine(Path.GetDirectoryName(path), "Block", blockName);
-                            string blockSymbolName = SymbolUtilityServices.GetSymbolNameFromPathName(blockPath, "dwg");
-                            tempDb.ReadDwgFile(blockPath, FileOpenMode.OpenForReadAndReadShare, allowCPConversion: true, null);
-                            return blockSymbolName;
-                        }
-                        // 载入感烟探测器块
-                        temperatureDetector = LoadBlock("FA-09-智能型点型感温探测器.dwg");
-                        tempDb.CloseInput(true);
-                        tempTransaction.Commit();
-                    }
-                    catch
-                    {
-                        tempTransaction.Abort();
-                        editor.WriteMessage("\n加载AutoCAD图块发生错误");
-                    }
-                    temperatureDetectorID = database.Insert(temperatureDetector, tempDb, true);
-                }
-
+                smokeDetectorID = LoadBlockIntoDatabase(database, "FA-08-智能型点型感烟探测器.dwg");
+                temperatureDetectorID = LoadBlockIntoDatabase(database, "FA-09-智能型点型感温探测器.dwg");
 
                 Model.Area baseArea = floorAreas.Where(f => f.Level == basePoint.Level).FirstOrDefault();
                 Vector3d baseVector = baseArea.BasePoint.GetVectorTo(basePoint.Point3d);
-                //slabs.ForEach(s => s.TranslateVertices(basePoint.X, basePoint.Y, basePoint.Z));
+
+                #region 根据房间边界及板轮廓生成烟感
 
                 foreach (var floorArea in floorAreas)
                 {
@@ -1021,7 +966,7 @@ namespace TimeIsLife.CADCommand
                     List<Beam> newBeams = beams.Where(beam => beam.Floor.LevelB == floorArea.Level).ToList();
                     List<Slab> newSlabs = slabs.Where(slab => slab.Floor.LevelB == floorArea.Level).ToList();
                     List<Wall> newWalls = walls.Where(wall => wall.Floor.LevelB == floorArea.Level).ToList();
-
+                    List<Coordinate> allCoordinates = new List<Coordinate>();
                     Vector3d vector3D = Point3d.Origin.GetVectorTo(floorArea.BasePoint) + baseVector;
 
                     foreach (var roomArea in roomAreas)
@@ -1215,39 +1160,7 @@ namespace TimeIsLife.CADCommand
                                                         break;
                                                     }
                                                 }
-                                                //var intersection = beamLineString.Intersection(lineString);
-                                                //if (intersection.Length > 0)
-                                                //{
-                                                //    double height = 0;
-                                                //    if (beam.IsConcrete)
-                                                //    {
-                                                //        height = beam.Height - item.Value;
-                                                //    }
-                                                //    else
-                                                //    {
-                                                //        height = beam.Height;
-                                                //    }
-
-                                                //    if (height > 600)
-                                                //    {
-                                                //        break;
-                                                //    }
-                                                //    else if (height >= 200 && height <= 600)
-                                                //    {
-                                                //        beam600Geometries.Add(item.Key);
-                                                //        break;
-                                                //    }
-                                                //    else if (0 < height && height < 200)
-                                                //    {
-                                                //        beam200Geometries.Add(item.Key);
-                                                //        break;
-                                                //    }
-                                                //}
                                             }
-                                            //if (lineStrings.Count > 0)
-                                            //{
-                                            //    continue;
-                                            //}
                                         }
 
                                         if (beam200Geometries.Count == 0 && beam600Geometries.Count == 0)
@@ -1338,22 +1251,33 @@ namespace TimeIsLife.CADCommand
                             }
                             foreach (var coordinate in coordinates)
                             {
+                                allCoordinates.Add(coordinate);
                                 BlockReference blockReference = new BlockReference(new Point3d(coordinate.X, coordinate.Y, 0), id);
                                 blockReference.ScaleFactors = new Scale3d(100);
                                 database.AddToModelSpace(blockReference);
                             }
+
+
                         }
                     }
-                    #region 根据房间边界及板轮廓生成烟感
 
+                    //#region 设备连线
+                    //var points = ConvertCoordinatesToPoints(geometryFactory, allCoordinates);
+                    //var tree = Kruskal.FindMinimumSpanningTree(points, geometryFactory);
+                    //SetLayer(database, "E-WIRE", 3);
+                    //foreach (var line in tree)
+                    //{
+                    //    var startPoint = new Point3d(line.Coordinates[0].X, line.Coordinates[0].Y, 0);
+                    //    var endPoint = new Point3d(line.Coordinates[1].X, line.Coordinates[1].Y, 0);
+                    //    var newLine = new Autodesk.AutoCAD.DatabaseServices.Line(startPoint, endPoint);
+                    //    database.AddToModelSpace(newLine);
+                    //}
+                    //#endregion
 
-                    #endregion
 
                     #region 生成梁
                     foreach (var beam in newBeams)
                     {
-                        //if (beam.Floor.LevelB != floorArea.Level) continue;
-
                         Point2d p1 = new Point2d(beam.Grid.Joint1.X, beam.Grid.Joint1.Y);
                         Point2d p2 = new Point2d(beam.Grid.Joint2.X, beam.Grid.Joint2.Y);
                         double startWidth = 0;
@@ -1362,69 +1286,32 @@ namespace TimeIsLife.CADCommand
 
                         Polyline polyline = new Polyline();
 
+                        string[] shapeVals = beam.BeamSect.ShapeVal.Split(',');
+                        startWidth = endWidth = double.Parse(shapeVals[1]);
+                        height = double.Parse(shapeVals[2]);
+                        string layerName = $"beam-steel-{beam.BeamSect.Kind}-{height}mm";
+
                         switch (beam.BeamSect.Kind)
                         {
                             case 1:
-                                startWidth = endWidth = double.Parse(beam.BeamSect.ShapeVal.Split(',')[1]);
-                                height = double.Parse(beam.BeamSect.ShapeVal.Split(',')[2]);
-
-                                polyline.AddVertexAt(0, p1, 0, startWidth, endWidth);
-                                polyline.AddVertexAt(1, p2, 0, startWidth, endWidth);
-                                SetLayer(database, $"beam-concrete-{height.ToString()}mm", 7);
-                                break;
-                            case 2:
-                                startWidth = endWidth = double.Parse(beam.BeamSect.ShapeVal.Split(',')[3]);
-                                height = double.Parse(beam.BeamSect.ShapeVal.Split(',')[2]);
-
-                                polyline.AddVertexAt(0, p1, 0, startWidth, endWidth);
-                                polyline.AddVertexAt(1, p2, 0, startWidth, endWidth);
-                                SetLayer(database, $"beam-steel-{beam.BeamSect.Kind.ToString()}-{height.ToString()}mm", 7);
-                                break;
-                            case 7:
-                                startWidth = endWidth = double.Parse(beam.BeamSect.ShapeVal.Split(',')[1]);
-                                height = double.Parse(beam.BeamSect.ShapeVal.Split(',')[2]);
-
-                                polyline.AddVertexAt(0, p1, 0, startWidth, endWidth);
-                                polyline.AddVertexAt(1, p2, 0, startWidth, endWidth);
-                                SetLayer(database, $"beam-steel-{beam.BeamSect.Kind.ToString()}-{height.ToString()}mm", 7);
-                                break;
-                            case 13:
-                                startWidth = endWidth = double.Parse(beam.BeamSect.ShapeVal.Split(',')[1]);
-                                height = double.Parse(beam.BeamSect.ShapeVal.Split(',')[2]);
-
-                                polyline.AddVertexAt(0, p1, 0, startWidth, endWidth);
-                                polyline.AddVertexAt(1, p2, 0, startWidth, endWidth);
-                                SetLayer(database, $"beam-steel-{beam.BeamSect.Kind.ToString()}-{height.ToString()}mm", 7);
+                                layerName = $"beam-concrete-{height}mm";
                                 break;
                             case 22:
-                                startWidth = endWidth = double.Parse(beam.BeamSect.ShapeVal.Split(',')[1]);
-                                height = Math.Min(double.Parse(beam.BeamSect.ShapeVal.Split(',')[3]), double.Parse(beam.BeamSect.ShapeVal.Split(',')[4]));
-
-                                polyline.AddVertexAt(0, p1, 0, startWidth, endWidth);
-                                polyline.AddVertexAt(1, p2, 0, startWidth, endWidth);
-                                SetLayer(database, $"beam-steel-{beam.BeamSect.Kind.ToString()}-{height.ToString()}mm", 7);
+                                height = Math.Min(double.Parse(shapeVals[3]), double.Parse(shapeVals[4]));
                                 break;
                             case 26:
-                                startWidth = endWidth = double.Parse(beam.BeamSect.ShapeVal.Split(',')[5]);
-                                height = double.Parse(beam.BeamSect.ShapeVal.Split(',')[3]);
-
-                                polyline.AddVertexAt(0, p1, 0, startWidth, endWidth);
-                                polyline.AddVertexAt(1, p2, 0, startWidth, endWidth);
-                                SetLayer(database, $"beam-steel-{beam.BeamSect.Kind.ToString()}-{height.ToString()}mm", 7);
-                                break;
-
-                            default:
-                                startWidth = endWidth = double.Parse(beam.BeamSect.ShapeVal.Split(',')[1]);
-                                height = double.Parse(beam.BeamSect.ShapeVal.Split(',')[2]);
-
-                                polyline.AddVertexAt(0, p1, 0, startWidth, endWidth);
-                                polyline.AddVertexAt(1, p2, 0, startWidth, endWidth);
-                                SetLayer(database, $"beam-steel-{beam.BeamSect.Kind.ToString()}-{height.ToString()}mm", 7);
+                                startWidth = endWidth = double.Parse(shapeVals[5]);
                                 break;
                         }
+
+                        polyline.AddVertexAt(0, p1, 0, startWidth, endWidth);
+                        polyline.AddVertexAt(1, p2, 0, startWidth, endWidth);
+                        SetLayer(database, layerName, 7);
+
                         polyline.TransformBy(Matrix3d.Displacement(vector3D));
                         database.AddToModelSpace(polyline);
                     }
+
                     #endregion
 
                     #region 生成墙
@@ -1455,10 +1342,43 @@ namespace TimeIsLife.CADCommand
                         editor.WriteMessage("\n布置点位时发生错误");
                     }
                 }
+                #endregion
                 transaction.Commit();
             }
             editor.WriteMessage("\n结束");
         }
+
+
+
+
+        private ObjectId LoadBlockIntoDatabase(Database database, string blockName)
+        {
+            using (Database tempDb = new Database(false, true))
+            {
+                using (Transaction tempTransaction = tempDb.TransactionManager.StartTransaction())
+                {
+                    try
+                    {
+                        string codeBase = Assembly.GetExecutingAssembly().CodeBase;
+                        UriBuilder uri = new UriBuilder(codeBase);
+                        string path = Uri.UnescapeDataString(uri.Path);
+                        string blockPath = Path.Combine(Path.GetDirectoryName(path), "Block", blockName);
+                        string blockSymbolName = SymbolUtilityServices.GetSymbolNameFromPathName(blockPath, "dwg");
+                        tempDb.ReadDwgFile(blockPath, FileOpenMode.OpenForReadAndReadShare, allowCPConversion: true, null);
+                        tempDb.CloseInput(true);
+                        tempTransaction.Commit();
+                        return database.Insert(blockSymbolName, tempDb, true);
+                    }
+                    catch
+                    {
+                        tempTransaction.Abort();
+                        editor.WriteMessage("\n加载AutoCAD图块发生错误");
+                        return ObjectId.Null;
+                    }
+                }
+            }
+        }
+
 
         private HashSet<string> FindTargetStrings(string input)
         {

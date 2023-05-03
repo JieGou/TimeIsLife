@@ -93,6 +93,7 @@
     <Compile Include="Model\Floor.cs" />
     <Compile Include="Model\Grid.cs" />
     <Compile Include="Model\Joint.cs" />
+    <Compile Include="Model\Kruskal.cs" />
     <Compile Include="Model\Slab.cs" />
     <Compile Include="Model\Wall.cs" />
     <Compile Include="Model\WallSect.cs" />

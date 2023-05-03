@@ -61,6 +61,7 @@ using TimeIsLife.Jig;
 using MessageBox = System.Windows.Forms.MessageBox;
 using System.Data.Entity;
 using Database = Autodesk.AutoCAD.DatabaseServices.Database;
+using NetTopologySuite.Precision;
 
 [assembly: CommandClass(typeof(TimeIsLife.CADCommand.FireAlarmCommand2))]
 
@@ -797,6 +798,252 @@ namespace TimeIsLife.CADCommand
         }
         #endregion
 
+        #region FF_AutomaticConnection
+        [CommandMethod("FF_AutomaticConnection")]
+        public void FF_AutomaticConnection()
+        {
+            Document document = Application.DocumentManager.CurrentDocument;
+            Database database = document.Database;
+            Editor editor = document.Editor;
+            string s1 = "\n作用：多个块按照最近距离自动连线。";
+            string s2 = "\n操作方法：框选对象";
+            string s3 = "\n注意事项：块不能锁定";
+            editor.WriteMessage(s1 + s2 + s3);
+
+            //NTS
+            var precisionModel = new PrecisionModel(1000d);
+            GeometryPrecisionReducer precisionReducer = new GeometryPrecisionReducer(precisionModel);
+            NetTopologySuite.NtsGeometryServices.Instance = new NetTopologySuite.NtsGeometryServices
+                (
+                NetTopologySuite.Geometries.Implementation.CoordinateArraySequenceFactory.Instance,
+                precisionModel,
+                4326
+                );
+            GeometryFactory geometryFactory = NtsGeometryServices.Instance.CreateGeometryFactory(precisionModel);
+
+            try
+            {
+                using (Transaction transaction = database.TransactionManager.StartOpenCloseTransaction())
+                {
+                    Point3d startPoint3D = new Point3d();
+                    Point3d endPoint3D = new Point3d();
+                    Vector3d xVector3D = database.Ucsxdir;
+                    Vector3d yVector3D = database.Ucsydir;
+
+                    Matrix3d matrix3D = editor.CurrentUserCoordinateSystem;
+                    PromptPointOptions promptPointOptions;
+
+                    promptPointOptions = new PromptPointOptions("\n 请选择第一个角点：");
+                    PromptPointResult ppr = editor.GetPoint(promptPointOptions);
+
+                    if (ppr.Status == PromptStatus.OK)
+                    {
+                        startPoint3D = ppr.Value;
+                    }
+                    else
+                    {
+                        transaction.Abort();
+                        return;
+                    }
+
+                    using (Transaction loadLineTypeTransaction = database.TransactionManager.StartTransaction())
+                    {
+                        LinetypeTable linetypeTable = loadLineTypeTransaction.GetObject(database.LinetypeTableId, OpenMode.ForWrite) as LinetypeTable;
+
+                        try
+                        {
+                            database.LoadLineTypeFile("DASHED", "acad.lin");
+                        }
+                        catch (Autodesk.AutoCAD.Runtime.Exception ex)
+                        {
+                            // Handle the exception
+                        }
+
+                        loadLineTypeTransaction.Commit();
+                    }
+
+                    // 初始化矩形
+                    Polyline polyLine = new Polyline();
+                    for (int i = 0; i < 4; i++)
+                    {
+                        polyLine.AddVertexAt(i, new Point2d(0, 0), 0, 0, 0);
+                    }
+                    polyLine.Closed = true;
+                    polyLine.Linetype = "DASHED";
+                    polyLine.Transparency = new Transparency(128);
+                    polyLine.ColorIndex = 31;
+                    polyLine.LinetypeScale = 1000 / database.Ltscale;
+
+                    UcsSelectJig ucsSelectJig = new UcsSelectJig(startPoint3D, polyLine);
+                    PromptResult promptResult = editor.Drag(ucsSelectJig);
+                    if (promptResult.Status == PromptStatus.OK)
+                    {
+                        endPoint3D = ucsSelectJig.endPoint3d.TransformBy(matrix3D.Inverse());
+                    }
+                    else
+                    {
+                        transaction.Abort();
+                        return;
+                    }
+
+                    Point3dCollection point3DCollection = GetPoint3DCollection(startPoint3D, endPoint3D, matrix3D);
+                    TypedValueList typedValues = new TypedValueList
+                    {
+                        typeof(BlockReference),
+                        { DxfCode.LayerName, "E-EQUIP" }
+                    };
+                    SelectionFilter selectionFilter = new SelectionFilter(typedValues);
+                    PromptSelectionResult promptSelectionResult = editor.SelectCrossingPolygon(point3DCollection, selectionFilter);
+                    if (promptSelectionResult.Status != PromptStatus.OK)
+                    {
+                        transaction.Abort();
+                        return;
+                    }
+                    List<BlockReference> blockReferences = new List<BlockReference>();
+                    SelectionSet selectionSet = promptSelectionResult.Value;
+                    foreach (var id in selectionSet.GetObjectIds())
+                    {
+                        BlockReference blockReference = transaction.GetObject(id, OpenMode.ForRead) as BlockReference;
+                        if (blockReference == null) continue;
+                        LayerTableRecord layerTableRecord = transaction.GetObject(blockReference.LayerId, OpenMode.ForRead) as LayerTableRecord;
+                        if (layerTableRecord.IsLocked == true) continue;
+                        blockReferences.Add(blockReference);
+                    }
+
+                    var points = ConvertCoordinatesToPoints(geometryFactory, blockReferences);
+                    var tree = Kruskal.FindMinimumSpanningTree(points, geometryFactory);
+                    SetLayer(database, "E-WIRE", 1);
+                    BlockReference br1;
+                    BlockReference br2;
+                    const double Tolerance = 1e-3;
+
+                    foreach (var line in tree)
+                    {
+                        var startPoint = new Point3d(line.Coordinates[0].X, line.Coordinates[0].Y, 0);
+                        var endPoint = new Point3d(line.Coordinates[1].X, line.Coordinates[1].Y, 0);
+
+                        br1 = blockReferences.FirstOrDefault(b => Math.Abs(b.Position.X - startPoint.X) < Tolerance && Math.Abs(b.Position.Y - startPoint.Y) < Tolerance);
+                        br2 = blockReferences.FirstOrDefault(b => Math.Abs(b.Position.X - endPoint.X) < Tolerance && Math.Abs(b.Position.Y - endPoint.Y) < Tolerance);
+
+                        List<Point3d> point3DList1 = GetPoint3DCollection(br1);
+                        List<Point3d> point3DList2 = GetPoint3DCollection(br2);
+
+                        if (point3DList1.Count == 0 || point3DList2.Count == 0)
+                        {
+                            transaction.Abort();
+                            break;
+                        }
+
+                        var closestPair = (from p1 in point3DList1
+                                           from p2 in point3DList2
+                                           orderby p1.DistanceTo(p2)
+                                           select new { Point1 = p1, Point2 = p2 }).First();
+
+                        Line wire = new Line(closestPair.Point1, closestPair.Point2);
+
+                        BlockTable blockTable = transaction.GetObject(database.BlockTableId, OpenMode.ForRead) as BlockTable;
+                        BlockTableRecord btr = transaction.GetObject(blockTable[BlockTableRecord.ModelSpace], OpenMode.ForRead) as BlockTableRecord;
+
+                        btr.UpgradeOpen();
+                        btr.AppendEntity(wire);
+                        transaction.AddNewlyCreatedDBObject(wire, true);
+                        btr.DowngradeOpen();
+                    }
+
+                    transaction.Commit();
+                }
+            }
+            catch (System.Exception)
+            {
+
+            }
+        }
+
+        public List<Point> ConvertCoordinatesToPoints(GeometryFactory geometryFactory, List<BlockReference> blockReferences)
+        {
+            var points = new List<Point>();
+            foreach (var blockReference in blockReferences)
+            {
+                points.Add(geometryFactory.CreatePoint(new Coordinate(blockReference.Position.X, blockReference.Position.Y)));
+            }
+            return points;
+        }
+
+        private Point3dCollection GetPoint3DCollection(Point3d startPoint3D, Point3d endPoint3D, Matrix3d matrix3D)
+        {
+            //    Point3d p1 = up1.TransformBy(matrix3D.Inverse());
+            //    Point3d p2 = up2.TransformBy(matrix3D.Inverse());
+            Point3dCollection point3DCollection = new Point3dCollection();
+            if (startPoint3D.X < endPoint3D.X && startPoint3D.Y < endPoint3D.Y)
+            {
+                var leftDownPoint = startPoint3D;
+                var leftUpPoint = new Point3d(startPoint3D.X, endPoint3D.Y, 0);
+                var rightUpPoint = endPoint3D;
+                var rightDownPoint = new Point3d(endPoint3D.X, startPoint3D.Y, 0);
+                point3DCollection = GetPoint3DCollection(point3DCollection, leftDownPoint, rightDownPoint, rightUpPoint, leftUpPoint, matrix3D);
+            }
+            else if (startPoint3D.X < endPoint3D.X && startPoint3D.Y > endPoint3D.Y)
+            {
+                var leftDownPoint = new Point3d(startPoint3D.X, endPoint3D.Y, 0);
+                var leftUpPoint = startPoint3D;
+                var rightUpPoint = new Point3d(endPoint3D.X, startPoint3D.Y, 0);
+                var rightDownPoint = endPoint3D;
+                point3DCollection = GetPoint3DCollection(point3DCollection, leftDownPoint, rightDownPoint, rightUpPoint, leftUpPoint, matrix3D);
+            }
+            else if (startPoint3D.X > endPoint3D.X && startPoint3D.Y > endPoint3D.Y)
+            {
+                var leftDownPoint = endPoint3D;
+                var leftUpPoint = new Point3d(endPoint3D.X, startPoint3D.Y, 0);
+                var rightUpPoint = startPoint3D;
+                var rightDownPoint = new Point3d(startPoint3D.X, endPoint3D.Y, 0);
+                point3DCollection = GetPoint3DCollection(point3DCollection, leftDownPoint, rightDownPoint, rightUpPoint, leftUpPoint, matrix3D);
+            }
+            else
+            {
+                var leftDownPoint = new Point3d(endPoint3D.X, startPoint3D.Y, 0);
+                var leftUpPoint = endPoint3D;
+                var rightUpPoint = new Point3d(startPoint3D.X, endPoint3D.Y, 0);
+                var rightDownPoint = startPoint3D;
+                point3DCollection = GetPoint3DCollection(point3DCollection, leftDownPoint, rightDownPoint, rightUpPoint, leftUpPoint, matrix3D);
+            }
+            return point3DCollection;
+        }
+
+        private Point3dCollection GetPoint3DCollection(Point3dCollection point3DCollection, Point3d leftDownPoint, Point3d rightDownPoint, Point3d rightUpPoint, Point3d leftUpPoint, Matrix3d matrix3D)
+        {
+
+            point3DCollection.Add(leftDownPoint);
+            point3DCollection.Add(rightDownPoint);
+            point3DCollection.Add(rightUpPoint);
+            point3DCollection.Add(leftUpPoint);
+
+            return point3DCollection;
+        }
+
+        private List<Point3d> GetPoint3DCollection(BlockReference blockReference)
+        {
+            Document document = Application.DocumentManager.CurrentDocument;
+            Database database = document.Database;
+            Editor editor = document.Editor;
+
+            List<Point3d> point3DList = new List<Point3d>();
+
+            using (Transaction transaction = database.TransactionManager.StartOpenCloseTransaction())
+            {
+                Matrix3d matrix3D = blockReference.BlockTransform;
+
+                BlockTableRecord btr = transaction.GetObject(blockReference.BlockTableRecord, OpenMode.ForRead) as BlockTableRecord;
+                if (btr == null) return point3DList;
+
+                foreach (DBPoint dBPoint in btr.OfType<ObjectId>().Select(id => transaction.GetObject(id, OpenMode.ForRead)).OfType<DBPoint>())
+                {
+                    point3DList.Add(dBPoint.Position.TransformBy(matrix3D));
+                }
+            }
+
+            return point3DList;
+        }
+        #endregion
 
         #region FF_LoadYdbFile
 
@@ -1060,11 +1307,39 @@ namespace TimeIsLife.CADCommand
 
         private void SetLayer(Database db, string layerName, int colorIndex)
         {
-            db.AddLayer(layerName);
-            db.SetLayerColor(layerName, (short)colorIndex);
-            db.SetCurrentLayer(layerName);
-        }
+            using (Transaction tr = db.TransactionManager.StartTransaction())
+            {
+                LayerTable layerTable = (LayerTable)tr.GetObject(db.LayerTableId, OpenMode.ForRead);
 
+                // Create new layer if it doesn't exist
+                ObjectId layerId;
+                if (!layerTable.Has(layerName))
+                {
+                    LayerTableRecord layerTableRecord = new LayerTableRecord
+                    {
+                        Name = layerName
+                    };
+
+                    layerTable.UpgradeOpen();
+                    layerId = layerTable.Add(layerTableRecord);
+                    tr.AddNewlyCreatedDBObject(layerTableRecord, add: true);
+                    layerTable.DowngradeOpen();
+                }
+                else
+                {
+                    layerId = layerTable[layerName];
+                }
+
+                // Set layer color
+                LayerTableRecord layerTableRecordToModify = (LayerTableRecord)tr.GetObject(layerId, OpenMode.ForWrite);
+                layerTableRecordToModify.Color = Color.FromColorIndex(ColorMethod.ByAci, (short)colorIndex);
+
+                // Set current layer
+                db.Clayer = layerId;
+
+                tr.Commit();
+            }
+        }
 
         /// <summary>
         /// 根据已知点集合求重心

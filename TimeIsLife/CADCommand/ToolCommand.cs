@@ -319,11 +319,21 @@ namespace TimeIsLife.CADCommand
                         return;
                     }
 
-                    try
+                    using (Transaction loadLineTypeTransaction = database.TransactionManager.StartTransaction())
                     {
-                        database.LoadLineTypeFile("DASHED", "acad.lin");
+                        LinetypeTable linetypeTable = loadLineTypeTransaction.GetObject(database.LinetypeTableId, OpenMode.ForWrite) as LinetypeTable;
+
+                        try
+                        {
+                            database.LoadLineTypeFile("DASHED", "acad.lin");
+                        }
+                        catch (Autodesk.AutoCAD.Runtime.Exception ex)
+                        {
+                            // Handle the exception
+                        }
+
+                        loadLineTypeTransaction.Commit();
                     }
-                    catch { }
 
                     // 初始化矩形
                     Polyline polyLine = new Polyline();
@@ -587,11 +597,21 @@ namespace TimeIsLife.CADCommand
                     }
 
                     //获取第二个点
-                    try
+                    using (Transaction loadLineTypeTransaction = database.TransactionManager.StartTransaction())
                     {
-                        database.LoadLineTypeFile("DASHED", "acad.lin");
+                        LinetypeTable linetypeTable = loadLineTypeTransaction.GetObject(database.LinetypeTableId, OpenMode.ForWrite) as LinetypeTable;
+
+                        try
+                        {
+                            database.LoadLineTypeFile("DASHED", "acad.lin");
+                        }
+                        catch (Autodesk.AutoCAD.Runtime.Exception ex)
+                        {
+                            // Handle the exception
+                        }
+
+                        loadLineTypeTransaction.Commit();
                     }
-                    catch { }
 
                     // 初始化矩形
                     Polyline polyLine = new Polyline();
@@ -763,11 +783,21 @@ namespace TimeIsLife.CADCommand
                         return;
                     }
 
-                    try
+                    using (Transaction loadLineTypeTransaction = database.TransactionManager.StartTransaction())
                     {
-                        database.LoadLineTypeFile("DASHED", "acad.lin");
+                        LinetypeTable linetypeTable = loadLineTypeTransaction.GetObject(database.LinetypeTableId, OpenMode.ForWrite) as LinetypeTable;
+
+                        try
+                        {
+                            database.LoadLineTypeFile("DASHED", "acad.lin");
+                        }
+                        catch (Autodesk.AutoCAD.Runtime.Exception ex)
+                        {
+                            // Handle the exception
+                        }
+
+                        loadLineTypeTransaction.Commit();
                     }
-                    catch { }
                     // 初始化矩形
                     Polyline polyLine = new Polyline();
                     for (int i = 0; i < 4; i++)
@@ -885,7 +915,7 @@ namespace TimeIsLife.CADCommand
             string sysFontsPath = Environment.GetFolderPath(Environment.SpecialFolder.Fonts);//windows系统字体目录
             DirectoryInfo sysDirInfo = new DirectoryInfo(sysFontsPath);//Windows系统字体文件夹
 
-            Document document =Application.DocumentManager.MdiActiveDocument;
+            Document document = Application.DocumentManager.MdiActiveDocument;
             Database database = document.Database;
             Editor editor = document.Editor;
 
