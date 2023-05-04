@@ -827,8 +827,6 @@ namespace TimeIsLife.CADCommand
                 {
                     Point3d startPoint3D = new Point3d();
                     Point3d endPoint3D = new Point3d();
-                    Vector3d xVector3D = database.Ucsxdir;
-                    Vector3d yVector3D = database.Ucsydir;
 
                     Matrix3d matrix3D = editor.CurrentUserCoordinateSystem;
                     PromptPointOptions promptPointOptions;

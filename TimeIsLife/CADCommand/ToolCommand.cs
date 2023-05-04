@@ -7,6 +7,10 @@ using Autodesk.AutoCAD.Runtime;
 
 using DotNetARX;
 
+using NetTopologySuite.Geometries;
+using NetTopologySuite.Precision;
+using NetTopologySuite;
+
 using System;
 using System.Collections.Generic;
 using System.Drawing.Text;
@@ -17,8 +21,10 @@ using System.Threading.Tasks;
 using System.Windows;
 
 using TimeIsLife.Jig;
+using TimeIsLife.Model;
 
 using Application = Autodesk.AutoCAD.ApplicationServices.Application;
+using Point = NetTopologySuite.Geometries.Point;
 
 [assembly: CommandClass(typeof(TimeIsLife.CADCommand.ToolCommand))]
 
@@ -245,69 +251,34 @@ namespace TimeIsLife.CADCommand
             Document document = Application.DocumentManager.CurrentDocument;
             Database database = document.Database;
             Editor editor = document.Editor;
-            string s1 = "\n作用：在F1的基础上，多个块之间连线。";
-            string s2 = "\n操作方法：框选对象，设置连接方向（默认ucs的x轴）";
-            string s3 = "\n注意事项：块内需要用点表示连接点。";
+            string s1 = "\n作用：多个块按照最近距离自动连线。";
+            string s2 = "\n操作方法：框选对象";
+            string s3 = "\n注意事项：块不能锁定";
             editor.WriteMessage(s1 + s2 + s3);
+
+            //NTS
+            var precisionModel = new PrecisionModel(1000d);
+            GeometryPrecisionReducer precisionReducer = new GeometryPrecisionReducer(precisionModel);
+            NetTopologySuite.NtsGeometryServices.Instance = new NetTopologySuite.NtsGeometryServices
+                (
+                NetTopologySuite.Geometries.Implementation.CoordinateArraySequenceFactory.Instance,
+                precisionModel,
+                4326
+                );
+            GeometryFactory geometryFactory = NtsGeometryServices.Instance.CreateGeometryFactory(precisionModel);
+
             try
             {
                 using (Transaction transaction = database.TransactionManager.StartOpenCloseTransaction())
                 {
                     Point3d startPoint3D = new Point3d();
                     Point3d endPoint3D = new Point3d();
-                    Vector3d xVector3D = database.Ucsxdir;
-                    Vector3d yVector3D = database.Ucsydir;
 
                     Matrix3d matrix3D = editor.CurrentUserCoordinateSystem;
-                    PromptPointOptions promptPointOptionsX;
-                    PromptPointOptions promptPointOptionsY;
-                    PromptPointResult ppr;
+                    PromptPointOptions promptPointOptions;
 
-                    if (bo)
-                    {
-                        promptPointOptionsX = new PromptPointOptions("\n 请选择第一个角点：[x轴(X)/y轴(Y)]<X>");
-                        promptPointOptionsX.Keywords.Add("X");
-                        promptPointOptionsX.Keywords.Add("Y");
-                        promptPointOptionsX.Keywords.Default = "X";
-                        promptPointOptionsX.AppendKeywordsToMessage = false;
-                        ppr = editor.GetPoint(promptPointOptionsX);
-                    }
-                    else
-                    {
-                        promptPointOptionsY = new PromptPointOptions("\n 请选择第一个角点：[x轴(X)/y轴(Y)]<Y>");
-                        promptPointOptionsY.Keywords.Add("X");
-                        promptPointOptionsY.Keywords.Add("Y");
-                        promptPointOptionsY.Keywords.Default = "X";
-                        promptPointOptionsY.AppendKeywordsToMessage = false;
-                        ppr = editor.GetPoint(promptPointOptionsY);
-                    }
-
-                    while (ppr.Status == PromptStatus.Keyword)
-                    {
-                        switch (ppr.StringResult)
-                        {
-                            case "X":
-                                promptPointOptionsX = new PromptPointOptions("\n 请选择第一个角点：[x轴(X)/y轴(Y)]<X>");
-                                promptPointOptionsX.Keywords.Add("X");
-                                promptPointOptionsX.Keywords.Add("Y");
-                                promptPointOptionsX.Keywords.Default = "X";
-                                promptPointOptionsX.AppendKeywordsToMessage = false;
-                                ppr = editor.GetPoint(promptPointOptionsX);
-                                bo = true;
-                                break;
-                            case "Y":
-                                promptPointOptionsY = new PromptPointOptions("\n 请选择第一个角点：[x轴(X)/y轴(Y)]<Y>");
-                                promptPointOptionsY.Keywords.Add("X");
-                                promptPointOptionsY.Keywords.Add("Y");
-                                promptPointOptionsY.Keywords.Default = "X";
-                                promptPointOptionsY.AppendKeywordsToMessage = false;
-                                ppr = editor.GetPoint(promptPointOptionsY);
-                                bo = false;
-                                break;
-                            default:
-                                break;
-                        }
-                    }
+                    promptPointOptions = new PromptPointOptions("\n 请选择第一个角点：");
+                    PromptPointResult ppr = editor.GetPoint(promptPointOptions);
 
                     if (ppr.Status == PromptStatus.OK)
                     {
@@ -360,8 +331,11 @@ namespace TimeIsLife.CADCommand
                     }
 
                     Point3dCollection point3DCollection = GetPoint3DCollection(startPoint3D, endPoint3D, matrix3D);
-                    TypedValueList typedValues = new TypedValueList();
-                    typedValues.Add(typeof(BlockReference));
+                    TypedValueList typedValues = new TypedValueList
+                    {
+                        typeof(BlockReference),
+                        { DxfCode.LayerName, "E-EQUIP" }
+                    };
                     SelectionFilter selectionFilter = new SelectionFilter(typedValues);
                     PromptSelectionResult promptSelectionResult = editor.SelectCrossingPolygon(point3DCollection, selectionFilter);
                     if (promptSelectionResult.Status != PromptStatus.OK)
@@ -377,59 +351,44 @@ namespace TimeIsLife.CADCommand
                         if (blockReference == null) continue;
                         LayerTableRecord layerTableRecord = transaction.GetObject(blockReference.LayerId, OpenMode.ForRead) as LayerTableRecord;
                         if (layerTableRecord.IsLocked == true) continue;
+                        if (GetPoint3DCollection(blockReference).Count == 0) continue;
                         blockReferences.Add(blockReference);
                     }
-                    if (bo)
-                    {
-                        blockReferences = blockReferences.OrderBy(b => b.Position.TransformBy(matrix3D.Inverse()).X).ToList();
-                    }
-                    else
-                    {
-                        blockReferences = blockReferences.OrderBy(b => b.Position.TransformBy(matrix3D.Inverse()).Y).ToList();
-                    }
 
-                    for (int i = 0; i < blockReferences.Count - 1; i++)
-                    {
+                    var points = ConvertCoordinatesToPoints(geometryFactory, blockReferences);
+                    var tree = Kruskal.FindMinimumSpanningTree(points, geometryFactory);
+                    SetLayer(database, "E-WIRE", 1);
+                    BlockReference br1;
+                    BlockReference br2;
+                    const double Tolerance = 1e-3;
 
-                        BlockReference br1 = blockReferences[i];
-                        BlockReference br2 = blockReferences[i + 1];
-                        //editor.WriteMessage($"\n br1-{br1.Position.X.ToString()},{br1.Position.Y.ToString()},{br1.Position.Z.ToString()};br2-{br2.Position.X.ToString()},{br2.Position.Y.ToString()},{br2.Position.Z.ToString()}");
-                        Point3dCollection point3DCollection1 = GetPoint3DCollection(br1);
-                        if (point3DCollection1.Count == 0) transaction.Abort();
-                        Point3dCollection point3DCollection2 = GetPoint3DCollection(br2);
-                        if (point3DCollection2.Count == 0) transaction.Abort();
+                    foreach (var line in tree)
+                    {
+                        var startPoint = new Point3d(line.Coordinates[0].X, line.Coordinates[0].Y, 0);
+                        var endPoint = new Point3d(line.Coordinates[1].X, line.Coordinates[1].Y, 0);
+
+                        br1 = blockReferences.FirstOrDefault(b => Math.Abs(b.Position.X - startPoint.X) < Tolerance && Math.Abs(b.Position.Y - startPoint.Y) < Tolerance);
+                        br2 = blockReferences.FirstOrDefault(b => Math.Abs(b.Position.X - endPoint.X) < Tolerance && Math.Abs(b.Position.Y - endPoint.Y) < Tolerance);
+
+                        List<Point3d> point3DList1 = GetPoint3DCollection(br1);
+                        List<Point3d> point3DList2 = GetPoint3DCollection(br2);
+
+                        var closestPair = (from p1 in point3DList1
+                                           from p2 in point3DList2
+                                           orderby p1.DistanceTo(p2)
+                                           select new { Point1 = p1, Point2 = p2 }).First();
+
+                        Line wire = new Line(closestPair.Point1, closestPair.Point2);
 
                         BlockTable blockTable = transaction.GetObject(database.BlockTableId, OpenMode.ForRead) as BlockTable;
                         BlockTableRecord btr = transaction.GetObject(blockTable[BlockTableRecord.ModelSpace], OpenMode.ForRead) as BlockTableRecord;
 
-                        List<List<Point3d>> point3Ds1 = new List<List<Point3d>>();
-                        Dictionary<List<Point3d>, double> keyValuePairs = new Dictionary<List<Point3d>, double>();
-
-                        foreach (Point3d item1 in point3DCollection1)
-                        {
-                            foreach (Point3d item2 in point3DCollection2)
-                            {
-                                List<Point3d> point3Ds = new List<Point3d>();
-                                point3Ds.Add(item1);
-                                point3Ds.Add(item2);
-                                keyValuePairs.Add(point3Ds, item1.DistanceTo(item2));
-                            }
-                        }
-                        Line line = null;
-                        double d = keyValuePairs.Min(p => p.Value);
-                        foreach (var item in keyValuePairs)
-                        {
-                            if (item.Value.Equals(d))
-                            {
-                                line = new Line(item.Key[0], item.Key[1]);
-                            }
-                        }
-                        if (line == null) continue;
                         btr.UpgradeOpen();
-                        btr.AppendEntity(line);
-                        transaction.AddNewlyCreatedDBObject(line, true);
+                        btr.AppendEntity(wire);
+                        transaction.AddNewlyCreatedDBObject(wire, true);
                         btr.DowngradeOpen();
                     }
+
                     transaction.Commit();
                 }
             }
@@ -437,6 +396,52 @@ namespace TimeIsLife.CADCommand
             {
 
             }
+        }
+
+        private void SetLayer(Database db, string layerName, int colorIndex)
+        {
+            using (Transaction tr = db.TransactionManager.StartTransaction())
+            {
+                LayerTable layerTable = (LayerTable)tr.GetObject(db.LayerTableId, OpenMode.ForRead);
+
+                // Create new layer if it doesn't exist
+                ObjectId layerId;
+                if (!layerTable.Has(layerName))
+                {
+                    LayerTableRecord layerTableRecord = new LayerTableRecord
+                    {
+                        Name = layerName
+                    };
+
+                    layerTable.UpgradeOpen();
+                    layerId = layerTable.Add(layerTableRecord);
+                    tr.AddNewlyCreatedDBObject(layerTableRecord, add: true);
+                    layerTable.DowngradeOpen();
+                }
+                else
+                {
+                    layerId = layerTable[layerName];
+                }
+
+                // Set layer color
+                LayerTableRecord layerTableRecordToModify = (LayerTableRecord)tr.GetObject(layerId, OpenMode.ForWrite);
+                layerTableRecordToModify.Color = Color.FromColorIndex(ColorMethod.ByAci, (short)colorIndex);
+
+                // Set current layer
+                db.Clayer = layerId;
+
+                tr.Commit();
+            }
+        }
+
+        public List<Point> ConvertCoordinatesToPoints(GeometryFactory geometryFactory, List<BlockReference> blockReferences)
+        {
+            var points = new List<Point>();
+            foreach (var blockReference in blockReferences)
+            {
+                points.Add(geometryFactory.CreatePoint(new Coordinate(blockReference.Position.X, blockReference.Position.Y)));
+            }
+            return points;
         }
 
         private Point3dCollection GetPoint3DCollection(Point3d up1, Point3d up2, Matrix3d matrix3D)
@@ -494,28 +499,28 @@ namespace TimeIsLife.CADCommand
             return point3DCollection;
         }
 
-        private Point3dCollection GetPoint3DCollection(BlockReference blockReference)
+        private List<Point3d> GetPoint3DCollection(BlockReference blockReference)
         {
             Document document = Application.DocumentManager.CurrentDocument;
             Database database = document.Database;
             Editor editor = document.Editor;
-            Point3dCollection point3DCollection = new Point3dCollection();
+
+            List<Point3d> point3DList = new List<Point3d>();
 
             using (Transaction transaction = database.TransactionManager.StartOpenCloseTransaction())
             {
                 Matrix3d matrix3D = blockReference.BlockTransform;
 
                 BlockTableRecord btr = transaction.GetObject(blockReference.BlockTableRecord, OpenMode.ForRead) as BlockTableRecord;
-                if (btr == null) return point3DCollection;
-                foreach (var objectId in btr)
+                if (btr == null) return point3DList;
+
+                foreach (DBPoint dBPoint in btr.OfType<ObjectId>().Select(id => transaction.GetObject(id, OpenMode.ForRead)).OfType<DBPoint>())
                 {
-                    DBPoint dBPoint = transaction.GetObject(objectId, OpenMode.ForRead) as DBPoint;
-                    if (dBPoint == null) continue;
-                    point3DCollection.Add(dBPoint.Position.TransformBy(matrix3D));
+                    point3DList.Add(dBPoint.Position.TransformBy(matrix3D));
                 }
             }
 
-            return point3DCollection;
+            return point3DList;
         }
         #endregion
 

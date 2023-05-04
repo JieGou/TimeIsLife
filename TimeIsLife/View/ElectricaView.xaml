@@ -551,6 +551,14 @@
                     </GroupBox>
                 </StackPanel>
             </Expander>
+            <Expander Header="强电系统图" Template="{StaticResource ExpanderTemplate}" >
+                <StackPanel>
+                    <Button
+                        Command="{Binding QuickUcsCommand}"
+                        Content=""
+                        Template="{StaticResource ButtonTemplate}" />
+                </StackPanel>
+            </Expander>
         </StackPanel>
     </ScrollViewer>
 </UserControl>
