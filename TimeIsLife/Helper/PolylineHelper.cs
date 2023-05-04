@@ -36,7 +36,7 @@ namespace TimeIsLife.Helper
         /// </summary>
         /// <param name="polyline"></param>
         /// <returns></returns>
-        public static Point3dCollection GetPoint3dCollection(this Polyline polyline,Matrix3d ucsToWcsMatrix3d)
+        public static Point3dCollection GetPoint3dCollection(this Polyline polyline, Matrix3d ucsToWcsMatrix3d)
         {
             Point3dCollection points = new Point3dCollection();
 
@@ -114,37 +114,49 @@ namespace TimeIsLife.Helper
             return bo;
         }
 
-        public static string GetXValues(this Polyline polyline)
+        public static string GetXValues(this Polyline polyline, double segmentLength = 300)
         {
             List<double> xValues = new List<double>();
-            for (int i = 0; i < polyline.NumberOfVertices; i++)
-            {
-
-                xValues.Add(polyline.GetPoint3dAt(i).X);
-            }
+            ProcessPolyline(polyline, segmentLength, (point) => xValues.Add(point.X));
             return string.Join(",", xValues.ToArray());
         }
 
-        public static string GetYValues(this Polyline polyline)
+        public static string GetYValues(this Polyline polyline, double segmentLength = 300)
         {
-            List<double> xValues = new List<double>();
-            for (int i = 0; i < polyline.NumberOfVertices; i++)
-            {
-
-                xValues.Add(polyline.GetPoint3dAt(i).Y);
-            }
-            return string.Join(",", xValues.ToArray());
+            List<double> yValues = new List<double>();
+            ProcessPolyline(polyline, segmentLength, (point) => yValues.Add(point.Y));
+            return string.Join(",", yValues.ToArray());
         }
 
-        public static string GetZValues(this Polyline polyline)
+        public static string GetZValues(this Polyline polyline, double segmentLength = 300)
         {
-            List<double> xValues = new List<double>();
+            List<double> zValues = new List<double>();
+            ProcessPolyline(polyline, segmentLength, (point) => zValues.Add(point.Z));
+            return string.Join(",", zValues.ToArray());
+        }
+
+        private static void ProcessPolyline(Polyline polyline, double segmentLength, Action<Point3d> processPoint)
+        {
             for (int i = 0; i < polyline.NumberOfVertices; i++)
             {
+                if (polyline.GetSegmentType(i) == SegmentType.Arc)
+                {
+                    CircularArc3d arc = polyline.GetArcSegmentAt(i);
+                    double arcLength = arc.GetLength(0, 1, 1e-3);
+                    int numSegments = (int)Math.Ceiling(arcLength / segmentLength);
 
-                xValues.Add(polyline.GetPoint3dAt(i).Z);
+                    for (int j = 0; j <= numSegments; j++)
+                    {
+                        double param = j / numSegments;
+                        Point3d pointOnArc = arc.EvaluatePoint(param);
+                        processPoint(pointOnArc);
+                    }
+                }
+                else
+                {
+                    processPoint(polyline.GetPoint3dAt(i));
+                }
             }
-            return string.Join(",", xValues.ToArray());
         }
     }
 }

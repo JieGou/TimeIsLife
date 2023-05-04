@@ -108,3 +108,9 @@ D:\github\TimeIsLife\TimeIsLife\obj\Debug\TimeIsLife.csproj.CoreCompileInputs.ca
 D:\github\TimeIsLife\TimeIsLife\obj\Debug\TimeIsLife.csproj.CopyComplete
 D:\github\TimeIsLife\TimeIsLife\obj\Debug\TimeIsLife.dll
 D:\github\TimeIsLife\TimeIsLife\obj\Debug\TimeIsLife.pdb
+D:\github\TimeIsLife\TimeIsLife\bin\Debug\FA\FA-38-常闭防火门监控模块.dwg
+D:\github\TimeIsLife\TimeIsLife\bin\Debug\FA\FA-39-常开防火门监控模块.dwg
+D:\github\TimeIsLife\TimeIsLife\bin\Debug\FA\FA-40-压力开关.dwg
+D:\github\TimeIsLife\TimeIsLife\bin\Debug\FA\FA-41-火焰探测器.dwg
+D:\github\TimeIsLife\TimeIsLife\bin\Debug\FA\FA-42-电磁阀.dwg
+D:\github\TimeIsLife\TimeIsLife\bin\Debug\FA\弱电-火灾自动报警图例及示例.dwg

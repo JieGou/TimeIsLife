@@ -327,7 +327,7 @@ namespace TimeIsLife.CADCommand
                         {
                             database.LoadLineTypeFile("DASHED", "acad.lin");
                         }
-                        catch (Autodesk.AutoCAD.Runtime.Exception ex)
+                        catch (Autodesk.AutoCAD.Runtime.Exception)
                         {
                             // Handle the exception
                         }
@@ -605,7 +605,7 @@ namespace TimeIsLife.CADCommand
                         {
                             database.LoadLineTypeFile("DASHED", "acad.lin");
                         }
-                        catch (Autodesk.AutoCAD.Runtime.Exception ex)
+                        catch (Autodesk.AutoCAD.Runtime.Exception)
                         {
                             // Handle the exception
                         }
@@ -791,7 +791,7 @@ namespace TimeIsLife.CADCommand
                         {
                             database.LoadLineTypeFile("DASHED", "acad.lin");
                         }
-                        catch (Autodesk.AutoCAD.Runtime.Exception ex)
+                        catch (Autodesk.AutoCAD.Runtime.Exception)
                         {
                             // Handle the exception
                         }

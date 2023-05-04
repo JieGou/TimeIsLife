@@ -513,10 +513,10 @@
                                     Width="120"
                                     Content="块比例"
                                     Template="{DynamicResource LabelTemplate}" />
-                                <ComboBox ItemsSource="{Binding BlockScales}" SelectedItem="{Binding BlockScale}" >
+                                <ComboBox ItemsSource="{Binding BlockScales}" SelectedItem="{Binding BlockScale}">
                                     <ComboBox.ItemTemplate>
                                         <DataTemplate>
-                                            <TextBlock Text="{Binding}" VerticalAlignment="Center" />
+                                            <TextBlock VerticalAlignment="Center" Text="{Binding}" />
                                         </DataTemplate>
                                     </ComboBox.ItemTemplate>
                                 </ComboBox>
@@ -526,10 +526,10 @@
                                     Width="120"
                                     Content="块角度"
                                     Template="{DynamicResource LabelTemplate}" />
-                                <ComboBox ItemsSource="{Binding BlockAngles}" SelectedItem="{Binding BlockAngle}" >
+                                <ComboBox ItemsSource="{Binding BlockAngles}" SelectedItem="{Binding BlockAngle}">
                                     <ComboBox.ItemTemplate>
                                         <DataTemplate>
-                                            <TextBlock Text="{Binding}" VerticalAlignment="Center" />
+                                            <TextBlock VerticalAlignment="Center" Text="{Binding}" />
                                         </DataTemplate>
                                     </ComboBox.ItemTemplate>
                                 </ComboBox>
@@ -539,10 +539,10 @@
                                     Width="120"
                                     Content="首端距离偏移比例"
                                     Template="{DynamicResource LabelTemplate}" />
-                                <ComboBox ItemsSource="{Binding Distances}" SelectedItem="{Binding Distance}" >
+                                <ComboBox ItemsSource="{Binding Distances}" SelectedItem="{Binding Distance}">
                                     <ComboBox.ItemTemplate>
                                         <DataTemplate>
-                                            <TextBlock Text="{Binding}" VerticalAlignment="Center" />
+                                            <TextBlock VerticalAlignment="Center" Text="{Binding}" />
                                         </DataTemplate>
                                     </ComboBox.ItemTemplate>
                                 </ComboBox>

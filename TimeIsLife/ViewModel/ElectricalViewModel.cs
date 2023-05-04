@@ -72,6 +72,8 @@ namespace TimeIsLife.ViewModel
             kx = 0.8;
             cosø = 0.85;
 
+            MaxValue = 100;
+
             BlockScales = new List<int>() { 1, 25, 50, 75, 100, 150, 200, 250 };
             BlockAngles = new List<int> { 0, 90, 180, 270 };
             Distances = new List<double> { 0.0, 0.5, 1.0 };
@@ -175,6 +177,14 @@ namespace TimeIsLife.ViewModel
         {
             get => isLayoutAtHole;
             set => SetProperty(ref isLayoutAtHole, value);
+        }
+
+        //最短路径阈值
+        private int maxValue;
+        public int MaxValue
+        {
+            get => maxValue;
+            set => SetProperty(ref maxValue, value);
         }
         #endregion
 

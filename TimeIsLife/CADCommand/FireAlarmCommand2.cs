@@ -854,7 +854,7 @@ namespace TimeIsLife.CADCommand
                         {
                             database.LoadLineTypeFile("DASHED", "acad.lin");
                         }
-                        catch (Autodesk.AutoCAD.Runtime.Exception ex)
+                        catch (Autodesk.AutoCAD.Runtime.Exception)
                         {
                             // Handle the exception
                         }
@@ -907,6 +907,7 @@ namespace TimeIsLife.CADCommand
                         if (blockReference == null) continue;
                         LayerTableRecord layerTableRecord = transaction.GetObject(blockReference.LayerId, OpenMode.ForRead) as LayerTableRecord;
                         if (layerTableRecord.IsLocked == true) continue;
+                        if (GetPoint3DCollection(blockReference).Count == 0) continue;
                         blockReferences.Add(blockReference);
                     }
 
@@ -927,12 +928,6 @@ namespace TimeIsLife.CADCommand
 
                         List<Point3d> point3DList1 = GetPoint3DCollection(br1);
                         List<Point3d> point3DList2 = GetPoint3DCollection(br2);
-
-                        if (point3DList1.Count == 0 || point3DList2.Count == 0)
-                        {
-                            transaction.Abort();
-                            break;
-                        }
 
                         var closestPair = (from p1 in point3DList1
                                            from p2 in point3DList2
