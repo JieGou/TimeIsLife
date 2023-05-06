@@ -73,6 +73,7 @@ namespace TimeIsLife.ViewModel
             cosø = 0.85;
 
             MaxValue = 100;
+            isTreeConnection = true;
 
             BlockScales = new List<int>() { 1, 25, 50, 75, 100, 150, 200, 250 };
             BlockAngles = new List<int> { 0, 90, 180, 270 };
@@ -185,6 +186,28 @@ namespace TimeIsLife.ViewModel
         {
             get => maxValue;
             set => SetProperty(ref maxValue, value);
+        }
+
+        //算法选择
+        private bool isTreeConnection;
+        public bool IsTreeConnection
+        {
+            get => isTreeConnection;
+            set => SetProperty(ref isTreeConnection, value);
+        }
+
+        private bool isCircularConnection1;
+        public bool IsCircularConnection1
+        {
+            get => isCircularConnection1;
+            set => SetProperty(ref isCircularConnection1, value);
+        }
+
+        private bool isCircularConnection2;
+        public bool IsCircularConnection2
+        {
+            get => isCircularConnection2;
+            set => SetProperty(ref isCircularConnection2, value);
         }
         #endregion
 

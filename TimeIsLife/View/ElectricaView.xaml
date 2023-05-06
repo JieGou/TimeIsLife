@@ -129,6 +129,27 @@
                         Command="{Binding AutomaticConnectionCommand}"
                         Content="自动连线"
                         Template="{StaticResource ButtonTemplate}" />
+                    <Border
+                        Margin="1"
+                        Background="#B8F1CC"
+                        BorderBrush="Chocolate"
+                        BorderThickness="1"
+                        CornerRadius="5">
+                        <StackPanel Orientation="Vertical">
+                            <RadioButton
+                                Content="树形连接"
+                                GroupName="AlgorithmSelection"
+                                IsChecked="{Binding IsTreeConnection, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                            <RadioButton
+                                Content="环形连接 1"
+                                GroupName="AlgorithmSelection"
+                                IsChecked="{Binding IsCircularConnection1, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                            <RadioButton
+                                Content="环形连接 2"
+                                GroupName="AlgorithmSelection"
+                                IsChecked="{Binding IsCircularConnection2, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                        </StackPanel>
+                    </Border>
                     <Button
                         Command="{Binding FasCommand}"
                         Content="生成火灾自动报警系统图"
@@ -551,7 +572,7 @@
                     </GroupBox>
                 </StackPanel>
             </Expander>
-            <Expander Header="强电系统图" Template="{StaticResource ExpanderTemplate}" >
+            <Expander Header="强电系统图" Template="{StaticResource ExpanderTemplate}">
                 <StackPanel>
                     <Button
                         Command="{Binding QuickUcsCommand}"

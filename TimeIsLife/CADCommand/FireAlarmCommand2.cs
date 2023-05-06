@@ -910,7 +910,27 @@ namespace TimeIsLife.CADCommand
                     }
 
                     var points = ConvertCoordinatesToPoints(geometryFactory, blockReferences);
-                    var tree = Kruskal.FindMinimumSpanningTree(points, geometryFactory);
+
+                    List<LineString> tree;
+
+                    if (ElectricalViewModel.electricalViewModel.IsTreeConnection)
+                    {
+                        tree = Kruskal.FindMinimumSpanningTree(points, geometryFactory);
+                    }
+                    else if (ElectricalViewModel.electricalViewModel.IsCircularConnection1)
+                    {
+                        tree = ConnectPointsNonCrossing(points, geometryFactory);
+                    }
+                    else if (ElectricalViewModel.electricalViewModel.IsCircularConnection2)
+                    {
+                        tree = ConnectPointsNonCrossingMST(points, geometryFactory);
+                    }
+                    else
+                    {
+                        // 如果没有选中任何 RadioButton，您可以在这里处理该情况
+                        tree = new List<LineString>();
+                    }
+
                     SetLayer(database, "E-WIRE", 1);
                     BlockReference br1;
                     BlockReference br2;
@@ -951,6 +971,132 @@ namespace TimeIsLife.CADCommand
 
             }
         }
+
+        public static List<LineString> ConnectPointsNonCrossingMST(List<Point> points, GeometryFactory geometry)
+        {
+            int count = points.Count;
+            var result = new List<LineString>();
+
+            if (count < 2)
+            {
+                return result;
+            }
+
+            // Step 1: Construct the minimum spanning tree
+            var mst = Kruskal.FindMinimumSpanningTree(points, geometry);
+
+            // Step 2: Perform depth-first search on the minimum spanning tree
+            var adjacencyList = new Dictionary<Point, List<Point>>();
+            foreach (var line in mst)
+            {
+                var p1 = line.StartPoint;
+                var p2 = line.EndPoint;
+
+                if (!adjacencyList.ContainsKey(p1))
+                {
+                    adjacencyList[p1] = new List<Point>();
+                }
+                adjacencyList[p1].Add(p2);
+
+                if (!adjacencyList.ContainsKey(p2))
+                {
+                    adjacencyList[p2] = new List<Point>();
+                }
+                adjacencyList[p2].Add(p1);
+            }
+
+            var visited = new HashSet<Point>();
+            var dfsOrder = new List<Point>();
+
+            void DFS(Point current)
+            {
+                visited.Add(current);
+                dfsOrder.Add(current);
+
+                foreach (var neighbor in adjacencyList[current])
+                {
+                    if (!visited.Contains(neighbor))
+                    {
+                        DFS(neighbor);
+                    }
+                }
+            }
+
+            DFS(points[0]);
+
+            // Step 3: Connect the points in the DFS order
+            for (int i = 0; i < count - 1; i++)
+            {
+                result.Add(geometry.CreateLineString(new[] {
+            new Coordinate(dfsOrder[i].X, dfsOrder[i].Y),
+            new Coordinate(dfsOrder[i + 1].X, dfsOrder[i + 1].Y)
+        }));
+            }
+
+            // Close the cycle by connecting the last point to the first one
+            result.Add(geometry.CreateLineString(new[] {
+        new Coordinate(dfsOrder[count - 1].X, dfsOrder[count - 1].Y),
+        new Coordinate(dfsOrder[0].X, dfsOrder[0].Y)
+    }));
+
+            return result;
+        }
+
+
+        public static List<LineString> ConnectPointsNonCrossing(List<Point> points, GeometryFactory geometry)
+        {
+            int count = points.Count;
+            var result = new List<LineString>();
+
+            if (count < 2)
+            {
+                return result;
+            }
+
+            var remainingPoints = new List<Point>(points);
+            var currentPoint = remainingPoints[0];
+            remainingPoints.RemoveAt(0);
+
+            while (remainingPoints.Count > 0)
+            {
+                int nearestPointIndex = -1;
+                double minDist = double.PositiveInfinity;
+
+                for (int i = 0; i < remainingPoints.Count; i++)
+                {
+                    double dist = Distance(currentPoint, remainingPoints[i]);
+                    if (dist < minDist)
+                    {
+                        minDist = dist;
+                        nearestPointIndex = i;
+                    }
+                }
+
+                var nextPoint = remainingPoints[nearestPointIndex];
+                remainingPoints.RemoveAt(nearestPointIndex);
+
+                result.Add(geometry.CreateLineString(new[] {
+            new Coordinate(currentPoint.X, currentPoint.Y),
+            new Coordinate(nextPoint.X, nextPoint.Y)
+        }));
+
+                currentPoint = nextPoint;
+            }
+
+            // Close the cycle by connecting the last point to the first one
+            result.Add(geometry.CreateLineString(new[] {
+        new Coordinate(currentPoint.X, currentPoint.Y),
+        new Coordinate(points[0].X, points[0].Y)
+    }));
+
+            return result;
+        }
+
+        private static double Distance(Point p1, Point p2)
+        {
+            return Math.Sqrt(Math.Pow(p1.X - p2.X, 2) + Math.Pow(p1.Y - p2.Y, 2));
+        }
+
 
         public List<Point> ConvertCoordinatesToPoints(GeometryFactory geometryFactory, List<BlockReference> blockReferences)
         {
@@ -1508,4 +1654,5 @@ namespace TimeIsLife.CADCommand
 
         #endregion
     }
+
 }
