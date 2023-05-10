@@ -107,9 +107,7 @@ namespace TimeIsLife.CADCommand
             Database database = document.Database;
             Editor editor = document.Editor;
 
-            electricalViewModel.Pe = 0;
-            electricalViewModel.NormalOrFirePower = 0;
-            electricalViewModel.NormalInFirePower = 0;
+
 
             try
             {
@@ -143,9 +141,9 @@ namespace TimeIsLife.CADCommand
                         b += item[1];
                     }
 
-                    electricalViewModel.NormalOrFirePower = a;
-                    electricalViewModel.NormalInFirePower = b;
-                    electricalViewModel.Pe = Math.Max(a, b);
+                    CalculateCurrentViewModel.Instance.NormalOrFirePower = a;
+                    CalculateCurrentViewModel.Instance.NormalInFirePower = b;
+                    CalculateCurrentViewModel.Instance.Pe = Math.Max(a, b);
 
                     transaction.Commit();
 

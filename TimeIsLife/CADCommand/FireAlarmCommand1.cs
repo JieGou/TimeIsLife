@@ -135,7 +135,7 @@ namespace TimeIsLife.CADCommand
                         FireAlarmWindow.instance.ShowDialog();
                         return;
                     }
-                    FireAlarmWindowViewModel.instance.FloorAreaLayerName = polyline.Layer;
+                    FireAlarmWindowViewModel.Instance.FloorAreaLayerName = polyline.Layer;
                     transaction.Commit();
                 }
                 catch
@@ -191,7 +191,7 @@ namespace TimeIsLife.CADCommand
                         FireAlarmWindow.instance.ShowDialog();
                         return;
                     }
-                    FireAlarmWindowViewModel.instance.FireAreaLayerName = polyline.Layer;
+                    FireAlarmWindowViewModel.Instance.FireAreaLayerName = polyline.Layer;
                     transaction.Commit();
                 }
                 catch
@@ -247,7 +247,7 @@ namespace TimeIsLife.CADCommand
                         FireAlarmWindow.instance.ShowDialog();
                         return;
                     }
-                    FireAlarmWindowViewModel.instance.RoomAreaLayerName = polyline.Layer;
+                    FireAlarmWindowViewModel.Instance.RoomAreaLayerName = polyline.Layer;
                     transaction.Commit();
                 }
                 catch
@@ -268,7 +268,7 @@ namespace TimeIsLife.CADCommand
             Editor editor = document.Editor;
             Matrix3d ucsToWcsMatrix3d = editor.CurrentUserCoordinateSystem;
 
-            if (FireAlarmWindowViewModel.instance.FloorAreaLayerName.IsNullOrWhiteSpace())
+            if (FireAlarmWindowViewModel.Instance.FloorAreaLayerName.IsNullOrWhiteSpace())
             {
                 MessageBox.Show("请先完成楼层图层的选择！");
                 FireAlarmWindow.instance.ShowDialog();
@@ -302,15 +302,15 @@ namespace TimeIsLife.CADCommand
                         FireAlarmWindow.instance.ShowDialog();
                         return;
                     }
-                    FireAlarmWindowViewModel.instance.SelectedAreaFloor.X = polyline.GeometricExtents.MinPoint.X;
-                    FireAlarmWindowViewModel.instance.SelectedAreaFloor.Y = polyline.GeometricExtents.MinPoint.Y;
-                    FireAlarmWindowViewModel.instance.SelectedAreaFloor.Z = polyline.GeometricExtents.MinPoint.Z;
+                    FireAlarmWindowViewModel.Instance.SelectedAreaFloor.X = polyline.GeometricExtents.MinPoint.X;
+                    FireAlarmWindowViewModel.Instance.SelectedAreaFloor.Y = polyline.GeometricExtents.MinPoint.Y;
+                    FireAlarmWindowViewModel.Instance.SelectedAreaFloor.Z = polyline.GeometricExtents.MinPoint.Z;
                     //FireAlarmWindowViewModel.instance.SelectedAreaFloor.MinPoint3d = polyline.GeometricExtents.MinPoint;
                     //FireAlarmWindowViewModel.instance.SelectedAreaFloor.MaxPoint3d = polyline.GeometricExtents.MaxPoint;
 
                     //过滤器
                     TypedValueList typedValues = new TypedValueList();
-                    typedValues.Add(DxfCode.LayerName, FireAlarmWindowViewModel.instance.FloorAreaLayerName);
+                    typedValues.Add(DxfCode.LayerName, FireAlarmWindowViewModel.Instance.FloorAreaLayerName);
                     typedValues.Add(typeof(DBText));
 
                     SelectionSet selectionSet = editor.GetSelectionSet(SelectString.SelectWindowPolygon, null,
@@ -335,16 +335,16 @@ namespace TimeIsLife.CADCommand
                         FireAlarmWindow.instance.ShowDialog();
                         return;
                     }
-                    FireAlarmWindowViewModel.instance.SelectedAreaFloor.Name = dBText.TextString;
+                    FireAlarmWindowViewModel.Instance.SelectedAreaFloor.Name = dBText.TextString;
                     Model.Area area = new Model.Area
                     {
-                        Floor = FireAlarmWindowViewModel.instance.SelectedAreaFloor,
+                        Floor = FireAlarmWindowViewModel.Instance.SelectedAreaFloor,
                         Kind = 0,
                         VertexX = polyline.GetXValues(),
                         VertexY = polyline.GetYValues(),
                         VertexZ = polyline.GetZValues()
                     };
-                    FireAlarmWindowViewModel.instance.Areas.Add(area);
+                    FireAlarmWindowViewModel.Instance.Areas.Add(area);
                     transaction.Commit();
                 }
                 catch
@@ -368,13 +368,13 @@ namespace TimeIsLife.CADCommand
             {
                 try
                 {
-                    if (FireAlarmWindowViewModel.instance.SelectedAreaFloor == null)
+                    if (FireAlarmWindowViewModel.Instance.SelectedAreaFloor == null)
                     {
                         System.Windows.Forms.MessageBox.Show("未选择基点对应的楼层！");
                         FireAlarmWindow.instance.ShowDialog();
                         transaction.Abort();
                     }
-                    var ydbConn = new SQLiteConnection($"Data Source={FireAlarmWindowViewModel.instance.YdbFileName}");
+                    var ydbConn = new SQLiteConnection($"Data Source={FireAlarmWindowViewModel.Instance.YdbFileName}");
 
                     //查询梁
                     string sqlBeam = "SELECT b.ID,f.ID,f.LevelB,f.Height,bs.ID,bs.kind,bs.ShapeVal,bs.ShapeVal1,g.ID,j1.ID,j1.X,j1.Y,j2.ID,j2.X,j2.Y " +
@@ -398,7 +398,7 @@ namespace TimeIsLife.CADCommand
                         };
 
                     List<Beam> beams = ydbConn.Query(sqlBeam, mappingBeam,
-                        new { LevelB = FireAlarmWindowViewModel.instance.SelectedAreaFloor.Level }).ToList();
+                        new { LevelB = FireAlarmWindowViewModel.Instance.SelectedAreaFloor.Level }).ToList();
 
                     //查询墙
                     string sqlWall = "SELECT w.ID,f.ID,f.LevelB,f.Height,ws.ID,ws.kind,ws.B,g.ID,j1.ID,j1.X,j1.Y,j2.ID,j2.X,j2.Y " +
@@ -421,7 +421,7 @@ namespace TimeIsLife.CADCommand
                             return wall;
                         };
                     List<Wall> walls = ydbConn.Query(sqlWall, mappingWall,
-                        new { LevelB = FireAlarmWindowViewModel.instance.SelectedAreaFloor.Level }).ToList();
+                        new { LevelB = FireAlarmWindowViewModel.Instance.SelectedAreaFloor.Level }).ToList();
                     //关闭数据库
                     ydbConn.Close();
 
@@ -520,7 +520,7 @@ namespace TimeIsLife.CADCommand
                     PromptResult promptResult = editor.Drag(basePointJig);
                     if (promptResult.Status == PromptStatus.OK)
                     {
-                        FireAlarmWindowViewModel.instance.ReferenceBasePoint = basePointJig._point;
+                        FireAlarmWindowViewModel.Instance.ReferenceBasePoint = basePointJig._point;
                     }
                     transaction.Abort();
                 }
@@ -588,13 +588,13 @@ namespace TimeIsLife.CADCommand
 
                 try
                 {
-                    if (File.Exists(FireAlarmWindowViewModel.instance.AreaFileName))
+                    if (File.Exists(FireAlarmWindowViewModel.Instance.AreaFileName))
                     {
-                        File.Delete(FireAlarmWindowViewModel.instance.AreaFileName);
+                        File.Delete(FireAlarmWindowViewModel.Instance.AreaFileName);
                     }
 
-                    SQLiteConnection.CreateFile(FireAlarmWindowViewModel.instance.AreaFileName);
-                    SQLiteHelper sqliteHelper = new SQLiteHelper($"Data Source={FireAlarmWindowViewModel.instance.AreaFileName};Version=3;");
+                    SQLiteConnection.CreateFile(FireAlarmWindowViewModel.Instance.AreaFileName);
+                    SQLiteHelper sqliteHelper = new SQLiteHelper($"Data Source={FireAlarmWindowViewModel.Instance.AreaFileName};Version=3;");
                     sqliteHelper.Execute(createFloorTableSql);
                     sqliteHelper.Execute(createAreaTableSql);
                     sqliteHelper.Execute(createBasePointTableSql);
@@ -602,19 +602,19 @@ namespace TimeIsLife.CADCommand
                     sqliteHelper.Insert<int>(insertBasePointSql,
                         new
                         {
-                            FireAlarmWindowViewModel.instance.SelectedAreaFloor.Name,
-                            FireAlarmWindowViewModel.instance.SelectedAreaFloor.Level,
-                            FireAlarmWindowViewModel.instance.ReferenceBasePoint.X,
-                            FireAlarmWindowViewModel.instance.ReferenceBasePoint.Y,
-                            FireAlarmWindowViewModel.instance.ReferenceBasePoint.Z
+                            FireAlarmWindowViewModel.Instance.SelectedAreaFloor.Name,
+                            FireAlarmWindowViewModel.Instance.SelectedAreaFloor.Level,
+                            FireAlarmWindowViewModel.Instance.ReferenceBasePoint.X,
+                            FireAlarmWindowViewModel.Instance.ReferenceBasePoint.Y,
+                            FireAlarmWindowViewModel.Instance.ReferenceBasePoint.Z
                         });
 
-                    foreach (var areaFloor in FireAlarmWindowViewModel.instance.AreaFloors)
+                    foreach (var areaFloor in FireAlarmWindowViewModel.Instance.AreaFloors)
                     {
                         sqliteHelper.Insert<int>(insertFloorSql, areaFloor);
                     }
 
-                    foreach (var area in FireAlarmWindowViewModel.instance.Areas)
+                    foreach (var area in FireAlarmWindowViewModel.Instance.Areas)
                     {
                         // 从Floor表中查询指定标高的ID
                         int floorId = sqliteHelper.Query<int>("SELECT ID FROM Floor WHERE Level = @level", new { level = area.Floor.Level }).FirstOrDefault();
@@ -637,7 +637,7 @@ namespace TimeIsLife.CADCommand
                         {
                             Polyline polyline = transaction.GetObject(id, OpenMode.ForRead) as Polyline;
                             if (polyline == null) continue;
-                            if (polyline.Layer == FireAlarmWindowViewModel.instance.FireAreaLayerName || polyline.Layer == FireAlarmWindowViewModel.instance.RoomAreaLayerName)
+                            if (polyline.Layer == FireAlarmWindowViewModel.Instance.FireAreaLayerName || polyline.Layer == FireAlarmWindowViewModel.Instance.RoomAreaLayerName)
                             {
                                 TypedValueList dbTextTypedValues = new TypedValueList
                                 {
@@ -655,7 +655,7 @@ namespace TimeIsLife.CADCommand
                                 }
 
                                 Model.Area newArea = null;
-                                if (polyline.Layer == FireAlarmWindowViewModel.instance.FireAreaLayerName)
+                                if (polyline.Layer == FireAlarmWindowViewModel.Instance.FireAreaLayerName)
                                 {
                                     newArea = new Model.Area
                                     {
@@ -666,7 +666,7 @@ namespace TimeIsLife.CADCommand
                                         VertexZ = polyline.GetZValues()
                                     };
                                 }
-                                else if (polyline.Layer == FireAlarmWindowViewModel.instance.RoomAreaLayerName)
+                                else if (polyline.Layer == FireAlarmWindowViewModel.Instance.RoomAreaLayerName)
                                 {
                                     newArea = new Model.Area
                                     {
@@ -774,13 +774,13 @@ namespace TimeIsLife.CADCommand
                 //获取图纸空间
                 BlockTableRecord paperSpace = transaction.GetObject(blockTable[BlockTableRecord.PaperSpace], OpenMode.ForRead) as BlockTableRecord;
 
-                if (File.Exists(FireAlarmWindowViewModel.instance.AreaFileName))
+                if (File.Exists(FireAlarmWindowViewModel.Instance.AreaFileName))
                 {
-                    File.Delete(FireAlarmWindowViewModel.instance.AreaFileName);
+                    File.Delete(FireAlarmWindowViewModel.Instance.AreaFileName);
                 }
 
-                SQLiteConnection.CreateFile(FireAlarmWindowViewModel.instance.AreaFileName);
-                SQLiteHelper sqliteHelper = new SQLiteHelper($"Data Source={FireAlarmWindowViewModel.instance.AreaFileName};Version=3;");
+                SQLiteConnection.CreateFile(FireAlarmWindowViewModel.Instance.AreaFileName);
+                SQLiteHelper sqliteHelper = new SQLiteHelper($"Data Source={FireAlarmWindowViewModel.Instance.AreaFileName};Version=3;");
                 sqliteHelper.Execute(createFloorTableSql);
                 sqliteHelper.Execute(createAreaTableSql);
                 sqliteHelper.Execute(createBasePointTableSql);
@@ -788,19 +788,19 @@ namespace TimeIsLife.CADCommand
                 sqliteHelper.Insert<int>(insertBasePointSql,
                     new
                     {
-                        FireAlarmWindowViewModel.instance.SelectedAreaFloor.Name,
-                        FireAlarmWindowViewModel.instance.SelectedAreaFloor.Level,
-                        FireAlarmWindowViewModel.instance.ReferenceBasePoint.X,
-                        FireAlarmWindowViewModel.instance.ReferenceBasePoint.Y,
-                        FireAlarmWindowViewModel.instance.ReferenceBasePoint.Z
+                        FireAlarmWindowViewModel.Instance.SelectedAreaFloor.Name,
+                        FireAlarmWindowViewModel.Instance.SelectedAreaFloor.Level,
+                        FireAlarmWindowViewModel.Instance.ReferenceBasePoint.X,
+                        FireAlarmWindowViewModel.Instance.ReferenceBasePoint.Y,
+                        FireAlarmWindowViewModel.Instance.ReferenceBasePoint.Z
                     });
 
-                foreach (var areaFloor in FireAlarmWindowViewModel.instance.AreaFloors)
+                foreach (var areaFloor in FireAlarmWindowViewModel.Instance.AreaFloors)
                 {
                     sqliteHelper.Insert<int>(insertFloorSql, areaFloor);
                 }
 
-                foreach (var area in FireAlarmWindowViewModel.instance.Areas)
+                foreach (var area in FireAlarmWindowViewModel.Instance.Areas)
                 {
                     // 从Floor表中查询指定标高的ID
                     int floorId = sqliteHelper.Query<int>("SELECT ID FROM Floor WHERE Level = @level", new { level = area.Floor.Level }).FirstOrDefault();
@@ -823,7 +823,7 @@ namespace TimeIsLife.CADCommand
                     {
                         Polyline polyline = transaction.GetObject(id, OpenMode.ForRead) as Polyline;
                         if (polyline == null) continue;
-                        if (polyline.Layer == FireAlarmWindowViewModel.instance.FireAreaLayerName || polyline.Layer == FireAlarmWindowViewModel.instance.RoomAreaLayerName)
+                        if (polyline.Layer == FireAlarmWindowViewModel.Instance.FireAreaLayerName || polyline.Layer == FireAlarmWindowViewModel.Instance.RoomAreaLayerName)
                         {
                             TypedValueList dbTextTypedValues = new TypedValueList
                                 {
@@ -841,7 +841,7 @@ namespace TimeIsLife.CADCommand
                             }
 
                             Model.Area newArea = null;
-                            if (polyline.Layer == FireAlarmWindowViewModel.instance.FireAreaLayerName)
+                            if (polyline.Layer == FireAlarmWindowViewModel.Instance.FireAreaLayerName)
                             {
                                 newArea = new Model.Area
                                 {
@@ -852,7 +852,7 @@ namespace TimeIsLife.CADCommand
                                     VertexZ = polyline.GetZValues()
                                 };
                             }
-                            else if (polyline.Layer == FireAlarmWindowViewModel.instance.RoomAreaLayerName)
+                            else if (polyline.Layer == FireAlarmWindowViewModel.Instance.RoomAreaLayerName)
                             {
                                 newArea = new Model.Area
                                 {
@@ -874,7 +874,7 @@ namespace TimeIsLife.CADCommand
 
                 #region YDB数据查询
                 // YDB数据查询
-                var ydbHelper = new SQLiteHelper($"Data Source={FireAlarmWindowViewModel.instance.YdbFileName}");
+                var ydbHelper = new SQLiteHelper($"Data Source={FireAlarmWindowViewModel.Instance.YdbFileName}");
                 using (var ydbConn = ydbHelper.GetConnection())
                 {
                     string sqlFloor = "SELECT f.ID,f.Name,f.LevelB,f.Height FROM tblFloor AS f WHERE f.Height != 0";
@@ -931,7 +931,7 @@ namespace TimeIsLife.CADCommand
 
                 #region 区域数据查询
                 // 区域数据查询            
-                var areaHelper = new SQLiteHelper($"Data Source={FireAlarmWindowViewModel.instance.AreaFileName}");
+                var areaHelper = new SQLiteHelper($"Data Source={FireAlarmWindowViewModel.Instance.AreaFileName}");
                 using (var areaConn = areaHelper.GetConnection())
                 {
                     string selectBasePointSql = "SELECT Name, Level, X, Y, Z FROM BasePoint";
@@ -1050,7 +1050,7 @@ namespace TimeIsLife.CADCommand
                                         }
                                         else
                                         {
-                                            geometriyDictionary.Add(intersectionGeometry, FireAlarmWindowViewModel.instance.SlabThickness);
+                                            geometriyDictionary.Add(intersectionGeometry, FireAlarmWindowViewModel.Instance.SlabThickness);
                                         }
                                     }
                                 }

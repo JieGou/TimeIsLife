@@ -913,15 +913,15 @@ namespace TimeIsLife.CADCommand
 
                     List<LineString> tree;
 
-                    if (ElectricalViewModel.electricalViewModel.IsTreeConnection)
+                    if (FireAlarmViewModel.Instance.IsTreeConnection)
                     {
                         tree = Kruskal.FindMinimumSpanningTree(points, geometryFactory);
                     }
-                    else if (ElectricalViewModel.electricalViewModel.IsCircularConnection1)
+                    else if (FireAlarmViewModel.Instance.IsCircularConnection1)
                     {
                         tree = ConnectPointsNonCrossing(points, geometryFactory);
                     }
-                    else if (ElectricalViewModel.electricalViewModel.IsCircularConnection2)
+                    else if (FireAlarmViewModel.Instance.IsCircularConnection2)
                     {
                         tree = ConnectPointsNonCrossingMST(points, geometryFactory);
                     }
@@ -1304,7 +1304,7 @@ namespace TimeIsLife.CADCommand
 
                                     if (slab.Thickness == 0)
                                     {
-                                        if (!ElectricalViewModel.electricalViewModel.IsLayoutAtHole) bo = false;
+                                        if (!FireAlarmViewModel.Instance.IsLayoutAtHole) bo = false;
                                     }
                                     if (!bo) continue;
                                     //在板的重心添加感烟探测器

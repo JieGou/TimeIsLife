@@ -114,3 +114,11 @@ D:\github\TimeIsLife\TimeIsLife\obj\Debug\TimeIsLife.csproj.CoreCompileInputs.ca
 D:\github\TimeIsLife\TimeIsLife\obj\Debug\TimeIsLife.csproj.CopyComplete
 D:\github\TimeIsLife\TimeIsLife\obj\Debug\TimeIsLife.dll
 D:\github\TimeIsLife\TimeIsLife\obj\Debug\TimeIsLife.pdb
+D:\GitHub\TimeIsLife\TimeIsLife\obj\Debug\View\CalculateCurrentView.g.cs
+D:\GitHub\TimeIsLife\TimeIsLife\obj\Debug\View\CalculateCurrentView.baml
+D:\GitHub\TimeIsLife\TimeIsLife\obj\Debug\View\FireAlarmView.g.cs
+D:\GitHub\TimeIsLife\TimeIsLife\obj\Debug\View\FireAlarmView.baml
+D:\GitHub\TimeIsLife\TimeIsLife\obj\Debug\View\ToolsView.g.cs
+D:\GitHub\TimeIsLife\TimeIsLife\obj\Debug\View\ToolsView.baml
+D:\GitHub\TimeIsLife\TimeIsLife\obj\Debug\View\LightingLayoutView.g.cs
+D:\GitHub\TimeIsLife\TimeIsLife\obj\Debug\View\LightingLayoutView.baml

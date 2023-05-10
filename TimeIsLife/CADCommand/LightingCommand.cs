@@ -26,13 +26,13 @@ namespace TimeIsLife.CADCommand
     class LightingCommand
     {
 
-        [CommandMethod("FF_GetArea",CommandFlags.UsePickSet)]
+        [CommandMethod("FF_GetArea", CommandFlags.UsePickSet)]
         public void FF_GetArea()
         {
             Document document = Application.DocumentManager.MdiActiveDocument;
             Editor editor = document.Editor;
             Database database = document.Database;
-            
+
             using Transaction transaction = document.TransactionManager.StartTransaction();
             try
             {
@@ -43,7 +43,7 @@ namespace TimeIsLife.CADCommand
                 if (psr.Status == PromptStatus.OK)
                 {
                     SelectionSet set = psr.Value;
-                    if (set.Count >0)
+                    if (set.Count > 0)
                     {
                         polyLine = (Polyline)transaction.GetObject(set.GetObjectIds()[0], OpenMode.ForRead);
                     }
@@ -63,11 +63,11 @@ namespace TimeIsLife.CADCommand
                     polyLine = (Polyline)transaction.GetObject(selectionSet.GetObjectIds()[0], OpenMode.ForRead);
                 }
 
-                
+
                 if (polyLine == null) return;
 
                 double polyLineArea = polyLine.Area;
-                ElectricalViewModel.electricalViewModel.LightingArea = Math.Round(polyLineArea * 1e-6, 2);
+                LightingLayoutViewModel.Instance.LightingArea = Math.Round(polyLineArea * 1e-6, 2);
                 transaction.Commit();
             }
             catch
@@ -93,7 +93,7 @@ namespace TimeIsLife.CADCommand
 
                 try
                 {
-                    if (ElectricalViewModel.electricalViewModel.LightingRow == 0 || ElectricalViewModel.electricalViewModel.LightingColumn == 0)
+                    if (LightingLayoutViewModel.Instance.LightingRow == 0 || LightingLayoutViewModel.Instance.LightingColumn == 0)
                     {
                         return;
                     }
@@ -246,8 +246,8 @@ namespace TimeIsLife.CADCommand
                 Point3d point3d = new Point3d();
                 Scale3d scale3D = baseBlockReference.ScaleFactors;
                 double rotateAngle = 0;
-                Dictionary<string,string> attNameValues = new Dictionary<string,string>();
-                BlockTableRecord blockTableRecord = transaction.GetObject(baseBlockReference.BlockTableRecord,OpenMode.ForRead) as BlockTableRecord;
+                Dictionary<string, string> attNameValues = new Dictionary<string, string>();
+                BlockTableRecord blockTableRecord = transaction.GetObject(baseBlockReference.BlockTableRecord, OpenMode.ForRead) as BlockTableRecord;
                 if (blockTableRecord == null) return;
                 if (blockTableRecord.HasAttributeDefinitions)
                 {
@@ -270,11 +270,11 @@ namespace TimeIsLife.CADCommand
                     }
                 }
 
-                switch (ElectricalViewModel.electricalViewModel.IsLengthOrCount)
+                switch (LightingLayoutViewModel.Instance.IsLengthOrCount)
                 {
                     //固定数量
                     case true:
-                        int m = ElectricalViewModel.electricalViewModel.LightingLineCount;
+                        int m = LightingLayoutViewModel.Instance.LightingLineCount;
                         while (m <= 0)
                         {
                             PromptIntegerOptions promptIntegerOptions = new PromptIntegerOptions("请输入灯具数量：");
@@ -283,7 +283,7 @@ namespace TimeIsLife.CADCommand
                             var result = editor.GetInteger(promptIntegerOptions);
                             if (result.Status == PromptStatus.OK)
                             {
-                                ElectricalViewModel.electricalViewModel.LightingLineCount = m = result.Value;
+                                LightingLayoutViewModel.Instance.LightingLineCount = m = result.Value;
                             }
                             else
                             {
@@ -293,25 +293,25 @@ namespace TimeIsLife.CADCommand
                         double unitLength = curveLength / m;
                         for (int i = 0; i < m; i++)
                         {
-                            point3d = curve.GetPointAtDist(unitLength * (i + ElectricalViewModel.electricalViewModel.Distance));
-                            switch (ElectricalViewModel.electricalViewModel.IsAlongTheLine)
+                            point3d = curve.GetPointAtDist(unitLength * (i + LightingLayoutViewModel.Instance.Distance));
+                            switch (LightingLayoutViewModel.Instance.IsAlongTheLine)
                             {
                                 //是否沿线方向
                                 case true:
                                     var vector3d = curve.GetFirstDerivative(point3d);
-                                    rotateAngle = vector3d.GetAngleTo(new Vector3d(1, 0, 0), new Vector3d(0, 0, -1)) + ElectricalViewModel.electricalViewModel.BlockAngle * Math.PI / 180;
+                                    rotateAngle = vector3d.GetAngleTo(new Vector3d(1, 0, 0), new Vector3d(0, 0, -1)) + LightingLayoutViewModel.Instance.BlockAngle * Math.PI / 180;
                                     break;
                                 case false:
-                                    rotateAngle = ElectricalViewModel.electricalViewModel.BlockAngle * Math.PI / 180;
+                                    rotateAngle = LightingLayoutViewModel.Instance.BlockAngle * Math.PI / 180;
                                     break;
                             };
-                                                        
+
                             InsertBlockReference(database, transaction, modelSpace, baseBlockReference, layer, point3d, scale3D, rotateAngle, attNameValues, blockTableRecord);
                         }
                         break;
                     //固定距离
                     case false:
-                        double l = ElectricalViewModel.electricalViewModel.LightingLength;
+                        double l = LightingLayoutViewModel.Instance.LightingLength;
                         while (l <= 0)
                         {
                             PromptDoubleOptions promptDoubleOptions = new PromptDoubleOptions("请输入灯具间距：");
@@ -320,7 +320,7 @@ namespace TimeIsLife.CADCommand
                             var result = editor.GetDouble(promptDoubleOptions);
                             if (result.Status == PromptStatus.OK)
                             {
-                                ElectricalViewModel.electricalViewModel.LightingLength = l = result.Value;
+                                LightingLayoutViewModel.Instance.LightingLength = l = result.Value;
                             }
                             else
                             {
@@ -330,30 +330,30 @@ namespace TimeIsLife.CADCommand
                         int j = 0;
                         while (true)
                         {
-                            double tempLength = (j + ElectricalViewModel.electricalViewModel.Distance) * ElectricalViewModel.electricalViewModel.LightingLength;
+                            double tempLength = (j + LightingLayoutViewModel.Instance.Distance) * LightingLayoutViewModel.Instance.LightingLength;
                             if (tempLength > curveLength) break;
 
                             point3d = curve.GetPointAtDist(tempLength);
-                            switch (ElectricalViewModel.electricalViewModel.IsAlongTheLine)
+                            switch (LightingLayoutViewModel.Instance.IsAlongTheLine)
                             {
                                 //是否沿线方向
                                 case true:
                                     var vector3d = curve.GetFirstDerivative(point3d);
-                                    rotateAngle = vector3d.GetAngleTo(new Vector3d(1, 0, 0), new Vector3d(0, 0, -1)) + ElectricalViewModel.electricalViewModel.BlockAngle * Math.PI / 180;
+                                    rotateAngle = vector3d.GetAngleTo(new Vector3d(1, 0, 0), new Vector3d(0, 0, -1)) + LightingLayoutViewModel.Instance.BlockAngle * Math.PI / 180;
                                     break;
                                 case false:
-                                    rotateAngle = ElectricalViewModel.electricalViewModel.BlockAngle * Math.PI / 180;
+                                    rotateAngle = LightingLayoutViewModel.Instance.BlockAngle * Math.PI / 180;
                                     break;
                             };
 
-                            
+
                             InsertBlockReference(database, transaction, modelSpace, baseBlockReference, layer, point3d, scale3D, rotateAngle, attNameValues, blockTableRecord);
                             j++;
                         }
                         break;
                 };
                 modelSpace.DowngradeOpen();
-                transaction.Commit();                
+                transaction.Commit();
             }
             catch
             {

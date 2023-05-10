@@ -141,8 +141,14 @@
     <Compile Include="NTSHelper\MyCompare.cs" />
     <Compile Include="NTSHelper\PointHelper.cs" />
     <Compile Include="RibbonCommandHandler.cs" />
+    <Compile Include="ViewModel\CalculateCurrentViewModel.cs" />
+    <Compile Include="ViewModel\FireAlarmViewModel.cs" />
     <Compile Include="ViewModel\FireAlarmWindowViewModel.cs" />
-    <Compile Include="ViewModel\ViewModelBase.cs" />
+    <Compile Include="ViewModel\LightingLayoutViewModel.cs" />
+    <Compile Include="ViewModel\ToolsViewModel.cs" />
+    <Compile Include="View\CalculateCurrentView.xaml.cs">
+      <DependentUpon>CalculateCurrentView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\ElectricaView.xaml.cs">
       <DependentUpon>ElectricaView.xaml</DependentUpon>
     </Compile>
@@ -157,8 +163,17 @@
     <Compile Include="myCommands.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TempMethod.cs" />
+    <Compile Include="View\FireAlarmView.xaml.cs">
+      <DependentUpon>FireAlarmView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\FireAlarmWindow.xaml.cs">
       <DependentUpon>FireAlarmWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\LightingLayoutView.xaml.cs">
+      <DependentUpon>LightingLayoutView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\ToolsView.xaml.cs">
+      <DependentUpon>ToolsView.xaml</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
@@ -367,6 +382,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="View\CalculateCurrentView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="View\ElectricaView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -379,7 +398,19 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="View\FireAlarmView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="View\FireAlarmWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\LightingLayoutView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\ToolsView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

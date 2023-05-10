@@ -1,0 +1,113 @@
+﻿<UserControl
+    x:Class="TimeIsLife.View.CalculateCurrentView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:Behaviors="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:TimeIsLife.View"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    d:DesignHeight="450"
+    d:DesignWidth="300"
+    mc:Ignorable="d">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/TimeIsLife;component/Resources/Shared.xaml" />
+                <ResourceDictionary Source="/TimeIsLife;component/Resources/Expander.xaml" />
+                <ResourceDictionary Source="/TimeIsLife;component/Resources/Button.xaml" />
+                <ResourceDictionary Source="/TimeIsLife;component/Resources/ComboBox.xaml" />
+                <ResourceDictionary Source="/TimeIsLife;component/Resources/TextBox.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <StackPanel Orientation="Vertical">
+        <Button
+            Command="{Binding SumPowerCommand}"
+            Content="统计功率"
+            Template="{StaticResource ButtonTemplate}" />
+        <DockPanel LastChildFill="True">
+            <Label
+                Width="100"
+                Content="额定功率Pe："
+                DockPanel.Dock="Left"
+                Template="{DynamicResource LabelTemplate}" />
+            <TextBox Template="{DynamicResource TextBoxTemplate}" Text="{Binding Pe, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                <Behaviors:Interaction.Triggers>
+                    <Behaviors:EventTrigger EventName="TextChanged">
+                        <Behaviors:InvokeCommandAction x:Name="CalculateCurrentCommand1" Command="{Binding CalculateCurrentCommand}" />
+                    </Behaviors:EventTrigger>
+                </Behaviors:Interaction.Triggers>
+            </TextBox>
+        </DockPanel>
+        <DockPanel LastChildFill="True">
+            <Label
+                Width="100"
+                Content="平时\消防功率："
+                Template="{DynamicResource LabelTemplate}" />
+            <TextBox
+                IsReadOnly="True"
+                Template="{DynamicResource TextBoxTemplate}"
+                Text="{Binding NormalOrFirePower}" />
+        </DockPanel>
+        <DockPanel LastChildFill="True">
+            <Label
+                Width="100"
+                Content="消防平时功率："
+                Template="{DynamicResource LabelTemplate}" />
+            <TextBox
+                IsReadOnly="True"
+                Template="{DynamicResource TextBoxTemplate}"
+                Text="{Binding NormalInFirePower}" />
+        </DockPanel>
+        <Label
+            Width="auto"
+            Content="注:消防/平时功率格式(1.0kW/1.0kW)"
+            Template="{DynamicResource LabelTemplate}" />
+        <DockPanel LastChildFill="True">
+            <Label
+                Width="100"
+                Content="需要系数Kx"
+                Template="{DynamicResource LabelTemplate}" />
+            <TextBox Template="{DynamicResource TextBoxTemplate}" Text="{Binding Kx, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                <Behaviors:Interaction.Triggers>
+                    <Behaviors:EventTrigger EventName="TextChanged">
+                        <Behaviors:InvokeCommandAction x:Name="CalculateCurrentCommand2" Command="{Binding CalculateCurrentCommand}" />
+                    </Behaviors:EventTrigger>
+                </Behaviors:Interaction.Triggers>
+            </TextBox>
+        </DockPanel>
+        <DockPanel LastChildFill="True">
+            <Label
+                Width="100"
+                Content="功率因数Cosø"
+                Template="{DynamicResource LabelTemplate}" />
+            <TextBox Template="{DynamicResource TextBoxTemplate}" Text="{Binding Cosø, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}">
+                <Behaviors:Interaction.Triggers>
+                    <Behaviors:EventTrigger EventName="TextChanged">
+                        <Behaviors:InvokeCommandAction x:Name="CalculateCurrentCommand3" Command="{Binding CalculateCurrentCommand}" />
+                    </Behaviors:EventTrigger>
+                </Behaviors:Interaction.Triggers>
+            </TextBox>
+        </DockPanel>
+        <DockPanel LastChildFill="True">
+            <Label
+                Width="100"
+                Content="计算电流Ic"
+                Template="{DynamicResource LabelTemplate}" />
+            <TextBox
+                IsReadOnly="True"
+                Template="{DynamicResource TextBoxTemplate}"
+                Text="{Binding Ic}" />
+        </DockPanel>
+        <Button
+            Command="{Binding AddSumPowerCommand}"
+            Content="添加功率和"
+            IsEnabled="False"
+            Template="{StaticResource ButtonTemplate}" />
+        <Button
+            Command="{Binding AddCalculateCurrentCommand}"
+            Content="添加电流计算"
+            IsEnabled="False"
+            Template="{StaticResource ButtonTemplate}" />
+    </StackPanel>
+</UserControl>

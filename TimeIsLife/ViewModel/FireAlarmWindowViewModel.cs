@@ -33,7 +33,7 @@ namespace TimeIsLife.ViewModel
 {
     internal class FireAlarmWindowViewModel : ObservableObject
     {
-        public static FireAlarmWindowViewModel instance;
+        public static FireAlarmWindowViewModel Instance { get; set; }
         public FireAlarmWindowViewModel()
         {
             Initialize();
@@ -50,7 +50,7 @@ namespace TimeIsLife.ViewModel
         }
         private void Initialize()
         {
-            instance = this;
+            Instance = this;
             AreaFloors = new ObservableCollection<AreaFloor>();
             Areas = new ObservableCollection<Area>();
         }
@@ -245,7 +245,7 @@ namespace TimeIsLife.ViewModel
             };
             if (saveFileDialog.ShowDialog() == DialogResult.OK)
             {
-                FireAlarmWindowViewModel.instance.AreaFileName = saveFileDialog.FileName;
+                FireAlarmWindowViewModel.Instance.AreaFileName = saveFileDialog.FileName;
             }
             FireAlarmWindow.instance.ShowDialog();
         }

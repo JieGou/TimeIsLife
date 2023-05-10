@@ -22,27 +22,26 @@ namespace TimeIsLife.Jig
         private BlockReference blockReference;
         private Point3d basePoint3d;
         private Point3d endPoint3d;
-        private ElectricalViewModel viewModel;
         private Polyline polyline;
         private BlockTableRecord btr;
         public LightingLayoutJig(BlockReference blockReference, Point3d basePoint3d, Polyline polyline)
         {
             this.blockReference = blockReference;
             this.basePoint3d = basePoint3d;
-            this.viewModel = ElectricalViewModel.electricalViewModel;
+
             blockReferences = new List<BlockReference>();
             this.polyline = polyline;
             this.btr = (BlockTableRecord)blockReference.BlockTableRecord.GetObject(OpenMode.ForRead);
         }
 
-        private List<Point3d> GetLayoutPoint(Point3d p1, Point3d p3, ElectricalViewModel viewModel, Matrix3d matrix3d, Polyline polyline)
+        private List<Point3d> GetLayoutPoint(Point3d p1, Point3d p3, LightingLayoutViewModel viewModel, Matrix3d matrix3d, Polyline polyline)
         {
             List<Point3d> list = new List<Point3d>();
             Point3d pointd = new Point3d(p3.X, p1.Y, p1.Z);
             Point3d pointd2 = new Point3d(p1.X, p3.Y, p1.Z);
-            int rowCount = viewModel.LightingRow;
-            double distance = viewModel.Distance;
-            int columnCount = viewModel.LightingColumn;
+            int rowCount = LightingLayoutViewModel.Instance.LightingRow;
+            double distance = LightingLayoutViewModel.Instance.Distance;
+            int columnCount = LightingLayoutViewModel.Instance.LightingColumn;
             if (pointd.IsEqualTo(p1))
             {
                 PolyLineUpdate(polyline, p1, pointd, p3, pointd2, matrix3d);
@@ -149,11 +148,11 @@ namespace TimeIsLife.Jig
                         int num = 0;
                         while (true)
                         {
-                            if (num >= (viewModel.LightingRow * viewModel.LightingColumn))
+                            if (num >= (LightingLayoutViewModel.Instance.LightingRow * LightingLayoutViewModel.Instance.LightingColumn))
                             {
                                 endPoint3d = pointd;
                                 Point3d pointd2 = endPoint3d.TransformBy(matrixd.Inverse());
-                                List<Point3d> list = GetLayoutPoint(basePoint3d, pointd2, viewModel, matrixd, polyline);
+                                List<Point3d> list = GetLayoutPoint(basePoint3d, pointd2, LightingLayoutViewModel.Instance, matrixd, polyline);
                                 if (list.Count == 0)
                                 {
                                     int num2 = 0;
@@ -204,9 +203,9 @@ namespace TimeIsLife.Jig
                             BlockReference item = (BlockReference)blockReference.Clone();
                             item.Rotation = 0;
                             item.TransformBy(matrixd);
-                            Matrix3d matrixd2 = Matrix3d.Rotation((viewModel.BlockAngle * Math.PI) / 180.0, Vector3d.ZAxis, item.Position);
+                            Matrix3d matrixd2 = Matrix3d.Rotation((LightingLayoutViewModel.Instance.BlockAngle * Math.PI) / 180.0, Vector3d.ZAxis, item.Position);
                             item.TransformBy(matrixd2);
-                            item.ScaleFactors = new Scale3d(viewModel.BlockScale);
+                            item.ScaleFactors = new Scale3d(LightingLayoutViewModel.Instance.BlockScale);
 
                             blockReferences.Add(item);
                             num++;
@@ -240,7 +239,7 @@ namespace TimeIsLife.Jig
                         }
                     }
 
-                    
+
                 }
                 else
                 {
