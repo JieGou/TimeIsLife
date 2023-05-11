@@ -16,6 +16,24 @@ namespace TimeIsLife.Helper
     internal static class PolylineHelper
     {
         /// <summary>
+        /// Polyline转换为NTS的二维Polygon
+        /// </summary>
+        /// <param name="polyline"></param>
+        /// <param name="geometryFactory"></param>
+        /// <returns></returns>
+        public static Polygon ToPolygon(this Polyline polyline, GeometryFactory geometryFactory)
+        {
+            int n = polyline.NumberOfVertices;
+            var coordinates = new Coordinate[n + 1];
+
+            for (int i = 0; i < n + 1; i++)
+            {
+                coordinates[i] = new Coordinate(polyline.GetPoint3dAt(i % n).X, polyline.GetPoint3dAt(i % n).Y);
+            }
+            return geometryFactory.CreatePolygon(coordinates);
+        }
+
+        /// <summary>
         /// 获取三维点集
         /// </summary>
         /// <param name="polyline"></param>
@@ -70,13 +88,13 @@ namespace TimeIsLife.Helper
         /// <returns></returns>
         public static List<Point2d> GetPoint2Ds(this Polyline polyline)
         {
-            List<Point2d> points = new List<Point2d>();
+            List<Point2d> point2ds = new List<Point2d>();
 
             for (int i = 0; i < polyline.NumberOfVertices; i++)
             {
-                points.Add(new Point2d(polyline.GetPoint3dAt(i).X, polyline.GetPoint3dAt(i).Y));
+                point2ds.Add(new Point2d(polyline.GetPoint3dAt(i).X, polyline.GetPoint3dAt(i).Y));
             }
-            return points;
+            return point2ds;
         }
 
         /// <summary>
@@ -86,13 +104,13 @@ namespace TimeIsLife.Helper
         /// <returns></returns>
         public static List<Coordinate> GetCoordinates(this Polyline polyline)
         {
-            List<Coordinate> points = new List<Coordinate>();
+            List<Coordinate> coordinates = new List<Coordinate>();
 
             for (int i = 0; i < polyline.NumberOfVertices; i++)
             {
-                points.Add(new Coordinate(polyline.GetPoint3dAt(i).X, polyline.GetPoint3dAt(i).Y));
+                coordinates.Add(new Coordinate(polyline.GetPoint3dAt(i).X, polyline.GetPoint3dAt(i).Y));
             }
-            return points;
+            return coordinates;
         }
 
         /// <summary>
@@ -135,6 +153,12 @@ namespace TimeIsLife.Helper
             return string.Join(",", zValues.ToArray());
         }
 
+        /// <summary>
+        /// 处理多段线内的弧线段为近似直线段
+        /// </summary>
+        /// <param name="polyline"></param>
+        /// <param name="segmentLength"></param>
+        /// <param name="processPoint"></param>
         private static void ProcessPolyline(Polyline polyline, double segmentLength, Action<Point3d> processPoint)
         {
             for (int i = 0; i < polyline.NumberOfVertices; i++)

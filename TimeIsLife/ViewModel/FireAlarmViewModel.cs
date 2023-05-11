@@ -28,6 +28,7 @@ namespace TimeIsLife.ViewModel
             AutomaticConnectionCommand = new RelayCommand(AutomaticConnection);
             ToHydrantAlarmButtonCommand = new RelayCommand(ToHydrantAlarmButton);
             OpenFireAlarmWindowCommand = new RelayCommand(OpenFireAlarmWindow);
+            FireAlarmCeilingCommand = new RelayCommand(FireAlarmCeiling);
         }
 
         private void Initialize()
@@ -108,6 +109,12 @@ namespace TimeIsLife.ViewModel
         {
             FireAlarmWindow fireAlarmWindow = new FireAlarmWindow();
             fireAlarmWindow.Show();
+        }
+
+        public IRelayCommand FireAlarmCeilingCommand { get; }
+        void FireAlarmCeiling()
+        {
+            Application.DocumentManager.MdiActiveDocument.SendStringToExecute("FF_FireAlarmCeiling\n", true, false, false);
         }
     }
 }

@@ -86,9 +86,8 @@ namespace TimeIsLife.CADCommand
         [CommandMethod("FF_FAS")]
         public void FF_FAS()
         {
-            Document document = Application.DocumentManager.CurrentDocument;
-            Database database = document.Database;
-            Editor editor = document.Editor;
+            Initialize();
+
             string s1 = "\n作用：生成火灾自动报警系统图";
             string s2 = "\n操作方法：选择表示防火分区多段线，选择一个基点放置系统图，基点为生成系统图区域左下角点";
             string s3 = "\n注意事项：防火分区多段线需要单独图层，防火分区多段线内需要文字标注防火分区编号，文字和多段线需要同一个图层";
@@ -814,9 +813,8 @@ namespace TimeIsLife.CADCommand
         [CommandMethod("FF_AutomaticConnection")]
         public void FF_AutomaticConnection()
         {
-            Document document = Application.DocumentManager.CurrentDocument;
-            Database database = document.Database;
-            Editor editor = document.Editor;
+            Initialize();
+
             string s1 = "\n作用：多个块按照最近距离自动连线。";
             string s2 = "\n操作方法：框选对象";
             string s3 = "\n注意事项：块不能锁定";
@@ -1201,9 +1199,7 @@ namespace TimeIsLife.CADCommand
         [CommandMethod("FF_LoadYdbFile")]
         public void FF_LoadYdbFile()
         {
-            Document document = Application.DocumentManager.CurrentDocument;
-            Database database = document.Database;
-            Editor editor = document.Editor;
+            Initialize();
 
             string filename = GetFilePath();
             if (filename == null) return;
@@ -1567,10 +1563,7 @@ namespace TimeIsLife.CADCommand
         [CommandMethod("FF_ToHydrantAlarmButton")]
         public void FF_ToHydrantAlarmButton()
         {
-            // Put your command code here
-            Document document = Application.DocumentManager.CurrentDocument;
-            Database database = document.Database;
-            Editor editor = document.Editor;
+            Initialize();
 
             using (Database tempDatabase = new Database(false, true))
             using (Transaction transaction = database.TransactionManager.StartTransaction())
@@ -1665,6 +1658,77 @@ namespace TimeIsLife.CADCommand
 
 
         #endregion
-    }
 
+        #region FF_FireAlarmCeiling
+        [CommandMethod("FF_FireAlarmCeiling")]
+        public void FF_FireAlarmCeiling()
+        {
+            Initialize();
+            GeometryFactory geometryFactory = CreateGeometryFactory();
+
+            using Transaction transaction = database.TransactionManager.StartTransaction();
+            try
+            {
+                BlockTable blockTable = transaction.GetObject(database.BlockTableId, OpenMode.ForRead) as BlockTable;
+                BlockTableRecord modelSpace = transaction.GetObject(blockTable[BlockTableRecord.ModelSpace], OpenMode.ForWrite) as BlockTableRecord;
+
+                PromptSelectionOptions promptSelectionOptions = new PromptSelectionOptions()
+                {
+                    RejectObjectsOnLockedLayers = true,
+                };
+                TypedValueList typedValues = new TypedValueList
+                {
+                    typeof(Polyline)
+                };
+                SelectionFilter selectionFilter = new SelectionFilter(typedValues);
+
+                SelectionSet selectionSet = editor.GetSelectionSet(SelectString.GetSelection, promptSelectionOptions, selectionFilter, null);
+                List<Polyline> polylines = new List<Polyline>();
+                foreach (var id in selectionSet.GetObjectIds())
+                {
+                    Polyline polyline = transaction.GetObject(id, OpenMode.ForRead) as Polyline;
+                    if (polyline == null) continue;
+                    polylines.Add(polyline);
+                }
+
+                foreach (var p in polylines)
+                {
+                    Polygon polygon = p.ToPolygon(geometryFactory);
+                    if (polygon.IsEmpty) continue;
+
+
+
+
+
+
+
+
+
+                }
+
+
+            }
+            catch
+            {
+                transaction.Abort();
+                return;
+            }
+            transaction.Commit();
+        }
+
+        private GeometryFactory CreateGeometryFactory()
+        {
+            //NTS
+            var precisionModel = new PrecisionModel(1000d);
+            GeometryPrecisionReducer precisionReducer = new GeometryPrecisionReducer(precisionModel);
+            NetTopologySuite.NtsGeometryServices.Instance = new NetTopologySuite.NtsGeometryServices
+                (
+                NetTopologySuite.Geometries.Implementation.CoordinateArraySequenceFactory.Instance,
+                precisionModel,
+                4326
+                );
+            return NtsGeometryServices.Instance.CreateGeometryFactory(precisionModel);
+        }
+        #endregion
+    }
 }
