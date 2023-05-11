@@ -1,0 +1,49 @@
+﻿<UserControl
+    x:Class="TimeIsLife.View.LayoutView.LightingLineLayoutView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:Behaviors="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:TimeIsLife.View.LayoutView"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    d:DesignHeight="450"
+    d:DesignWidth="300"
+    mc:Ignorable="d">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/TimeIsLife;component/Resources/Shared.xaml" />
+                <ResourceDictionary Source="/TimeIsLife;component/Resources/Expander.xaml" />
+                <ResourceDictionary Source="/TimeIsLife;component/Resources/Button.xaml" />
+                <ResourceDictionary Source="/TimeIsLife;component/Resources/ComboBox.xaml" />
+                <ResourceDictionary Source="/TimeIsLife;component/Resources/TextBox.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <StackPanel>
+        <DockPanel LastChildFill="True">
+            <Label
+                Width="100"
+                Content="灯具数量："
+                Template="{DynamicResource LabelTemplate}" />
+            <TextBox Template="{DynamicResource TextBoxTemplate}" Text="{Binding LightingLineCount, UpdateSourceTrigger=PropertyChanged}" />
+        </DockPanel>
+        <DockPanel LastChildFill="True">
+            <Label
+                Width="100"
+                Content="灯具间距："
+                Template="{DynamicResource LabelTemplate}" />
+            <TextBox Template="{DynamicResource TextBoxTemplate}" Text="{Binding LightingLength, UpdateSourceTrigger=PropertyChanged}" />
+        </DockPanel>
+        <CheckBox Content="灯具方向沿切线方向布置" IsChecked="{Binding IsAlongTheLine}" />
+        <RadioButton Content="固定间距布置" GroupName="A" />
+        <RadioButton
+            Content="固定数量布置"
+            GroupName="A"
+            IsChecked="{Binding IsLengthOrCount, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+        <Button
+            Command="{Binding CurveLightingCommand}"
+            Content="灯具沿线布置"
+            Template="{DynamicResource ButtonTemplate}" />
+    </StackPanel>
+</UserControl>

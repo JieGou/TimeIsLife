@@ -1,0 +1,46 @@
+﻿<UserControl
+    x:Class="TimeIsLife.View.LayoutView.LightingLayoutSetting"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:Behaviors="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:TimeIsLife.View.LayoutView"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    d:DesignHeight="450"
+    d:DesignWidth="300"
+    mc:Ignorable="d">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/TimeIsLife;component/Resources/Shared.xaml" />
+                <ResourceDictionary Source="/TimeIsLife;component/Resources/Expander.xaml" />
+                <ResourceDictionary Source="/TimeIsLife;component/Resources/Button.xaml" />
+                <ResourceDictionary Source="/TimeIsLife;component/Resources/ComboBox.xaml" />
+                <ResourceDictionary Source="/TimeIsLife;component/Resources/TextBox.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <StackPanel>
+        <DockPanel LastChildFill="True">
+            <Label
+                Width="120"
+                Content="块比例"
+                Template="{DynamicResource LabelTemplate}" />
+            <ComboBox ItemsSource="{Binding BlockScales}" SelectedItem="{Binding BlockScale}" />
+        </DockPanel>
+        <DockPanel LastChildFill="True">
+            <Label
+                Width="120"
+                Content="块角度"
+                Template="{DynamicResource LabelTemplate}" />
+            <ComboBox ItemsSource="{Binding BlockAngles}" SelectedItem="{Binding BlockAngle}" />
+        </DockPanel>
+        <DockPanel LastChildFill="True">
+            <Label
+                Width="120"
+                Content="首端距离偏移比例"
+                Template="{DynamicResource LabelTemplate}" />
+            <ComboBox ItemsSource="{Binding Distances}" SelectedItem="{Binding Distance}" />
+        </DockPanel>
+    </StackPanel>
+</UserControl>

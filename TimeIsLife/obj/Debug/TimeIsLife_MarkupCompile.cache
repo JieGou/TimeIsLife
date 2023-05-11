@@ -4,17 +4,17 @@
 library
 C#
 .cs
-D:\GitHub\TimeIsLife\TimeIsLife\obj\Debug\
+D:\github\TimeIsLife\TimeIsLife\obj\Debug\
 TimeIsLife
 none
 false
 DEBUG;TRACE
 
-121986780866
-11746149430
-73-126536806
-53828227323
-Resources\Button.xaml;Resources\ComboBox.xaml;Resources\RibbonDictionary.xaml;Resources\TextBox.xaml;View\CalculateCurrentView.xaml;View\ElectricaView.xaml;Resources\Shared.xaml;Resources\Expander.xaml;View\FireAlarmView.xaml;View\FireAlarmWindow.xaml;View\LightingLayoutView.xaml;View\ToolsView.xaml;
+1621315223
+1-1548109444
+81-1422711529
+53-269555483
+Resources\Button.xaml;Resources\ComboBox.xaml;Resources\RibbonDictionary.xaml;Resources\TextBox.xaml;View\CalculateCurrentView.xaml;View\ElectricaView.xaml;Resources\Shared.xaml;Resources\Expander.xaml;View\FireAlarmView.xaml;View\FireAlarmWindow.xaml;View\LayoutView\LightingCarLayoutView.xaml;View\LayoutView\LightingLayoutSetting.xaml;View\LayoutView\LightingLineLayoutView.xaml;View\LightingLayoutView.xaml;View\LayoutView\LightingRecLayoutView.xaml;View\ToolsView.xaml;
 
 False
 

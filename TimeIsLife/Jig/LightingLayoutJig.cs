@@ -13,6 +13,7 @@ using TimeIsLife.ViewModel;
 
 using Polyline = Autodesk.AutoCAD.DatabaseServices.Polyline;
 using Application = Autodesk.AutoCAD.ApplicationServices.Application;
+using TimeIsLife.ViewModel.LayoutViewModel;
 
 namespace TimeIsLife.Jig
 {
@@ -39,9 +40,9 @@ namespace TimeIsLife.Jig
             List<Point3d> list = new List<Point3d>();
             Point3d pointd = new Point3d(p3.X, p1.Y, p1.Z);
             Point3d pointd2 = new Point3d(p1.X, p3.Y, p1.Z);
-            int rowCount = LightingLayoutViewModel.Instance.LightingRow;
-            double distance = LightingLayoutViewModel.Instance.Distance;
-            int columnCount = LightingLayoutViewModel.Instance.LightingColumn;
+            int rowCount = LightingRecLayoutViewModel.Instance.LightingRow;
+            double distance = LightingLayoutSettingViewModel.Instance.Distance;
+            int columnCount = LightingRecLayoutViewModel.Instance.LightingColumn;
             if (pointd.IsEqualTo(p1))
             {
                 PolyLineUpdate(polyline, p1, pointd, p3, pointd2, matrix3d);
@@ -148,7 +149,7 @@ namespace TimeIsLife.Jig
                         int num = 0;
                         while (true)
                         {
-                            if (num >= (LightingLayoutViewModel.Instance.LightingRow * LightingLayoutViewModel.Instance.LightingColumn))
+                            if (num >= (LightingRecLayoutViewModel.Instance.LightingRow * LightingRecLayoutViewModel.Instance.LightingColumn))
                             {
                                 endPoint3d = pointd;
                                 Point3d pointd2 = endPoint3d.TransformBy(matrixd.Inverse());
@@ -203,9 +204,9 @@ namespace TimeIsLife.Jig
                             BlockReference item = (BlockReference)blockReference.Clone();
                             item.Rotation = 0;
                             item.TransformBy(matrixd);
-                            Matrix3d matrixd2 = Matrix3d.Rotation((LightingLayoutViewModel.Instance.BlockAngle * Math.PI) / 180.0, Vector3d.ZAxis, item.Position);
+                            Matrix3d matrixd2 = Matrix3d.Rotation((LightingLayoutSettingViewModel.Instance.BlockAngle * Math.PI) / 180.0, Vector3d.ZAxis, item.Position);
                             item.TransformBy(matrixd2);
-                            item.ScaleFactors = new Scale3d(LightingLayoutViewModel.Instance.BlockScale);
+                            item.ScaleFactors = new Scale3d(LightingLayoutSettingViewModel.Instance.BlockScale);
 
                             blockReferences.Add(item);
                             num++;

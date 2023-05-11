@@ -32,13 +32,23 @@ namespace TimeIsLife.CADCommand
 {
     class ToolCommand
     {
+        private Document document;
+        private Database database;
+        private Editor editor;
+        private Matrix3d ucsToWcsMatrix3d;
+
+        void Initialize()
+        {
+            document = Application.DocumentManager.CurrentDocument;
+            database = document.Database;
+            editor = document.Editor;
+            ucsToWcsMatrix3d = editor.CurrentUserCoordinateSystem;
+        }
+
         #region FF_QuickUcs
         [CommandMethod("FF_QuickUcs")]
         public void FF_QuickUcs()
         {
-            Document document = Application.DocumentManager.CurrentDocument;
-            Database database = document.Database;
-            Editor editor = document.Editor;
             //using Transaction transaction = database.TransactionManager.StartOpenCloseTransaction();
             //try
             //{
@@ -60,10 +70,11 @@ namespace TimeIsLife.CADCommand
             //{
             //    transaction.Abort();
             //}
+
+            Initialize();
+
             document.SendStringToExecute("UCSICON\nN\n", true, false, false);
             document.SendStringToExecute("UCS\nOB\n", true, false, false);
-
-
         }
         #endregion
 
@@ -75,9 +86,8 @@ namespace TimeIsLife.CADCommand
         [CommandMethod("F1_ConnectLine")]
         public void F1_ConnectLine()
         {
-            Document document = Application.DocumentManager.CurrentDocument;
-            Database database = document.Database;
-            Editor editor = document.Editor;
+            Initialize();
+
             string s1 = "\n作用：两个块之间连线。";
             string s2 = "\n操作方法：运行命令，依次点选两个块，块最近的连接点之间连线。";
             string s3 = "\n注意事项：块内需要用点表示连接点。";
@@ -195,9 +205,8 @@ namespace TimeIsLife.CADCommand
         [CommandMethod("F2_SetCurrentStatus")]
         public void F2_SetCurrentStatus()
         {
-            Document document = Application.DocumentManager.CurrentDocument;
-            Database database = document.Database;
-            Editor editor = document.Editor;
+            Initialize();
+
             string s1 = "\n作用：根据选择对象的图层、颜色、线型、线型比例设置默认的图层、颜色、线型、线型比例。";
             string s2 = "\n操作方法：运行命令，选择对象。";
             editor.WriteMessage(s1 + s2);
@@ -248,9 +257,8 @@ namespace TimeIsLife.CADCommand
         [CommandMethod("F3_ConnectLines")]
         public void F3_ConnectLines()
         {
-            Document document = Application.DocumentManager.CurrentDocument;
-            Database database = document.Database;
-            Editor editor = document.Editor;
+            Initialize();
+
             string s1 = "\n作用：多个块按照最近距离自动连线。";
             string s2 = "\n操作方法：框选对象";
             string s3 = "\n注意事项：块不能锁定";
@@ -528,9 +536,8 @@ namespace TimeIsLife.CADCommand
         [CommandMethod("F4_AlignUcs")]
         public void F4_AlignUcs()
         {
-            Document document = Application.DocumentManager.CurrentDocument;
-            Database database = document.Database;
-            Editor editor = document.Editor;
+            Initialize();
+
             string s1 = "\n作用：多个对象在ucs坐标系下，沿x轴或者y轴对齐";
             string s2 = "\n操作方法：框选对象，设置对齐方向（默认ucs的x轴），选择基准对齐对象";
             string s3 = "\n注意事项：";
@@ -735,9 +742,8 @@ namespace TimeIsLife.CADCommand
         [CommandMethod("F5_EquipmentAngle")]
         public void F5_EquipmentAngle()
         {
-            Document document = Application.DocumentManager.CurrentDocument;
-            Database database = document.Database;
-            Editor editor = document.Editor;
+            Initialize();
+
             string s1 = "\n作用：多个对象在ucs坐标系下，设置对象的旋转角度";
             string s2 = "\n操作方法：框选对象，设置旋转角度（默认ucs的x轴为0度，逆时针选择为正）";
             string s3 = "\n注意事项：";
@@ -870,9 +876,7 @@ namespace TimeIsLife.CADCommand
         [CommandMethod("FF_ExplodeMInsertBlock")]
         public void FF_ExplodeMInsertBlock()
         {
-            Document document = Application.DocumentManager.CurrentDocument;
-            Database database = document.Database;
-            Editor editor = document.Editor;
+            Initialize();
 
             using Transaction transaction = database.TransactionManager.StartOpenCloseTransaction();
             try
@@ -915,14 +919,12 @@ namespace TimeIsLife.CADCommand
         /// 文字样式校正
         /// </summary>
         [CommandMethod("FF_ModifyTextStyle")]
-        public static void FF_ModifyTextStyle()
+        public void FF_ModifyTextStyle()
         {
+            Initialize();
+
             string sysFontsPath = Environment.GetFolderPath(Environment.SpecialFolder.Fonts);//windows系统字体目录
             DirectoryInfo sysDirInfo = new DirectoryInfo(sysFontsPath);//Windows系统字体文件夹
-
-            Document document = Application.DocumentManager.MdiActiveDocument;
-            Database database = document.Database;
-            Editor editor = document.Editor;
 
             using (Transaction transaction = document.TransactionManager.StartOpenCloseTransaction())
             {

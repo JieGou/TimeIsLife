@@ -38,61 +38,52 @@ namespace TimeIsLife.CADCommand
         private Document document;
         private Database database;
         private Editor editor;
+        private Matrix3d ucsToWcsMatrix3d;
 
         void Initialize()
         {
             document = Application.DocumentManager.CurrentDocument;
             database = document.Database;
             editor = document.Editor;
+            ucsToWcsMatrix3d = editor.CurrentUserCoordinateSystem;
         }
 
-        #region FF_CircuitMonitoring
-
-
-
-
-
-
-
-        #endregion
-
         #region FF_Tools
-        //创建面板
-        static PaletteSet paletteSet;
-        static ElectricalView electricalView;
-        static ElectricalViewModel electricalViewModel;
 
+        private PaletteSet paletteSet;
         [CommandMethod("FF_Tools")]
-        public static void FF_Tools()
+        public void FF_Tools()
         {
             if (paletteSet == null) // 如果面板没有被创建
             {
+                // 创建面板
                 // 创建一个新的PaletteSet实例，并设置其标题为"TimeIsLife"
-                paletteSet = new PaletteSet("TimeIsLife");
+                paletteSet = new PaletteSet("TimeIsLife")
+                {
+                    // 设置PaletteSet的DockEnabled属性为DockSides.Left，使其可以停靠在窗口的左侧
+                    DockEnabled = DockSides.Left,
 
-                // 设置PaletteSet的DockEnabled属性为DockSides.Left，使其可以停靠在窗口的左侧
-                paletteSet.DockEnabled = DockSides.Left;
-
-                // 设置标题栏位置
-                paletteSet.TitleBarLocation = PaletteSetTitleBarLocation.Left;
+                    // 设置标题栏位置
+                    TitleBarLocation = PaletteSetTitleBarLocation.Left
+                };
 
                 // 创建一个ElementHost实例
-                ElementHost host = new ElementHost();
-                host.AutoSize = true;
-                host.Dock = DockStyle.Fill;
+                ElementHost host = new ElementHost
+                {
+                    AutoSize = true,
+                    Dock = DockStyle.Fill,
 
-                // 将ElectricalView实例分配给ElementHost的Child属性
-                host.Child = electricalView = new ElectricalView();
-                electricalViewModel = (ElectricalViewModel)electricalView.DataContext;
+                    // 将ElectricalView实例分配给ElementHost的Child属性
+                    Child = new ElectricalView()
+                };
 
                 // 将ElementHost实例添加到PaletteSet中，并将其命名为"电气"
                 paletteSet.Add("电气", host);
+                // 设置PaletteSet的Dock属性                
             }
 
             // 设置面板可见
             paletteSet.Visible = true;
-
-            // 设置PaletteSet的Dock属性
             paletteSet.Dock = DockSides.Left;
         }
         #endregion
@@ -103,64 +94,54 @@ namespace TimeIsLife.CADCommand
         [CommandMethod("FF_SumPower")]
         public void FF_SumPower()
         {
-            Document document = Application.DocumentManager.MdiActiveDocument;
-            Database database = document.Database;
-            Editor editor = document.Editor;
+            Initialize();
 
+            using Transaction transaction = document.TransactionManager.StartTransaction();
+            PromptSelectionOptions options = new PromptSelectionOptions { MessageForAdding = "\n请选择要统计的功率:" };
+            TypedValueList values = new TypedValueList { typeof(DBText) };
+            PromptSelectionResult result = editor.GetSelection(options, values);
 
-
-            try
+            if (result.Status == PromptStatus.OK)
             {
-                using Transaction transaction = document.TransactionManager.StartTransaction();
-                PromptSelectionOptions options = new PromptSelectionOptions { MessageForAdding = "\n请选择要统计的功率:" };
-                TypedValueList values = new TypedValueList { typeof(DBText) };
-                PromptSelectionResult result = editor.GetSelection(options, values);
+                SelectionSet set = result.Value;
 
-                if (result.Status == PromptStatus.OK)
+                List<double[]> list = new List<double[]>();
+
+                foreach (var objectId in set.GetObjectIds())
                 {
-                    SelectionSet set = result.Value;
 
-                    List<double[]> list = new List<double[]>();
-
-                    foreach (var objectId in set.GetObjectIds())
-                    {
-
-                        DBText dBText = (DBText)objectId.GetObject(OpenMode.ForRead);
-                        string text = dBText.TextString;
-                        list.Add(GetPower(text));
-                    }
-
-                    //消防/非消防
-                    double a = 0;
-                    //消防平时负荷
-                    double b = 0;
-
-                    foreach (var item in list)
-                    {
-                        a += item[0];
-                        b += item[1];
-                    }
-
-                    CalculateCurrentViewModel.Instance.NormalOrFirePower = a;
-                    CalculateCurrentViewModel.Instance.NormalInFirePower = b;
-                    CalculateCurrentViewModel.Instance.Pe = Math.Max(a, b);
-
-                    transaction.Commit();
-
-
-                    //PromptSelectionOptions options1 = new PromptSelectionOptions { MessageForAdding = "\n请选择要修改的功率:", SingleOnly = true };
-                    //PromptSelectionResult result1 = editor.GetSelection(options1, values);
-                    //if (result1.Status == PromptStatus.OK)
-                    //{
-                    //    SelectionSet set1 = result1.Value;
-                    //    DBText dBText = (DBText)set1.GetObjectIds().First().GetObject(OpenMode.ForWrite);
-                    //    dBText.TextString = $"{d.ToString()}kW";
-                    //    dBText.DowngradeOpen();
-                    //}
+                    DBText dBText = (DBText)objectId.GetObject(OpenMode.ForRead);
+                    string text = dBText.TextString;
+                    list.Add(GetPower(text));
                 }
-            }
-            catch
-            {
+
+                //消防/非消防
+                double a = 0;
+                //消防平时负荷
+                double b = 0;
+
+                foreach (var item in list)
+                {
+                    a += item[0];
+                    b += item[1];
+                }
+
+                CalculateCurrentViewModel.Instance.NormalOrFirePower = a;
+                CalculateCurrentViewModel.Instance.NormalInFirePower = b;
+                CalculateCurrentViewModel.Instance.Pe = Math.Max(a, b);
+
+                transaction.Commit();
+
+
+                //PromptSelectionOptions options1 = new PromptSelectionOptions { MessageForAdding = "\n请选择要修改的功率:", SingleOnly = true };
+                //PromptSelectionResult result1 = editor.GetSelection(options1, values);
+                //if (result1.Status == PromptStatus.OK)
+                //{
+                //    SelectionSet set1 = result1.Value;
+                //    DBText dBText = (DBText)set1.GetObjectIds().First().GetObject(OpenMode.ForWrite);
+                //    dBText.TextString = $"{d.ToString()}kW";
+                //    dBText.DowngradeOpen();
+                //}
             }
         }
 
@@ -723,7 +704,6 @@ namespace TimeIsLife.CADCommand
         }
 
         #endregion
-
 
         //#region 1.2 计算电流
 

@@ -144,6 +144,10 @@
     <Compile Include="ViewModel\CalculateCurrentViewModel.cs" />
     <Compile Include="ViewModel\FireAlarmViewModel.cs" />
     <Compile Include="ViewModel\FireAlarmWindowViewModel.cs" />
+    <Compile Include="ViewModel\LayoutViewModel\LightingCarLayoutViewModel.cs" />
+    <Compile Include="ViewModel\LayoutViewModel\LightingLayoutSettingViewModel.cs" />
+    <Compile Include="ViewModel\LayoutViewModel\LightingLineLayoutViewModel.cs" />
+    <Compile Include="ViewModel\LayoutViewModel\LightingRecLayoutViewModel.cs" />
     <Compile Include="ViewModel\LightingLayoutViewModel.cs" />
     <Compile Include="ViewModel\ToolsViewModel.cs" />
     <Compile Include="View\CalculateCurrentView.xaml.cs">
@@ -169,8 +173,20 @@
     <Compile Include="View\FireAlarmWindow.xaml.cs">
       <DependentUpon>FireAlarmWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="View\LayoutView\LightingCarLayoutView.xaml.cs">
+      <DependentUpon>LightingCarLayoutView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\LayoutView\LightingLayoutSetting.xaml.cs">
+      <DependentUpon>LightingLayoutSetting.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\LayoutView\LightingLineLayoutView.xaml.cs">
+      <DependentUpon>LightingLineLayoutView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\LightingLayoutView.xaml.cs">
       <DependentUpon>LightingLayoutView.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\LayoutView\LightingRecLayoutView.xaml.cs">
+      <DependentUpon>LightingRecLayoutView.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\ToolsView.xaml.cs">
       <DependentUpon>ToolsView.xaml</DependentUpon>
@@ -406,7 +422,23 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="View\LayoutView\LightingCarLayoutView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\LayoutView\LightingLayoutSetting.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\LayoutView\LightingLineLayoutView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="View\LightingLayoutView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\LayoutView\LightingRecLayoutView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -458,8 +490,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="TestDwg\" />
-    <Folder Include="Tools\" />
-    <Folder Include="UserData\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

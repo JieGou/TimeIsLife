@@ -1,7 +1,9 @@
 ﻿using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
+
 using DotNetARX;
+
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,13 +16,22 @@ namespace TimeIsLife.Helper
 {
     public static class EditorHelper
     {
-        public static SelectionSet GetSelectionSet(this Editor editor,SelectString selectString, 
+        /// <summary>
+        /// 通过枚举类型切换多种选择模式
+        /// </summary>
+        /// <param name="editor"></param>
+        /// <param name="selectString"></param>
+        /// <param name="promptSelectionOptions"></param>
+        /// <param name="selectionFilter"></param>
+        /// <param name="point3dCollection"></param>
+        /// <returns></returns>
+        public static SelectionSet GetSelectionSet(this Editor editor, SelectString selectString,
             PromptSelectionOptions promptSelectionOptions, SelectionFilter selectionFilter, Point3dCollection point3dCollection)
         {
             // 请求在图形区域选择对象
             PromptSelectionResult psr = null;
             // 提示用户从图形文件中选取对象
-            if (selectString == SelectString.GetSelection)  
+            if (selectString == SelectString.GetSelection)
             {
                 if (promptSelectionOptions == null && selectionFilter == null)
                 {
@@ -40,7 +51,7 @@ namespace TimeIsLife.Helper
                 }
             }
             //选择当前空间内所有未锁定及未冻结的对象
-            else if (selectString == SelectString.SelectAll) 
+            else if (selectString == SelectString.SelectAll)
             {
                 if (selectionFilter == null)
                 {
@@ -52,11 +63,11 @@ namespace TimeIsLife.Helper
                 }
             }
             //选择由给定点定义的多边形内的所有对象以及与多边形相交的对象。多边形可以是任意形状，但不能与自己交叉或接触。
-            else if (selectString == SelectString.SelectCrossingPolygon) 
+            else if (selectString == SelectString.SelectCrossingPolygon)
             {
                 if (selectionFilter == null)
                 {
-                    psr = editor.SelectCrossingPolygon(point3dCollection) ;
+                    psr = editor.SelectCrossingPolygon(point3dCollection);
                 }
                 else
                 {
@@ -88,7 +99,7 @@ namespace TimeIsLife.Helper
                 }
             }
             //选择由两个点定义的窗口内的对象以及与窗口相交的对象
-            else if (selectString == SelectString.SelectCrossingWindow)  
+            else if (selectString == SelectString.SelectCrossingWindow)
             {
                 if (selectionFilter == null)
                 {
@@ -100,7 +111,7 @@ namespace TimeIsLife.Helper
                 }
             }
             // 选择完全框入由两个点定义的矩形内的所有对象。
-            else if (selectString == SelectString.SelectWindow) 
+            else if (selectString == SelectString.SelectWindow)
             {
                 if (selectionFilter == null)
                 {
@@ -127,7 +138,7 @@ namespace TimeIsLife.Helper
             else
             {
                 // 打印选择对象数量
-                editor.WriteMessage("Number of objects selected 0 \n");
+                editor.WriteMessage("\n 未选择对象！");
                 return null;
             }
         }

@@ -14,8 +14,10 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 
+using TimeIsLife.Helper;
 using TimeIsLife.Jig;
 using TimeIsLife.ViewModel;
+using TimeIsLife.ViewModel.LayoutViewModel;
 
 using Application = Autodesk.AutoCAD.ApplicationServices.Application;
 
@@ -25,19 +27,29 @@ namespace TimeIsLife.CADCommand
 {
     class LightingCommand
     {
+        private Document document;
+        private Database database;
+        private Editor editor;
+        private Matrix3d ucsToWcsMatrix3d;
 
+        void Initialize()
+        {
+            document = Application.DocumentManager.CurrentDocument;
+            database = document.Database;
+            editor = document.Editor;
+            ucsToWcsMatrix3d = editor.CurrentUserCoordinateSystem;
+        }
+
+        #region FF_GetArea
         [CommandMethod("FF_GetArea", CommandFlags.UsePickSet)]
         public void FF_GetArea()
         {
-            Document document = Application.DocumentManager.MdiActiveDocument;
-            Editor editor = document.Editor;
-            Database database = document.Database;
+            Initialize();
 
-            using Transaction transaction = document.TransactionManager.StartTransaction();
+            using Transaction transaction = database.TransactionManager.StartTransaction();
             try
             {
                 Polyline polyLine = null;
-
                 PromptSelectionResult psr = editor.SelectImplied();
 
                 if (psr.Status == PromptStatus.OK)
@@ -55,19 +67,24 @@ namespace TimeIsLife.CADCommand
                         SingleOnly = true,
                         RejectObjectsOnLockedLayers = true,
                     };
-                    PromptSelectionResult promptSelectionResult = editor.GetSelection(promptSelectionOptions);
-                    if (promptSelectionResult.Status != PromptStatus.OK) return;
 
-                    SelectionSet selectionSet = promptSelectionResult.Value;
+                    TypedValueList typedValues = new TypedValueList()
+                    {
+                        //类型
+                        new TypedValue((int)DxfCode.Start,"LWPOLYLINE"),
+                        //图层名称
+                        //new TypedValue((int)DxfCode.LayerName,""),
+                        //块名
+                        //new TypedValue((int)DxfCode.BlockName,"")
+                    };
 
+                    SelectionFilter selectionFilter = new SelectionFilter(typedValues);
+                    SelectionSet selectionSet = editor.GetSelectionSet(SelectString.GetSelection, promptSelectionOptions, selectionFilter, null);
                     polyLine = (Polyline)transaction.GetObject(selectionSet.GetObjectIds()[0], OpenMode.ForRead);
                 }
-
-
                 if (polyLine == null) return;
-
                 double polyLineArea = polyLine.Area;
-                LightingLayoutViewModel.Instance.LightingArea = Math.Round(polyLineArea * 1e-6, 2);
+                LightingRecLayoutViewModel.Instance.LightingArea = Math.Round(polyLineArea * 1e-6, 2);
                 transaction.Commit();
             }
             catch
@@ -75,15 +92,13 @@ namespace TimeIsLife.CADCommand
                 transaction.Abort();
             }
         }
+        #endregion
 
+        #region FF_RecLighting
         [CommandMethod("FF_RecLighting")]
         public void FF_RecLighting()
         {
-            Document document = Application.DocumentManager.MdiActiveDocument;
-            Editor editor = document.Editor;
-            Database database = document.Database;
-
-            Matrix3d matrix3d = Application.DocumentManager.MdiActiveDocument.Editor.CurrentUserCoordinateSystem;
+            Initialize();
 
             using (document.LockDocument())
             {
@@ -93,7 +108,7 @@ namespace TimeIsLife.CADCommand
 
                 try
                 {
-                    if (LightingLayoutViewModel.Instance.LightingRow == 0 || LightingLayoutViewModel.Instance.LightingColumn == 0)
+                    if (LightingRecLayoutViewModel.Instance.LightingRow == 0 || LightingRecLayoutViewModel.Instance.LightingColumn == 0)
                     {
                         return;
                     }
@@ -165,7 +180,9 @@ namespace TimeIsLife.CADCommand
                 }
             }
         }
+        #endregion
 
+        #region FF_CurveLighting
         [CommandMethod("FF_CurveLighting")]
         public void FF_CurveLighting()
         {
@@ -270,11 +287,11 @@ namespace TimeIsLife.CADCommand
                     }
                 }
 
-                switch (LightingLayoutViewModel.Instance.IsLengthOrCount)
+                switch (LightingLineLayoutViewModel.Instance.IsLengthOrCount)
                 {
                     //固定数量
                     case true:
-                        int m = LightingLayoutViewModel.Instance.LightingLineCount;
+                        int m = LightingLineLayoutViewModel.Instance.LightingLineCount;
                         while (m <= 0)
                         {
                             PromptIntegerOptions promptIntegerOptions = new PromptIntegerOptions("请输入灯具数量：");
@@ -283,7 +300,7 @@ namespace TimeIsLife.CADCommand
                             var result = editor.GetInteger(promptIntegerOptions);
                             if (result.Status == PromptStatus.OK)
                             {
-                                LightingLayoutViewModel.Instance.LightingLineCount = m = result.Value;
+                                LightingLineLayoutViewModel.Instance.LightingLineCount = m = result.Value;
                             }
                             else
                             {
@@ -293,16 +310,16 @@ namespace TimeIsLife.CADCommand
                         double unitLength = curveLength / m;
                         for (int i = 0; i < m; i++)
                         {
-                            point3d = curve.GetPointAtDist(unitLength * (i + LightingLayoutViewModel.Instance.Distance));
-                            switch (LightingLayoutViewModel.Instance.IsAlongTheLine)
+                            point3d = curve.GetPointAtDist(unitLength * (i + LightingLayoutSettingViewModel.Instance.Distance));
+                            switch (LightingLineLayoutViewModel.Instance.IsAlongTheLine)
                             {
                                 //是否沿线方向
                                 case true:
                                     var vector3d = curve.GetFirstDerivative(point3d);
-                                    rotateAngle = vector3d.GetAngleTo(new Vector3d(1, 0, 0), new Vector3d(0, 0, -1)) + LightingLayoutViewModel.Instance.BlockAngle * Math.PI / 180;
+                                    rotateAngle = vector3d.GetAngleTo(new Vector3d(1, 0, 0), new Vector3d(0, 0, -1)) + LightingLayoutSettingViewModel.Instance.BlockAngle * Math.PI / 180;
                                     break;
                                 case false:
-                                    rotateAngle = LightingLayoutViewModel.Instance.BlockAngle * Math.PI / 180;
+                                    rotateAngle = LightingLayoutSettingViewModel.Instance.BlockAngle * Math.PI / 180;
                                     break;
                             };
 
@@ -311,7 +328,7 @@ namespace TimeIsLife.CADCommand
                         break;
                     //固定距离
                     case false:
-                        double l = LightingLayoutViewModel.Instance.LightingLength;
+                        double l = LightingLineLayoutViewModel.Instance.LightingLength;
                         while (l <= 0)
                         {
                             PromptDoubleOptions promptDoubleOptions = new PromptDoubleOptions("请输入灯具间距：");
@@ -320,7 +337,7 @@ namespace TimeIsLife.CADCommand
                             var result = editor.GetDouble(promptDoubleOptions);
                             if (result.Status == PromptStatus.OK)
                             {
-                                LightingLayoutViewModel.Instance.LightingLength = l = result.Value;
+                                LightingLineLayoutViewModel.Instance.LightingLength = l = result.Value;
                             }
                             else
                             {
@@ -330,19 +347,19 @@ namespace TimeIsLife.CADCommand
                         int j = 0;
                         while (true)
                         {
-                            double tempLength = (j + LightingLayoutViewModel.Instance.Distance) * LightingLayoutViewModel.Instance.LightingLength;
+                            double tempLength = (j + LightingLayoutSettingViewModel.Instance.Distance) * LightingLineLayoutViewModel.Instance.LightingLength;
                             if (tempLength > curveLength) break;
 
                             point3d = curve.GetPointAtDist(tempLength);
-                            switch (LightingLayoutViewModel.Instance.IsAlongTheLine)
+                            switch (LightingLineLayoutViewModel.Instance.IsAlongTheLine)
                             {
                                 //是否沿线方向
                                 case true:
                                     var vector3d = curve.GetFirstDerivative(point3d);
-                                    rotateAngle = vector3d.GetAngleTo(new Vector3d(1, 0, 0), new Vector3d(0, 0, -1)) + LightingLayoutViewModel.Instance.BlockAngle * Math.PI / 180;
+                                    rotateAngle = vector3d.GetAngleTo(new Vector3d(1, 0, 0), new Vector3d(0, 0, -1)) + LightingLayoutSettingViewModel.Instance.BlockAngle * Math.PI / 180;
                                     break;
                                 case false:
-                                    rotateAngle = LightingLayoutViewModel.Instance.BlockAngle * Math.PI / 180;
+                                    rotateAngle = LightingLayoutSettingViewModel.Instance.BlockAngle * Math.PI / 180;
                                     break;
                             };
 
@@ -360,6 +377,8 @@ namespace TimeIsLife.CADCommand
                 transaction.Abort();
             }
         }
+        #endregion
+
 
         private static void InsertBlockReference(Database database, Transaction transaction, BlockTableRecord modelSpace, BlockReference baseBlockReference, string layer, Point3d point3d, Scale3d scale3D, double rotateAngle, Dictionary<string, string> attNameValues, BlockTableRecord blockTableRecord)
         {

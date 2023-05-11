@@ -69,6 +69,18 @@ namespace TimeIsLife.CADCommand
 {
     internal class FireAlarmCommand2
     {
+        private Document document;
+        private Database database;
+        private Editor editor;
+        private Matrix3d ucsToWcsMatrix3d;
+
+        void Initialize()
+        {
+            document = Application.DocumentManager.CurrentDocument;
+            database = document.Database;
+            editor = document.Editor;
+            ucsToWcsMatrix3d = editor.CurrentUserCoordinateSystem;
+        }
 
         #region FF_FAS
         [CommandMethod("FF_FAS")]

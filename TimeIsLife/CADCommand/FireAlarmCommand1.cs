@@ -82,22 +82,21 @@ namespace TimeIsLife.CADCommand
         private Document document;
         private Database database;
         private Editor editor;
+        private Matrix3d ucsToWcsMatrix3d;
 
         void Initialize()
         {
             document = Application.DocumentManager.CurrentDocument;
             database = document.Database;
             editor = document.Editor;
+            ucsToWcsMatrix3d = editor.CurrentUserCoordinateSystem;
         }
-
 
         #region _FF_GetFloorAreaLayerName
         [CommandMethod("_FF_GetFloorAreaLayerName")]
         public void _FF_GetFloorAreaLayerName()
         {
-            Document document = Application.DocumentManager.CurrentDocument;
-            Database database = document.Database;
-            Editor editor = document.Editor;
+            Initialize();
 
             using (Transaction transaction = database.TransactionManager.StartTransaction())
             {
@@ -207,9 +206,7 @@ namespace TimeIsLife.CADCommand
         [CommandMethod("_FF_GetRoomAreaLayerName")]
         public void _FF_GetRoomAreaLayerName()
         {
-            Document document = Application.DocumentManager.CurrentDocument;
-            Database database = document.Database;
-            Editor editor = document.Editor;
+            Initialize();
 
             using (Transaction transaction = database.TransactionManager.StartTransaction())
             {
@@ -263,10 +260,7 @@ namespace TimeIsLife.CADCommand
         [CommandMethod("_FF_GetFloorArea")]
         public void _FF_GetFloorArea()
         {
-            Document document = Application.DocumentManager.CurrentDocument;
-            Database database = document.Database;
-            Editor editor = document.Editor;
-            Matrix3d ucsToWcsMatrix3d = editor.CurrentUserCoordinateSystem;
+            Initialize();
 
             if (FireAlarmWindowViewModel.Instance.FloorAreaLayerName.IsNullOrWhiteSpace())
             {
@@ -309,9 +303,11 @@ namespace TimeIsLife.CADCommand
                     //FireAlarmWindowViewModel.instance.SelectedAreaFloor.MaxPoint3d = polyline.GeometricExtents.MaxPoint;
 
                     //过滤器
-                    TypedValueList typedValues = new TypedValueList();
-                    typedValues.Add(DxfCode.LayerName, FireAlarmWindowViewModel.Instance.FloorAreaLayerName);
-                    typedValues.Add(typeof(DBText));
+                    TypedValueList typedValues = new TypedValueList
+                    {
+                        { DxfCode.LayerName, FireAlarmWindowViewModel.Instance.FloorAreaLayerName },
+                        typeof(DBText)
+                    };
 
                     SelectionSet selectionSet = editor.GetSelectionSet(SelectString.SelectWindowPolygon, null,
                         new SelectionFilter(typedValues), polyline.GetPoint3dCollection(ucsToWcsMatrix3d));
@@ -360,9 +356,7 @@ namespace TimeIsLife.CADCommand
         [CommandMethod("_FF_GetBasePoint")]
         public void _FF_GetBasePoint()
         {
-            Document document = Application.DocumentManager.CurrentDocument;
-            Database database = document.Database;
-            Editor editor = document.Editor;
+            Initialize();
 
             using (Transaction transaction = database.TransactionManager.StartTransaction())
             {
@@ -537,6 +531,8 @@ namespace TimeIsLife.CADCommand
         [CommandMethod("_FF_SaveAreaFile")]
         public void _FF_SaveAreaFile()
         {
+            Initialize();
+
             const string createFloorTableSql = @"
                 CREATE TABLE IF NOT EXISTS Floor (
                     ID INTEGER PRIMARY KEY,
@@ -571,11 +567,6 @@ namespace TimeIsLife.CADCommand
                 VALUES (@name, @level, @x, @y, @z)";
             const string insertFloorSql = "INSERT INTO Floor (Name, Level, X, Y, Z) VALUES (@Name, @Level, @X, @Y, @Z)";
             const string insertAreaSql = "INSERT INTO Area (FloorID, VertexX, VertexY, VertexZ, Kind, Note) VALUES (@FloorID, @X, @Y, @Z, @Kind, @Note)";
-
-            Document document = Application.DocumentManager.CurrentDocument;
-            Database database = document.Database;
-            Editor editor = document.Editor;
-            Matrix3d ucsToWcsMatrix3d = editor.CurrentUserCoordinateSystem;
 
             using (Transaction transaction = database.TransactionManager.StartTransaction())
             {
@@ -701,12 +692,7 @@ namespace TimeIsLife.CADCommand
         [CommandMethod("_FF_LayoutEquipment")]
         public void _FF_LayoutEquipment()
         {
-
-            Document document = Application.DocumentManager.CurrentDocument;
-            Database database = document.Database;
-            Editor editor = document.Editor;
-            Matrix3d ucsToWcsMatrix3d = editor.CurrentUserCoordinateSystem;
-
+            Initialize();
 
             const string createFloorTableSql = @"
                 CREATE TABLE IF NOT EXISTS Floor (
