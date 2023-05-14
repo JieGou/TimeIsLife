@@ -25,6 +25,7 @@ using TimeIsLife.Model;
 
 using Application = Autodesk.AutoCAD.ApplicationServices.Application;
 using Point = NetTopologySuite.Geometries.Point;
+using TimeIsLife.Helper;
 
 [assembly: CommandClass(typeof(TimeIsLife.CADCommand.ToolCommand))]
 
@@ -298,21 +299,7 @@ namespace TimeIsLife.CADCommand
                         return;
                     }
 
-                    using (Transaction loadLineTypeTransaction = database.TransactionManager.StartTransaction())
-                    {
-                        LinetypeTable linetypeTable = loadLineTypeTransaction.GetObject(database.LinetypeTableId, OpenMode.ForWrite) as LinetypeTable;
-
-                        try
-                        {
-                            database.LoadLineTypeFile("DASHED", "acad.lin");
-                        }
-                        catch (Autodesk.AutoCAD.Runtime.Exception)
-                        {
-                            // Handle the exception
-                        }
-
-                        loadLineTypeTransaction.Commit();
-                    }
+                    database.AddLineType2("DASHED");
 
                     // 初始化矩形
                     Polyline polyLine = new Polyline();
@@ -609,21 +596,7 @@ namespace TimeIsLife.CADCommand
                     }
 
                     //获取第二个点
-                    using (Transaction loadLineTypeTransaction = database.TransactionManager.StartTransaction())
-                    {
-                        LinetypeTable linetypeTable = loadLineTypeTransaction.GetObject(database.LinetypeTableId, OpenMode.ForWrite) as LinetypeTable;
-
-                        try
-                        {
-                            database.LoadLineTypeFile("DASHED", "acad.lin");
-                        }
-                        catch (Autodesk.AutoCAD.Runtime.Exception)
-                        {
-                            // Handle the exception
-                        }
-
-                        loadLineTypeTransaction.Commit();
-                    }
+                    database.AddLineType2("DASHED");
 
                     // 初始化矩形
                     Polyline polyLine = new Polyline();
@@ -794,21 +767,7 @@ namespace TimeIsLife.CADCommand
                         return;
                     }
 
-                    using (Transaction loadLineTypeTransaction = database.TransactionManager.StartTransaction())
-                    {
-                        LinetypeTable linetypeTable = loadLineTypeTransaction.GetObject(database.LinetypeTableId, OpenMode.ForWrite) as LinetypeTable;
-
-                        try
-                        {
-                            database.LoadLineTypeFile("DASHED", "acad.lin");
-                        }
-                        catch (Autodesk.AutoCAD.Runtime.Exception)
-                        {
-                            // Handle the exception
-                        }
-
-                        loadLineTypeTransaction.Commit();
-                    }
+                    database.AddLineType2("DASHED");
                     // 初始化矩形
                     Polyline polyLine = new Polyline();
                     for (int i = 0; i < 4; i++)

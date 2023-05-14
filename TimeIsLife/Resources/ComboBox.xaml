@@ -17,11 +17,13 @@
         <Setter Property="ItemTemplate">
             <Setter.Value>
                 <DataTemplate>
-                    <TextBlock VerticalAlignment="Center" Text="{Binding}" />
+                    <TextBlock VerticalAlignment="Center" Text="{Binding}">
+                    </TextBlock>
                 </DataTemplate>
             </Setter.Value>
         </Setter>
     </Style>
+
 
 
     <LinearGradientBrush x:Key="ComboBox.Static.Background" StartPoint="0,0" EndPoint="0,1">

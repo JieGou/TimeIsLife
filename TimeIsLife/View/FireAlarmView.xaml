@@ -28,6 +28,14 @@
             Command="{Binding FireAlarmCeilingCommand}"
             Content="吊顶区域布置感烟、感温探测器"
             Template="{StaticResource ButtonTemplate}" />
+        <DockPanel LastChildFill="True">
+            <Label
+                Width="120"
+                HorizontalContentAlignment="Center"
+                Content="探测器半径"
+                Template="{DynamicResource LabelTemplate}" />
+            <ComboBox ItemsSource="{Binding RadiusList}" SelectedItem="{Binding Radius}" />
+        </DockPanel>
         <Button
             Command="{Binding AutomaticConnectionCommand}"
             Content="区域自动连线"

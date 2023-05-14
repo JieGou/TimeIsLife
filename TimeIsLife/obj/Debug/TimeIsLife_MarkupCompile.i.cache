@@ -12,9 +12,9 @@ DEBUG;TRACE
 
 1621315223
 1-1548109444
-82-1786393686
+83135384435
 53-269555483
 Resources\Button.xaml;Resources\ComboBox.xaml;Resources\RibbonDictionary.xaml;Resources\TextBox.xaml;View\CalculateCurrentView.xaml;View\ElectricaView.xaml;Resources\Shared.xaml;Resources\Expander.xaml;View\FireAlarmView.xaml;View\FireAlarmWindow.xaml;View\LayoutView\LightingCarLayoutView.xaml;View\LayoutView\LightingLayoutSetting.xaml;View\LayoutView\LightingLineLayoutView.xaml;View\LightingLayoutView.xaml;View\LayoutView\LightingRecLayoutView.xaml;View\ToolsView.xaml;
 
-False
+True
 

@@ -23,24 +23,27 @@ namespace TimeIsLife.Jig
 {
     internal class BasePointJig : DrawJig
     {
-        public Point3d _point;
-        //PrecisionModel precisionModel;
-        //GeometryPrecisionReducer precisionReducer;
-        //GeometryFactory geometryFactory;
-        private List<Polyline> polylines;
+        private Document document;
+        private Database database;
+        private Editor editor;
+        private Matrix3d ucsToWcsMatrix3d;
+
+        void Initialize()
+        {
+            document = Application.DocumentManager.CurrentDocument;
+            database = document.Database;
+            editor = document.Editor;
+            ucsToWcsMatrix3d = editor.CurrentUserCoordinateSystem;
+        }
+
         public BasePointJig(List<Polyline> polylines)
         {
+            Initialize();
             this.polylines = polylines;
-            //this.precisionModel = new PrecisionModel(1000d);
-            //this.precisionReducer = new GeometryPrecisionReducer(precisionModel);
-            //NetTopologySuite.NtsGeometryServices.Instance = new NetTopologySuite.NtsGeometryServices
-            //    (
-            //    NetTopologySuite.Geometries.Implementation.CoordinateArraySequenceFactory.Instance,
-            //    precisionModel,
-            //    4326
-            //    );
-            //this.geometryFactory = NtsGeometryServices.Instance.CreateGeometryFactory(precisionModel);
         }
+
+        public Point3d _point;
+        private List<Polyline> polylines;
 
         protected override SamplerStatus Sampler(JigPrompts prompts)
         {
@@ -59,13 +62,6 @@ namespace TimeIsLife.Jig
             if (_point != tempPoint)
             {
                 _point = tempPoint;
-                //Coordinate coordinate = new Coordinate(_point.X, _point.Y);
-                //Point point = geometryFactory.CreatePoint(coordinate);
-
-                //if (point.Within(geometry))
-                //{
-                //    gridPoints.Add(new double[2] { x, y });
-                //}
                 return SamplerStatus.OK;
             }
             else
@@ -76,21 +72,15 @@ namespace TimeIsLife.Jig
 
         protected override bool WorldDraw(WorldDraw draw)
         {
-            Document document = Application.DocumentManager.CurrentDocument;
-            Database database = document.Database;
-            Editor editor = document.Editor;
-            Matrix3d matrix = editor.CurrentUserCoordinateSystem;
-
-            //Point3d ucsPoint3d = _point.TransformBy(matrix.Inverse());
-            Vector3d vector3D = Point3d.Origin.TransformBy(matrix).GetVectorTo(_point);
+            Vector3d vector3D = Point3d.Origin.TransformBy(ucsToWcsMatrix3d).GetVectorTo(_point);
             Matrix3d matrix3D = Matrix3d.Displacement(vector3D);
             foreach (var polyline in polylines)
             {
-                polyline.TransformBy(matrix);
+                polyline.TransformBy(ucsToWcsMatrix3d);
                 polyline.TransformBy(matrix3D);
                 draw.Geometry.Draw(polyline);
                 polyline.TransformBy(matrix3D.Inverse());
-                polyline.TransformBy(matrix.Inverse());
+                polyline.TransformBy(ucsToWcsMatrix3d.Inverse());
             }
             return true;
         }

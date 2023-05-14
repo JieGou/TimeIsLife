@@ -37,10 +37,12 @@ namespace TimeIsLife.ViewModel
 
             MaxValue = 100;
             isTreeConnection = true;
+            RadiusList = new List<int> { 3600, 4400, 5800, 6700 };
+            Radius = 5800;
         }
 
         #region 属性
-        //计算电流
+        //是否在洞口布置
         private bool isLayoutAtHole;
         public bool IsLayoutAtHole
         {
@@ -54,6 +56,16 @@ namespace TimeIsLife.ViewModel
         {
             get => maxValue;
             set => SetProperty(ref maxValue, value);
+        }
+
+        //半径
+        public List<int> RadiusList { get; set; }
+
+        private int radius;
+        public int Radius
+        {
+            get => radius;
+            set => SetProperty(ref radius, value);
         }
 
         //算法选择

@@ -62,6 +62,8 @@ using MessageBox = System.Windows.Forms.MessageBox;
 using System.Data.Entity;
 using Database = Autodesk.AutoCAD.DatabaseServices.Database;
 using NetTopologySuite.Precision;
+using NetTopologySuite.Operation.Distance;
+using NetTopologySuite.Operation.OverlayNG;
 
 [assembly: CommandClass(typeof(TimeIsLife.CADCommand.FireAlarmCommand2))]
 
@@ -854,21 +856,7 @@ namespace TimeIsLife.CADCommand
                         return;
                     }
 
-                    using (Transaction loadLineTypeTransaction = database.TransactionManager.StartTransaction())
-                    {
-                        LinetypeTable linetypeTable = loadLineTypeTransaction.GetObject(database.LinetypeTableId, OpenMode.ForWrite) as LinetypeTable;
-
-                        try
-                        {
-                            database.LoadLineTypeFile("DASHED", "acad.lin");
-                        }
-                        catch (Autodesk.AutoCAD.Runtime.Exception)
-                        {
-                            // Handle the exception
-                        }
-
-                        loadLineTypeTransaction.Commit();
-                    }
+                    database.AddLineType2("DASHED");
 
                     // 初始化矩形
                     Polyline polyLine = new Polyline();
@@ -1683,30 +1671,70 @@ namespace TimeIsLife.CADCommand
                 SelectionFilter selectionFilter = new SelectionFilter(typedValues);
 
                 SelectionSet selectionSet = editor.GetSelectionSet(SelectString.GetSelection, promptSelectionOptions, selectionFilter, null);
-                List<Polyline> polylines = new List<Polyline>();
+                if (selectionSet == null)
+                {
+                    transaction.Abort();
+                    return;
+                }
+                List<Polygon> polygons = new List<Polygon>();
+                // 提前获取 Radius 的值
+                var radius = FireAlarmViewModel.Instance.Radius;
+
                 foreach (var id in selectionSet.GetObjectIds())
                 {
                     Polyline polyline = transaction.GetObject(id, OpenMode.ForRead) as Polyline;
                     if (polyline == null) continue;
-                    polylines.Add(polyline);
+                    polygons.Add(polyline.ToPolygon(geometryFactory));
                 }
-
-                foreach (var p in polylines)
+                SetLayer(database, $"E-EQUIP", 4);
+                List<Coordinate> coordinates = new List<Coordinate>();
+                foreach (var polygon in polygons)
                 {
-                    Polygon polygon = p.ToPolygon(geometryFactory);
                     if (polygon.IsEmpty) continue;
-
-
-
-
-
-
-
-
-
+                    if (IsProtected(polygon, radius))
+                    {
+                        coordinates.Add(polygon.Centroid.Coordinate);
+                    }
+                    else
+                    {
+                        int n = 2;
+                        while (true)
+                        {
+                            List<Geometry> splitGeometries = SplitPolygon(geometryFactory, polygon, n, 100.0);
+                            if (splitGeometries.All(item => IsProtected(item, radius)))
+                            {
+                                foreach (var item in splitGeometries)
+                                {
+                                    coordinates.Add(item.Centroid.Coordinate);
+                                }
+                                break;
+                            }
+                            n++;
+                        }
+                    }
                 }
 
+                //去除距梁边小于500mm的布置点
+                if (coordinates.Count == 0)
+                {
+                    editor.WriteMessage("/n 未布置探测器！");
+                    transaction.Abort();
+                    return;
+                }
 
+                // 提前加载并缓存模块ID
+                var smokeDetectorID = LoadBlockIntoDatabase(database, "FA-08-智能型点型感烟探测器.dwg");
+                var temperatureDetectorID = LoadBlockIntoDatabase(database, "FA-09-智能型点型感温探测器.dwg");
+
+
+                ObjectId blockReferenceId = (radius == 3600 || radius == 4400) ? temperatureDetectorID : smokeDetectorID;
+
+                foreach (var coordinate in coordinates)
+                {
+                    BlockReference blockReference = new BlockReference(new Point3d(coordinate.X, coordinate.Y, 0), blockReferenceId);
+                    blockReference.ScaleFactors = new Scale3d(100);
+                    database.AddToModelSpace(blockReference);
+                }
             }
             catch
             {
@@ -1716,6 +1744,10 @@ namespace TimeIsLife.CADCommand
             transaction.Commit();
         }
 
+        /// <summary>
+        /// 获取NTS指定精度和标准坐标系的GeometryFactory实例
+        /// </summary>
+        /// <returns>GeometryFactory实例</returns>
         private GeometryFactory CreateGeometryFactory()
         {
             //NTS
@@ -1728,6 +1760,116 @@ namespace TimeIsLife.CADCommand
                 4326
                 );
             return NtsGeometryServices.Instance.CreateGeometryFactory(precisionModel);
+        }
+
+        /// <summary>
+        /// 输入半径是否小于几何的最小外接圆的半径
+        /// </summary>
+        /// <param name="geometry">几何</param>
+        /// <param name="radius">半径</param>
+        /// <returns>小于等于为真，大于为假</returns>
+        private bool IsProtected(Geometry geometry, double radius)
+        {
+            MinimumBoundingCircle mbc = new MinimumBoundingCircle(geometry);
+            Geometry circlePolygon = mbc.GetCircle();
+
+            // 计算几何质心与最小外接圆边界上的一个点之间的距离作为最小外接圆半径
+            Point centerPoint = circlePolygon.Centroid;
+            Coordinate[] circleCoordinates = circlePolygon.Coordinates;
+            double minRadius = centerPoint.Coordinate.Distance(circleCoordinates[0]);
+
+            return minRadius <= radius;
+        }
+
+        /// <summary>
+        /// 根据输入的值和采样精度拆分几何
+        /// </summary>
+        /// <param name="geometryFactory"></param>
+        /// <param name="geometry">几何</param>
+        /// <param name="count">数量</param>
+        /// <param name="interval">采样精度</param>
+        /// <returns>几何的集合</returns>
+        List<Geometry> SplitPolygon(GeometryFactory geometryFactory, Geometry geometry, int count, double interval)
+        {
+            // 质心点集
+            Coordinate maxPoint = geometry.Max();
+            Coordinate minPoint = geometry.Min();
+
+            // 构建网格点并判断点是否在多边形内部
+            List<double[]> gridPoints = new List<double[]>();
+            for (double x = minPoint.X; x <= maxPoint.X; x += interval)
+            {
+                for (double y = minPoint.Y; y <= maxPoint.Y; y += interval)
+                {
+                    Point point2D = geometryFactory.CreatePoint(new Coordinate(x, y));
+
+                    if (point2D.Within(geometry))
+                    {
+                        gridPoints.Add(new double[2] { x, y });
+                    }
+                }
+            }
+
+            // 利用EKmeans 获取分组和簇的质心
+            Accord.Math.Random.Generator.Seed = 0;
+            KMeans kMeans = new KMeans(count);
+            KMeansClusterCollection clusters = kMeans.Learn(gridPoints.ToArray());
+            double[][] centerPoints = clusters.Centroids;
+            List<Coordinate> coords = new List<Coordinate>();
+            foreach (var c in centerPoints)
+            {
+                coords.Add(new Coordinate(c[0], c[1]));
+            }
+
+            // 构建泰森多边形
+            VoronoiDiagramBuilder voronoiDiagramBuilder = new VoronoiDiagramBuilder();
+            Envelope clipEnvelpoe = new Envelope(minPoint, maxPoint);
+            voronoiDiagramBuilder.ClipEnvelope = clipEnvelpoe;
+            voronoiDiagramBuilder.SetSites(coords);
+            GeometryCollection geometryCollection = voronoiDiagramBuilder.GetDiagram(geometryFactory);
+
+            // 利用封闭面切割泰森多边形
+            List<Geometry> geometries = new List<Geometry>();
+            for (int i = 0; i < geometryCollection.NumGeometries; i++)
+            {
+                Geometry vorGeometry = geometryCollection.GetGeometryN(i);
+                geometries.Add(vorGeometry.Intersection(geometry));
+            }
+            return geometries;
+        }
+
+        /// <summary>
+        /// 加载指定名称块
+        /// </summary>
+        /// <param name="database">加载块的数据库</param>
+        /// <param name="blockName">块名</param>
+        /// <returns>载入块ID</returns>
+        private ObjectId LoadBlockIntoDatabase(Database database, string blockName)
+        {
+            using (Database tempDb = new Database(false, true))
+            {
+                using (Transaction tempTransaction = tempDb.TransactionManager.StartTransaction())
+                {
+                    try
+                    {
+                        string codeBase = Assembly.GetExecutingAssembly().CodeBase;
+                        UriBuilder uri = new UriBuilder(codeBase);
+                        string path = Uri.UnescapeDataString(uri.Path);
+                        string blockPath = Path.Combine(Path.GetDirectoryName(path), "Block", blockName);
+                        string blockSymbolName = SymbolUtilityServices.GetSymbolNameFromPathName(blockPath, "dwg");
+                        tempDb.ReadDwgFile(blockPath, FileOpenMode.OpenForReadAndReadShare, allowCPConversion: true, null);
+                        tempDb.CloseInput(true);
+                        tempTransaction.Commit();
+                        return database.Insert(blockSymbolName, tempDb, true);
+                    }
+                    catch
+                    {
+                        tempTransaction.Abort();
+                        editor.WriteMessage("\n加载AutoCAD图块发生错误");
+                        return ObjectId.Null;
+                    }
+                }
+            }
         }
         #endregion
     }

@@ -99,85 +99,73 @@ namespace TimeIsLife.CADCommand
         public void FF_RecLighting()
         {
             Initialize();
+            using Transaction transaction = document.TransactionManager.StartOpenCloseTransaction();
+            BlockTable blockTable = (BlockTable)transaction.GetObject(database.BlockTableId, OpenMode.ForRead);
+            BlockTableRecord modelSpace = ((BlockTableRecord)transaction.GetObject(blockTable[BlockTableRecord.ModelSpace], OpenMode.ForRead));
 
-            using (document.LockDocument())
+            try
             {
-                Transaction transaction = document.TransactionManager.StartTransaction();
-                BlockTable blockTable = (BlockTable)transaction.GetObject(database.BlockTableId, OpenMode.ForRead);
-                BlockTableRecord modelSpace = ((BlockTableRecord)transaction.GetObject(blockTable[BlockTableRecord.ModelSpace], OpenMode.ForRead));
-
-                try
+                if (LightingRecLayoutViewModel.Instance.LightingRow == 0 || LightingRecLayoutViewModel.Instance.LightingColumn == 0)
                 {
-                    if (LightingRecLayoutViewModel.Instance.LightingRow == 0 || LightingRecLayoutViewModel.Instance.LightingColumn == 0)
-                    {
-                        return;
-                    }
-
-                    PromptSelectionOptions promptSelectionOptions = new PromptSelectionOptions
-                    {
-                        SingleOnly = true,
-                        RejectObjectsOnLockedLayers = true,
-                        MessageForAdding = "\n请选择块："
-                    };
-                    PromptSelectionResult promptSelectionResult = editor.GetSelection(promptSelectionOptions);
-                    if (promptSelectionResult.Status != PromptStatus.OK) return;
-                    SelectionSet selectionSet = promptSelectionResult.Value;
-
-                    //亮显选择的块参照
-                    //editor.SetImpliedSelection(selectionSet.GetObjectIds());
-
-
-                    BlockReference blockReference = (BlockReference)transaction.GetObject(selectionSet.GetObjectIds()[0], OpenMode.ForRead);
-                    blockReference.Highlight();
-                    BlockTableRecord btr = (BlockTableRecord)blockReference.BlockTableRecord.GetObject(OpenMode.ForRead);
-                    if (btr == null) return;
-
-                    PromptPointOptions pointOptions = new PromptPointOptions("\n请选择起始点：");
-                    PromptPointResult pointResult = editor.GetPoint(pointOptions);
-                    if (pointResult.Status != PromptStatus.OK) return;
-                    Point3d basePoint3d = pointResult.Value;
-
-                    string linetypeName = "DASHED";
-                    LinetypeTable linetypeTable = (LinetypeTable)database.LinetypeTableId.GetObject(OpenMode.ForRead);
-                    if (!linetypeTable.Has(linetypeName))
-                    {
-                        database.LoadLineTypeFile(linetypeName, "acad.lin");
-                    }
-
-                    // 初始化矩形
-                    Polyline polyLine = new Polyline();
-                    for (int i = 0; i < 4; i++)
-                    {
-                        polyLine.AddVertexAt(i, new Point2d(0, 0), 0, 0, 0);
-                    }
-                    polyLine.Closed = true;
-                    polyLine.Linetype = "DASHED";
-                    polyLine.Transparency = new Transparency(128);
-                    polyLine.ColorIndex = 31;
-                    polyLine.LinetypeScale = 1000 / database.Ltscale;
-
-
-                    LightingLayoutJig lightingLayoutJig = new LightingLayoutJig(blockReference, basePoint3d, polyLine);
-                    PromptResult resJig = editor.Drag(lightingLayoutJig);
-                    if (resJig.Status != PromptStatus.OK) return;
-
-                    blockReference.Unhighlight();
-
-                    modelSpace.UpgradeOpen();
-                    foreach (var reference in lightingLayoutJig.blockReferences)
-                    {
-                        modelSpace.AppendEntity(reference);
-                        transaction.AddNewlyCreatedDBObject(reference, true);
-
-                    }
-                    modelSpace.DowngradeOpen();
-                    transaction.Commit();
-                }
-                catch
-                {
-                    transaction.Abort();
                     return;
                 }
+
+                PromptSelectionOptions promptSelectionOptions = new PromptSelectionOptions
+                {
+                    SingleOnly = true,
+                    RejectObjectsOnLockedLayers = true,
+                    MessageForAdding = "\n请选择块："
+                };
+                TypedValueList typedValues = new TypedValueList
+                {
+                    typeof(BlockReference)
+                };
+                SelectionFilter selectionFilter = new SelectionFilter(typedValues);
+
+                SelectionSet selectionSet = editor.GetSelectionSet(SelectString.GetSelection, promptSelectionOptions, selectionFilter, null);
+                if (selectionSet == null) { return; }
+
+                BlockReference blockReference = (BlockReference)transaction.GetObject(selectionSet.GetObjectIds()[0], OpenMode.ForRead);
+                blockReference.Highlight();
+                BlockTableRecord blockTableRecord = (BlockTableRecord)transaction.GetObject(blockReference.BlockTableRecord, OpenMode.ForRead);
+                if (blockTableRecord == null) return;
+
+                PromptPointOptions pointOptions = new PromptPointOptions("\n请选择起始点：");
+                PromptPointResult pointResult = editor.GetPoint(pointOptions);
+                if (pointResult.Status != PromptStatus.OK) return;
+                Point3d basePoint3d = pointResult.Value;
+
+                database.AddLineType2("DASHED");
+
+                // 初始化矩形
+                Polyline polyLine = new Polyline
+                {
+                    Closed = true,
+                    Linetype = "DASHED",
+                    Transparency = new Transparency(128),
+                    ColorIndex = 31,
+                    LinetypeScale = 1000 / database.Ltscale
+                };
+                for (int i = 0; i < 4; i++)
+                {
+                    polyLine.AddVertexAt(i, new Point2d(0, 0), 0, 0, 0);
+                }
+
+                LightingLayoutJig lightingLayoutJig = new LightingLayoutJig(blockReference, basePoint3d, polyLine, blockTableRecord);
+                PromptResult resJig = editor.Drag(lightingLayoutJig);
+                if (resJig.Status != PromptStatus.OK) return;
+
+                blockReference.Unhighlight();
+                foreach (var reference in lightingLayoutJig.blockReferences)
+                {
+                    database.AddToModelSpace(reference);
+                }
+                transaction.Commit();
+            }
+            catch
+            {
+                transaction.Abort();
+                return;
             }
         }
         #endregion

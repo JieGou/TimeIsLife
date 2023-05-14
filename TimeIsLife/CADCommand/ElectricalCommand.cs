@@ -534,12 +534,7 @@ namespace TimeIsLife.CADCommand
             }
 
             //绘制楼层线
-            string linetypeName = "DASHED";
-            LinetypeTable linetypeTable = (LinetypeTable)database.LinetypeTableId.GetObject(OpenMode.ForRead);
-            if (!linetypeTable.Has(linetypeName))
-            {
-                database.LoadLineTypeFile(linetypeName, "acad.lin");
-            }
+            database.AddLineType2("DASHED");
 
             modelSpace.UpgradeOpen();
             for (int i = 0; i <= floors.Count; i++)
