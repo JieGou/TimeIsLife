@@ -108,8 +108,10 @@ namespace TimeIsLife.CADCommand
                     Point3d basePoint3d = new Point3d();
 
 
-                    TypedValueList typedValues = new TypedValueList();
-                    typedValues.Add(typeof(Polyline));
+                    TypedValueList typedValues = new TypedValueList
+                    {
+                        typeof(Polyline)
+                    };
                     SelectionFilter selectionFilter = new SelectionFilter(typedValues);
 
                     PromptSelectionOptions promptSelectionOptions = new PromptSelectionOptions()
@@ -131,9 +133,11 @@ namespace TimeIsLife.CADCommand
                         if (ppr.Status == PromptStatus.OK) basePoint3d = ppr.Value;
 
                         //选择选定图上的所有多段线
-                        TypedValueList typedValues1 = new TypedValueList();
-                        typedValues1.Add(DxfCode.LayerName, name);
-                        typedValues1.Add(typeof(Polyline));
+                        TypedValueList typedValues1 = new TypedValueList
+                        {
+                            { DxfCode.LayerName, name },
+                            typeof(Polyline)
+                        };
                         SelectionFilter layerSelectionFilter = new SelectionFilter(typedValues1);
                         PromptSelectionResult psr = editor.SelectAll(layerSelectionFilter);
                         Dictionary<Polyline, KeyValuePair<DBText, Point3dCollection>> keyValuePairs = new Dictionary<Polyline, KeyValuePair<DBText, Point3dCollection>>();
@@ -196,8 +200,10 @@ namespace TimeIsLife.CADCommand
                             List<string> blockNames = new List<string>();
                             List<BlockReference> blockReferences = new List<BlockReference>();
 
-                            TypedValueList typedValues3 = new TypedValueList();
-                            typedValues3.Add(typeof(BlockReference));
+                            TypedValueList typedValues3 = new TypedValueList
+                            {
+                                typeof(BlockReference)
+                            };
                             SelectionFilter blockReferenceSelectionFilter = new SelectionFilter(typedValues3);
 
                             for (int j = i + 1; j < keyValuePairs.Count; j++)
@@ -816,158 +822,106 @@ namespace TimeIsLife.CADCommand
         public void FF_AutomaticConnection()
         {
             Initialize();
+            GeometryFactory geometryFactory = CreateGeometryFactory();
 
-            string s1 = "\n作用：多个块按照最近距离自动连线。";
-            string s2 = "\n操作方法：框选对象";
-            string s3 = "\n注意事项：块不能锁定";
+            string s1 = "作用：多个块按照最近距离自动连线。\n";
+            string s2 = "操作方法：选择防火分区多段线\n";
+            string s3 = "注意事项：块不能锁定\n";
             editor.WriteMessage(s1 + s2 + s3);
 
-            //NTS
-            var precisionModel = new PrecisionModel(1000d);
-            GeometryPrecisionReducer precisionReducer = new GeometryPrecisionReducer(precisionModel);
-            NetTopologySuite.NtsGeometryServices.Instance = new NetTopologySuite.NtsGeometryServices
-                (
-                NetTopologySuite.Geometries.Implementation.CoordinateArraySequenceFactory.Instance,
-                precisionModel,
-                4326
-                );
-            GeometryFactory geometryFactory = NtsGeometryServices.Instance.CreateGeometryFactory(precisionModel);
-
-            try
+            using Transaction transaction = database.TransactionManager.StartOpenCloseTransaction();
+            TypedValueList typedValues = new TypedValueList
             {
-                using (Transaction transaction = database.TransactionManager.StartOpenCloseTransaction())
+                typeof(Polyline)
+            };
+            SelectionFilter selectionFilter = new SelectionFilter(typedValues);
+            PromptSelectionOptions promptSelectionOptions = new PromptSelectionOptions
+            {
+                AllowDuplicates = true,
+                RejectObjectsOnLockedLayers = true
+            };
+            SelectionSet selectionSet = editor.GetSelectionSet(SelectString.GetSelection, promptSelectionOptions, selectionFilter, null);
+
+            if (selectionSet == null)
+            {
+                transaction.Abort();
+                return;
+            }
+            //迭代防火分区
+            foreach (var id in selectionSet.GetObjectIds())
+            {
+                Polyline polyline = transaction.GetObject(id, OpenMode.ForRead) as Polyline;
+                if (polyline == null) continue;
+
+                TypedValueList blockReferenceTypedValues = new TypedValueList
+                                {
+                                    typeof(BlockReference)
+                                };
+                SelectionFilter blockReferenceSelectionFilter = new SelectionFilter(blockReferenceTypedValues);
+                SelectionSet blockReferenceSelectionSet = editor.GetSelectionSet(SelectString.SelectCrossingPolygon, null, blockReferenceSelectionFilter, polyline.GetPoint3dCollection(ucsToWcsMatrix3d.Inverse()));
+                if (blockReferenceSelectionSet == null) continue;
+                List<BlockReference> blockReferences = new List<BlockReference>();
+                foreach (var blockReferenceId in blockReferenceSelectionSet.GetObjectIds())
                 {
-                    Point3d startPoint3D = new Point3d();
-                    Point3d endPoint3D = new Point3d();
+                    BlockReference blockReference = transaction.GetObject(blockReferenceId, OpenMode.ForRead) as BlockReference;
+                    if (blockReference == null) continue;
+                    blockReferences.Add(blockReference);
+                }
 
-                    Matrix3d matrix3D = editor.CurrentUserCoordinateSystem;
-                    PromptPointOptions promptPointOptions;
+                var points = ConvertCoordinatesToPoints(geometryFactory, blockReferences);
 
-                    promptPointOptions = new PromptPointOptions("\n 请选择第一个角点：");
-                    PromptPointResult ppr = editor.GetPoint(promptPointOptions);
+                List<LineString> tree;
 
-                    if (ppr.Status == PromptStatus.OK)
-                    {
-                        startPoint3D = ppr.Value;
-                    }
-                    else
-                    {
-                        transaction.Abort();
-                        return;
-                    }
+                if (FireAlarmViewModel.Instance.IsTreeConnection)
+                {
+                    tree = Kruskal.FindMinimumSpanningTree(points, geometryFactory);
+                }
+                else if (FireAlarmViewModel.Instance.IsCircularConnection1)
+                {
+                    tree = ConnectPointsNonCrossing(points, geometryFactory);
+                }
+                else if (FireAlarmViewModel.Instance.IsCircularConnection2)
+                {
+                    tree = ConnectPointsNonCrossingMST(points, geometryFactory);
+                }
+                else
+                {
+                    tree = new List<LineString>();
+                }
 
-                    database.AddLineType2("DASHED");
+                database.NewLayer("E-WIRE", 1);
+                BlockReference br1;
+                BlockReference br2;
+                const double Tolerance = 1e-3;
 
-                    // 初始化矩形
-                    Polyline polyLine = new Polyline();
-                    for (int i = 0; i < 4; i++)
-                    {
-                        polyLine.AddVertexAt(i, new Point2d(0, 0), 0, 0, 0);
-                    }
-                    polyLine.Closed = true;
-                    polyLine.Linetype = "DASHED";
-                    polyLine.Transparency = new Transparency(128);
-                    polyLine.ColorIndex = 31;
-                    polyLine.LinetypeScale = 1000 / database.Ltscale;
+                foreach (var line in tree)
+                {
+                    var startPoint = new Point3d(line.Coordinates[0].X, line.Coordinates[0].Y, 0);
+                    var endPoint = new Point3d(line.Coordinates[1].X, line.Coordinates[1].Y, 0);
 
-                    UcsSelectJig ucsSelectJig = new UcsSelectJig(startPoint3D, polyLine);
-                    PromptResult promptResult = editor.Drag(ucsSelectJig);
-                    if (promptResult.Status == PromptStatus.OK)
-                    {
-                        endPoint3D = ucsSelectJig.endPoint3d.TransformBy(matrix3D.Inverse());
-                    }
-                    else
-                    {
-                        transaction.Abort();
-                        return;
-                    }
+                    br1 = blockReferences.FirstOrDefault(b => Math.Abs(b.Position.X - startPoint.X) < Tolerance && Math.Abs(b.Position.Y - startPoint.Y) < Tolerance);
+                    br2 = blockReferences.FirstOrDefault(b => Math.Abs(b.Position.X - endPoint.X) < Tolerance && Math.Abs(b.Position.Y - endPoint.Y) < Tolerance);
 
-                    Point3dCollection point3DCollection = GetPoint3DCollection(startPoint3D, endPoint3D, matrix3D);
-                    TypedValueList typedValues = new TypedValueList
-                    {
-                        typeof(BlockReference),
-                        { DxfCode.LayerName, "E-EQUIP" }
-                    };
-                    SelectionFilter selectionFilter = new SelectionFilter(typedValues);
-                    PromptSelectionResult promptSelectionResult = editor.SelectCrossingPolygon(point3DCollection, selectionFilter);
-                    if (promptSelectionResult.Status != PromptStatus.OK)
-                    {
-                        transaction.Abort();
-                        return;
-                    }
-                    List<BlockReference> blockReferences = new List<BlockReference>();
-                    SelectionSet selectionSet = promptSelectionResult.Value;
-                    foreach (var id in selectionSet.GetObjectIds())
-                    {
-                        BlockReference blockReference = transaction.GetObject(id, OpenMode.ForRead) as BlockReference;
-                        if (blockReference == null) continue;
-                        LayerTableRecord layerTableRecord = transaction.GetObject(blockReference.LayerId, OpenMode.ForRead) as LayerTableRecord;
-                        if (layerTableRecord.IsLocked == true) continue;
-                        if (GetPoint3DCollection(blockReference).Count == 0) continue;
-                        blockReferences.Add(blockReference);
-                    }
+                    List<Point3d> point3DList1 = GetPoint3DCollection(br1);
+                    List<Point3d> point3DList2 = GetPoint3DCollection(br2);
 
-                    var points = ConvertCoordinatesToPoints(geometryFactory, blockReferences);
+                    var closestPair = (from p1 in point3DList1
+                                       from p2 in point3DList2
+                                       orderby p1.DistanceTo(p2)
+                                       select new { Point1 = p1, Point2 = p2 }).First();
 
-                    List<LineString> tree;
+                    Line wire = new Line(closestPair.Point1, closestPair.Point2);
 
-                    if (FireAlarmViewModel.Instance.IsTreeConnection)
-                    {
-                        tree = Kruskal.FindMinimumSpanningTree(points, geometryFactory);
-                    }
-                    else if (FireAlarmViewModel.Instance.IsCircularConnection1)
-                    {
-                        tree = ConnectPointsNonCrossing(points, geometryFactory);
-                    }
-                    else if (FireAlarmViewModel.Instance.IsCircularConnection2)
-                    {
-                        tree = ConnectPointsNonCrossingMST(points, geometryFactory);
-                    }
-                    else
-                    {
-                        // 如果没有选中任何 RadioButton，您可以在这里处理该情况
-                        tree = new List<LineString>();
-                    }
+                    BlockTable blockTable = transaction.GetObject(database.BlockTableId, OpenMode.ForRead) as BlockTable;
+                    BlockTableRecord btr = transaction.GetObject(blockTable[BlockTableRecord.ModelSpace], OpenMode.ForRead) as BlockTableRecord;
 
-                    SetLayer(database, "E-WIRE", 1);
-                    BlockReference br1;
-                    BlockReference br2;
-                    const double Tolerance = 1e-3;
-
-                    foreach (var line in tree)
-                    {
-                        var startPoint = new Point3d(line.Coordinates[0].X, line.Coordinates[0].Y, 0);
-                        var endPoint = new Point3d(line.Coordinates[1].X, line.Coordinates[1].Y, 0);
-
-                        br1 = blockReferences.FirstOrDefault(b => Math.Abs(b.Position.X - startPoint.X) < Tolerance && Math.Abs(b.Position.Y - startPoint.Y) < Tolerance);
-                        br2 = blockReferences.FirstOrDefault(b => Math.Abs(b.Position.X - endPoint.X) < Tolerance && Math.Abs(b.Position.Y - endPoint.Y) < Tolerance);
-
-                        List<Point3d> point3DList1 = GetPoint3DCollection(br1);
-                        List<Point3d> point3DList2 = GetPoint3DCollection(br2);
-
-                        var closestPair = (from p1 in point3DList1
-                                           from p2 in point3DList2
-                                           orderby p1.DistanceTo(p2)
-                                           select new { Point1 = p1, Point2 = p2 }).First();
-
-                        Line wire = new Line(closestPair.Point1, closestPair.Point2);
-
-                        BlockTable blockTable = transaction.GetObject(database.BlockTableId, OpenMode.ForRead) as BlockTable;
-                        BlockTableRecord btr = transaction.GetObject(blockTable[BlockTableRecord.ModelSpace], OpenMode.ForRead) as BlockTableRecord;
-
-                        btr.UpgradeOpen();
-                        btr.AppendEntity(wire);
-                        transaction.AddNewlyCreatedDBObject(wire, true);
-                        btr.DowngradeOpen();
-                    }
-
-                    transaction.Commit();
+                    btr.UpgradeOpen();
+                    btr.AppendEntity(wire);
+                    transaction.AddNewlyCreatedDBObject(wire, true);
+                    btr.DowngradeOpen();
                 }
             }
-            catch (System.Exception)
-            {
-
-            }
+            transaction.Commit();
         }
 
         public static List<LineString> ConnectPointsNonCrossingMST(List<Point> points, GeometryFactory geometry)
@@ -1040,7 +994,6 @@ namespace TimeIsLife.CADCommand
             return result;
         }
 
-
         public static List<LineString> ConnectPointsNonCrossing(List<Point> points, GeometryFactory geometry)
         {
             int count = points.Count;
@@ -1094,7 +1047,6 @@ namespace TimeIsLife.CADCommand
         {
             return Math.Sqrt(Math.Pow(p1.X - p2.X, 2) + Math.Pow(p1.Y - p2.Y, 2));
         }
-
 
         public List<Point> ConvertCoordinatesToPoints(GeometryFactory geometryFactory, List<BlockReference> blockReferences)
         {

@@ -1,4 +1,3 @@
-D:\github\TimeIsLife\TimeIsLife\bin\Debug\AcDbMgd.dll
 D:\github\TimeIsLife\TimeIsLife\bin\Debug\Ref\DotNetARX.dll
 D:\github\TimeIsLife\TimeIsLife\bin\Debug\Image\卸载.ico
 D:\github\TimeIsLife\TimeIsLife\bin\Debug\Image\注册有礼.ico
@@ -72,6 +71,7 @@ D:\github\TimeIsLife\TimeIsLife\bin\Debug\AdUIMgd.dll
 D:\github\TimeIsLife\TimeIsLife\bin\Debug\AdUiPalettes.dll
 D:\github\TimeIsLife\TimeIsLife\bin\Debug\AdWindows.dll
 D:\github\TimeIsLife\TimeIsLife\bin\Debug\AcCoreMgd.dll
+D:\github\TimeIsLife\TimeIsLife\bin\Debug\AcDbMgd.dll
 D:\github\TimeIsLife\TimeIsLife\bin\Debug\acdbmgdbrep.dll
 D:\github\TimeIsLife\TimeIsLife\bin\Debug\CommunityToolkit.Mvvm.dll
 D:\github\TimeIsLife\TimeIsLife\bin\Debug\CommunityToolkit.Mvvm.pdb

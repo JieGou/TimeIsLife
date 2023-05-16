@@ -1,0 +1,45 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CodeSnippets xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+	<CodeSnippet Format="1.0.0">
+		<Header>
+			<Title>TimeIsLife</Title>
+			<Author>TimeIsLife</Author>
+			<Description>添加公共字段和初始化方法</Description>
+			<Shortcut>timeislife</Shortcut>
+		</Header>
+		<Snippet>
+			<Code Language="CSharp">
+				<![CDATA[private Document document;
+        private Database database;
+        private Editor editor;
+        private Matrix3d ucsToWcsMatrix3d;
+
+        void Initialize()
+        {
+            document = Application.DocumentManager.CurrentDocument;
+            database = document.Database;
+            editor = document.Editor;
+            ucsToWcsMatrix3d = editor.CurrentUserCoordinateSystem;
+        }
+
+        /// <summary>
+        /// 获取NTS指定精度和标准坐标系的GeometryFactory实例
+        /// </summary>
+        /// <returns>GeometryFactory实例</returns>
+        private GeometryFactory CreateGeometryFactory()
+        {
+            //NTS
+            var precisionModel = new PrecisionModel(1000d);
+            GeometryPrecisionReducer precisionReducer = new GeometryPrecisionReducer(precisionModel);
+            NetTopologySuite.NtsGeometryServices.Instance = new NetTopologySuite.NtsGeometryServices
+                (
+                NetTopologySuite.Geometries.Implementation.CoordinateArraySequenceFactory.Instance,
+                precisionModel,
+                4326
+                );
+            return NtsGeometryServices.Instance.CreateGeometryFactory(precisionModel);
+        }]]>
+			</Code>
+		</Snippet>
+	</CodeSnippet>
+</CodeSnippets>

@@ -355,6 +355,7 @@
     <None Include="FA\FA-37-区域显示器.dwg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="Snippet\TimeIsLife Command.snippet" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Accord.MachineLearning">
@@ -491,6 +492,9 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="TestDwg\" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Snippet\TimeIsLife.snippet" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

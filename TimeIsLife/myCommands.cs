@@ -6,6 +6,10 @@ using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
 using Autodesk.AutoCAD.Runtime;
 
+using NetTopologySuite.Geometries;
+using NetTopologySuite.Precision;
+using NetTopologySuite;
+
 using System;
 
 // 该行不是必需的，但是可以提高加载性能
@@ -26,13 +30,16 @@ namespace TimeIsLife
         public void MyCommand() // This method can have any name
         {
             // Put your command code here
-            Document doc = Application.DocumentManager.MdiActiveDocument;
-            Editor ed;
-            if (doc != null)
-            {
-                ed = doc.Editor;
-                ed.WriteMessage("Hello, this is your first command.");
 
+            #region 样板
+            Initialize();
+            GeometryFactory geometryFactory = CreateGeometryFactory();
+            #endregion
+
+            if (document != null)
+            {
+                editor = document.Editor;
+                editor.WriteMessage("Hello, this is your first command.");
             }
         }
 
@@ -71,6 +78,37 @@ namespace TimeIsLife
             return 1;
         }
 
+
+        private Document document;
+        private Database database;
+        private Editor editor;
+        private Matrix3d ucsToWcsMatrix3d;
+
+        void Initialize()
+        {
+            document = Application.DocumentManager.CurrentDocument;
+            database = document.Database;
+            editor = document.Editor;
+            ucsToWcsMatrix3d = editor.CurrentUserCoordinateSystem;
+        }
+
+        /// <summary>
+        /// 获取NTS指定精度和标准坐标系的GeometryFactory实例
+        /// </summary>
+        /// <returns>GeometryFactory实例</returns>
+        private GeometryFactory CreateGeometryFactory()
+        {
+            //NTS
+            var precisionModel = new PrecisionModel(1000d);
+            GeometryPrecisionReducer precisionReducer = new GeometryPrecisionReducer(precisionModel);
+            NetTopologySuite.NtsGeometryServices.Instance = new NetTopologySuite.NtsGeometryServices
+                (
+                NetTopologySuite.Geometries.Implementation.CoordinateArraySequenceFactory.Instance,
+                precisionModel,
+                4326
+                );
+            return NtsGeometryServices.Instance.CreateGeometryFactory(precisionModel);
+        }
     }
 
 }

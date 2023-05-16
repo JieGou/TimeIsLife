@@ -9,7 +9,7 @@
         <Setter Property="BorderThickness" Value="1" />
 
     </Style>
-    
+
     <SolidColorBrush x:Key="Expander.Static.Circle.Stroke" Color="#FF333333" />
     <SolidColorBrush x:Key="Expander.Static.Circle.Fill" Color="#FFFFFFFF" />
     <SolidColorBrush x:Key="Expander.Static.Arrow.Stroke" Color="#FF333333" />

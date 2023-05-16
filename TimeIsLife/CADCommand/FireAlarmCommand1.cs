@@ -692,6 +692,7 @@ namespace TimeIsLife.CADCommand
         [CommandMethod("_FF_LayoutEquipment")]
         public void _FF_LayoutEquipment()
         {
+
             Initialize();
 
             const string createFloorTableSql = @"
@@ -798,8 +799,10 @@ namespace TimeIsLife.CADCommand
                     }
 
                     //过滤器
-                    TypedValueList typedValues = new TypedValueList();
-                    typedValues.Add(typeof(Polyline));
+                    TypedValueList typedValues = new TypedValueList
+                    {
+                        typeof(Polyline)
+                    };
                     SelectionFilter selectionFilter1 = new SelectionFilter(typedValues);
                     Point3dCollection point3DCollection1 = area.Point3dCollection.TransformBy(ucsToWcsMatrix3d.Inverse());
                     SelectionSet selectionSet = editor.GetSelectionSet(SelectString.SelectCrossingPolygon, null, selectionFilter1, point3DCollection1);

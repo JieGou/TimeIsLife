@@ -17,8 +17,7 @@
         <Setter Property="ItemTemplate">
             <Setter.Value>
                 <DataTemplate>
-                    <TextBlock VerticalAlignment="Center" Text="{Binding}">
-                    </TextBlock>
+                    <TextBlock VerticalAlignment="Center" Text="{Binding}" />
                 </DataTemplate>
             </Setter.Value>
         </Setter>

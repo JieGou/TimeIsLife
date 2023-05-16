@@ -33,6 +33,7 @@ namespace TimeIsLife.CADCommand
 {
     class ToolCommand
     {
+
         private Document document;
         private Database database;
         private Editor editor;
@@ -44,6 +45,24 @@ namespace TimeIsLife.CADCommand
             database = document.Database;
             editor = document.Editor;
             ucsToWcsMatrix3d = editor.CurrentUserCoordinateSystem;
+        }
+
+        /// <summary>
+        /// 获取NTS指定精度和标准坐标系的GeometryFactory实例
+        /// </summary>
+        /// <returns>GeometryFactory实例</returns>
+        private GeometryFactory CreateGeometryFactory()
+        {
+            //NTS
+            var precisionModel = new PrecisionModel(1000d);
+            GeometryPrecisionReducer precisionReducer = new GeometryPrecisionReducer(precisionModel);
+            NetTopologySuite.NtsGeometryServices.Instance = new NetTopologySuite.NtsGeometryServices
+                (
+                NetTopologySuite.Geometries.Implementation.CoordinateArraySequenceFactory.Instance,
+                precisionModel,
+                4326
+                );
+            return NtsGeometryServices.Instance.CreateGeometryFactory(precisionModel);
         }
 
         #region FF_QuickUcs
@@ -258,139 +277,121 @@ namespace TimeIsLife.CADCommand
         [CommandMethod("F3_ConnectLines")]
         public void F3_ConnectLines()
         {
+
             Initialize();
+            GeometryFactory geometryFactory = CreateGeometryFactory();
 
             string s1 = "\n作用：多个块按照最近距离自动连线。";
             string s2 = "\n操作方法：框选对象";
             string s3 = "\n注意事项：块不能锁定";
             editor.WriteMessage(s1 + s2 + s3);
 
-            //NTS
-            var precisionModel = new PrecisionModel(1000d);
-            GeometryPrecisionReducer precisionReducer = new GeometryPrecisionReducer(precisionModel);
-            NetTopologySuite.NtsGeometryServices.Instance = new NetTopologySuite.NtsGeometryServices
-                (
-                NetTopologySuite.Geometries.Implementation.CoordinateArraySequenceFactory.Instance,
-                precisionModel,
-                4326
-                );
-            GeometryFactory geometryFactory = NtsGeometryServices.Instance.CreateGeometryFactory(precisionModel);
+            using Transaction transaction = database.TransactionManager.StartOpenCloseTransaction();
+            Point3d startPoint3D = new Point3d();
+            Point3d endPoint3D = new Point3d();
 
-            try
+            Matrix3d matrix3D = editor.CurrentUserCoordinateSystem;
+            PromptPointOptions promptPointOptions;
+
+            promptPointOptions = new PromptPointOptions("\n 请选择第一个角点：");
+            PromptPointResult ppr = editor.GetPoint(promptPointOptions);
+
+            if (ppr.Status == PromptStatus.OK)
             {
-                using (Transaction transaction = database.TransactionManager.StartOpenCloseTransaction())
-                {
-                    Point3d startPoint3D = new Point3d();
-                    Point3d endPoint3D = new Point3d();
+                startPoint3D = ppr.Value;
+            }
+            else
+            {
+                transaction.Abort();
+                return;
+            }
 
-                    Matrix3d matrix3D = editor.CurrentUserCoordinateSystem;
-                    PromptPointOptions promptPointOptions;
+            database.AddLineType2("DASHED");
 
-                    promptPointOptions = new PromptPointOptions("\n 请选择第一个角点：");
-                    PromptPointResult ppr = editor.GetPoint(promptPointOptions);
+            // 初始化矩形
+            Polyline polyLine = new Polyline();
+            for (int i = 0; i < 4; i++)
+            {
+                polyLine.AddVertexAt(i, new Point2d(0, 0), 0, 0, 0);
+            }
+            polyLine.Closed = true;
+            polyLine.Linetype = "DASHED";
+            polyLine.Transparency = new Transparency(128);
+            polyLine.ColorIndex = 31;
+            polyLine.LinetypeScale = 1000 / database.Ltscale;
 
-                    if (ppr.Status == PromptStatus.OK)
-                    {
-                        startPoint3D = ppr.Value;
-                    }
-                    else
-                    {
-                        transaction.Abort();
-                        return;
-                    }
+            UcsSelectJig ucsSelectJig = new UcsSelectJig(startPoint3D, polyLine);
+            PromptResult promptResult = editor.Drag(ucsSelectJig);
+            if (promptResult.Status == PromptStatus.OK)
+            {
+                endPoint3D = ucsSelectJig.endPoint3d.TransformBy(matrix3D.Inverse());
+            }
+            else
+            {
+                transaction.Abort();
+                return;
+            }
 
-                    database.AddLineType2("DASHED");
-
-                    // 初始化矩形
-                    Polyline polyLine = new Polyline();
-                    for (int i = 0; i < 4; i++)
-                    {
-                        polyLine.AddVertexAt(i, new Point2d(0, 0), 0, 0, 0);
-                    }
-                    polyLine.Closed = true;
-                    polyLine.Linetype = "DASHED";
-                    polyLine.Transparency = new Transparency(128);
-                    polyLine.ColorIndex = 31;
-                    polyLine.LinetypeScale = 1000 / database.Ltscale;
-
-                    UcsSelectJig ucsSelectJig = new UcsSelectJig(startPoint3D, polyLine);
-                    PromptResult promptResult = editor.Drag(ucsSelectJig);
-                    if (promptResult.Status == PromptStatus.OK)
-                    {
-                        endPoint3D = ucsSelectJig.endPoint3d.TransformBy(matrix3D.Inverse());
-                    }
-                    else
-                    {
-                        transaction.Abort();
-                        return;
-                    }
-
-                    Point3dCollection point3DCollection = GetPoint3DCollection(startPoint3D, endPoint3D, matrix3D);
-                    TypedValueList typedValues = new TypedValueList
+            Point3dCollection point3DCollection = GetPoint3DCollection(startPoint3D, endPoint3D, matrix3D);
+            TypedValueList typedValues = new TypedValueList
                     {
                         typeof(BlockReference),
                         { DxfCode.LayerName, "E-EQUIP" }
                     };
-                    SelectionFilter selectionFilter = new SelectionFilter(typedValues);
-                    PromptSelectionResult promptSelectionResult = editor.SelectCrossingPolygon(point3DCollection, selectionFilter);
-                    if (promptSelectionResult.Status != PromptStatus.OK)
-                    {
-                        transaction.Abort();
-                        return;
-                    }
-                    List<BlockReference> blockReferences = new List<BlockReference>();
-                    SelectionSet selectionSet = promptSelectionResult.Value;
-                    foreach (var id in selectionSet.GetObjectIds())
-                    {
-                        BlockReference blockReference = transaction.GetObject(id, OpenMode.ForRead) as BlockReference;
-                        if (blockReference == null) continue;
-                        LayerTableRecord layerTableRecord = transaction.GetObject(blockReference.LayerId, OpenMode.ForRead) as LayerTableRecord;
-                        if (layerTableRecord.IsLocked == true) continue;
-                        if (GetPoint3DCollection(blockReference).Count == 0) continue;
-                        blockReferences.Add(blockReference);
-                    }
-
-                    var points = ConvertCoordinatesToPoints(geometryFactory, blockReferences);
-                    var tree = Kruskal.FindMinimumSpanningTree(points, geometryFactory);
-                    SetLayer(database, "E-WIRE", 1);
-                    BlockReference br1;
-                    BlockReference br2;
-                    const double Tolerance = 1e-3;
-
-                    foreach (var line in tree)
-                    {
-                        var startPoint = new Point3d(line.Coordinates[0].X, line.Coordinates[0].Y, 0);
-                        var endPoint = new Point3d(line.Coordinates[1].X, line.Coordinates[1].Y, 0);
-
-                        br1 = blockReferences.FirstOrDefault(b => Math.Abs(b.Position.X - startPoint.X) < Tolerance && Math.Abs(b.Position.Y - startPoint.Y) < Tolerance);
-                        br2 = blockReferences.FirstOrDefault(b => Math.Abs(b.Position.X - endPoint.X) < Tolerance && Math.Abs(b.Position.Y - endPoint.Y) < Tolerance);
-
-                        List<Point3d> point3DList1 = GetPoint3DCollection(br1);
-                        List<Point3d> point3DList2 = GetPoint3DCollection(br2);
-
-                        var closestPair = (from p1 in point3DList1
-                                           from p2 in point3DList2
-                                           orderby p1.DistanceTo(p2)
-                                           select new { Point1 = p1, Point2 = p2 }).First();
-
-                        Line wire = new Line(closestPair.Point1, closestPair.Point2);
-
-                        BlockTable blockTable = transaction.GetObject(database.BlockTableId, OpenMode.ForRead) as BlockTable;
-                        BlockTableRecord btr = transaction.GetObject(blockTable[BlockTableRecord.ModelSpace], OpenMode.ForRead) as BlockTableRecord;
-
-                        btr.UpgradeOpen();
-                        btr.AppendEntity(wire);
-                        transaction.AddNewlyCreatedDBObject(wire, true);
-                        btr.DowngradeOpen();
-                    }
-
-                    transaction.Commit();
-                }
-            }
-            catch (System.Exception)
+            SelectionFilter selectionFilter = new SelectionFilter(typedValues);
+            PromptSelectionResult promptSelectionResult = editor.SelectCrossingPolygon(point3DCollection, selectionFilter);
+            if (promptSelectionResult.Status != PromptStatus.OK)
             {
-
+                transaction.Abort();
+                return;
             }
+            List<BlockReference> blockReferences = new List<BlockReference>();
+            SelectionSet selectionSet = promptSelectionResult.Value;
+            foreach (var id in selectionSet.GetObjectIds())
+            {
+                BlockReference blockReference = transaction.GetObject(id, OpenMode.ForRead) as BlockReference;
+                if (blockReference == null) continue;
+                LayerTableRecord layerTableRecord = transaction.GetObject(blockReference.LayerId, OpenMode.ForRead) as LayerTableRecord;
+                if (layerTableRecord.IsLocked == true) continue;
+                if (GetPoint3DCollection(blockReference).Count == 0) continue;
+                blockReferences.Add(blockReference);
+            }
+
+            var points = ConvertCoordinatesToPoints(geometryFactory, blockReferences);
+            var tree = Kruskal.FindMinimumSpanningTree(points, geometryFactory);
+            SetLayer(database, "E-WIRE", 1);
+            BlockReference br1;
+            BlockReference br2;
+            const double Tolerance = 1e-3;
+
+            foreach (var line in tree)
+            {
+                var startPoint = new Point3d(line.Coordinates[0].X, line.Coordinates[0].Y, 0);
+                var endPoint = new Point3d(line.Coordinates[1].X, line.Coordinates[1].Y, 0);
+
+                br1 = blockReferences.FirstOrDefault(b => Math.Abs(b.Position.X - startPoint.X) < Tolerance && Math.Abs(b.Position.Y - startPoint.Y) < Tolerance);
+                br2 = blockReferences.FirstOrDefault(b => Math.Abs(b.Position.X - endPoint.X) < Tolerance && Math.Abs(b.Position.Y - endPoint.Y) < Tolerance);
+
+                List<Point3d> point3DList1 = GetPoint3DCollection(br1);
+                List<Point3d> point3DList2 = GetPoint3DCollection(br2);
+
+                var closestPair = (from p1 in point3DList1
+                                   from p2 in point3DList2
+                                   orderby p1.DistanceTo(p2)
+                                   select new { Point1 = p1, Point2 = p2 }).First();
+
+                Line wire = new Line(closestPair.Point1, closestPair.Point2);
+
+                BlockTable blockTable = transaction.GetObject(database.BlockTableId, OpenMode.ForRead) as BlockTable;
+                BlockTableRecord btr = transaction.GetObject(blockTable[BlockTableRecord.ModelSpace], OpenMode.ForRead) as BlockTableRecord;
+
+                btr.UpgradeOpen();
+                btr.AppendEntity(wire);
+                transaction.AddNewlyCreatedDBObject(wire, true);
+                btr.DowngradeOpen();
+            }
+
+            transaction.Commit();
         }
 
         private void SetLayer(Database db, string layerName, int colorIndex)
@@ -721,113 +722,82 @@ namespace TimeIsLife.CADCommand
             string s2 = "\n操作方法：框选对象，设置旋转角度（默认ucs的x轴为0度，逆时针选择为正）";
             string s3 = "\n注意事项：";
             editor.WriteMessage(s1 + s2 + s3);
-            try
+
+            using Transaction transaction = database.TransactionManager.StartOpenCloseTransaction();
+
+            Point3d startPoint3D = new Point3d();
+            Point3d endPoint3D = new Point3d();
+
+            PromptPointOptions promptPointOptions = new PromptPointOptions($"\n 请选择第一个角点:");
+            PromptPointResult promptPointResult = editor.GetPoint(promptPointOptions);
+
+            if (promptPointResult.Status == PromptStatus.OK)
             {
-                using (Transaction transaction = database.TransactionManager.StartOpenCloseTransaction())
-                {
-                    double angle = 0;
-                    Point3d startPoint3D = new Point3d();
-                    Point3d endPoint3D = new Point3d();
-                    Matrix3d matrix3D = editor.CurrentUserCoordinateSystem;
-
-                    PromptPointOptions promptPointOptions1 = new PromptPointOptions($"\n 请选择第一个角点：[块的角度(A)]<{angle}>");
-                    promptPointOptions1.Keywords.Add("A");
-                    promptPointOptions1.AppendKeywordsToMessage = false;
-
-                    PromptPointResult promptPointResult1;
-                    promptPointResult1 = editor.GetPoint(promptPointOptions1);
-                    while (promptPointResult1.Status == PromptStatus.Keyword)
-                    {
-                        switch (promptPointResult1.StringResult)
-                        {
-                            case "A":
-                                PromptDoubleOptions promptDoubleOptions = new PromptDoubleOptions($"\n 请输入块角度<{angle}>：");
-                                PromptDoubleResult promptDoubleResult = editor.GetDouble(promptDoubleOptions);
-                                if (promptDoubleResult.Status == PromptStatus.OK)
-                                {
-                                    angle = promptDoubleResult.Value;
-                                }
-                                PromptPointOptions promptPointOptions = new PromptPointOptions($"\n 请选择第一个角点：[块的角度(A)]<{angle}>");
-                                promptPointOptions.Keywords.Add("A");
-                                promptPointOptions.AppendKeywordsToMessage = false;
-                                promptPointResult1 = editor.GetPoint(promptPointOptions);
-                                break;
-                            default:
-                                break;
-                        }
-                    }
-
-                    if (promptPointResult1.Status == PromptStatus.OK)
-                    {
-                        startPoint3D = promptPointResult1.Value;
-                    }
-                    else
-                    {
-                        transaction.Abort();
-                        return;
-                    }
-
-                    database.AddLineType2("DASHED");
-                    // 初始化矩形
-                    Polyline polyLine = new Polyline();
-                    for (int i = 0; i < 4; i++)
-                    {
-                        polyLine.AddVertexAt(i, new Point2d(0, 0), 0, 0, 0);
-                    }
-                    polyLine.Closed = true;
-                    polyLine.Linetype = "DASHED";
-                    polyLine.Transparency = new Transparency(128);
-                    polyLine.ColorIndex = 31;
-                    polyLine.LinetypeScale = 1000 / database.Ltscale;
-
-                    UcsSelectJig ucsSelectJig = new UcsSelectJig(startPoint3D, polyLine);
-                    PromptResult promptResult = editor.Drag(ucsSelectJig);
-                    if (promptResult.Status == PromptStatus.OK)
-                    {
-                        endPoint3D = ucsSelectJig.endPoint3d.TransformBy(matrix3D.Inverse());
-                    }
-                    else
-                    {
-                        transaction.Abort();
-                        return;
-                    }
-
-                    Point3dCollection point3DCollection = GetPoint3DCollection(startPoint3D, endPoint3D, matrix3D);
-
-                    TypedValueList typedValues = new TypedValueList();
-                    typedValues.Add(typeof(BlockReference));
-                    SelectionFilter selectionFilter = new SelectionFilter(typedValues);
-                    PromptSelectionResult promptSelectionResult = editor.SelectCrossingPolygon(point3DCollection, selectionFilter);
-
-                    List<BlockReference> blockReferences = new List<BlockReference>();
-                    SelectionSet selectionSet = promptSelectionResult.Value;
-                    if (selectionSet.Count == 0)
-                    {
-                        transaction.Abort();
-                    }
-                    foreach (var id in selectionSet.GetObjectIds())
-                    {
-                        BlockReference blockReference = transaction.GetObject(id, OpenMode.ForRead) as BlockReference;
-                        if (blockReference == null) continue;
-                        LayerTableRecord layerTableRecord = transaction.GetObject(blockReference.LayerId, OpenMode.ForRead) as LayerTableRecord;
-                        if (layerTableRecord.IsLocked == true) continue;
-                        blockReferences.Add(blockReference);
-                    }
-                    foreach (BlockReference blockReference in blockReferences)
-                    {
-                        blockReference.UpgradeOpen();
-                        blockReference.TransformBy(matrix3D.Inverse());
-                        blockReference.Rotation = Math.PI / 180 * angle;
-                        blockReference.TransformBy(matrix3D);
-                        blockReference.DowngradeOpen();
-                    }
-                    transaction.Commit();
-                }
+                startPoint3D = promptPointResult.Value;
             }
-            catch (System.Exception)
+            else
             {
-
+                transaction.Abort();
+                return;
             }
+
+            database.AddLineType2("DASHED");
+            // 初始化矩形
+            Polyline polyLine = new Polyline();
+            for (int i = 0; i < 4; i++)
+            {
+                polyLine.AddVertexAt(i, new Point2d(0, 0), 0, 0, 0);
+            }
+            polyLine.Closed = true;
+            polyLine.Linetype = "DASHED";
+            polyLine.Transparency = new Transparency(128);
+            polyLine.ColorIndex = 31;
+            polyLine.LinetypeScale = 1000 / database.Ltscale;
+
+            UcsSelectJig ucsSelectJig = new UcsSelectJig(startPoint3D, polyLine);
+            PromptResult promptResult = editor.Drag(ucsSelectJig);
+            if (promptResult.Status == PromptStatus.OK)
+            {
+                endPoint3D = ucsSelectJig.endPoint3d.TransformBy(ucsToWcsMatrix3d.Inverse());
+            }
+            else
+            {
+                transaction.Abort();
+                return;
+            }
+
+            Point3dCollection point3DCollection = GetPoint3DCollection(startPoint3D, endPoint3D, ucsToWcsMatrix3d);
+
+            TypedValueList typedValues = new TypedValueList
+            {
+                typeof(BlockReference)
+            };
+            SelectionFilter selectionFilter = new SelectionFilter(typedValues);
+            PromptSelectionResult promptSelectionResult = editor.SelectCrossingPolygon(point3DCollection, selectionFilter);
+            List<BlockReference> blockReferences = new List<BlockReference>();
+            SelectionSet selectionSet = promptSelectionResult.Value;
+            if (selectionSet == null)
+            {
+                transaction.Abort();
+                return;
+            }
+            foreach (var id in selectionSet.GetObjectIds())
+            {
+                BlockReference blockReference = transaction.GetObject(id, OpenMode.ForRead) as BlockReference;
+                if (blockReference == null) continue;
+                LayerTableRecord layerTableRecord = transaction.GetObject(blockReference.LayerId, OpenMode.ForRead) as LayerTableRecord;
+                if (layerTableRecord.IsLocked == true) continue;
+                blockReferences.Add(blockReference);
+            }
+            foreach (BlockReference blockReference in blockReferences)
+            {
+                blockReference.UpgradeOpen();
+                blockReference.TransformBy(ucsToWcsMatrix3d.Inverse());
+                blockReference.Rotation = 0;
+                blockReference.TransformBy(ucsToWcsMatrix3d);
+                blockReference.DowngradeOpen();
+            }
+            transaction.Commit();
         }
         #endregion
 
@@ -890,71 +860,69 @@ namespace TimeIsLife.CADCommand
                 TextStyleTable textStyleTable = (TextStyleTable)transaction.GetObject(database.TextStyleTableId, OpenMode.ForRead, false);
                 foreach (ObjectId id in textStyleTable)
                 {
-                    using (TextStyleTableRecord textStyleTableRecord = (TextStyleTableRecord)transaction.GetObject(id, OpenMode.ForWrite, false))
+                    using TextStyleTableRecord textStyleTableRecord = (TextStyleTableRecord)transaction.GetObject(id, OpenMode.ForWrite, false);
+                    #region 校正windows系统字体
+                    if (textStyleTableRecord.Font.TypeFace != string.Empty)
                     {
-                        #region 校正windows系统字体
-                        if (textStyleTableRecord.Font.TypeFace != string.Empty)
+                        string fontFileFullName = string.Empty;
+
+                        FileInfo[] fis = sysDirInfo.GetFiles(textStyleTableRecord.FileName);
+                        if (fis.Length > 0)
                         {
-                            string fontFileFullName = string.Empty;
-
-                            FileInfo[] fis = sysDirInfo.GetFiles(textStyleTableRecord.FileName);
-                            if (fis.Length > 0)
-                            {
-                                fontFileFullName = fis[0].FullName;
-                            }
-                            else
-                            {
-                                fontFileFullName = FindFontFile(database, textStyleTableRecord.FileName);
-                            }
-
-                            if (fontFileFullName != string.Empty)
-                            {
-                                using (PrivateFontCollection privateFontCollection = new PrivateFontCollection())
-                                {
-                                    try
-                                    {
-                                        privateFontCollection.AddFontFile(fontFileFullName);
-
-                                        //更正文字样式的字体名
-                                        if (privateFontCollection.Families[0].Name != textStyleTableRecord.Font.TypeFace)
-                                        {
-                                            textStyleTableRecord.Font = new Autodesk.AutoCAD.GraphicsInterface.FontDescriptor(
-                                                privateFontCollection.Families[0].Name, textStyleTableRecord.Font.Bold, textStyleTableRecord.Font.Italic,
-                                                textStyleTableRecord.Font.CharacterSet, textStyleTableRecord.Font.PitchAndFamily
-                                                );
-                                        }
-                                    }
-                                    catch (System.Exception e)
-                                    {
-                                        editor.WriteMessage($"\n***错误***：{fontFileFullName}-{e.Message}");
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                //字体缺失,则用宋体代替
-                                textStyleTableRecord.FileName = "SimSun.ttf";
-                                textStyleTableRecord.Font = new Autodesk.AutoCAD.GraphicsInterface.FontDescriptor("宋体", false, false, 134, 2);
-                            }
+                            fontFileFullName = fis[0].FullName;
                         }
-                        #endregion
-                        #region 校正shx字体
                         else
                         {
-                            if (!textStyleTableRecord.IsShapeFile &&
-                                FindFontFile(database, textStyleTableRecord.FileName) == string.Empty)
-                            {
-                                textStyleTableRecord.FileName = "romans.shx";//用romans.shx代替
-                            }
+                            fontFileFullName = FindFontFile(database, textStyleTableRecord.FileName);
+                        }
 
-                            if (textStyleTableRecord.BigFontFileName != string.Empty &&
-                                FindFontFile(database, textStyleTableRecord.BigFontFileName) == string.Empty)
+                        if (fontFileFullName != string.Empty)
+                        {
+                            using (PrivateFontCollection privateFontCollection = new PrivateFontCollection())
                             {
-                                textStyleTableRecord.BigFontFileName = "hztxt.shx";//用gbcbig.shx代替
+                                try
+                                {
+                                    privateFontCollection.AddFontFile(fontFileFullName);
+
+                                    //更正文字样式的字体名
+                                    if (privateFontCollection.Families[0].Name != textStyleTableRecord.Font.TypeFace)
+                                    {
+                                        textStyleTableRecord.Font = new Autodesk.AutoCAD.GraphicsInterface.FontDescriptor(
+                                            privateFontCollection.Families[0].Name, textStyleTableRecord.Font.Bold, textStyleTableRecord.Font.Italic,
+                                            textStyleTableRecord.Font.CharacterSet, textStyleTableRecord.Font.PitchAndFamily
+                                            );
+                                    }
+                                }
+                                catch (System.Exception e)
+                                {
+                                    editor.WriteMessage($"\n***错误***：{fontFileFullName}-{e.Message}");
+                                }
                             }
                         }
-                        #endregion
+                        else
+                        {
+                            //字体缺失,则用宋体代替
+                            textStyleTableRecord.FileName = "SimSun.ttf";
+                            textStyleTableRecord.Font = new Autodesk.AutoCAD.GraphicsInterface.FontDescriptor("宋体", false, false, 134, 2);
+                        }
                     }
+                    #endregion
+                    #region 校正shx字体
+                    else
+                    {
+                        if (!textStyleTableRecord.IsShapeFile &&
+                            FindFontFile(database, textStyleTableRecord.FileName) == string.Empty)
+                        {
+                            textStyleTableRecord.FileName = "romans.shx";//用romans.shx代替
+                        }
+
+                        if (textStyleTableRecord.BigFontFileName != string.Empty &&
+                            FindFontFile(database, textStyleTableRecord.BigFontFileName) == string.Empty)
+                        {
+                            textStyleTableRecord.BigFontFileName = "hztxt.shx";//用gbcbig.shx代替
+                        }
+                    }
+                    #endregion
                 }
 
                 transaction.Commit();

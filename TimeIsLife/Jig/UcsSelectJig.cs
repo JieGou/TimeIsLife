@@ -16,13 +16,13 @@ namespace TimeIsLife.Jig
 {
     class UcsSelectJig : DrawJig
     {
-        Point3d startPoint3d;
+        Point3d _startPoint3d;
         public Point3d endPoint3d;
-        Polyline polyline;
-        public UcsSelectJig(Point3d basePoint3d, Polyline polyline)
+        Polyline _polyline;
+        public UcsSelectJig(Point3d startPoint3d, Polyline polyline)
         {
-            this.startPoint3d = basePoint3d;
-            this.polyline = polyline;
+            this._startPoint3d = startPoint3d;
+            this._polyline = polyline;
         }
         protected override SamplerStatus Sampler(JigPrompts prompts)
         {
@@ -39,23 +39,23 @@ namespace TimeIsLife.Jig
                 UseBasePoint = true
             };
             PromptPointResult result = prompts.AcquirePoint(options);
-            Point3d tempPoint3d = result.Value;
             if (result.Status == PromptStatus.Cancel)
             {
                 return SamplerStatus.Cancel;
             }
+            Point3d tempPoint3d = result.Value;
             if (tempPoint3d != endPoint3d)
             {
                 endPoint3d = tempPoint3d;
                 //将WCS点转化为UCS点
                 Point3d uscEndPoint3d = endPoint3d.TransformBy(matrixd.Inverse());
-                polyline.Normal = Vector3d.ZAxis;
-                polyline.Elevation = 0.0;
-                polyline.SetPointAt(0, new Point2d(startPoint3d.X, startPoint3d.Y));
-                polyline.SetPointAt(1, new Point2d(startPoint3d.X, uscEndPoint3d.Y));
-                polyline.SetPointAt(2, new Point2d(uscEndPoint3d.X, uscEndPoint3d.Y));
-                polyline.SetPointAt(3, new Point2d(uscEndPoint3d.X, startPoint3d.Y));
-                polyline.TransformBy(matrixd);
+                _polyline.Normal = Vector3d.ZAxis;
+                _polyline.Elevation = 0.0;
+                _polyline.SetPointAt(0, new Point2d(_startPoint3d.X, _startPoint3d.Y));
+                _polyline.SetPointAt(1, new Point2d(_startPoint3d.X, uscEndPoint3d.Y));
+                _polyline.SetPointAt(2, new Point2d(uscEndPoint3d.X, uscEndPoint3d.Y));
+                _polyline.SetPointAt(3, new Point2d(uscEndPoint3d.X, _startPoint3d.Y));
+                _polyline.TransformBy(matrixd);
                 return SamplerStatus.OK;
             }
             else
@@ -66,7 +66,7 @@ namespace TimeIsLife.Jig
 
         protected override bool WorldDraw(WorldDraw draw)
         {
-            draw.Geometry.Draw(polyline);
+            draw.Geometry.Draw(_polyline);
             return true;
         }
     }
