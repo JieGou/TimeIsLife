@@ -822,6 +822,7 @@ namespace TimeIsLife.CADCommand
                             SelectionFilter selectionFilter2 = new SelectionFilter(dbTextTypedValues);
                             SelectionSet dbTextSelectionSet = editor.GetSelectionSet(SelectString.SelectCrossingPolygon, null, selectionFilter2, polyline.GetPoint3dCollection(ucsToWcsMatrix3d.Inverse()));
                             List<string> notes = new List<string>();
+                            if (dbTextSelectionSet == null || dbTextSelectionSet.Count == 0) continue;
                             foreach (var textId in dbTextSelectionSet.GetObjectIds())
                             {
                                 DBText dBText = transaction.GetObject(textId, OpenMode.ForRead) as DBText;
