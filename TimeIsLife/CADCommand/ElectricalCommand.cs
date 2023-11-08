@@ -54,37 +54,24 @@ namespace TimeIsLife.CADCommand
         [CommandMethod("FF_Tools")]
         public void FF_Tools()
         {
-            if (paletteSet == null) // 如果面板没有被创建
+            if (paletteSet == null) // 判断面板是否创建；true:未创建；false:已创建；
             {
                 // 创建面板
-                // 创建一个新的PaletteSet实例，并设置其标题为"TimeIsLife"
-                paletteSet = new PaletteSet("TimeIsLife")
+                paletteSet = new PaletteSet("TimeIsLife") // 创建一个新的PaletteSet实例，并设置其标题为"TimeIsLife"
                 {
-                    // 设置PaletteSet的DockEnabled属性为DockSides.Left，使其可以停靠在窗口的左侧
-                    DockEnabled = DockSides.Left,
-
-                    // 设置标题栏位置
-                    TitleBarLocation = PaletteSetTitleBarLocation.Left
+                    DockEnabled = DockSides.Left, // 设置PaletteSet的DockEnabled属性为DockSides.Left，使其可以停靠在窗口的左侧
+                    TitleBarLocation = PaletteSetTitleBarLocation.Left // 设置标题栏位置
                 };
-
-                // 创建一个ElementHost实例
-                ElementHost host = new ElementHost
+                ElementHost host = new ElementHost // 创建一个ElementHost实例
                 {
                     AutoSize = true,
                     Dock = DockStyle.Fill,
-
-                    // 将ElectricalView实例分配给ElementHost的Child属性
-                    Child = new ElectricalView()
+                    Child = new ElectricalView() // 将ElectricalView实例分配给ElementHost的Child属性
                 };
-
-                // 将ElementHost实例添加到PaletteSet中，并将其命名为"电气"
-                paletteSet.Add("电气", host);
-                // 设置PaletteSet的Dock属性                
+                paletteSet.Add("电气", host); // 将ElementHost实例添加到PaletteSet中，并将其命名为"电气"
             }
-
-            // 设置面板可见
-            paletteSet.Visible = true;
-            paletteSet.Dock = DockSides.Left;
+            paletteSet.Visible = true; // 设置面板可见
+            paletteSet.Dock = DockSides.Left; // 设置PaletteSet的Dock属性
         }
         #endregion
 
