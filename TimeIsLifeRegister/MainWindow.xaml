@@ -24,20 +24,11 @@
     <Grid>
         <DockPanel>
             <Label Content="CAD版本选择：" DockPanel.Dock="Top" />
-            <!--<Button
-                Command="{Binding RefreshCommand}"
-                Content="重新加载"
-                DockPanel.Dock="Top" />-->
             <Button
                 Command="{Binding RegiserCommand}"
                 Content="确定"
                 DockPanel.Dock="Bottom" />            
             <ListBox ItemsSource="{Binding Cads}" SelectionMode="Multiple">
-                <!--<Behaviors:Interaction.Triggers>
-                    <Behaviors:EventTrigger EventName="SelectionChanged">
-                        <Behaviors:InvokeCommandAction Command="{Binding SelectedCommand}" />
-                    </Behaviors:EventTrigger>
-                </Behaviors:Interaction.Triggers>-->
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <StackPanel Orientation="Horizontal">

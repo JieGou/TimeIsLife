@@ -86,6 +86,9 @@
     <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CADCommand\BaseInfo.cs" />
+    <Compile Include="CADCommand\FF_FAS.cs" />
+    <Compile Include="CADCommand\FF_LoadYdbFile.cs" />
     <Compile Include="Helper\DatabaseHelper.cs" />
     <Compile Include="Model\Beam.cs" />
     <Compile Include="Model\BeamSect.cs" />
