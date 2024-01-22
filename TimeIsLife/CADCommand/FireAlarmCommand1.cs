@@ -905,6 +905,7 @@ namespace TimeIsLife.CADCommand
                         }
                     }
 
+
                     //#region 设备连线
                     //var points = ConvertCoordinatesToPoints(geometryFactory, allCoordinates);
                     //var tree = Kruskal.FindMinimumSpanningTree(points, geometryFactory);
@@ -993,7 +994,74 @@ namespace TimeIsLife.CADCommand
         }
 
 
+        public List<Tuple<Coordinate, Coordinate>> CreateOptimalRingConnections(List<Coordinate> points)
+        {
+            if (points.Count < 3)
+                throw new ArgumentException("至少需要3个点来形成环形连线。");
 
+            var sortedPoints = GreedySortPoints(points);
+            var connections = new List<Tuple<Coordinate, Coordinate>>();
+
+            for (int i = 0; i < sortedPoints.Count; i++)
+            {
+                connections.Add(new Tuple<Coordinate, Coordinate>(sortedPoints[i], sortedPoints[(i + 1) % sortedPoints.Count]));
+            }
+
+            return connections;
+        }
+
+        public List<Tuple<Coordinate, Coordinate>> CreateMinimumSpanningTreeConnections(List<Coordinate> points)
+        {
+            var connections = new List<Tuple<Coordinate, Coordinate>>();
+            var connectedPoints = new HashSet<Coordinate>();
+            var remainingPoints = new HashSet<Coordinate>(points);
+
+            if (points.Count < 2)
+                throw new ArgumentException("至少需要2个点来形成树形连线。");
+
+            var currentPoint = points[0];
+            connectedPoints.Add(currentPoint);
+            remainingPoints.Remove(currentPoint);
+
+            while (remainingPoints.Count > 0)
+            {
+                var closestPoint = remainingPoints.Select(p => new { Point = p, Distance = Distance(currentPoint, p) })
+                                                  .OrderBy(x => x.Distance)
+                                                  .First()
+                                                  .Point;
+
+                connections.Add(new Tuple<Coordinate, Coordinate>(currentPoint, closestPoint));
+                connectedPoints.Add(closestPoint);
+                remainingPoints.Remove(closestPoint);
+                currentPoint = closestPoint;
+            }
+
+            return connections;
+        }
+
+        private List<Coordinate> GreedySortPoints(List<Coordinate> points)
+        {
+            var sortedPoints = new List<Coordinate>();
+            var remainingPoints = new List<Coordinate>(points);
+            var currentPoint = remainingPoints[0];
+            sortedPoints.Add(currentPoint);
+            remainingPoints.RemoveAt(0);
+
+            while (remainingPoints.Count > 0)
+            {
+                remainingPoints = remainingPoints.OrderBy(p => Distance(currentPoint, p)).ToList();
+                currentPoint = remainingPoints[0];
+                sortedPoints.Add(currentPoint);
+                remainingPoints.RemoveAt(0);
+            }
+
+            return sortedPoints;
+        }
+
+        private double Distance(Coordinate p1, Coordinate p2)
+        {
+            return p1.Distance(p2);
+        }
 
         private ObjectId LoadBlockIntoDatabase(Database database, Editor editor,string blockName)
         {
