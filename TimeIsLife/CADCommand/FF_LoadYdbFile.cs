@@ -152,21 +152,18 @@ namespace TimeIsLife.CADCommand
                                 blockId = newDatabase.Insert(blockName, blcokDatabase, true);
                                 foreach (var slab in slabs)
                                 {
-                                    bool bo = true;
+                                    
                                     if (slab.Floor.LevelB != floor.LevelB) continue;
 
                                     SetLayer(newDatabase, $"slab-{slab.Thickness.ToString()}mm", 7);
 
                                     Polyline polyline = new Polyline();
                                     Point2dCollection point2Ds = GetPoint2Ds(slab);
+                                    if (point2Ds != null)
                                     polyline.CreatePolyline(point2Ds);
                                     newDatabase.AddToModelSpace(polyline);
 
-                                    if (slab.Thickness == 0)
-                                    {
-                                        if (!FireAlarmViewModel.Instance.IsLayoutAtHole) bo = false;
-                                    }
-                                    if (!bo) continue;
+                                    if (slab.Thickness == 0) continue;
                                     //在板的重心添加感烟探测器
                                     SetLayer(newDatabase, $"E-EQUIP-{slab.Thickness.ToString()}", 4);
 
@@ -374,6 +371,7 @@ namespace TimeIsLife.CADCommand
         {
             Point2dCollection points = new Point2dCollection();
             int n = slab.VertexX.Split(',').Length;
+            if(n<= 1) { return points; }
             for (int i = 0; i < n; i++)
             {
                 points.Add(new Point2d(double.Parse(slab.VertexX.Split(',')[i % (n - 1)]), double.Parse(slab.VertexY.Split(',')[i % (n - 1)])));
