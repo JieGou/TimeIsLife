@@ -21,25 +21,53 @@ namespace TimeIsLife.View
     /// FireAlarmWindow.xaml 的交互逻辑
     /// </summary>
     public partial class FireAlarmWindow : Window
-    {
-        public static FireAlarmWindow instance;
-        private FireAlarmWindowViewModel viewModel;
+    {        
+        private readonly FireAlarmWindowViewModel viewModel;
         public FireAlarmWindow()
         {
             InitializeComponent();
             viewModel = new FireAlarmWindowViewModel();
             DataContext = viewModel;
-            instance = this;
+        }
+
+        private static FireAlarmWindow _instance;
+
+        public static FireAlarmWindow Instance
+        {
+            get
+            {
+                if (_instance == null || !_instance.IsLoaded)
+                    _instance = new FireAlarmWindow();
+                return _instance;
+            }
         }
 
         private void Window_Closing(object sender, CancelEventArgs e)
         {
-            viewModel.SaveState();
+            // 确保状态保存操作是安全的
+            try
+            {
+                viewModel.SaveState();
+            }
+            catch (Exception ex)
+            {
+                // 处理异常，如记录日志
+                MessageBox.Show("发生错误: " + ex.Message); // 提供详细的错误信息
+            }
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            viewModel.LoadState();
+            // 确保状态加载操作是安全的
+            try
+            {
+                viewModel.LoadState();
+            }
+            catch (Exception ex)
+            {
+                // 处理异常，如记录日志
+                MessageBox.Show("发生错误: " + ex.Message); // 提供详细的错误信息
+            }
         }
 
     }

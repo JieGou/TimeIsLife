@@ -119,8 +119,7 @@ namespace TimeIsLife.ViewModel
         public IRelayCommand OpenFireAlarmWindowCommand { get; }
         void OpenFireAlarmWindow()
         {
-            FireAlarmWindow fireAlarmWindow = new FireAlarmWindow();
-            fireAlarmWindow.Show();
+            Application.DocumentManager.MdiActiveDocument.SendStringToExecute("FF_LayoutEquipment\n", true, false, false);
         }
 
         public IRelayCommand FireAlarmCeilingCommand { get; }

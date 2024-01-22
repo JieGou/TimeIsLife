@@ -115,7 +115,7 @@
                     Template="{StaticResource ButtonTemplate}" />
 
             </StackPanel>
-            <DockPanel
+            <!--<DockPanel
                 Margin="3"
                 DockPanel.Dock="Bottom"
                 LastChildFill="True">
@@ -132,7 +132,7 @@
                     DockPanel.Dock="Right"
                     Template="{StaticResource ButtonTemplate}" />
                 <TextBox Template="{DynamicResource TextBoxTemplate}" Text="{Binding AreaFileName, Mode=TwoWay}" />
-            </DockPanel>
+            </DockPanel>-->
             <DockPanel Margin="3" DockPanel.Dock="Bottom">
                 <Button
                     Width="100"

@@ -21,7 +21,6 @@ namespace TimeIsLife.Model
             {
                 return new Point3d(X, Y, Z);
             }
-
         }
     }
 }
