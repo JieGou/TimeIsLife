@@ -301,41 +301,6 @@ namespace TimeIsLife.CADCommand
             editor.WriteMessage("\n结束");
         }
 
-        private void SetLayer(Database db, string layerName, int colorIndex)
-        {
-            using (Transaction tr = db.TransactionManager.StartTransaction())
-            {
-                LayerTable layerTable = (LayerTable)tr.GetObject(db.LayerTableId, OpenMode.ForRead);
-
-                // Create new layer if it doesn't exist
-                ObjectId layerId;
-                if (!layerTable.Has(layerName))
-                {
-                    LayerTableRecord layerTableRecord = new LayerTableRecord
-                    {
-                        Name = layerName
-                    };
-
-                    layerTable.UpgradeOpen();
-                    layerId = layerTable.Add(layerTableRecord);
-                    tr.AddNewlyCreatedDBObject(layerTableRecord, add: true);
-                    layerTable.DowngradeOpen();
-                }
-                else
-                {
-                    layerId = layerTable[layerName];
-                }
-
-                // Set layer color
-                LayerTableRecord layerTableRecordToModify = (LayerTableRecord)tr.GetObject(layerId, OpenMode.ForWrite);
-                layerTableRecordToModify.Color = Color.FromColorIndex(ColorMethod.ByAci, (short)colorIndex);
-
-                // Set current layer
-                db.Clayer = layerId;
-
-                tr.Commit();
-            }
-        }
 
         /// <summary>
         /// 根据已知点集合求重心

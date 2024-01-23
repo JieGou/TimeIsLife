@@ -137,6 +137,14 @@ namespace TimeIsLife.ViewModel
             get => slabThickness;
             set => SetProperty(ref slabThickness, value);
         }
+
+        private bool sCircularConnectionSelected;
+        public bool IsCircularConnectionSelected
+        {
+            get => sCircularConnectionSelected;
+            set => SetProperty(ref sCircularConnectionSelected, value);
+        }
+        
         #endregion
 
         #region 委托
@@ -158,7 +166,7 @@ namespace TimeIsLife.ViewModel
         {
             FireAlarmWindow.Instance.Hide();
 
-            Document document = Application.DocumentManager.CurrentDocument;
+            Document document = Autodesk.AutoCAD.ApplicationServices.Core.Application.DocumentManager.CurrentDocument;
             Database database = document.Database;
             Editor editor = document.Editor;
 
@@ -174,10 +182,12 @@ namespace TimeIsLife.ViewModel
                     BlockTableRecord paperSpace = transaction.GetObject(blockTable[BlockTableRecord.PaperSpace], OpenMode.ForRead) as BlockTableRecord;
 
                     //选择选项
-                    PromptSelectionOptions promptSelectionOptions = new PromptSelectionOptions();
-                    promptSelectionOptions.SingleOnly = true;
-                    promptSelectionOptions.RejectObjectsOnLockedLayers = true;
-                    promptSelectionOptions.MessageForAdding = $"选择表示楼层区域的闭合多段线";
+                    PromptSelectionOptions promptSelectionOptions = new PromptSelectionOptions
+                    {
+                        SingleOnly = true,
+                        RejectObjectsOnLockedLayers = true,
+                        MessageForAdding = $"选择表示楼层区域的闭合多段线"
+                    };
 
                     //过滤器
                     TypedValueList typedValues = new TypedValueList()
@@ -209,13 +219,11 @@ namespace TimeIsLife.ViewModel
             }
             FireAlarmWindow.Instance.ShowDialog();
         }
-
-
         public void GetFireAreaLayerName()
         {
             FireAlarmWindow.Instance.Hide();
 
-            Document document = Application.DocumentManager.CurrentDocument;
+            Document document = Autodesk.AutoCAD.ApplicationServices.Core.Application.DocumentManager.CurrentDocument;
             Database database = document.Database;
             Editor editor = document.Editor;
 
@@ -231,10 +239,12 @@ namespace TimeIsLife.ViewModel
                     BlockTableRecord paperSpace = transaction.GetObject(blockTable[BlockTableRecord.PaperSpace], OpenMode.ForRead) as BlockTableRecord;
 
                     //选择选项
-                    PromptSelectionOptions promptSelectionOptions = new PromptSelectionOptions();
-                    promptSelectionOptions.SingleOnly = true;
-                    promptSelectionOptions.RejectObjectsOnLockedLayers = true;
-                    promptSelectionOptions.MessageForAdding = $"选择表示防火分区的闭合多段线";
+                    PromptSelectionOptions promptSelectionOptions = new PromptSelectionOptions
+                    {
+                        SingleOnly = true,
+                        RejectObjectsOnLockedLayers = true,
+                        MessageForAdding = $"选择表示防火分区的闭合多段线"
+                    };
 
                     //过滤器
                     TypedValueList typedValues = new TypedValueList()
@@ -270,7 +280,7 @@ namespace TimeIsLife.ViewModel
         public void GetRoomAreaLayerName()
         {
             FireAlarmWindow.Instance.Hide();
-            Document document = Application.DocumentManager.CurrentDocument;
+            Document document = Autodesk.AutoCAD.ApplicationServices.Core.Application.DocumentManager.CurrentDocument;
             Database database = document.Database;
             Editor editor = document.Editor;
 
@@ -286,10 +296,12 @@ namespace TimeIsLife.ViewModel
                     BlockTableRecord paperSpace = transaction.GetObject(blockTable[BlockTableRecord.PaperSpace], OpenMode.ForRead) as BlockTableRecord;
 
                     //选择选项
-                    PromptSelectionOptions promptSelectionOptions = new PromptSelectionOptions();
-                    promptSelectionOptions.SingleOnly = true;
-                    promptSelectionOptions.RejectObjectsOnLockedLayers = true;
-                    promptSelectionOptions.MessageForAdding = $"选择表示房间区域的闭合多段线";
+                    PromptSelectionOptions promptSelectionOptions = new PromptSelectionOptions
+                    {
+                        SingleOnly = true,
+                        RejectObjectsOnLockedLayers = true,
+                        MessageForAdding = $"选择表示房间区域的闭合多段线"
+                    };
 
                     //过滤器
                     TypedValueList typedValues = new TypedValueList()
@@ -321,7 +333,6 @@ namespace TimeIsLife.ViewModel
             }
             FireAlarmWindow.Instance.ShowDialog();
         }
-
         public void GetYdbFileName()
         {
             HideFireAlarmWindow();
@@ -335,13 +346,11 @@ namespace TimeIsLife.ViewModel
             LoadYdbDatabase(ydbFileName);
             ShowFireAlarmWindow();
         }
-
         private void HideFireAlarmWindow()
         {
             FireAlarmWindow.Instance.Hide();
             AreaFloors.Clear();
         }
-
         private bool TryOpenFileDialog(out string ydbFileName)
         {
             OpenFileDialog openFileDialog = new OpenFileDialog
@@ -363,171 +372,196 @@ namespace TimeIsLife.ViewModel
             ydbFileName = null;
             return false;
         }
-
         private void ShowErrorAndRetry()
         {
             MessageBox.Show("请重新选择YDB文件！");
             FireAlarmWindow.Instance.ShowDialog();
         }
-
-        private void LoadYdbDatabase(string ydbFileName)
+        public void LoadYdbDatabase(string ydbFileName)
         {
-            using (SQLiteConnection ydbConn = new SQLiteConnection($"Data Source={ydbFileName}"))
-            {
-                string sqlFloor = "SELECT f.ID,f.Name,f.LevelB,f.Height FROM tblFloor AS f WHERE f.Height != 0";
-                IEnumerable<Floor> floors = ydbConn.Query<Floor>(sqlFloor);
+            using SQLiteConnection ydbConn = new SQLiteConnection($"Data Source={ydbFileName}");
+            string sqlFloor = "SELECT f.ID,f.Name,f.LevelB,f.Height FROM tblFloor AS f WHERE f.Height != 0";
+            IEnumerable<Floor> floors = ydbConn.Query<Floor>(sqlFloor);
 
-                foreach (var floor in floors)
+            foreach (var floor in floors)
+            {
+                AreaFloor area = new AreaFloor
                 {
-                    AreaFloor area = new AreaFloor
-                    {
-                        Name = floor.Name,
-                        Level = floor.LevelB
-                    };
-                    AreaFloors.Add(area);
-                }
+                    Name = floor.Name,
+                    Level = floor.LevelB
+                };
+                AreaFloors.Add(area);
             }
         }
-
         private void ShowFireAlarmWindow()
         {
             FireAlarmWindow.Instance.ShowDialog();
         }
-
-
         private void GetFloorArea() 
         {
             if (SelectedAreaFloor == null)
             {
                 MessageBox.Show("未选择楼层！");
+                return;
             }
-            else
+
+            if (Instance.FloorAreaLayerName.IsNullOrWhiteSpace())
             {
-                FireAlarmWindow.Instance.Hide();
-
-                Document document = Application.DocumentManager.CurrentDocument;
-                Database database = document.Database;
-                Editor editor = document.Editor;
-                Matrix3d ucsToWcsMatrix3d = editor.CurrentUserCoordinateSystem;
-
-                if (Instance.FloorAreaLayerName.IsNullOrWhiteSpace())
-                {
-                    MessageBox.Show("请先完成楼层图层的选择！");
-                    FireAlarmWindow.Instance.ShowDialog();
-                    return;
-                }
-
-                using (Transaction transaction = database.TransactionManager.StartTransaction())
-                {
-                    try
-                    {
-                        //获取块表
-                        BlockTable blockTable = transaction.GetObject(database.BlockTableId, OpenMode.ForRead) as BlockTable;
-                        //获取模型空间
-                        BlockTableRecord modelSpace = transaction.GetObject(blockTable[BlockTableRecord.ModelSpace], OpenMode.ForRead) as BlockTableRecord;
-                        //获取图纸空间
-                        BlockTableRecord paperSpace = transaction.GetObject(blockTable[BlockTableRecord.PaperSpace], OpenMode.ForRead) as BlockTableRecord;
-
-                        //选择选项
-                        PromptEntityOptions promptEntityOptions = new PromptEntityOptions("\n选择楼层");
-                        PromptEntityResult result = editor.GetEntity(promptEntityOptions);
-                        if (result.Status != PromptStatus.OK)
-                        {
-                            MessageBox.Show("重新选择楼层！");
-                            FireAlarmWindow.Instance.ShowDialog();
-                            return;
-                        }
-                        Polyline polyline = transaction.GetObject(result.ObjectId, OpenMode.ForRead) as Polyline;
-                        if (polyline == null)
-                        {
-                            MessageBox.Show("选择对象不是多段线！");
-                            FireAlarmWindow.Instance.ShowDialog();
-                            return;
-                        }
-                        FireAlarmWindowViewModel.Instance.SelectedAreaFloor.X = polyline.GeometricExtents.MinPoint.X;
-                        FireAlarmWindowViewModel.Instance.SelectedAreaFloor.Y = polyline.GeometricExtents.MinPoint.Y;
-                        FireAlarmWindowViewModel.Instance.SelectedAreaFloor.Z = polyline.GeometricExtents.MinPoint.Z;
-                        //FireAlarmWindowViewModel.instance.SelectedAreaFloor.MinPoint3d = polyline.GeometricExtents.MinPoint;
-                        //FireAlarmWindowViewModel.instance.SelectedAreaFloor.MaxPoint3d = polyline.GeometricExtents.MaxPoint;
-
-                        //过滤器
-                        TypedValueList typedValues = new TypedValueList
-                    {
-                        { DxfCode.LayerName, FireAlarmWindowViewModel.Instance.FloorAreaLayerName },
-                        typeof(DBText)
-                    };
-
-                        SelectionSet selectionSet = editor.GetSelectionSet(SelectString.SelectWindowPolygon, null,
-                            new SelectionFilter(typedValues), polyline.GetPoint3dCollection(ucsToWcsMatrix3d));
-                        if (selectionSet == null)
-                        {
-                            MessageBox.Show("缺少楼层名称！");
-                            FireAlarmWindow.Instance.ShowDialog();
-                            return;
-                        }
-                        else if (selectionSet.Count != 1)
-                        {
-                            MessageBox.Show("包含多个楼层名称！");
-                            FireAlarmWindow.Instance.ShowDialog();
-                            return;
-                        }
-
-                        DBText dBText = transaction.GetObject(selectionSet.GetObjectIds()[0], OpenMode.ForRead) as DBText;
-                        if (dBText == null)
-                        {
-                            MessageBox.Show("未包含楼层名称！");
-                            FireAlarmWindow.Instance.ShowDialog();
-                            return;
-                        }
-                        FireAlarmWindowViewModel.Instance.SelectedAreaFloor.Name = dBText.TextString;
-                        Model.Area area = new Model.Area
-                        {
-                            Floor = FireAlarmWindowViewModel.Instance.SelectedAreaFloor,
-                            Kind = 0,
-                            VertexX = polyline.GetXValues(),
-                            VertexY = polyline.GetYValues(),
-                            VertexZ = polyline.GetZValues()
-                        };
-                        FireAlarmWindowViewModel.Instance.Areas.Add(area);
-                        transaction.Commit();
-                    }
-                    catch
-                    {
-                        transaction.Abort();
-                    }
-                }
-                FireAlarmWindow.Instance.ShowDialog();
-
-            }
-        }
-
-
-
-        private void GetBasePoint()
-        {
-            if (Instance.SelectedAreaFloor == null)
-            {
-                MessageBox.Show("未选择基点对应的楼层！");
-                FireAlarmWindow.Instance.ShowDialog();
+                MessageBox.Show("请先完成楼层图层的选择！");
                 return;
             }
 
             FireAlarmWindow.Instance.Hide();
 
-            Document document = Application.DocumentManager.CurrentDocument;
+            Document document = Autodesk.AutoCAD.ApplicationServices.Core.Application.DocumentManager.CurrentDocument;
             Database database = document.Database;
             Editor editor = document.Editor;
             Matrix3d ucsToWcsMatrix3d = editor.CurrentUserCoordinateSystem;
 
+            using Transaction transaction = database.TransactionManager.StartTransaction();
+            try
+            {
+                //获取块表
+                BlockTable blockTable = transaction.GetObject(database.BlockTableId, OpenMode.ForRead) as BlockTable;
+                //获取模型空间
+                BlockTableRecord modelSpace = transaction.GetObject(blockTable[BlockTableRecord.ModelSpace], OpenMode.ForRead) as BlockTableRecord;
+                //获取图纸空间
+                BlockTableRecord paperSpace = transaction.GetObject(blockTable[BlockTableRecord.PaperSpace], OpenMode.ForRead) as BlockTableRecord;
+
+                //选择选项
+                PromptEntityOptions promptEntityOptions = new PromptEntityOptions("\n选择楼层");
+                PromptEntityResult result = editor.GetEntity(promptEntityOptions);
+                if (result.Status != PromptStatus.OK)
+                {
+                    MessageBox.Show("重新选择楼层！");
+                    FireAlarmWindow.Instance.ShowDialog();
+                    return;
+                }
+                Polyline polyline = transaction.GetObject(result.ObjectId, OpenMode.ForRead) as Polyline;
+                if (polyline == null)
+                {
+                    MessageBox.Show("选择对象不是多段线！");
+                    FireAlarmWindow.Instance.ShowDialog();
+                    return;
+                }
+                Instance.SelectedAreaFloor.X = polyline.GeometricExtents.MinPoint.X;
+                Instance.SelectedAreaFloor.Y = polyline.GeometricExtents.MinPoint.Y;
+                Instance.SelectedAreaFloor.Z = polyline.GeometricExtents.MinPoint.Z;
+                //FireAlarmWindowViewModel.instance.SelectedAreaFloor.MinPoint3d = polyline.GeometricExtents.MinPoint;
+                //FireAlarmWindowViewModel.instance.SelectedAreaFloor.MaxPoint3d = polyline.GeometricExtents.MaxPoint;
+
+                //过滤器
+                TypedValueList typedValues = new TypedValueList
+                    {
+                        { DxfCode.LayerName, Instance.FloorAreaLayerName },
+                        typeof(DBText)
+                    };
+
+                SelectionSet selectionSet = editor.GetSelectionSet(SelectString.SelectWindowPolygon, null,
+                    new SelectionFilter(typedValues), polyline.GetPoint3dCollection(ucsToWcsMatrix3d));
+                if (selectionSet == null)
+                {
+                    MessageBox.Show("缺少楼层名称！");
+                    FireAlarmWindow.Instance.ShowDialog();
+                    return;
+                }
+                else if (selectionSet.Count != 1)
+                {
+                    MessageBox.Show("包含多个楼层名称！");
+                    FireAlarmWindow.Instance.ShowDialog();
+                    return;
+                }
+
+                DBText dBText = transaction.GetObject(selectionSet.GetObjectIds()[0], OpenMode.ForRead) as DBText;
+                if (dBText == null)
+                {
+                    MessageBox.Show("未包含楼层名称！");
+                    FireAlarmWindow.Instance.ShowDialog();
+                    return;
+                }
+                Instance.SelectedAreaFloor.Name = dBText.TextString;
+                Area area = new Model.Area
+                {
+                    Floor = Instance.SelectedAreaFloor,
+                    Kind = 0,
+                    VertexX = polyline.GetXValues(),
+                    VertexY = polyline.GetYValues(),
+                    VertexZ = polyline.GetZValues()
+                };
+                Instance.Areas.Add(area);
+                transaction.Commit();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"发生错误: {ex.Message}");
+                transaction.Abort();
+            }
+            finally
+            {
+                FireAlarmWindow.Instance.ShowDialog();
+            }
+        }
+        private void GetBasePoint()
+        {
+            if (Instance.SelectedAreaFloor == null)
+            {
+                MessageBox.Show("未选择基点对应的楼层！");
+                return;
+            }
+
+            FireAlarmWindow.Instance.Hide();
+
+            Document document = Autodesk.AutoCAD.ApplicationServices.Core.Application.DocumentManager.CurrentDocument;
+            Database database = document.Database;
+            Editor editor = document.Editor;
+            Matrix3d ucsToWcsMatrix3d = editor.CurrentUserCoordinateSystem;
+
+            
 
             using (Transaction transaction = database.TransactionManager.StartTransaction())
             {
                 try
-                {                    
-                    var ydbConn = new SQLiteConnection($"Data Source={Instance.YdbFileName}");
+                {
+                    List<Beam> beams = new List<Beam>();
+                    List<Wall> walls = new List<Wall>();
 
-                    //查询梁
-                    string sqlBeam = "SELECT b.ID,f.ID,f.LevelB,f.Height,bs.ID,bs.kind,bs.ShapeVal,bs.ShapeVal1,g.ID,j1.ID,j1.X,j1.Y,j2.ID,j2.X,j2.Y " +
+                    using (var ydbConn = new SQLiteConnection($"Data Source={Instance.YdbFileName}"))
+                    {
+                        ydbConn.Open();
+
+                        // 查询梁的逻辑
+                        beams = QueryBeams(ydbConn, Instance.SelectedAreaFloor.Level);
+
+                        // 查询墙的逻辑
+                        walls = QueryWalls(ydbConn, Instance.SelectedAreaFloor.Level);
+
+                        ydbConn.Close();
+                    }
+
+                    List<Polyline> polylines = GeneratePolylines(beams, walls);                    
+
+                    BasePointJig basePointJig = new BasePointJig(polylines);
+                    PromptResult promptResult = editor.Drag(basePointJig);
+                    if (promptResult.Status == PromptStatus.OK)
+                    {
+                        Instance.ReferenceBasePoint = basePointJig._point;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"发生错误: {ex.Message}");
+                }
+                finally
+                {
+                    transaction.Abort();
+                }
+            }
+            FireAlarmWindow.Instance.ShowDialog();
+        }
+        private List<Beam> QueryBeams(SQLiteConnection ydbConn, double level)
+        {
+            //查询梁
+            string sqlBeam = "SELECT b.ID,f.ID,f.LevelB,f.Height,bs.ID,bs.kind,bs.ShapeVal,bs.ShapeVal1,g.ID,j1.ID,j1.X,j1.Y,j2.ID,j2.X,j2.Y " +
                         "FROM tblBeamSeg AS b " +
                         "INNER JOIN tblFloor AS f on f.StdFlrID = b.StdFlrID " +
                         "INNER JOIN tblBeamSect AS bs on bs.ID = b.SectID " +
@@ -536,150 +570,145 @@ namespace TimeIsLife.ViewModel
                         "INNER JOIN tblJoint AS j2 on g.Jt2ID = j2.ID " +
                         "WHERE f.LevelB = @LevelB"; // add a WHERE clause to filter by f.LevelB
 
-                    Func<Beam, Floor, BeamSect, Grid, Joint, Joint, Beam> mappingBeam =
-                        (beam, floor, beamSect, grid, j1, j2) =>
-                        {
-                            grid.Joint1 = j1;
-                            grid.Joint2 = j2;
-                            beam.Grid = grid;
-                            beam.Floor = floor;
-                            beam.BeamSect = beamSect;
-                            return beam;
-                        };
-
-                    List<Beam> beams = ydbConn.Query(sqlBeam, mappingBeam,
-                        new { LevelB = FireAlarmWindowViewModel.Instance.SelectedAreaFloor.Level }).ToList();
-
-                    //查询墙
-                    string sqlWall = "SELECT w.ID,f.ID,f.LevelB,f.Height,ws.ID,ws.kind,ws.B,g.ID,j1.ID,j1.X,j1.Y,j2.ID,j2.X,j2.Y " +
-                        "FROM tblWallSeg AS w " +
-                        "INNER JOIN tblFloor AS f on f.StdFlrID = w.StdFlrID " +
-                        "INNER JOIN tblWallSect AS ws on ws.ID = w.SectID " +
-                        "INNER JOIN tblGrid AS g on g.ID = w.GridId " +
-                        "INNER JOIN tblJoint AS j1 on g.Jt1ID = j1.ID " +
-                        "INNER JOIN tblJoint AS j2 on g.Jt2ID = j2.ID " +
-                        "WHERE f.LevelB = @LevelB";
-
-                    Func<Wall, Floor, WallSect, Grid, Joint, Joint, Wall> mappingWall =
-                        (wall, floor, wallSect, grid, j1, j2) =>
-                        {
-                            grid.Joint1 = j1;
-                            grid.Joint2 = j2;
-                            wall.Grid = grid;
-                            wall.Floor = floor;
-                            wall.WallSect = wallSect;
-                            return wall;
-                        };
-                    List<Wall> walls = ydbConn.Query(sqlWall, mappingWall,
-                        new { LevelB = Instance.SelectedAreaFloor.Level }).ToList();
-                    //关闭数据库
-                    ydbConn.Close();
-
-                    //获取块表
-                    BlockTable blockTable = transaction.GetObject(database.BlockTableId, OpenMode.ForRead) as BlockTable;
-                    //获取模型空间
-                    BlockTableRecord modelSpace = transaction.GetObject(blockTable[BlockTableRecord.ModelSpace], OpenMode.ForRead) as BlockTableRecord;
-                    //获取图纸空间
-                    BlockTableRecord paperSpace = transaction.GetObject(blockTable[BlockTableRecord.PaperSpace], OpenMode.ForRead) as BlockTableRecord;
-
-
-                    List<Polyline> polylines = new List<Polyline>();
-                    #region 生成梁
-                    foreach (var beam in beams)
-                    {
-                        Point2d p1 = new Point2d(beam.Grid.Joint1.X, beam.Grid.Joint1.Y);
-                        Point2d p2 = new Point2d(beam.Grid.Joint2.X, beam.Grid.Joint2.Y);
-                        double startWidth = 0;
-                        double endWidth = 0;
-                        double height = 0;
-
-                        Polyline polyline = new Polyline();
-                        switch (beam.BeamSect.Kind)
-                        {
-                            case 1:
-                                startWidth = endWidth = double.Parse(beam.BeamSect.ShapeVal.Split(',')[1]);
-                                height = double.Parse(beam.BeamSect.ShapeVal.Split(',')[2]);
-
-                                polyline.AddVertexAt(0, p1, 0, startWidth, endWidth);
-                                polyline.AddVertexAt(1, p2, 0, startWidth, endWidth);
-                                break;
-                            case 2:
-                                startWidth = endWidth = double.Parse(beam.BeamSect.ShapeVal.Split(',')[3]);
-                                height = double.Parse(beam.BeamSect.ShapeVal.Split(',')[2]);
-
-                                polyline.AddVertexAt(0, p1, 0, startWidth, endWidth);
-                                polyline.AddVertexAt(1, p2, 0, startWidth, endWidth);
-                                break;
-                            case 7:
-                                startWidth = endWidth = double.Parse(beam.BeamSect.ShapeVal.Split(',')[1]);
-                                height = double.Parse(beam.BeamSect.ShapeVal.Split(',')[2]);
-
-                                polyline.AddVertexAt(0, p1, 0, startWidth, endWidth);
-                                polyline.AddVertexAt(1, p2, 0, startWidth, endWidth);
-                                break;
-                            case 13:
-                                startWidth = endWidth = double.Parse(beam.BeamSect.ShapeVal.Split(',')[1]);
-                                height = double.Parse(beam.BeamSect.ShapeVal.Split(',')[2]);
-
-                                polyline.AddVertexAt(0, p1, 0, startWidth, endWidth);
-                                polyline.AddVertexAt(1, p2, 0, startWidth, endWidth);
-                                break;
-                            case 22:
-                                startWidth = endWidth = double.Parse(beam.BeamSect.ShapeVal.Split(',')[1]);
-                                height = Math.Min(double.Parse(beam.BeamSect.ShapeVal.Split(',')[3]), double.Parse(beam.BeamSect.ShapeVal.Split(',')[4]));
-
-                                polyline.AddVertexAt(0, p1, 0, startWidth, endWidth);
-                                polyline.AddVertexAt(1, p2, 0, startWidth, endWidth);
-                                break;
-                            case 26:
-                                startWidth = endWidth = double.Parse(beam.BeamSect.ShapeVal.Split(',')[5]);
-                                height = double.Parse(beam.BeamSect.ShapeVal.Split(',')[3]);
-
-                                polyline.AddVertexAt(0, p1, 0, startWidth, endWidth);
-                                polyline.AddVertexAt(1, p2, 0, startWidth, endWidth);
-                                break;
-
-                            default:
-                                startWidth = endWidth = double.Parse(beam.BeamSect.ShapeVal.Split(',')[1]);
-                                height = double.Parse(beam.BeamSect.ShapeVal.Split(',')[2]);
-
-                                polyline.AddVertexAt(0, p1, 0, startWidth, endWidth);
-                                polyline.AddVertexAt(1, p2, 0, startWidth, endWidth);
-                                break;
-                        }
-                        polylines.Add(polyline);
-                    }
-                    #endregion
-
-                    #region 生成墙
-                    foreach (var wall in walls)
-                    {
-                        Point2d p1 = new Point2d(wall.Grid.Joint1.X, wall.Grid.Joint1.Y);
-                        Point2d p2 = new Point2d(wall.Grid.Joint2.X, wall.Grid.Joint2.Y);
-                        int startWidth = wall.WallSect.B;
-                        int endWidth = wall.WallSect.B;
-
-                        Polyline polyline = new Polyline();
-                        polyline.AddVertexAt(0, p1, 0, startWidth, endWidth);
-                        polyline.AddVertexAt(1, p2, 0, startWidth, endWidth);
-                        polylines.Add(polyline);
-                    }
-                    #endregion
-
-                    BasePointJig basePointJig = new BasePointJig(polylines);
-                    PromptResult promptResult = editor.Drag(basePointJig);
-                    if (promptResult.Status == PromptStatus.OK)
-                    {
-                        Instance.ReferenceBasePoint = basePointJig._point;
-                    }
-                    transaction.Abort();
-                }
-                catch
+            Func<Beam, Floor, BeamSect, Grid, Joint, Joint, Beam> mappingBeam =
+                (beam, floor, beamSect, grid, j1, j2) =>
                 {
-                    transaction.Abort();
+                    grid.Joint1 = j1;
+                    grid.Joint2 = j2;
+                    beam.Grid = grid;
+                    beam.Floor = floor;
+                    beam.BeamSect = beamSect;
+                    return beam;
+                };
+
+            return ydbConn.Query(sqlBeam, mappingBeam,
+                new { LevelB = level }).ToList();
+        }
+        private List<Wall> QueryWalls(SQLiteConnection ydbConn, double level)
+        {
+            //查询墙
+            string sqlWall = "SELECT w.ID,f.ID,f.LevelB,f.Height,ws.ID,ws.kind,ws.B,g.ID,j1.ID,j1.X,j1.Y,j2.ID,j2.X,j2.Y " +
+                "FROM tblWallSeg AS w " +
+                "INNER JOIN tblFloor AS f on f.StdFlrID = w.StdFlrID " +
+                "INNER JOIN tblWallSect AS ws on ws.ID = w.SectID " +
+                "INNER JOIN tblGrid AS g on g.ID = w.GridId " +
+                "INNER JOIN tblJoint AS j1 on g.Jt1ID = j1.ID " +
+                "INNER JOIN tblJoint AS j2 on g.Jt2ID = j2.ID " +
+                "WHERE f.LevelB = @LevelB";
+
+            Func<Wall, Floor, WallSect, Grid, Joint, Joint, Wall> mappingWall =
+                (wall, floor, wallSect, grid, j1, j2) =>
+                {
+                    grid.Joint1 = j1;
+                    grid.Joint2 = j2;
+                    wall.Grid = grid;
+                    wall.Floor = floor;
+                    wall.WallSect = wallSect;
+                    return wall;
+                };
+            return ydbConn.Query(sqlWall, mappingWall,
+                new { LevelB = level }).ToList();
+        }
+        private List<Polyline> GeneratePolylines(List<Beam> beams, List<Wall> walls)
+        {
+            Document document = Autodesk.AutoCAD.ApplicationServices.Core.Application.DocumentManager.CurrentDocument;
+            Database database = document.Database;
+            Editor editor = document.Editor;
+            List<Polyline> polylines = new List<Polyline>();
+
+            using (Transaction transaction = database.TransactionManager.StartTransaction())
+            {
+                //获取块表
+                BlockTable blockTable = transaction.GetObject(database.BlockTableId, OpenMode.ForRead) as BlockTable;
+                //获取模型空间
+                BlockTableRecord modelSpace = transaction.GetObject(blockTable[BlockTableRecord.ModelSpace], OpenMode.ForRead) as BlockTableRecord;
+                //获取图纸空间
+                BlockTableRecord paperSpace = transaction.GetObject(blockTable[BlockTableRecord.PaperSpace], OpenMode.ForRead) as BlockTableRecord;
+
+                #region 生成梁
+                foreach (var beam in beams)
+                {
+                    Point2d p1 = new Point2d(beam.Grid.Joint1.X, beam.Grid.Joint1.Y);
+                    Point2d p2 = new Point2d(beam.Grid.Joint2.X, beam.Grid.Joint2.Y);
+                    double startWidth = 0;
+                    double endWidth = 0;
+                    double height = 0;
+
+                    Polyline polyline = new Polyline();
+                    switch (beam.BeamSect.Kind)
+                    {
+                        case 1:
+                            startWidth = endWidth = double.Parse(beam.BeamSect.ShapeVal.Split(',')[1]);
+                            height = double.Parse(beam.BeamSect.ShapeVal.Split(',')[2]);
+
+                            polyline.AddVertexAt(0, p1, 0, startWidth, endWidth);
+                            polyline.AddVertexAt(1, p2, 0, startWidth, endWidth);
+                            break;
+                        case 2:
+                            startWidth = endWidth = double.Parse(beam.BeamSect.ShapeVal.Split(',')[3]);
+                            height = double.Parse(beam.BeamSect.ShapeVal.Split(',')[2]);
+
+                            polyline.AddVertexAt(0, p1, 0, startWidth, endWidth);
+                            polyline.AddVertexAt(1, p2, 0, startWidth, endWidth);
+                            break;
+                        case 7:
+                            startWidth = endWidth = double.Parse(beam.BeamSect.ShapeVal.Split(',')[1]);
+                            height = double.Parse(beam.BeamSect.ShapeVal.Split(',')[2]);
+
+                            polyline.AddVertexAt(0, p1, 0, startWidth, endWidth);
+                            polyline.AddVertexAt(1, p2, 0, startWidth, endWidth);
+                            break;
+                        case 13:
+                            startWidth = endWidth = double.Parse(beam.BeamSect.ShapeVal.Split(',')[1]);
+                            height = double.Parse(beam.BeamSect.ShapeVal.Split(',')[2]);
+
+                            polyline.AddVertexAt(0, p1, 0, startWidth, endWidth);
+                            polyline.AddVertexAt(1, p2, 0, startWidth, endWidth);
+                            break;
+                        case 22:
+                            startWidth = endWidth = double.Parse(beam.BeamSect.ShapeVal.Split(',')[1]);
+                            height = Math.Min(double.Parse(beam.BeamSect.ShapeVal.Split(',')[3]), double.Parse(beam.BeamSect.ShapeVal.Split(',')[4]));
+
+                            polyline.AddVertexAt(0, p1, 0, startWidth, endWidth);
+                            polyline.AddVertexAt(1, p2, 0, startWidth, endWidth);
+                            break;
+                        case 26:
+                            startWidth = endWidth = double.Parse(beam.BeamSect.ShapeVal.Split(',')[5]);
+                            height = double.Parse(beam.BeamSect.ShapeVal.Split(',')[3]);
+
+                            polyline.AddVertexAt(0, p1, 0, startWidth, endWidth);
+                            polyline.AddVertexAt(1, p2, 0, startWidth, endWidth);
+                            break;
+
+                        default:
+                            startWidth = endWidth = double.Parse(beam.BeamSect.ShapeVal.Split(',')[1]);
+                            height = double.Parse(beam.BeamSect.ShapeVal.Split(',')[2]);
+
+                            polyline.AddVertexAt(0, p1, 0, startWidth, endWidth);
+                            polyline.AddVertexAt(1, p2, 0, startWidth, endWidth);
+                            break;
+                    }
+                    polylines.Add(polyline);
                 }
+                #endregion
+
+                #region 生成墙
+                foreach (var wall in walls)
+                {
+                    Point2d p1 = new Point2d(wall.Grid.Joint1.X, wall.Grid.Joint1.Y);
+                    Point2d p2 = new Point2d(wall.Grid.Joint2.X, wall.Grid.Joint2.Y);
+                    int startWidth = wall.WallSect.B;
+                    int endWidth = wall.WallSect.B;
+
+                    Polyline polyline = new Polyline();
+                    polyline.AddVertexAt(0, p1, 0, startWidth, endWidth);
+                    polyline.AddVertexAt(1, p2, 0, startWidth, endWidth);
+                    polylines.Add(polyline);
+                }
+                #endregion
+
             }
-            FireAlarmWindow.Instance.ShowDialog();
+            return polylines;
         }
 
         //public void SaveAreaFile()
@@ -705,16 +734,14 @@ namespace TimeIsLife.ViewModel
 
         public void Confirm()
         {
-            this.DialogResult = DialogResult.OK;
+            DialogResult = DialogResult.OK;
             FireAlarmWindow.Instance.Close();
         }
-
         public void Cancel()
         {
-            this.DialogResult= DialogResult.Cancel;
+            DialogResult = DialogResult.Cancel;
             FireAlarmWindow.Instance.Close();
         }
-
         public void SaveState()
         {
             CurrentState.FloorLayerName = this.FloorAreaLayerName;
@@ -736,7 +763,6 @@ namespace TimeIsLife.ViewModel
             string filePath = Path.Combine(directory, "FireAlarmWindowState.json");
             File.WriteAllText(filePath, json);
         }
-
         public void LoadState()
         {
             // 读取本地文件中的JSON字符串
@@ -748,14 +774,13 @@ namespace TimeIsLife.ViewModel
 
             // 将JSON字符串反序列化为State对象
             CurrentState = JsonConvert.DeserializeObject<FireAlarmWindowState>(json);
-            this.FloorAreaLayerName = CurrentState.FloorLayerName;
-            this.FireAreaLayerName = CurrentState.FireAlarmLayerName;
-            this.RoomAreaLayerName = CurrentState.RoomLayerName;
-            this.YdbFileName = CurrentState.YdbFileName;
+            FloorAreaLayerName = CurrentState.FloorLayerName;
+            FireAreaLayerName = CurrentState.FireAlarmLayerName;
+            RoomAreaLayerName = CurrentState.RoomLayerName;
+            YdbFileName = CurrentState.YdbFileName;
             //this.AreaFileName = CurrentState.AreaFileName;
-            this.SlabThickness = CurrentState.SlabThickness;
+            SlabThickness = CurrentState.SlabThickness;
         }
-
         #endregion
     }
 }

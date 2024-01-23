@@ -358,7 +358,7 @@ namespace TimeIsLife.CADCommand
             }
 
             var points = ConvertCoordinatesToPoints(geometryFactory, blockReferences);
-            var tree = Kruskal.FindMinimumSpanningTree(points, geometryFactory);
+            List<LineString> tree = Kruskal.FindMinimumSpanningTree(points, geometryFactory);
             SetLayer(database, "E-WIRE", 1);
             BlockReference br1;
             BlockReference br2;

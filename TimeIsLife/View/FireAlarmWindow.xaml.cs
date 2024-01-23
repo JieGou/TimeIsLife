@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Data.SQLite;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,7 +14,10 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 
+using TimeIsLife.Model;
 using TimeIsLife.ViewModel;
+
+using static TimeIsLife.CADCommand.FireAlarmCommand1;
 
 namespace TimeIsLife.View
 {
@@ -62,6 +66,10 @@ namespace TimeIsLife.View
             try
             {
                 viewModel.LoadState();
+                if (!string.IsNullOrEmpty(viewModel.YdbFileName))
+                {
+                    viewModel.LoadYdbDatabase(viewModel.YdbFileName);
+                }
             }
             catch (Exception ex)
             {
