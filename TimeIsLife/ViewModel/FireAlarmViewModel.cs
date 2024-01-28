@@ -125,7 +125,7 @@ namespace TimeIsLife.ViewModel
         public IRelayCommand FireAlarmCeilingCommand { get; }
         void FireAlarmCeiling()
         {
-            Application.DocumentManager.MdiActiveDocument.SendStringToExecute("FF_FireAlarmCeiling\n", true, false, false);
+            Application.DocumentManager.MdiActiveDocument.SendStringToExecute("FF_EquipmentConnectLine\n", true, false, false);
         }
     }
 }

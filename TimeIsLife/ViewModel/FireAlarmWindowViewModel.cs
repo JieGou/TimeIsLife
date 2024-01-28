@@ -158,7 +158,7 @@ namespace TimeIsLife.ViewModel
         //public IRelayCommand ApplyCommand { get; }
         public IRelayCommand ConfirmCommand { get; }
         public IRelayCommand CancelCommand { get; }
-        public DialogResult DialogResult { get; private set; }
+        public bool Result { get; private set; }
         #endregion
 
         #region 方法      
@@ -335,24 +335,9 @@ namespace TimeIsLife.ViewModel
         }
         public void GetYdbFileName()
         {
-            HideFireAlarmWindow();
-
-            if (!TryOpenFileDialog(out string ydbFileName))
-            {
-                ShowErrorAndRetry();
-                return;
-            }
-
-            LoadYdbDatabase(ydbFileName);
-            ShowFireAlarmWindow();
-        }
-        private void HideFireAlarmWindow()
-        {
             FireAlarmWindow.Instance.Hide();
             AreaFloors.Clear();
-        }
-        private bool TryOpenFileDialog(out string ydbFileName)
-        {
+
             OpenFileDialog openFileDialog = new OpenFileDialog
             {
                 Filter = "盈建科数据库(*.ydb)|*.ydb|所有文件|*.*",
@@ -365,18 +350,21 @@ namespace TimeIsLife.ViewModel
 
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
-                ydbFileName = openFileDialog.FileName;
-                return true;
+                YdbFileName = openFileDialog.FileName;
+                LoadYdbDatabase(YdbFileName);
+                FireAlarmWindow.Instance.ShowDialog();
+                return;
             }
+            else
+            {
+                MessageBox.Show("请重新选择YDB文件！");
+                FireAlarmWindow.Instance.ShowDialog();
+                return;
+            }         
 
-            ydbFileName = null;
-            return false;
+            
         }
-        private void ShowErrorAndRetry()
-        {
-            MessageBox.Show("请重新选择YDB文件！");
-            FireAlarmWindow.Instance.ShowDialog();
-        }
+        
         public void LoadYdbDatabase(string ydbFileName)
         {
             using SQLiteConnection ydbConn = new SQLiteConnection($"Data Source={ydbFileName}");
@@ -393,10 +381,7 @@ namespace TimeIsLife.ViewModel
                 AreaFloors.Add(area);
             }
         }
-        private void ShowFireAlarmWindow()
-        {
-            FireAlarmWindow.Instance.ShowDialog();
-        }
+        
         private void GetFloorArea() 
         {
             if (SelectedAreaFloor == null)
@@ -734,12 +719,12 @@ namespace TimeIsLife.ViewModel
 
         public void Confirm()
         {
-            DialogResult = DialogResult.OK;
+            Result = true;
             FireAlarmWindow.Instance.Close();
         }
         public void Cancel()
         {
-            DialogResult = DialogResult.Cancel;
+            Result = false;
             FireAlarmWindow.Instance.Close();
         }
         public void SaveState()

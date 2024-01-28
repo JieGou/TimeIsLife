@@ -22,62 +22,23 @@
     <StackPanel>
         <Button
             Command="{Binding OpenFireAlarmWindowCommand}"
-            Content="自动布置感烟、感温探测器"
+            Content="设备布置"
             Template="{StaticResource ButtonTemplate}" />
         <Button
             Command="{Binding FireAlarmCeilingCommand}"
-            Content="吊顶区域布置感烟、感温探测器"
+            Content="设备连线"
             Template="{StaticResource ButtonTemplate}" />
-        <DockPanel LastChildFill="True">
-            <Label
-                Width="100"
-                HorizontalContentAlignment="Center"
-                Content="探测器半径"
-                Template="{DynamicResource LabelTemplate}" />
-            <ComboBox ItemsSource="{Binding RadiusList}" SelectedItem="{Binding Radius}" />
-        </DockPanel>
-        <Border
-            Margin="1"
-            Padding="3"
-            Background="#B8F1CC"
-            BorderBrush="Chocolate"
-            BorderThickness="1"
-            CornerRadius="5">
-            <StackPanel Orientation="Vertical">
-                <Border
-                    Margin="1"
-                    Background="#B8F1CC"
-                    BorderBrush="Chocolate"
-                    BorderThickness="1"
-                    CornerRadius="5">
-                    <StackPanel Orientation="Vertical">
-                        <RadioButton
-                            Content="树形连接"
-                            GroupName="AlgorithmSelection"
-                            IsChecked="{Binding IsTreeConnection, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                        <RadioButton
-                            Content="环形连接形式1"
-                            GroupName="AlgorithmSelection"
-                            IsChecked="{Binding IsCircularConnection1, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                        <RadioButton
-                            Content="环形连接形式2"
-                            GroupName="AlgorithmSelection"
-                            IsChecked="{Binding IsCircularConnection2, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                    </StackPanel>
-                </Border>
-                <Button
-                    Command="{Binding AutomaticConnectionCommand}"
-                    Content="区域自动连线"
-                    Template="{StaticResource ButtonTemplate}" />
-            </StackPanel>
-        </Border>
         <Button
             Command="{Binding FasCommand}"
-            Content="生成火灾自动报警系统图"
+            Content="系统图生成"
             Template="{StaticResource ButtonTemplate}" />
         <Button
             Command="{Binding ToHydrantAlarmButtonCommand}"
             Content="消防栓转消防栓报警按钮"
+            Template="{StaticResource ButtonTemplate}" />
+        <Button
+            Command="{Binding LoadYdbFileCommand}"
+            Content="YDB to DWG"
             Template="{StaticResource ButtonTemplate}" />
     </StackPanel>
 </UserControl>

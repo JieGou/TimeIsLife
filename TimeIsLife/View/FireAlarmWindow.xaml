@@ -133,25 +133,7 @@
             Template="{StaticResource ButtonTemplate}" />
             <TextBox Template="{DynamicResource TextBoxTemplate}" Text="{Binding AreaFileName, Mode=TwoWay}" />
             </DockPanel>-->
-            <DockPanel DockPanel.Dock="Bottom">
-                <Border
-                    Margin="1"
-                    Background="#B8F1CC"
-                    BorderBrush="Chocolate"
-                    BorderThickness="1"
-                    CornerRadius="5">
-                    <StackPanel Orientation="Horizontal">
-                        <RadioButton
-                            Content="树形连接"
-                            GroupName="AlgorithmSelection"
-                            IsChecked="True" />
-                        <RadioButton
-                            Content="环形连接"
-                            GroupName="AlgorithmSelection"
-                            IsChecked="{Binding IsCircularConnectionSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                    </StackPanel>
-                </Border>
-            </DockPanel>
+            
             <DockPanel Margin="3" DockPanel.Dock="Bottom">
                 <Button
                     Width="100"

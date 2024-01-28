@@ -27,26 +27,11 @@ using Application = Autodesk.AutoCAD.ApplicationServices.Application;
 using Point = NetTopologySuite.Geometries.Point;
 using TimeIsLife.Helper;
 
-[assembly: CommandClass(typeof(TimeIsLife.CADCommand.ToolCommand))]
 
 namespace TimeIsLife.CADCommand
 {
-    class ToolCommand
+    partial class TilCommand
     {
-
-        private Document document;
-        private Database database;
-        private Editor editor;
-        private Matrix3d ucsToWcsMatrix3d;
-
-        void Initialize()
-        {
-            document = Application.DocumentManager.CurrentDocument;
-            database = document.Database;
-            editor = document.Editor;
-            ucsToWcsMatrix3d = editor.CurrentUserCoordinateSystem;
-        }
-
         /// <summary>
         /// 获取NTS指定精度和标准坐标系的GeometryFactory实例
         /// </summary>
@@ -394,41 +379,7 @@ namespace TimeIsLife.CADCommand
             transaction.Commit();
         }
 
-        private void SetLayer(Database db, string layerName, int colorIndex)
-        {
-            using (Transaction tr = db.TransactionManager.StartTransaction())
-            {
-                LayerTable layerTable = (LayerTable)tr.GetObject(db.LayerTableId, OpenMode.ForRead);
-
-                // Create new layer if it doesn't exist
-                ObjectId layerId;
-                if (!layerTable.Has(layerName))
-                {
-                    LayerTableRecord layerTableRecord = new LayerTableRecord
-                    {
-                        Name = layerName
-                    };
-
-                    layerTable.UpgradeOpen();
-                    layerId = layerTable.Add(layerTableRecord);
-                    tr.AddNewlyCreatedDBObject(layerTableRecord, add: true);
-                    layerTable.DowngradeOpen();
-                }
-                else
-                {
-                    layerId = layerTable[layerName];
-                }
-
-                // Set layer color
-                LayerTableRecord layerTableRecordToModify = (LayerTableRecord)tr.GetObject(layerId, OpenMode.ForWrite);
-                layerTableRecordToModify.Color = Color.FromColorIndex(ColorMethod.ByAci, (short)colorIndex);
-
-                // Set current layer
-                db.Clayer = layerId;
-
-                tr.Commit();
-            }
-        }
+        
 
         public List<Point> ConvertCoordinatesToPoints(GeometryFactory geometryFactory, List<BlockReference> blockReferences)
         {
@@ -495,29 +446,7 @@ namespace TimeIsLife.CADCommand
             return point3DCollection;
         }
 
-        private List<Point3d> GetPoint3DCollection(BlockReference blockReference)
-        {
-            Document document = Application.DocumentManager.CurrentDocument;
-            Database database = document.Database;
-            Editor editor = document.Editor;
-
-            List<Point3d> point3DList = new List<Point3d>();
-
-            using (Transaction transaction = database.TransactionManager.StartOpenCloseTransaction())
-            {
-                Matrix3d matrix3D = blockReference.BlockTransform;
-
-                BlockTableRecord btr = transaction.GetObject(blockReference.BlockTableRecord, OpenMode.ForRead) as BlockTableRecord;
-                if (btr == null) return point3DList;
-
-                foreach (DBPoint dBPoint in btr.OfType<ObjectId>().Select(id => transaction.GetObject(id, OpenMode.ForRead)).OfType<DBPoint>())
-                {
-                    point3DList.Add(dBPoint.Position.TransformBy(matrix3D));
-                }
-            }
-
-            return point3DList;
-        }
+        
         #endregion
 
         #region F4_AlignUcs
@@ -716,7 +645,10 @@ namespace TimeIsLife.CADCommand
         [CommandMethod("F5_EquipmentAngle")]
         public void F5_EquipmentAngle()
         {
-            Initialize();
+            Document document = Application.DocumentManager.CurrentDocument;
+            Database database = document.Database;
+            Editor editor = document.Editor;
+            Matrix3d ucsToWcsMatrix3d = editor.CurrentUserCoordinateSystem;
 
             string s1 = "\n作用：多个对象在ucs坐标系下，设置对象的旋转角度";
             string s2 = "\n操作方法：框选对象，设置旋转角度（默认ucs的x轴为0度，逆时针选择为正）";

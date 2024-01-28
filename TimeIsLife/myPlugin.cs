@@ -19,7 +19,7 @@ using System.Windows.Input;
 [assembly: CommandClass(typeof(ElectricalCommand))]
 [assembly: CommandClass(typeof(FireAlarmCommand1))]
 [assembly: CommandClass(typeof(LightingCommand))]
-[assembly: CommandClass(typeof(ToolCommand))]
+[assembly: CommandClass(typeof(TilCommand))]
 
 namespace TimeIsLife
 {

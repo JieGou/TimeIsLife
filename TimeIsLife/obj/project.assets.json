@@ -75,10 +75,10 @@
           }
         }
       },
-      "AutoCAD.NET/24.2.0": {
+      "AutoCAD.NET/24.3.0": {
         "type": "package",
         "dependencies": {
-          "AutoCAD.NET.Core": "[24.2.0]"
+          "AutoCAD.NET.Core": "[24.3.0]"
         },
         "compile": {
           "lib/net47/AcCui.dll": {
@@ -145,10 +145,10 @@
           }
         }
       },
-      "AutoCAD.NET.Core/24.2.0": {
+      "AutoCAD.NET.Core/24.3.0": {
         "type": "package",
         "dependencies": {
-          "AutoCAD.NET.Model": "[24.2.0]"
+          "AutoCAD.NET.Model": "[24.3.0]"
         },
         "compile": {
           "lib/net47/AcCoreMgd.dll": {
@@ -161,7 +161,7 @@
           }
         }
       },
-      "AutoCAD.NET.Model/24.2.0": {
+      "AutoCAD.NET.Model/24.3.0": {
         "type": "package",
         "compile": {
           "lib/net47/AcDbMgd.dll": {
@@ -176,7 +176,7 @@
           "lib/net47/acdbmgdbrep.dll": {}
         }
       },
-      "CommunityToolkit.Mvvm/8.1.0": {
+      "CommunityToolkit.Mvvm/8.2.2": {
         "type": "package",
         "dependencies": {
           "Microsoft.Bcl.AsyncInterfaces": "7.0.0",
@@ -198,7 +198,7 @@
           "buildTransitive/netstandard2.0/CommunityToolkit.Mvvm.targets": {}
         }
       },
-      "Dapper/2.0.123": {
+      "Dapper/2.1.28": {
         "type": "package",
         "compile": {
           "lib/net461/Dapper.dll": {
@@ -237,6 +237,104 @@
           "buildTransitive/EntityFramework.targets": {}
         }
       },
+      "Google.OrTools/9.8.3296": {
+        "type": "package",
+        "dependencies": {
+          "Google.OrTools.runtime.linux-arm64": "9.8.3296",
+          "Google.OrTools.runtime.linux-x64": "9.8.3296",
+          "Google.OrTools.runtime.osx-arm64": "9.8.3296",
+          "Google.OrTools.runtime.osx-x64": "9.8.3296",
+          "Google.OrTools.runtime.win-x64": "9.8.3296",
+          "Google.Protobuf": "3.25.0"
+        },
+        "compile": {
+          "lib/net462/Google.OrTools.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net462/Google.OrTools.dll": {
+            "related": ".xml"
+          }
+        }
+      },
+      "Google.OrTools.runtime.linux-arm64/9.8.3296": {
+        "type": "package",
+        "runtimeTargets": {
+          "runtimes/linux-arm64/native/google-ortools-native.so": {
+            "assetType": "native",
+            "rid": "linux-arm64"
+          },
+          "runtimes/linux-arm64/native/libortools.so.9": {
+            "assetType": "native",
+            "rid": "linux-arm64"
+          }
+        }
+      },
+      "Google.OrTools.runtime.linux-x64/9.8.3296": {
+        "type": "package",
+        "runtimeTargets": {
+          "runtimes/linux-x64/native/google-ortools-native.so": {
+            "assetType": "native",
+            "rid": "linux-x64"
+          },
+          "runtimes/linux-x64/native/libortools.so.9": {
+            "assetType": "native",
+            "rid": "linux-x64"
+          }
+        }
+      },
+      "Google.OrTools.runtime.osx-arm64/9.8.3296": {
+        "type": "package",
+        "runtimeTargets": {
+          "runtimes/osx-arm64/native/google-ortools-native.dylib": {
+            "assetType": "native",
+            "rid": "osx-arm64"
+          },
+          "runtimes/osx-arm64/native/libortools.9.dylib": {
+            "assetType": "native",
+            "rid": "osx-arm64"
+          }
+        }
+      },
+      "Google.OrTools.runtime.osx-x64/9.8.3296": {
+        "type": "package",
+        "runtimeTargets": {
+          "runtimes/osx-x64/native/google-ortools-native.dylib": {
+            "assetType": "native",
+            "rid": "osx-x64"
+          },
+          "runtimes/osx-x64/native/libortools.9.dylib": {
+            "assetType": "native",
+            "rid": "osx-x64"
+          }
+        }
+      },
+      "Google.OrTools.runtime.win-x64/9.8.3296": {
+        "type": "package",
+        "runtimeTargets": {
+          "runtimes/win-x64/native/google-ortools-native.dll": {
+            "assetType": "native",
+            "rid": "win-x64"
+          }
+        }
+      },
+      "Google.Protobuf/3.25.0": {
+        "type": "package",
+        "dependencies": {
+          "System.Memory": "4.5.3"
+        },
+        "compile": {
+          "lib/net45/Google.Protobuf.dll": {
+            "related": ".pdb;.xml"
+          }
+        },
+        "runtime": {
+          "lib/net45/Google.Protobuf.dll": {
+            "related": ".pdb;.xml"
+          }
+        }
+      },
       "Microsoft.Bcl.AsyncInterfaces/7.0.0": {
         "type": "package",
         "dependencies": {
@@ -256,24 +354,15 @@
           "buildTransitive/net462/_._": {}
         }
       },
-      "Microsoft.Xaml.Behaviors.Wpf/1.1.39": {
+      "Microsoft.Xaml.Behaviors.Wpf/1.1.77": {
         "type": "package",
-        "frameworkAssemblies": [
-          "PresentationCore",
-          "PresentationFramework",
-          "System",
-          "System.Core",
-          "System.XML",
-          "System.Xaml",
-          "WindowsBase"
-        ],
         "compile": {
-          "lib/net45/Microsoft.Xaml.Behaviors.dll": {
+          "lib/net462/Microsoft.Xaml.Behaviors.dll": {
             "related": ".pdb;.xml"
           }
         },
         "runtime": {
-          "lib/net45/Microsoft.Xaml.Behaviors.dll": {
+          "lib/net462/Microsoft.Xaml.Behaviors.dll": {
             "related": ".pdb;.xml"
           }
         }
@@ -307,7 +396,7 @@
           }
         }
       },
-      "Stub.System.Data.SQLite.Core.NetFramework/1.0.117": {
+      "Stub.System.Data.SQLite.Core.NetFramework/1.0.118": {
         "type": "package",
         "compile": {
           "lib/net46/System.Data.SQLite.dll": {
@@ -354,21 +443,21 @@
           "lib/net461/System.ComponentModel.Annotations.dll": {}
         }
       },
-      "System.Data.SQLite/1.0.117": {
+      "System.Data.SQLite/1.0.118": {
         "type": "package",
         "dependencies": {
-          "System.Data.SQLite.Core": "[1.0.117]",
-          "System.Data.SQLite.EF6": "[1.0.117]",
-          "System.Data.SQLite.Linq": "[1.0.117]"
+          "System.Data.SQLite.Core": "[1.0.118]",
+          "System.Data.SQLite.EF6": "[1.0.118]",
+          "System.Data.SQLite.Linq": "[1.0.118]"
         }
       },
-      "System.Data.SQLite.Core/1.0.117": {
+      "System.Data.SQLite.Core/1.0.118": {
         "type": "package",
         "dependencies": {
-          "Stub.System.Data.SQLite.Core.NetFramework": "[1.0.117]"
+          "Stub.System.Data.SQLite.Core.NetFramework": "[1.0.118]"
         }
       },
-      "System.Data.SQLite.EF6/1.0.117": {
+      "System.Data.SQLite.EF6/1.0.118": {
         "type": "package",
         "dependencies": {
           "EntityFramework": "6.4.4"
@@ -380,7 +469,7 @@
           "lib/net46/System.Data.SQLite.EF6.dll": {}
         }
       },
-      "System.Data.SQLite.Linq/1.0.117": {
+      "System.Data.SQLite.Linq/1.0.118": {
         "type": "package",
         "compile": {
           "lib/net46/System.Data.SQLite.Linq.dll": {}
@@ -389,7 +478,7 @@
           "lib/net46/System.Data.SQLite.Linq.dll": {}
         }
       },
-      "System.Memory/4.5.5": {
+      "System.Memory/4.5.4": {
         "type": "package",
         "dependencies": {
           "System.Buffers": "4.5.1",
@@ -538,10 +627,10 @@
           }
         }
       },
-      "AutoCAD.NET/24.2.0": {
+      "AutoCAD.NET/24.3.0": {
         "type": "package",
         "dependencies": {
-          "AutoCAD.NET.Core": "[24.2.0]"
+          "AutoCAD.NET.Core": "[24.3.0]"
         },
         "compile": {
           "lib/net47/AcCui.dll": {
@@ -608,10 +697,10 @@
           }
         }
       },
-      "AutoCAD.NET.Core/24.2.0": {
+      "AutoCAD.NET.Core/24.3.0": {
         "type": "package",
         "dependencies": {
-          "AutoCAD.NET.Model": "[24.2.0]"
+          "AutoCAD.NET.Model": "[24.3.0]"
         },
         "compile": {
           "lib/net47/AcCoreMgd.dll": {
@@ -624,7 +713,7 @@
           }
         }
       },
-      "AutoCAD.NET.Model/24.2.0": {
+      "AutoCAD.NET.Model/24.3.0": {
         "type": "package",
         "compile": {
           "lib/net47/AcDbMgd.dll": {
@@ -639,7 +728,7 @@
           "lib/net47/acdbmgdbrep.dll": {}
         }
       },
-      "CommunityToolkit.Mvvm/8.1.0": {
+      "CommunityToolkit.Mvvm/8.2.2": {
         "type": "package",
         "dependencies": {
           "Microsoft.Bcl.AsyncInterfaces": "7.0.0",
@@ -661,7 +750,7 @@
           "buildTransitive/netstandard2.0/CommunityToolkit.Mvvm.targets": {}
         }
       },
-      "Dapper/2.0.123": {
+      "Dapper/2.1.28": {
         "type": "package",
         "compile": {
           "lib/net461/Dapper.dll": {
@@ -700,6 +789,58 @@
           "buildTransitive/EntityFramework.targets": {}
         }
       },
+      "Google.OrTools/9.8.3296": {
+        "type": "package",
+        "dependencies": {
+          "Google.OrTools.runtime.linux-arm64": "9.8.3296",
+          "Google.OrTools.runtime.linux-x64": "9.8.3296",
+          "Google.OrTools.runtime.osx-arm64": "9.8.3296",
+          "Google.OrTools.runtime.osx-x64": "9.8.3296",
+          "Google.OrTools.runtime.win-x64": "9.8.3296",
+          "Google.Protobuf": "3.25.0"
+        },
+        "compile": {
+          "lib/net462/Google.OrTools.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net462/Google.OrTools.dll": {
+            "related": ".xml"
+          }
+        }
+      },
+      "Google.OrTools.runtime.linux-arm64/9.8.3296": {
+        "type": "package"
+      },
+      "Google.OrTools.runtime.linux-x64/9.8.3296": {
+        "type": "package"
+      },
+      "Google.OrTools.runtime.osx-arm64/9.8.3296": {
+        "type": "package"
+      },
+      "Google.OrTools.runtime.osx-x64/9.8.3296": {
+        "type": "package"
+      },
+      "Google.OrTools.runtime.win-x64/9.8.3296": {
+        "type": "package"
+      },
+      "Google.Protobuf/3.25.0": {
+        "type": "package",
+        "dependencies": {
+          "System.Memory": "4.5.3"
+        },
+        "compile": {
+          "lib/net45/Google.Protobuf.dll": {
+            "related": ".pdb;.xml"
+          }
+        },
+        "runtime": {
+          "lib/net45/Google.Protobuf.dll": {
+            "related": ".pdb;.xml"
+          }
+        }
+      },
       "Microsoft.Bcl.AsyncInterfaces/7.0.0": {
         "type": "package",
         "dependencies": {
@@ -719,24 +860,15 @@
           "buildTransitive/net462/_._": {}
         }
       },
-      "Microsoft.Xaml.Behaviors.Wpf/1.1.39": {
+      "Microsoft.Xaml.Behaviors.Wpf/1.1.77": {
         "type": "package",
-        "frameworkAssemblies": [
-          "PresentationCore",
-          "PresentationFramework",
-          "System",
-          "System.Core",
-          "System.XML",
-          "System.Xaml",
-          "WindowsBase"
-        ],
         "compile": {
-          "lib/net45/Microsoft.Xaml.Behaviors.dll": {
+          "lib/net462/Microsoft.Xaml.Behaviors.dll": {
             "related": ".pdb;.xml"
           }
         },
         "runtime": {
-          "lib/net45/Microsoft.Xaml.Behaviors.dll": {
+          "lib/net462/Microsoft.Xaml.Behaviors.dll": {
             "related": ".pdb;.xml"
           }
         }
@@ -770,7 +902,7 @@
           }
         }
       },
-      "Stub.System.Data.SQLite.Core.NetFramework/1.0.117": {
+      "Stub.System.Data.SQLite.Core.NetFramework/1.0.118": {
         "type": "package",
         "compile": {
           "lib/net46/System.Data.SQLite.dll": {
@@ -817,21 +949,21 @@
           "lib/net461/System.ComponentModel.Annotations.dll": {}
         }
       },
-      "System.Data.SQLite/1.0.117": {
+      "System.Data.SQLite/1.0.118": {
         "type": "package",
         "dependencies": {
-          "System.Data.SQLite.Core": "[1.0.117]",
-          "System.Data.SQLite.EF6": "[1.0.117]",
-          "System.Data.SQLite.Linq": "[1.0.117]"
+          "System.Data.SQLite.Core": "[1.0.118]",
+          "System.Data.SQLite.EF6": "[1.0.118]",
+          "System.Data.SQLite.Linq": "[1.0.118]"
         }
       },
-      "System.Data.SQLite.Core/1.0.117": {
+      "System.Data.SQLite.Core/1.0.118": {
         "type": "package",
         "dependencies": {
-          "Stub.System.Data.SQLite.Core.NetFramework": "[1.0.117]"
+          "Stub.System.Data.SQLite.Core.NetFramework": "[1.0.118]"
         }
       },
-      "System.Data.SQLite.EF6/1.0.117": {
+      "System.Data.SQLite.EF6/1.0.118": {
         "type": "package",
         "dependencies": {
           "EntityFramework": "6.4.4"
@@ -843,7 +975,7 @@
           "lib/net46/System.Data.SQLite.EF6.dll": {}
         }
       },
-      "System.Data.SQLite.Linq/1.0.117": {
+      "System.Data.SQLite.Linq/1.0.118": {
         "type": "package",
         "compile": {
           "lib/net46/System.Data.SQLite.Linq.dll": {}
@@ -852,7 +984,7 @@
           "lib/net46/System.Data.SQLite.Linq.dll": {}
         }
       },
-      "System.Memory/4.5.5": {
+      "System.Memory/4.5.4": {
         "type": "package",
         "dependencies": {
           "System.Buffers": "4.5.1",
@@ -1001,10 +1133,10 @@
           }
         }
       },
-      "AutoCAD.NET/24.2.0": {
+      "AutoCAD.NET/24.3.0": {
         "type": "package",
         "dependencies": {
-          "AutoCAD.NET.Core": "[24.2.0]"
+          "AutoCAD.NET.Core": "[24.3.0]"
         },
         "compile": {
           "lib/net47/AcCui.dll": {
@@ -1071,10 +1203,10 @@
           }
         }
       },
-      "AutoCAD.NET.Core/24.2.0": {
+      "AutoCAD.NET.Core/24.3.0": {
         "type": "package",
         "dependencies": {
-          "AutoCAD.NET.Model": "[24.2.0]"
+          "AutoCAD.NET.Model": "[24.3.0]"
         },
         "compile": {
           "lib/net47/AcCoreMgd.dll": {
@@ -1087,7 +1219,7 @@
           }
         }
       },
-      "AutoCAD.NET.Model/24.2.0": {
+      "AutoCAD.NET.Model/24.3.0": {
         "type": "package",
         "compile": {
           "lib/net47/AcDbMgd.dll": {
@@ -1102,7 +1234,7 @@
           "lib/net47/acdbmgdbrep.dll": {}
         }
       },
-      "CommunityToolkit.Mvvm/8.1.0": {
+      "CommunityToolkit.Mvvm/8.2.2": {
         "type": "package",
         "dependencies": {
           "Microsoft.Bcl.AsyncInterfaces": "7.0.0",
@@ -1124,7 +1256,7 @@
           "buildTransitive/netstandard2.0/CommunityToolkit.Mvvm.targets": {}
         }
       },
-      "Dapper/2.0.123": {
+      "Dapper/2.1.28": {
         "type": "package",
         "compile": {
           "lib/net461/Dapper.dll": {
@@ -1163,6 +1295,58 @@
           "buildTransitive/EntityFramework.targets": {}
         }
       },
+      "Google.OrTools/9.8.3296": {
+        "type": "package",
+        "dependencies": {
+          "Google.OrTools.runtime.linux-arm64": "9.8.3296",
+          "Google.OrTools.runtime.linux-x64": "9.8.3296",
+          "Google.OrTools.runtime.osx-arm64": "9.8.3296",
+          "Google.OrTools.runtime.osx-x64": "9.8.3296",
+          "Google.OrTools.runtime.win-x64": "9.8.3296",
+          "Google.Protobuf": "3.25.0"
+        },
+        "compile": {
+          "lib/net462/Google.OrTools.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net462/Google.OrTools.dll": {
+            "related": ".xml"
+          }
+        }
+      },
+      "Google.OrTools.runtime.linux-arm64/9.8.3296": {
+        "type": "package"
+      },
+      "Google.OrTools.runtime.linux-x64/9.8.3296": {
+        "type": "package"
+      },
+      "Google.OrTools.runtime.osx-arm64/9.8.3296": {
+        "type": "package"
+      },
+      "Google.OrTools.runtime.osx-x64/9.8.3296": {
+        "type": "package"
+      },
+      "Google.OrTools.runtime.win-x64/9.8.3296": {
+        "type": "package"
+      },
+      "Google.Protobuf/3.25.0": {
+        "type": "package",
+        "dependencies": {
+          "System.Memory": "4.5.3"
+        },
+        "compile": {
+          "lib/net45/Google.Protobuf.dll": {
+            "related": ".pdb;.xml"
+          }
+        },
+        "runtime": {
+          "lib/net45/Google.Protobuf.dll": {
+            "related": ".pdb;.xml"
+          }
+        }
+      },
       "Microsoft.Bcl.AsyncInterfaces/7.0.0": {
         "type": "package",
         "dependencies": {
@@ -1182,24 +1366,15 @@
           "buildTransitive/net462/_._": {}
         }
       },
-      "Microsoft.Xaml.Behaviors.Wpf/1.1.39": {
+      "Microsoft.Xaml.Behaviors.Wpf/1.1.77": {
         "type": "package",
-        "frameworkAssemblies": [
-          "PresentationCore",
-          "PresentationFramework",
-          "System",
-          "System.Core",
-          "System.XML",
-          "System.Xaml",
-          "WindowsBase"
-        ],
         "compile": {
-          "lib/net45/Microsoft.Xaml.Behaviors.dll": {
+          "lib/net462/Microsoft.Xaml.Behaviors.dll": {
             "related": ".pdb;.xml"
           }
         },
         "runtime": {
-          "lib/net45/Microsoft.Xaml.Behaviors.dll": {
+          "lib/net462/Microsoft.Xaml.Behaviors.dll": {
             "related": ".pdb;.xml"
           }
         }
@@ -1233,7 +1408,7 @@
           }
         }
       },
-      "Stub.System.Data.SQLite.Core.NetFramework/1.0.117": {
+      "Stub.System.Data.SQLite.Core.NetFramework/1.0.118": {
         "type": "package",
         "compile": {
           "lib/net46/System.Data.SQLite.dll": {
@@ -1280,21 +1455,21 @@
           "lib/net461/System.ComponentModel.Annotations.dll": {}
         }
       },
-      "System.Data.SQLite/1.0.117": {
+      "System.Data.SQLite/1.0.118": {
         "type": "package",
         "dependencies": {
-          "System.Data.SQLite.Core": "[1.0.117]",
-          "System.Data.SQLite.EF6": "[1.0.117]",
-          "System.Data.SQLite.Linq": "[1.0.117]"
+          "System.Data.SQLite.Core": "[1.0.118]",
+          "System.Data.SQLite.EF6": "[1.0.118]",
+          "System.Data.SQLite.Linq": "[1.0.118]"
         }
       },
-      "System.Data.SQLite.Core/1.0.117": {
+      "System.Data.SQLite.Core/1.0.118": {
         "type": "package",
         "dependencies": {
-          "Stub.System.Data.SQLite.Core.NetFramework": "[1.0.117]"
+          "Stub.System.Data.SQLite.Core.NetFramework": "[1.0.118]"
         }
       },
-      "System.Data.SQLite.EF6/1.0.117": {
+      "System.Data.SQLite.EF6/1.0.118": {
         "type": "package",
         "dependencies": {
           "EntityFramework": "6.4.4"
@@ -1306,7 +1481,7 @@
           "lib/net46/System.Data.SQLite.EF6.dll": {}
         }
       },
-      "System.Data.SQLite.Linq/1.0.117": {
+      "System.Data.SQLite.Linq/1.0.118": {
         "type": "package",
         "compile": {
           "lib/net46/System.Data.SQLite.Linq.dll": {}
@@ -1315,7 +1490,7 @@
           "lib/net46/System.Data.SQLite.Linq.dll": {}
         }
       },
-      "System.Memory/4.5.5": {
+      "System.Memory/4.5.4": {
         "type": "package",
         "dependencies": {
           "System.Buffers": "4.5.1",
@@ -1464,10 +1639,10 @@
           }
         }
       },
-      "AutoCAD.NET/24.2.0": {
+      "AutoCAD.NET/24.3.0": {
         "type": "package",
         "dependencies": {
-          "AutoCAD.NET.Core": "[24.2.0]"
+          "AutoCAD.NET.Core": "[24.3.0]"
         },
         "compile": {
           "lib/net47/AcCui.dll": {
@@ -1534,10 +1709,10 @@
           }
         }
       },
-      "AutoCAD.NET.Core/24.2.0": {
+      "AutoCAD.NET.Core/24.3.0": {
         "type": "package",
         "dependencies": {
-          "AutoCAD.NET.Model": "[24.2.0]"
+          "AutoCAD.NET.Model": "[24.3.0]"
         },
         "compile": {
           "lib/net47/AcCoreMgd.dll": {
@@ -1550,7 +1725,7 @@
           }
         }
       },
-      "AutoCAD.NET.Model/24.2.0": {
+      "AutoCAD.NET.Model/24.3.0": {
         "type": "package",
         "compile": {
           "lib/net47/AcDbMgd.dll": {
@@ -1565,7 +1740,7 @@
           "lib/net47/acdbmgdbrep.dll": {}
         }
       },
-      "CommunityToolkit.Mvvm/8.1.0": {
+      "CommunityToolkit.Mvvm/8.2.2": {
         "type": "package",
         "dependencies": {
           "Microsoft.Bcl.AsyncInterfaces": "7.0.0",
@@ -1587,7 +1762,7 @@
           "buildTransitive/netstandard2.0/CommunityToolkit.Mvvm.targets": {}
         }
       },
-      "Dapper/2.0.123": {
+      "Dapper/2.1.28": {
         "type": "package",
         "compile": {
           "lib/net461/Dapper.dll": {
@@ -1626,6 +1801,61 @@
           "buildTransitive/EntityFramework.targets": {}
         }
       },
+      "Google.OrTools/9.8.3296": {
+        "type": "package",
+        "dependencies": {
+          "Google.OrTools.runtime.linux-arm64": "9.8.3296",
+          "Google.OrTools.runtime.linux-x64": "9.8.3296",
+          "Google.OrTools.runtime.osx-arm64": "9.8.3296",
+          "Google.OrTools.runtime.osx-x64": "9.8.3296",
+          "Google.OrTools.runtime.win-x64": "9.8.3296",
+          "Google.Protobuf": "3.25.0"
+        },
+        "compile": {
+          "lib/net462/Google.OrTools.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net462/Google.OrTools.dll": {
+            "related": ".xml"
+          }
+        }
+      },
+      "Google.OrTools.runtime.linux-arm64/9.8.3296": {
+        "type": "package"
+      },
+      "Google.OrTools.runtime.linux-x64/9.8.3296": {
+        "type": "package"
+      },
+      "Google.OrTools.runtime.osx-arm64/9.8.3296": {
+        "type": "package"
+      },
+      "Google.OrTools.runtime.osx-x64/9.8.3296": {
+        "type": "package"
+      },
+      "Google.OrTools.runtime.win-x64/9.8.3296": {
+        "type": "package",
+        "native": {
+          "runtimes/win-x64/native/google-ortools-native.dll": {}
+        }
+      },
+      "Google.Protobuf/3.25.0": {
+        "type": "package",
+        "dependencies": {
+          "System.Memory": "4.5.3"
+        },
+        "compile": {
+          "lib/net45/Google.Protobuf.dll": {
+            "related": ".pdb;.xml"
+          }
+        },
+        "runtime": {
+          "lib/net45/Google.Protobuf.dll": {
+            "related": ".pdb;.xml"
+          }
+        }
+      },
       "Microsoft.Bcl.AsyncInterfaces/7.0.0": {
         "type": "package",
         "dependencies": {
@@ -1645,24 +1875,15 @@
           "buildTransitive/net462/_._": {}
         }
       },
-      "Microsoft.Xaml.Behaviors.Wpf/1.1.39": {
+      "Microsoft.Xaml.Behaviors.Wpf/1.1.77": {
         "type": "package",
-        "frameworkAssemblies": [
-          "PresentationCore",
-          "PresentationFramework",
-          "System",
-          "System.Core",
-          "System.XML",
-          "System.Xaml",
-          "WindowsBase"
-        ],
         "compile": {
-          "lib/net45/Microsoft.Xaml.Behaviors.dll": {
+          "lib/net462/Microsoft.Xaml.Behaviors.dll": {
             "related": ".pdb;.xml"
           }
         },
         "runtime": {
-          "lib/net45/Microsoft.Xaml.Behaviors.dll": {
+          "lib/net462/Microsoft.Xaml.Behaviors.dll": {
             "related": ".pdb;.xml"
           }
         }
@@ -1696,7 +1917,7 @@
           }
         }
       },
-      "Stub.System.Data.SQLite.Core.NetFramework/1.0.117": {
+      "Stub.System.Data.SQLite.Core.NetFramework/1.0.118": {
         "type": "package",
         "compile": {
           "lib/net46/System.Data.SQLite.dll": {
@@ -1743,21 +1964,21 @@
           "lib/net461/System.ComponentModel.Annotations.dll": {}
         }
       },
-      "System.Data.SQLite/1.0.117": {
+      "System.Data.SQLite/1.0.118": {
         "type": "package",
         "dependencies": {
-          "System.Data.SQLite.Core": "[1.0.117]",
-          "System.Data.SQLite.EF6": "[1.0.117]",
-          "System.Data.SQLite.Linq": "[1.0.117]"
+          "System.Data.SQLite.Core": "[1.0.118]",
+          "System.Data.SQLite.EF6": "[1.0.118]",
+          "System.Data.SQLite.Linq": "[1.0.118]"
         }
       },
-      "System.Data.SQLite.Core/1.0.117": {
+      "System.Data.SQLite.Core/1.0.118": {
         "type": "package",
         "dependencies": {
-          "Stub.System.Data.SQLite.Core.NetFramework": "[1.0.117]"
+          "Stub.System.Data.SQLite.Core.NetFramework": "[1.0.118]"
         }
       },
-      "System.Data.SQLite.EF6/1.0.117": {
+      "System.Data.SQLite.EF6/1.0.118": {
         "type": "package",
         "dependencies": {
           "EntityFramework": "6.4.4"
@@ -1769,7 +1990,7 @@
           "lib/net46/System.Data.SQLite.EF6.dll": {}
         }
       },
-      "System.Data.SQLite.Linq/1.0.117": {
+      "System.Data.SQLite.Linq/1.0.118": {
         "type": "package",
         "compile": {
           "lib/net46/System.Data.SQLite.Linq.dll": {}
@@ -1778,7 +1999,7 @@
           "lib/net46/System.Data.SQLite.Linq.dll": {}
         }
       },
-      "System.Memory/4.5.5": {
+      "System.Memory/4.5.4": {
         "type": "package",
         "dependencies": {
           "System.Buffers": "4.5.1",
@@ -1927,10 +2148,10 @@
           }
         }
       },
-      "AutoCAD.NET/24.2.0": {
+      "AutoCAD.NET/24.3.0": {
         "type": "package",
         "dependencies": {
-          "AutoCAD.NET.Core": "[24.2.0]"
+          "AutoCAD.NET.Core": "[24.3.0]"
         },
         "compile": {
           "lib/net47/AcCui.dll": {
@@ -1997,10 +2218,10 @@
           }
         }
       },
-      "AutoCAD.NET.Core/24.2.0": {
+      "AutoCAD.NET.Core/24.3.0": {
         "type": "package",
         "dependencies": {
-          "AutoCAD.NET.Model": "[24.2.0]"
+          "AutoCAD.NET.Model": "[24.3.0]"
         },
         "compile": {
           "lib/net47/AcCoreMgd.dll": {
@@ -2013,7 +2234,7 @@
           }
         }
       },
-      "AutoCAD.NET.Model/24.2.0": {
+      "AutoCAD.NET.Model/24.3.0": {
         "type": "package",
         "compile": {
           "lib/net47/AcDbMgd.dll": {
@@ -2028,7 +2249,7 @@
           "lib/net47/acdbmgdbrep.dll": {}
         }
       },
-      "CommunityToolkit.Mvvm/8.1.0": {
+      "CommunityToolkit.Mvvm/8.2.2": {
         "type": "package",
         "dependencies": {
           "Microsoft.Bcl.AsyncInterfaces": "7.0.0",
@@ -2050,7 +2271,7 @@
           "buildTransitive/netstandard2.0/CommunityToolkit.Mvvm.targets": {}
         }
       },
-      "Dapper/2.0.123": {
+      "Dapper/2.1.28": {
         "type": "package",
         "compile": {
           "lib/net461/Dapper.dll": {
@@ -2089,6 +2310,58 @@
           "buildTransitive/EntityFramework.targets": {}
         }
       },
+      "Google.OrTools/9.8.3296": {
+        "type": "package",
+        "dependencies": {
+          "Google.OrTools.runtime.linux-arm64": "9.8.3296",
+          "Google.OrTools.runtime.linux-x64": "9.8.3296",
+          "Google.OrTools.runtime.osx-arm64": "9.8.3296",
+          "Google.OrTools.runtime.osx-x64": "9.8.3296",
+          "Google.OrTools.runtime.win-x64": "9.8.3296",
+          "Google.Protobuf": "3.25.0"
+        },
+        "compile": {
+          "lib/net462/Google.OrTools.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net462/Google.OrTools.dll": {
+            "related": ".xml"
+          }
+        }
+      },
+      "Google.OrTools.runtime.linux-arm64/9.8.3296": {
+        "type": "package"
+      },
+      "Google.OrTools.runtime.linux-x64/9.8.3296": {
+        "type": "package"
+      },
+      "Google.OrTools.runtime.osx-arm64/9.8.3296": {
+        "type": "package"
+      },
+      "Google.OrTools.runtime.osx-x64/9.8.3296": {
+        "type": "package"
+      },
+      "Google.OrTools.runtime.win-x64/9.8.3296": {
+        "type": "package"
+      },
+      "Google.Protobuf/3.25.0": {
+        "type": "package",
+        "dependencies": {
+          "System.Memory": "4.5.3"
+        },
+        "compile": {
+          "lib/net45/Google.Protobuf.dll": {
+            "related": ".pdb;.xml"
+          }
+        },
+        "runtime": {
+          "lib/net45/Google.Protobuf.dll": {
+            "related": ".pdb;.xml"
+          }
+        }
+      },
       "Microsoft.Bcl.AsyncInterfaces/7.0.0": {
         "type": "package",
         "dependencies": {
@@ -2108,24 +2381,15 @@
           "buildTransitive/net462/_._": {}
         }
       },
-      "Microsoft.Xaml.Behaviors.Wpf/1.1.39": {
+      "Microsoft.Xaml.Behaviors.Wpf/1.1.77": {
         "type": "package",
-        "frameworkAssemblies": [
-          "PresentationCore",
-          "PresentationFramework",
-          "System",
-          "System.Core",
-          "System.XML",
-          "System.Xaml",
-          "WindowsBase"
-        ],
         "compile": {
-          "lib/net45/Microsoft.Xaml.Behaviors.dll": {
+          "lib/net462/Microsoft.Xaml.Behaviors.dll": {
             "related": ".pdb;.xml"
           }
         },
         "runtime": {
-          "lib/net45/Microsoft.Xaml.Behaviors.dll": {
+          "lib/net462/Microsoft.Xaml.Behaviors.dll": {
             "related": ".pdb;.xml"
           }
         }
@@ -2159,7 +2423,7 @@
           }
         }
       },
-      "Stub.System.Data.SQLite.Core.NetFramework/1.0.117": {
+      "Stub.System.Data.SQLite.Core.NetFramework/1.0.118": {
         "type": "package",
         "compile": {
           "lib/net46/System.Data.SQLite.dll": {
@@ -2206,21 +2470,21 @@
           "lib/net461/System.ComponentModel.Annotations.dll": {}
         }
       },
-      "System.Data.SQLite/1.0.117": {
+      "System.Data.SQLite/1.0.118": {
         "type": "package",
         "dependencies": {
-          "System.Data.SQLite.Core": "[1.0.117]",
-          "System.Data.SQLite.EF6": "[1.0.117]",
-          "System.Data.SQLite.Linq": "[1.0.117]"
+          "System.Data.SQLite.Core": "[1.0.118]",
+          "System.Data.SQLite.EF6": "[1.0.118]",
+          "System.Data.SQLite.Linq": "[1.0.118]"
         }
       },
-      "System.Data.SQLite.Core/1.0.117": {
+      "System.Data.SQLite.Core/1.0.118": {
         "type": "package",
         "dependencies": {
-          "Stub.System.Data.SQLite.Core.NetFramework": "[1.0.117]"
+          "Stub.System.Data.SQLite.Core.NetFramework": "[1.0.118]"
         }
       },
-      "System.Data.SQLite.EF6/1.0.117": {
+      "System.Data.SQLite.EF6/1.0.118": {
         "type": "package",
         "dependencies": {
           "EntityFramework": "6.4.4"
@@ -2232,7 +2496,7 @@
           "lib/net46/System.Data.SQLite.EF6.dll": {}
         }
       },
-      "System.Data.SQLite.Linq/1.0.117": {
+      "System.Data.SQLite.Linq/1.0.118": {
         "type": "package",
         "compile": {
           "lib/net46/System.Data.SQLite.Linq.dll": {}
@@ -2241,7 +2505,7 @@
           "lib/net46/System.Data.SQLite.Linq.dll": {}
         }
       },
-      "System.Memory/4.5.5": {
+      "System.Memory/4.5.4": {
         "type": "package",
         "dependencies": {
           "System.Buffers": "4.5.1",
@@ -2474,16 +2738,16 @@
         "lib/netstandard2.0/Accord.Statistics.xml"
       ]
     },
-    "AutoCAD.NET/24.2.0": {
-      "sha512": "ryTyRSekQhtLEW8JjP7pOM4zbrfzaZm8cJAT8mNzyY/KYM1NZk7N/uf6JxkqY6ZyrB1vPCYtPxBbliUyA8sgCw==",
+    "AutoCAD.NET/24.3.0": {
+      "sha512": "u61vnlIBDgrBu8EvYDxqDwGwGFuZ71ilBvNHbSHe/OJbnhtAILg0RmsoUKdU2NjfMUApnMhCHwp7fzvJCXDvwg==",
       "type": "package",
-      "path": "autocad.net/24.2.0",
+      "path": "autocad.net/24.3.0",
       "hasTools": true,
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
         "adsk.xml",
-        "autocad.net.24.2.0.nupkg.sha512",
+        "autocad.net.24.3.0.nupkg.sha512",
         "autocad.net.nuspec",
         "lib/net47/AcCui.dll",
         "lib/net47/AcCui.xml",
@@ -2505,60 +2769,65 @@
         "lib/net47/AdUiPalettes.xml",
         "lib/net47/AdWindows.dll",
         "lib/net47/AdWindows.xml",
+        "license.txt",
         "tools/install.ps1"
       ]
     },
-    "AutoCAD.NET.Core/24.2.0": {
-      "sha512": "RY6sKZrul2jANoi51L+9O6t7sB3Zbq4rv9olFBM9oGd1XhVQH0FwTJrpxrfjSrmXv06XwPuQheY1+IOektsRtg==",
+    "AutoCAD.NET.Core/24.3.0": {
+      "sha512": "aA/V5c/LGahuH9qVI0XghGrZtuNzi0xObm9nJWYy3HsqqnUlZ7YngMuqn0kyigzuj70O2GwF8zpJwgQJmvb83Q==",
       "type": "package",
-      "path": "autocad.net.core/24.2.0",
+      "path": "autocad.net.core/24.3.0",
       "hasTools": true,
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
         "adsk.xml",
-        "autocad.net.core.24.2.0.nupkg.sha512",
+        "autocad.net.core.24.3.0.nupkg.sha512",
         "autocad.net.core.nuspec",
         "lib/net47/AcCoreMgd.dll",
         "lib/net47/AcCoreMgd.xml",
+        "license.txt",
         "tools/install.ps1"
       ]
     },
-    "AutoCAD.NET.Model/24.2.0": {
-      "sha512": "RsOM46Sly+A6mhqK7CDTuVnnPCRPDVudgllT1x9kcuuFsdLbsJAVpLGY3XuRfjj8wByFqPJ4N2CEc9YI5HsgSA==",
+    "AutoCAD.NET.Model/24.3.0": {
+      "sha512": "LV37ByKWj0LbHx4gSznJvkFNmTlGsMOtyXvTcBtz6V+WNFPXHlGCscqz1QJimzjyMJwHxOJKUxfTIJ5a4aXFKw==",
       "type": "package",
-      "path": "autocad.net.model/24.2.0",
+      "path": "autocad.net.model/24.3.0",
       "hasTools": true,
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
         "adsk.xml",
-        "autocad.net.model.24.2.0.nupkg.sha512",
+        "autocad.net.model.24.3.0.nupkg.sha512",
         "autocad.net.model.nuspec",
         "lib/net47/AcDbMgd.dll",
         "lib/net47/AcDbMgd.xml",
         "lib/net47/AcDbMgdBrep.xml",
         "lib/net47/acdbmgdbrep.dll",
+        "license.txt",
         "tools/install.ps1"
       ]
     },
-    "CommunityToolkit.Mvvm/8.1.0": {
-      "sha512": "xxOt7lu9a5kB5Fs9RfcxzVlKnhuuPe+w7AXHtmCFtS3oldrsUhEMxHfNulluXSscUUoGxZ0jh55Om12ZP6abHA==",
+    "CommunityToolkit.Mvvm/8.2.2": {
+      "sha512": "r0g0k9tGYdrnz8R7T3x5UiokDffeevzK/2P/9SBL6fqLgN8B157MIi/bVUWI1KAz6ZorZrK9AdABCWUeXZZsvA==",
       "type": "package",
-      "path": "communitytoolkit.mvvm/8.1.0",
+      "path": "communitytoolkit.mvvm/8.2.2",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
         "Icon.png",
         "License.md",
         "ThirdPartyNotices.txt",
+        "analyzers/dotnet/roslyn4.0/cs/CommunityToolkit.Mvvm.CodeFixers.dll",
         "analyzers/dotnet/roslyn4.0/cs/CommunityToolkit.Mvvm.SourceGenerators.dll",
+        "analyzers/dotnet/roslyn4.3/cs/CommunityToolkit.Mvvm.CodeFixers.dll",
         "analyzers/dotnet/roslyn4.3/cs/CommunityToolkit.Mvvm.SourceGenerators.dll",
         "build/netstandard2.0/CommunityToolkit.Mvvm.targets",
         "build/netstandard2.1/CommunityToolkit.Mvvm.targets",
         "buildTransitive/netstandard2.0/CommunityToolkit.Mvvm.targets",
         "buildTransitive/netstandard2.1/CommunityToolkit.Mvvm.targets",
-        "communitytoolkit.mvvm.8.1.0.nupkg.sha512",
+        "communitytoolkit.mvvm.8.2.2.nupkg.sha512",
         "communitytoolkit.mvvm.nuspec",
         "lib/net6.0/CommunityToolkit.Mvvm.dll",
         "lib/net6.0/CommunityToolkit.Mvvm.pdb",
@@ -2571,22 +2840,25 @@
         "lib/netstandard2.1/CommunityToolkit.Mvvm.xml"
       ]
     },
-    "Dapper/2.0.123": {
-      "sha512": "RDFF4rBLLmbpi6pwkY7q/M6UXHRJEOerplDGE5jwEkP/JGJnBauAClYavNKJPW1yOTWRPIyfj4is3EaJxQXILQ==",
+    "Dapper/2.1.28": {
+      "sha512": "ha49pzOEDmCPkMxwfPSR/wxa/6RD3r42TESIgpzpi7FXq/gNVUuJVEO+wtUzntNRhtmq3BKCl0s0aAlSZLkBUA==",
       "type": "package",
-      "path": "dapper/2.0.123",
+      "path": "dapper/2.1.28",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
         "Dapper.png",
-        "dapper.2.0.123.nupkg.sha512",
+        "dapper.2.1.28.nupkg.sha512",
         "dapper.nuspec",
         "lib/net461/Dapper.dll",
         "lib/net461/Dapper.xml",
         "lib/net5.0/Dapper.dll",
         "lib/net5.0/Dapper.xml",
+        "lib/net7.0/Dapper.dll",
+        "lib/net7.0/Dapper.xml",
         "lib/netstandard2.0/Dapper.dll",
-        "lib/netstandard2.0/Dapper.xml"
+        "lib/netstandard2.0/Dapper.xml",
+        "readme.md"
       ]
     },
     "EntityFramework/6.4.4": {
@@ -2646,6 +2918,132 @@
         "tools/netcoreapp3.0/any/ef6.runtimeconfig.json"
       ]
     },
+    "Google.OrTools/9.8.3296": {
+      "sha512": "9IiyH4v8lrE5bJ62f8HtBG3QdmsZA4sn8/EsmT+42bfc7aAKYPnhGhssG4e6sulU9rNkeovO4cdxc7PfZ717hA==",
+      "type": "package",
+      "path": "google.ortools/9.8.3296",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "content/bop/bop_parameters.proto",
+        "content/constraint_solver/assignment.proto",
+        "content/constraint_solver/demon_profiler.proto",
+        "content/constraint_solver/routing_enums.proto",
+        "content/constraint_solver/routing_parameters.proto",
+        "content/constraint_solver/search_limit.proto",
+        "content/constraint_solver/search_stats.proto",
+        "content/constraint_solver/solver_parameters.proto",
+        "content/glop/parameters.proto",
+        "content/graph/flow_problem.proto",
+        "content/linear_solver/linear_solver.proto",
+        "content/orLogo.png",
+        "content/pdlp/solve_log.proto",
+        "content/pdlp/solvers.proto",
+        "content/sat/boolean_problem.proto",
+        "content/sat/cp_model.proto",
+        "content/sat/cp_model_service.proto",
+        "content/sat/sat_parameters.proto",
+        "content/util/optional_boolean.proto",
+        "google.ortools.9.8.3296.nupkg.sha512",
+        "google.ortools.nuspec",
+        "lib/net462/Google.OrTools.dll",
+        "lib/net462/Google.OrTools.xml",
+        "lib/net6.0/Google.OrTools.dll",
+        "lib/net6.0/Google.OrTools.xml"
+      ]
+    },
+    "Google.OrTools.runtime.linux-arm64/9.8.3296": {
+      "sha512": "wSVE8JcVzozYgXMUGVyRAI7sC+HXYAiwmpe8n0YpTZAsXjYat1GA2+vbB8JUZAfSjwd09NqMzOPCaIW+2G2fDg==",
+      "type": "package",
+      "path": "google.ortools.runtime.linux-arm64/9.8.3296",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "content/orLogo.png",
+        "google.ortools.runtime.linux-arm64.9.8.3296.nupkg.sha512",
+        "google.ortools.runtime.linux-arm64.nuspec",
+        "runtimes/linux-arm64/native/google-ortools-native.so",
+        "runtimes/linux-arm64/native/libortools.so.9"
+      ]
+    },
+    "Google.OrTools.runtime.linux-x64/9.8.3296": {
+      "sha512": "bIwy9lTTtkBUmmKCJ2zPwKIXWUNSBdvb8jeazga4mIgtopx2VWTtNfIrsBglZbpXCE4MYsWl03Dk3GYazxkayw==",
+      "type": "package",
+      "path": "google.ortools.runtime.linux-x64/9.8.3296",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "content/orLogo.png",
+        "google.ortools.runtime.linux-x64.9.8.3296.nupkg.sha512",
+        "google.ortools.runtime.linux-x64.nuspec",
+        "runtimes/linux-x64/native/google-ortools-native.so",
+        "runtimes/linux-x64/native/libortools.so.9"
+      ]
+    },
+    "Google.OrTools.runtime.osx-arm64/9.8.3296": {
+      "sha512": "vHCUnGGpLFdxJ4j7eFiZBBCMpCFEEYcwiM4EFBF9vpfom6BbIex9dPa2Zuu2Bjt2XKjzX1NrjFDv8uzhgP43Tw==",
+      "type": "package",
+      "path": "google.ortools.runtime.osx-arm64/9.8.3296",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "content/orLogo.png",
+        "google.ortools.runtime.osx-arm64.9.8.3296.nupkg.sha512",
+        "google.ortools.runtime.osx-arm64.nuspec",
+        "runtimes/osx-arm64/native/google-ortools-native.dylib",
+        "runtimes/osx-arm64/native/libortools.9.dylib"
+      ]
+    },
+    "Google.OrTools.runtime.osx-x64/9.8.3296": {
+      "sha512": "kyLAlIOvMuyL+OosdMstXx5hFIGj5OtNkAJ1oYWX5E+hd/WMtLQqIY0pxv5Rl4pYxi0kFRdApS8ZHnCSPrWjVQ==",
+      "type": "package",
+      "path": "google.ortools.runtime.osx-x64/9.8.3296",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "content/orLogo.png",
+        "google.ortools.runtime.osx-x64.9.8.3296.nupkg.sha512",
+        "google.ortools.runtime.osx-x64.nuspec",
+        "runtimes/osx-x64/native/google-ortools-native.dylib",
+        "runtimes/osx-x64/native/libortools.9.dylib"
+      ]
+    },
+    "Google.OrTools.runtime.win-x64/9.8.3296": {
+      "sha512": "S3kBqbnULsZfyJ2TilzWC5xREWkM0D3W9I+Eaw20KP67HFQ/QnjeRlTAzZ1nVzLjR4XheY7VT0io/wIdwT4n1Q==",
+      "type": "package",
+      "path": "google.ortools.runtime.win-x64/9.8.3296",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "content/orLogo.png",
+        "google.ortools.runtime.win-x64.9.8.3296.nupkg.sha512",
+        "google.ortools.runtime.win-x64.nuspec",
+        "runtimes/win-x64/native/google-ortools-native.dll"
+      ]
+    },
+    "Google.Protobuf/3.25.0": {
+      "sha512": "pIEkH1IqZV1iK8J5MYdG1kOyY0EoQLB6yEKvBq12RYNtvGXwCvnQg5zQsFmcqAEPtIZvSqPozIbUZaEd5a2gCg==",
+      "type": "package",
+      "path": "google.protobuf/3.25.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "google.protobuf.3.25.0.nupkg.sha512",
+        "google.protobuf.nuspec",
+        "lib/net45/Google.Protobuf.dll",
+        "lib/net45/Google.Protobuf.pdb",
+        "lib/net45/Google.Protobuf.xml",
+        "lib/net5.0/Google.Protobuf.dll",
+        "lib/net5.0/Google.Protobuf.pdb",
+        "lib/net5.0/Google.Protobuf.xml",
+        "lib/netstandard1.1/Google.Protobuf.dll",
+        "lib/netstandard1.1/Google.Protobuf.pdb",
+        "lib/netstandard1.1/Google.Protobuf.xml",
+        "lib/netstandard2.0/Google.Protobuf.dll",
+        "lib/netstandard2.0/Google.Protobuf.pdb",
+        "lib/netstandard2.0/Google.Protobuf.xml"
+      ]
+    },
     "Microsoft.Bcl.AsyncInterfaces/7.0.0": {
       "sha512": "3aeMZ1N0lJoSyzqiP03hqemtb1BijhsJADdobn/4nsMJ8V1H+CrpuduUe4hlRdx+ikBQju1VGjMD1GJ3Sk05Eg==",
       "type": "package",
@@ -2669,27 +3067,24 @@
         "useSharedDesignerContext.txt"
       ]
     },
-    "Microsoft.Xaml.Behaviors.Wpf/1.1.39": {
-      "sha512": "8PZKqw9QOcu42xk8puY4P1+EXHL9YGOR9b7qhaYx5cILHul456H073tj99vyPcCt0W0781T9RwHqkx507ZyUpQ==",
+    "Microsoft.Xaml.Behaviors.Wpf/1.1.77": {
+      "sha512": "MCu674ZETgU18EbxfwIlRpUPJ02YbZenLsMCXTkpeA7KUBpXfFaOUDlEO+7UWu5AFnUoydg+aQENJkuaZPheMQ==",
       "type": "package",
-      "path": "microsoft.xaml.behaviors.wpf/1.1.39",
+      "path": "microsoft.xaml.behaviors.wpf/1.1.77",
       "hasTools": true,
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
-        "lib/net45/Design/Microsoft.Xaml.Behaviors.Design.dll",
-        "lib/net45/Microsoft.Xaml.Behaviors.dll",
-        "lib/net45/Microsoft.Xaml.Behaviors.pdb",
-        "lib/net45/Microsoft.Xaml.Behaviors.xml",
-        "lib/net5.0-windows7.0/Design/Microsoft.Xaml.Behaviors.DesignTools.dll",
-        "lib/net5.0-windows7.0/Microsoft.Xaml.Behaviors.dll",
-        "lib/net5.0-windows7.0/Microsoft.Xaml.Behaviors.pdb",
-        "lib/net5.0-windows7.0/Microsoft.Xaml.Behaviors.xml",
-        "lib/netcoreapp3.1/Design/Microsoft.Xaml.Behaviors.DesignTools.dll",
-        "lib/netcoreapp3.1/Microsoft.Xaml.Behaviors.dll",
-        "lib/netcoreapp3.1/Microsoft.Xaml.Behaviors.pdb",
-        "lib/netcoreapp3.1/Microsoft.Xaml.Behaviors.xml",
-        "microsoft.xaml.behaviors.wpf.1.1.39.nupkg.sha512",
+        "lib/net462/Design/Microsoft.Xaml.Behaviors.Design.dll",
+        "lib/net462/Design/Microsoft.Xaml.Behaviors.DesignTools.dll",
+        "lib/net462/Microsoft.Xaml.Behaviors.dll",
+        "lib/net462/Microsoft.Xaml.Behaviors.pdb",
+        "lib/net462/Microsoft.Xaml.Behaviors.xml",
+        "lib/net6.0-windows7.0/Design/Microsoft.Xaml.Behaviors.DesignTools.dll",
+        "lib/net6.0-windows7.0/Microsoft.Xaml.Behaviors.dll",
+        "lib/net6.0-windows7.0/Microsoft.Xaml.Behaviors.pdb",
+        "lib/net6.0-windows7.0/Microsoft.Xaml.Behaviors.xml",
+        "microsoft.xaml.behaviors.wpf.1.1.77.nupkg.sha512",
         "microsoft.xaml.behaviors.wpf.nuspec",
         "tools/Install.ps1"
       ]
@@ -2738,10 +3133,10 @@
         "packageIcon.png"
       ]
     },
-    "Stub.System.Data.SQLite.Core.NetFramework/1.0.117": {
-      "sha512": "My72UHGDfOX8mY020DU88q7o6qyRj4hEjpq80Cwxc5euIEQ9jdvs5Y+hRr+HyvKP4EPMfD0+9ntGqeSeGauw5A==",
+    "Stub.System.Data.SQLite.Core.NetFramework/1.0.118": {
+      "sha512": "oKvqJyhos18gUWQ7DphJwke15HsmXjcfaYm/qymJDkXHraqwDy0BqYMbbwDSJ/bmcbhug3jQEZ1N1FjynGFFyg==",
       "type": "package",
-      "path": "stub.system.data.sqlite.core.netframework/1.0.117",
+      "path": "stub.system.data.sqlite.core.netframework/1.0.118",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -2780,7 +3175,7 @@
         "lib/net46/System.Data.SQLite.dll",
         "lib/net46/System.Data.SQLite.dll.altconfig",
         "lib/net46/System.Data.SQLite.xml",
-        "stub.system.data.sqlite.core.netframework.1.0.117.nupkg.sha512",
+        "stub.system.data.sqlite.core.netframework.1.0.118.nupkg.sha512",
         "stub.system.data.sqlite.core.netframework.nuspec"
       ]
     },
@@ -2905,32 +3300,32 @@
         "version.txt"
       ]
     },
-    "System.Data.SQLite/1.0.117": {
-      "sha512": "yL8FPHoK9LfP9mPk0FGTJlF8ZiqujKfeyn2lIdE/5LyKDhhyXRNWtOF2dN6+OpBdmO1ZSHaYr8HyOY3a3rZ4sw==",
+    "System.Data.SQLite/1.0.118": {
+      "sha512": "lm+Qc7SxuMNl/HpyAbJhQng+snqUs38jaC+GvKoYm5/w+RCTspvM6aFvdWXn6+yhntJR8FnbPWZ7oi2K4UL2vQ==",
       "type": "package",
-      "path": "system.data.sqlite/1.0.117",
+      "path": "system.data.sqlite/1.0.118",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
-        "system.data.sqlite.1.0.117.nupkg.sha512",
+        "system.data.sqlite.1.0.118.nupkg.sha512",
         "system.data.sqlite.nuspec"
       ]
     },
-    "System.Data.SQLite.Core/1.0.117": {
-      "sha512": "lGfOhA3QQod9XhdWYqLgNgbgq5uZnVG6DtnhDAdPisbLpTTgZBNbeGnp+GWt8C+3EyaqBYTGJWXcxHlHKwo05A==",
+    "System.Data.SQLite.Core/1.0.118": {
+      "sha512": "2V1PsfBeqWlZxF/VtB8lQKPfDBayCU8zD5Xc3Mq7cILOa2ZqpPDSwMP0fTfk1gtGSStSk//DxKiGy6zwCQs7Uw==",
       "type": "package",
-      "path": "system.data.sqlite.core/1.0.117",
+      "path": "system.data.sqlite.core/1.0.118",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
-        "system.data.sqlite.core.1.0.117.nupkg.sha512",
+        "system.data.sqlite.core.1.0.118.nupkg.sha512",
         "system.data.sqlite.core.nuspec"
       ]
     },
-    "System.Data.SQLite.EF6/1.0.117": {
-      "sha512": "Q1y/Jz1K63okYr1Jea7DyNGrOyWJiOpPHdpJ9cbjWAJanKJ0RUAZ8HQHKy9oEdxfjv0kfPR+Up9QcWni8lryCQ==",
+    "System.Data.SQLite.EF6/1.0.118": {
+      "sha512": "6OqO3OA8tej0BidxjYxutfR2HlodiYAA3qU4BtYe/wQdXJ75rumiAr9inYJaxFkwgGb8jW1qyFy953ZFyCOe8A==",
       "type": "package",
-      "path": "system.data.sqlite.ef6/1.0.117",
+      "path": "system.data.sqlite.ef6/1.0.118",
       "hasTools": true,
       "files": [
         ".nupkg.metadata",
@@ -2956,7 +3351,7 @@
         "lib/net451/System.Data.SQLite.EF6.dll",
         "lib/net46/System.Data.SQLite.EF6.dll",
         "lib/netstandard2.1/System.Data.SQLite.EF6.dll",
-        "system.data.sqlite.ef6.1.0.117.nupkg.sha512",
+        "system.data.sqlite.ef6.1.0.118.nupkg.sha512",
         "system.data.sqlite.ef6.nuspec",
         "tools/net40/install.ps1",
         "tools/net45/install.ps1",
@@ -2964,10 +3359,10 @@
         "tools/net46/install.ps1"
       ]
     },
-    "System.Data.SQLite.Linq/1.0.117": {
-      "sha512": "n79RR22rVM+dkN6TF9QgbuLdJV+JKMmBaC5XE1HDcuXCy0n0Dq577DdaaWMwsAJc+8UNRrc2mNvxzTEoO0frNA==",
+    "System.Data.SQLite.Linq/1.0.118": {
+      "sha512": "8cPMubj5tEvoa5Mu/wQaisUnrG9NcoMGFh6B9zDUxnTXuGACi+vwEqIIX+njdFJYPIJrnmGEiHV1T+Lr3YH7jg==",
       "type": "package",
-      "path": "system.data.sqlite.linq/1.0.117",
+      "path": "system.data.sqlite.linq/1.0.118",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -2986,14 +3381,14 @@
         "lib/net45/System.Data.SQLite.Linq.dll",
         "lib/net451/System.Data.SQLite.Linq.dll",
         "lib/net46/System.Data.SQLite.Linq.dll",
-        "system.data.sqlite.linq.1.0.117.nupkg.sha512",
+        "system.data.sqlite.linq.1.0.118.nupkg.sha512",
         "system.data.sqlite.linq.nuspec"
       ]
     },
-    "System.Memory/4.5.5": {
-      "sha512": "XIWiDvKPXaTveaB7HVganDlOCRoj03l+jrwNvcge/t8vhGYKvqV+dMv6G4SAX2NoNmN0wZfVPTAlFwZcZvVOUw==",
+    "System.Memory/4.5.4": {
+      "sha512": "1MbJTHS1lZ4bS4FmsJjnuGJOu88ZzTT2rLvrhW7Ygic+pC0NWA+3hgAen0HRdsocuQXCkUTdFn9yHJJhsijDXw==",
       "type": "package",
-      "path": "system.memory/4.5.5",
+      "path": "system.memory/4.5.4",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
@@ -3007,7 +3402,7 @@
         "lib/netstandard2.0/System.Memory.dll",
         "lib/netstandard2.0/System.Memory.xml",
         "ref/netcoreapp2.1/_._",
-        "system.memory.4.5.5.nupkg.sha512",
+        "system.memory.4.5.4.nupkg.sha512",
         "system.memory.nuspec",
         "useSharedDesignerContext.txt",
         "version.txt"
@@ -3126,17 +3521,20 @@
   "projectFileDependencyGroups": {
     ".NETFramework,Version=v4.8": [
       "Accord.MachineLearning >= 3.8.0",
-      "AutoCAD.NET >= 24.2.0",
-      "CommunityToolkit.Mvvm >= 8.1.0",
-      "Dapper >= 2.0.123",
-      "Microsoft.Xaml.Behaviors.Wpf >= 1.1.39",
+      "AutoCAD.NET >= 24.3.0",
+      "CommunityToolkit.Mvvm >= 8.2.2",
+      "Dapper >= 2.1.28",
+      "Google.OrTools >= 9.8.3296",
+      "Microsoft.Xaml.Behaviors.Wpf >= 1.1.77",
       "NetTopologySuite >= 2.5.0",
       "Newtonsoft.Json >= 13.0.3",
-      "System.Data.SQLite >= 1.0.117"
+      "System.Data.SQLite >= 1.0.118",
+      "System.Memory >= 4.5.4"
     ]
   },
   "packageFolders": {
-    "C:\\Users\\liu18\\.nuget\\packages\\": {}
+    "C:\\Users\\liu18\\.nuget\\packages\\": {},
+    "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages": {}
   },
   "project": {
     "version": "1.0.0",
@@ -3148,8 +3546,12 @@
       "outputPath": "D:\\GitHub\\TimeIsLife\\obj\\",
       "projectStyle": "PackageReference",
       "skipContentFileWrite": true,
+      "fallbackFolders": [
+        "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
+      ],
       "configFilePaths": [
         "C:\\Users\\liu18\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.FallbackLocation.config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -3174,19 +3576,23 @@
           },
           "AutoCAD.NET": {
             "target": "Package",
-            "version": "[24.2.0, )"
+            "version": "[24.3.0, )"
           },
           "CommunityToolkit.Mvvm": {
             "target": "Package",
-            "version": "[8.1.0, )"
+            "version": "[8.2.2, )"
           },
           "Dapper": {
             "target": "Package",
-            "version": "[2.0.123, )"
+            "version": "[2.1.28, )"
+          },
+          "Google.OrTools": {
+            "target": "Package",
+            "version": "[9.8.3296, )"
           },
           "Microsoft.Xaml.Behaviors.Wpf": {
             "target": "Package",
-            "version": "[1.1.39, )"
+            "version": "[1.1.77, )"
           },
           "NetTopologySuite": {
             "target": "Package",
@@ -3198,7 +3604,11 @@
           },
           "System.Data.SQLite": {
             "target": "Package",
-            "version": "[1.0.117, )"
+            "version": "[1.0.118, )"
+          },
+          "System.Memory": {
+            "target": "Package",
+            "version": "[4.5.4, )"
           }
         }
       }
@@ -3217,5 +3627,21 @@
         "#import": []
       }
     }
-  }
+  },
+  "logs": [
+    {
+      "code": "NU1605",
+      "level": "Warning",
+      "warningLevel": 1,
+      "message": "检测到包降级: System.Memory 从 4.5.5 降级到 4.5.4。直接从项目引用包以选择不同版本。 \r\n TimeIsLife -> CommunityToolkit.Mvvm 8.2.2 -> System.Memory (>= 4.5.5) \r\n TimeIsLife -> System.Memory (>= 4.5.4)",
+      "libraryId": "System.Memory",
+      "targetGraphs": [
+        ".NETFramework,Version=v4.8",
+        ".NETFramework,Version=v4.8/win",
+        ".NETFramework,Version=v4.8/win-arm64",
+        ".NETFramework,Version=v4.8/win-x64",
+        ".NETFramework,Version=v4.8/win-x86"
+      ]
+    }
+  ]
 }
