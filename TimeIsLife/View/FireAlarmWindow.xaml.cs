@@ -68,7 +68,7 @@ namespace TimeIsLife.View
                 viewModel.LoadState();
                 if (!string.IsNullOrEmpty(viewModel.YdbFileName))
                 {
-                    viewModel.LoadYdbDatabase(viewModel.YdbFileName);
+                    viewModel.LoadYdbDatabase();
                 }
             }
             catch (Exception ex)

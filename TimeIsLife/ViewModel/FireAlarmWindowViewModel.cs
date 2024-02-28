@@ -144,7 +144,13 @@ namespace TimeIsLife.ViewModel
             get => sCircularConnectionSelected;
             set => SetProperty(ref sCircularConnectionSelected, value);
         }
-        
+
+        private Vector3d baseVector;
+        public Vector3d BaseVector
+        {
+            get => baseVector;
+            set => SetProperty(ref baseVector, value);
+        }
         #endregion
 
         #region 委托
@@ -161,8 +167,9 @@ namespace TimeIsLife.ViewModel
         public bool Result { get; private set; }
         #endregion
 
-        #region 方法      
-        public void GetFloorAreaLayerName()
+        #region 方法
+
+        private void GetFloorAreaLayerName()
         {
             FireAlarmWindow.Instance.Hide();
 
@@ -174,13 +181,6 @@ namespace TimeIsLife.ViewModel
             {
                 try
                 {
-                    //获取块表
-                    BlockTable blockTable = transaction.GetObject(database.BlockTableId, OpenMode.ForRead) as BlockTable;
-                    //获取模型空间
-                    BlockTableRecord modelSpace = transaction.GetObject(blockTable[BlockTableRecord.ModelSpace], OpenMode.ForRead) as BlockTableRecord;
-                    //获取图纸空间
-                    BlockTableRecord paperSpace = transaction.GetObject(blockTable[BlockTableRecord.PaperSpace], OpenMode.ForRead) as BlockTableRecord;
-
                     //选择选项
                     PromptSelectionOptions promptSelectionOptions = new PromptSelectionOptions
                     {
@@ -204,7 +204,7 @@ namespace TimeIsLife.ViewModel
                     Polyline polyline = transaction.GetObject(selectionSet.GetObjectIds().FirstOrDefault(), OpenMode.ForRead) as Polyline;
                     if (polyline == null)
                     {
-                        MessageBox.Show("选择的对象不是多段线！");
+                        MessageBox.Show(@"选择的对象不是多段线！");
                         FireAlarmWindow.Instance.ShowDialog();
                         return;
                     }
@@ -213,13 +213,14 @@ namespace TimeIsLife.ViewModel
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("发生错误: " + ex.Message); // 提供详细的错误信息
+                    MessageBox.Show(@"发生错误: " + ex.Message); // 提供详细的错误信息
                     transaction.Abort();
                 }
             }
             FireAlarmWindow.Instance.ShowDialog();
         }
-        public void GetFireAreaLayerName()
+
+        private void GetFireAreaLayerName()
         {
             FireAlarmWindow.Instance.Hide();
 
@@ -231,13 +232,6 @@ namespace TimeIsLife.ViewModel
             {
                 try
                 {
-                    //获取块表
-                    BlockTable blockTable = transaction.GetObject(database.BlockTableId, OpenMode.ForRead) as BlockTable;
-                    //获取模型空间
-                    BlockTableRecord modelSpace = transaction.GetObject(blockTable[BlockTableRecord.ModelSpace], OpenMode.ForRead) as BlockTableRecord;
-                    //获取图纸空间
-                    BlockTableRecord paperSpace = transaction.GetObject(blockTable[BlockTableRecord.PaperSpace], OpenMode.ForRead) as BlockTableRecord;
-
                     //选择选项
                     PromptSelectionOptions promptSelectionOptions = new PromptSelectionOptions
                     {
@@ -261,7 +255,7 @@ namespace TimeIsLife.ViewModel
                     Polyline polyline = transaction.GetObject(selectionSet.GetObjectIds().FirstOrDefault(), OpenMode.ForRead) as Polyline;
                     if (polyline == null)
                     {
-                        MessageBox.Show("选择的对象不是多段线！");
+                        MessageBox.Show(@"选择的对象不是多段线！");
                         FireAlarmWindow.Instance.ShowDialog();
                         return;
                     }
@@ -270,14 +264,15 @@ namespace TimeIsLife.ViewModel
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show("发生错误: " + ex.Message); // 提供详细的错误信息
+                    MessageBox.Show(@"发生错误: " + ex.Message); // 提供详细的错误信息
                     transaction.Abort();
                 }
             }
             FireAlarmWindow.Instance.ShowDialog();
 
         }
-        public void GetRoomAreaLayerName()
+
+        private void GetRoomAreaLayerName()
         {
             FireAlarmWindow.Instance.Hide();
             Document document = Autodesk.AutoCAD.ApplicationServices.Core.Application.DocumentManager.CurrentDocument;
@@ -333,15 +328,16 @@ namespace TimeIsLife.ViewModel
             }
             FireAlarmWindow.Instance.ShowDialog();
         }
-        public void GetYdbFileName()
+
+        private void GetYdbFileName()
         {
             FireAlarmWindow.Instance.Hide();
             AreaFloors.Clear();
 
             OpenFileDialog openFileDialog = new OpenFileDialog
             {
-                Filter = "盈建科数据库(*.ydb)|*.ydb|所有文件|*.*",
-                Title = "选择结构模型数据库文件",
+                Filter = @"盈建科数据库(*.ydb)|*.ydb|所有文件|*.*",
+                Title = @"选择结构模型数据库文件",
                 ValidateNames = true,
                 CheckFileExists = true,
                 CheckPathExists = true,
@@ -351,21 +347,18 @@ namespace TimeIsLife.ViewModel
             if (openFileDialog.ShowDialog() == DialogResult.OK)
             {
                 YdbFileName = openFileDialog.FileName;
-                LoadYdbDatabase(YdbFileName);
-                FireAlarmWindow.Instance.ShowDialog();
-                return;
+                LoadYdbDatabase();
+                FireAlarmWindow.Instance.ShowDialog(); 
             }
             else
             {
-                MessageBox.Show("请重新选择YDB文件！");
+                MessageBox.Show(@"请重新选择YDB文件！");
                 FireAlarmWindow.Instance.ShowDialog();
-                return;
             }         
 
             
         }
-        
-        public void LoadYdbDatabase(string ydbFileName)
+        public void LoadYdbDatabase()
         {
             using SQLiteConnection ydbConn = new SQLiteConnection($"Data Source={ydbFileName}");
             string sqlFloor = "SELECT f.ID,f.Name,f.LevelB,f.Height FROM tblFloor AS f WHERE f.Height != 0";
@@ -381,18 +374,17 @@ namespace TimeIsLife.ViewModel
                 AreaFloors.Add(area);
             }
         }
-        
         private void GetFloorArea() 
         {
             if (SelectedAreaFloor == null)
             {
-                MessageBox.Show("未选择楼层！");
+                MessageBox.Show(@"未选择楼层！");
                 return;
             }
 
             if (Instance.FloorAreaLayerName.IsNullOrWhiteSpace())
             {
-                MessageBox.Show("请先完成楼层图层的选择！");
+                MessageBox.Show(@"请先完成楼层图层的选择！");
                 return;
             }
 
@@ -406,26 +398,19 @@ namespace TimeIsLife.ViewModel
             using Transaction transaction = database.TransactionManager.StartTransaction();
             try
             {
-                //获取块表
-                BlockTable blockTable = transaction.GetObject(database.BlockTableId, OpenMode.ForRead) as BlockTable;
-                //获取模型空间
-                BlockTableRecord modelSpace = transaction.GetObject(blockTable[BlockTableRecord.ModelSpace], OpenMode.ForRead) as BlockTableRecord;
-                //获取图纸空间
-                BlockTableRecord paperSpace = transaction.GetObject(blockTable[BlockTableRecord.PaperSpace], OpenMode.ForRead) as BlockTableRecord;
-
                 //选择选项
                 PromptEntityOptions promptEntityOptions = new PromptEntityOptions("\n选择楼层");
                 PromptEntityResult result = editor.GetEntity(promptEntityOptions);
                 if (result.Status != PromptStatus.OK)
                 {
-                    MessageBox.Show("重新选择楼层！");
+                    MessageBox.Show(@"重新选择楼层！");
                     FireAlarmWindow.Instance.ShowDialog();
                     return;
                 }
                 Polyline polyline = transaction.GetObject(result.ObjectId, OpenMode.ForRead) as Polyline;
                 if (polyline == null)
                 {
-                    MessageBox.Show("选择对象不是多段线！");
+                    MessageBox.Show(@"选择对象不是多段线！");
                     FireAlarmWindow.Instance.ShowDialog();
                     return;
                 }
@@ -436,35 +421,46 @@ namespace TimeIsLife.ViewModel
                 //FireAlarmWindowViewModel.instance.SelectedAreaFloor.MaxPoint3d = polyline.GeometricExtents.MaxPoint;
 
                 //过滤器
-                TypedValueList typedValues = new TypedValueList
-                    {
-                        { DxfCode.LayerName, Instance.FloorAreaLayerName },
-                        typeof(DBText)
-                    };
+                var typedValues = new TypedValueList
+                {
+                    { DxfCode.LayerName, this.FloorAreaLayerName },
+                };
 
                 SelectionSet selectionSet = editor.GetSelectionSet(SelectString.SelectWindowPolygon, null,
                     new SelectionFilter(typedValues), polyline.GetPoint3dCollection(ucsToWcsMatrix3d));
                 if (selectionSet == null)
                 {
-                    MessageBox.Show("缺少楼层名称！");
+                    MessageBox.Show(@"缺少楼层名称！");
                     FireAlarmWindow.Instance.ShowDialog();
                     return;
                 }
                 else if (selectionSet.Count != 1)
                 {
-                    MessageBox.Show("包含多个楼层名称！");
+                    MessageBox.Show(@"包含多个楼层名称！");
                     FireAlarmWindow.Instance.ShowDialog();
                     return;
                 }
 
-                DBText dBText = transaction.GetObject(selectionSet.GetObjectIds()[0], OpenMode.ForRead) as DBText;
-                if (dBText == null)
+                var obj = transaction.GetObject(selectionSet.GetObjectIds()[0], OpenMode.ForRead);
+                // 检查对象是否为DBText
+                if (obj is DBText dbText)
                 {
-                    MessageBox.Show("未包含楼层名称！");
+                    this.SelectedAreaFloor.Name = dbText.TextString;
+
+                    // 这里可以对dbText进行更多操作
+                }
+                // 检查对象是否为MText
+                else if (obj is MText mText)
+                {
+                    this.SelectedAreaFloor.Name = mText.Text;
+                    // 这里可以对mText进行更多操作
+                }
+                else
+                {
+                    MessageBox.Show(@"未包含楼层名称！");
                     FireAlarmWindow.Instance.ShowDialog();
                     return;
                 }
-                Instance.SelectedAreaFloor.Name = dBText.TextString;
                 Area area = new Model.Area
                 {
                     Floor = Instance.SelectedAreaFloor,
@@ -478,7 +474,7 @@ namespace TimeIsLife.ViewModel
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"发生错误: {ex.Message}");
+                MessageBox.Show($@"发生错误: {ex.Message}");
                 transaction.Abort();
             }
             finally
@@ -490,7 +486,7 @@ namespace TimeIsLife.ViewModel
         {
             if (Instance.SelectedAreaFloor == null)
             {
-                MessageBox.Show("未选择基点对应的楼层！");
+                MessageBox.Show(@"未选择基点对应的楼层！");
                 return;
             }
 
@@ -499,16 +495,13 @@ namespace TimeIsLife.ViewModel
             Document document = Autodesk.AutoCAD.ApplicationServices.Core.Application.DocumentManager.CurrentDocument;
             Database database = document.Database;
             Editor editor = document.Editor;
-            Matrix3d ucsToWcsMatrix3d = editor.CurrentUserCoordinateSystem;
-
-            
 
             using (Transaction transaction = database.TransactionManager.StartTransaction())
             {
                 try
                 {
-                    List<Beam> beams = new List<Beam>();
-                    List<Wall> walls = new List<Wall>();
+                    List<Beam> beams;
+                    List<Wall> walls;
 
                     using (var ydbConn = new SQLiteConnection($"Data Source={Instance.YdbFileName}"))
                     {
@@ -530,11 +523,14 @@ namespace TimeIsLife.ViewModel
                     if (promptResult.Status == PromptStatus.OK)
                     {
                         Instance.ReferenceBasePoint = basePointJig._point;
+                        BaseVector =
+                            new Point3d(Instance.SelectedAreaFloor.X, Instance.SelectedAreaFloor.Y,
+                                Instance.SelectedAreaFloor.Z).GetVectorTo(Instance.ReferenceBasePoint);
                     }
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"发生错误: {ex.Message}");
+                    MessageBox.Show($@"发生错误: {ex.Message}");
                 }
                 finally
                 {
@@ -596,133 +592,99 @@ namespace TimeIsLife.ViewModel
         }
         private List<Polyline> GeneratePolylines(List<Beam> beams, List<Wall> walls)
         {
-            Document document = Autodesk.AutoCAD.ApplicationServices.Core.Application.DocumentManager.CurrentDocument;
-            Database database = document.Database;
-            Editor editor = document.Editor;
             List<Polyline> polylines = new List<Polyline>();
 
-            using (Transaction transaction = database.TransactionManager.StartTransaction())
+            #region 生成梁
+
+            double startWidth = 0;
+            double endWidth = 0;
+            double height = 0;
+            foreach (var beam in beams)
             {
-                //获取块表
-                BlockTable blockTable = transaction.GetObject(database.BlockTableId, OpenMode.ForRead) as BlockTable;
-                //获取模型空间
-                BlockTableRecord modelSpace = transaction.GetObject(blockTable[BlockTableRecord.ModelSpace], OpenMode.ForRead) as BlockTableRecord;
-                //获取图纸空间
-                BlockTableRecord paperSpace = transaction.GetObject(blockTable[BlockTableRecord.PaperSpace], OpenMode.ForRead) as BlockTableRecord;
+                Point2d p1 = new Point2d(beam.Grid.Joint1.X, beam.Grid.Joint1.Y);
+                Point2d p2 = new Point2d(beam.Grid.Joint2.X, beam.Grid.Joint2.Y);
 
-                #region 生成梁
-                foreach (var beam in beams)
+
+                Polyline polyline = new Polyline();
+                switch (beam.BeamSect.Kind)
                 {
-                    Point2d p1 = new Point2d(beam.Grid.Joint1.X, beam.Grid.Joint1.Y);
-                    Point2d p2 = new Point2d(beam.Grid.Joint2.X, beam.Grid.Joint2.Y);
-                    double startWidth = 0;
-                    double endWidth = 0;
-                    double height = 0;
+                    case 1:
+                        startWidth = endWidth = double.Parse(beam.BeamSect.ShapeVal.Split(',')[1]);
+                        height = double.Parse(beam.BeamSect.ShapeVal.Split(',')[2]);
 
-                    Polyline polyline = new Polyline();
-                    switch (beam.BeamSect.Kind)
-                    {
-                        case 1:
-                            startWidth = endWidth = double.Parse(beam.BeamSect.ShapeVal.Split(',')[1]);
-                            height = double.Parse(beam.BeamSect.ShapeVal.Split(',')[2]);
+                        polyline.AddVertexAt(0, p1, 0, startWidth, endWidth);
+                        polyline.AddVertexAt(1, p2, 0, startWidth, endWidth);
+                        break;
+                    case 2:
+                        startWidth = endWidth = double.Parse(beam.BeamSect.ShapeVal.Split(',')[3]);
+                        height = double.Parse(beam.BeamSect.ShapeVal.Split(',')[2]);
 
-                            polyline.AddVertexAt(0, p1, 0, startWidth, endWidth);
-                            polyline.AddVertexAt(1, p2, 0, startWidth, endWidth);
-                            break;
-                        case 2:
-                            startWidth = endWidth = double.Parse(beam.BeamSect.ShapeVal.Split(',')[3]);
-                            height = double.Parse(beam.BeamSect.ShapeVal.Split(',')[2]);
+                        polyline.AddVertexAt(0, p1, 0, startWidth, endWidth);
+                        polyline.AddVertexAt(1, p2, 0, startWidth, endWidth);
+                        break;
+                    case 7:
+                        startWidth = endWidth = double.Parse(beam.BeamSect.ShapeVal.Split(',')[1]);
+                        height = double.Parse(beam.BeamSect.ShapeVal.Split(',')[2]);
 
-                            polyline.AddVertexAt(0, p1, 0, startWidth, endWidth);
-                            polyline.AddVertexAt(1, p2, 0, startWidth, endWidth);
-                            break;
-                        case 7:
-                            startWidth = endWidth = double.Parse(beam.BeamSect.ShapeVal.Split(',')[1]);
-                            height = double.Parse(beam.BeamSect.ShapeVal.Split(',')[2]);
+                        polyline.AddVertexAt(0, p1, 0, startWidth, endWidth);
+                        polyline.AddVertexAt(1, p2, 0, startWidth, endWidth);
+                        break;
+                    case 13:
+                        startWidth = endWidth = double.Parse(beam.BeamSect.ShapeVal.Split(',')[1]);
+                        height = double.Parse(beam.BeamSect.ShapeVal.Split(',')[2]);
 
-                            polyline.AddVertexAt(0, p1, 0, startWidth, endWidth);
-                            polyline.AddVertexAt(1, p2, 0, startWidth, endWidth);
-                            break;
-                        case 13:
-                            startWidth = endWidth = double.Parse(beam.BeamSect.ShapeVal.Split(',')[1]);
-                            height = double.Parse(beam.BeamSect.ShapeVal.Split(',')[2]);
+                        polyline.AddVertexAt(0, p1, 0, startWidth, endWidth);
+                        polyline.AddVertexAt(1, p2, 0, startWidth, endWidth);
+                        break;
+                    case 22:
+                        startWidth = endWidth = double.Parse(beam.BeamSect.ShapeVal.Split(',')[1]);
+                        height = Math.Min(double.Parse(beam.BeamSect.ShapeVal.Split(',')[3]), double.Parse(beam.BeamSect.ShapeVal.Split(',')[4]));
 
-                            polyline.AddVertexAt(0, p1, 0, startWidth, endWidth);
-                            polyline.AddVertexAt(1, p2, 0, startWidth, endWidth);
-                            break;
-                        case 22:
-                            startWidth = endWidth = double.Parse(beam.BeamSect.ShapeVal.Split(',')[1]);
-                            height = Math.Min(double.Parse(beam.BeamSect.ShapeVal.Split(',')[3]), double.Parse(beam.BeamSect.ShapeVal.Split(',')[4]));
+                        polyline.AddVertexAt(0, p1, 0, startWidth, endWidth);
+                        polyline.AddVertexAt(1, p2, 0, startWidth, endWidth);
+                        break;
+                    case 26:
+                        startWidth = endWidth = double.Parse(beam.BeamSect.ShapeVal.Split(',')[5]);
+                        height = double.Parse(beam.BeamSect.ShapeVal.Split(',')[3]);
 
-                            polyline.AddVertexAt(0, p1, 0, startWidth, endWidth);
-                            polyline.AddVertexAt(1, p2, 0, startWidth, endWidth);
-                            break;
-                        case 26:
-                            startWidth = endWidth = double.Parse(beam.BeamSect.ShapeVal.Split(',')[5]);
-                            height = double.Parse(beam.BeamSect.ShapeVal.Split(',')[3]);
+                        polyline.AddVertexAt(0, p1, 0, startWidth, endWidth);
+                        polyline.AddVertexAt(1, p2, 0, startWidth, endWidth);
+                        break;
 
-                            polyline.AddVertexAt(0, p1, 0, startWidth, endWidth);
-                            polyline.AddVertexAt(1, p2, 0, startWidth, endWidth);
-                            break;
+                    default:
+                        startWidth = endWidth = double.Parse(beam.BeamSect.ShapeVal.Split(',')[1]);
+                        height = double.Parse(beam.BeamSect.ShapeVal.Split(',')[2]);
 
-                        default:
-                            startWidth = endWidth = double.Parse(beam.BeamSect.ShapeVal.Split(',')[1]);
-                            height = double.Parse(beam.BeamSect.ShapeVal.Split(',')[2]);
-
-                            polyline.AddVertexAt(0, p1, 0, startWidth, endWidth);
-                            polyline.AddVertexAt(1, p2, 0, startWidth, endWidth);
-                            break;
-                    }
-                    polylines.Add(polyline);
+                        polyline.AddVertexAt(0, p1, 0, startWidth, endWidth);
+                        polyline.AddVertexAt(1, p2, 0, startWidth, endWidth);
+                        break;
                 }
-                #endregion
-
-                #region 生成墙
-                foreach (var wall in walls)
-                {
-                    Point2d p1 = new Point2d(wall.Grid.Joint1.X, wall.Grid.Joint1.Y);
-                    Point2d p2 = new Point2d(wall.Grid.Joint2.X, wall.Grid.Joint2.Y);
-                    int startWidth = wall.WallSect.B;
-                    int endWidth = wall.WallSect.B;
-
-                    Polyline polyline = new Polyline();
-                    polyline.AddVertexAt(0, p1, 0, startWidth, endWidth);
-                    polyline.AddVertexAt(1, p2, 0, startWidth, endWidth);
-                    polylines.Add(polyline);
-                }
-                #endregion
-
+                polylines.Add(polyline);
             }
+            #endregion
+
+            #region 生成墙
+            foreach (var wall in walls)
+            {
+                Point2d p1 = new Point2d(wall.Grid.Joint1.X, wall.Grid.Joint1.Y);
+                Point2d p2 = new Point2d(wall.Grid.Joint2.X, wall.Grid.Joint2.Y);
+                startWidth = wall.WallSect.B;
+                endWidth = wall.WallSect.B;
+
+                Polyline polyline = new Polyline();
+                polyline.AddVertexAt(0, p1, 0, startWidth, endWidth);
+                polyline.AddVertexAt(1, p2, 0, startWidth, endWidth);
+                polylines.Add(polyline);
+            }
+            #endregion
             return polylines;
         }
-
-        //public void SaveAreaFile()
-        //{
-        //    FireAlarmWindow.Instance.Hide();
-        //    SaveFileDialog saveFileDialog = new SaveFileDialog
-        //    {
-        //        Filter = "区域数据库文件 (*.Area)|*.Area|所有文件 (*.*)|*.*",
-        //        Title = "文件另存为..."
-        //    };
-        //    if (saveFileDialog.ShowDialog() == DialogResult.OK)
-        //    {
-        //        Instance.AreaFileName = saveFileDialog.FileName;
-        //    }
-        //    FireAlarmWindow.Instance.ShowDialog();
-        //}
-
-        //public void Apply()
-        //{
-        //    Application.DocumentManager.MdiActiveDocument.SendStringToExecute("_FF_SaveAreaFile\n", true, false, true);
-        //    FireAlarmWindow.Instance.Hide();
-        //}
-
-        public void Confirm()
+        private void Confirm()
         {
             Result = true;
             FireAlarmWindow.Instance.Close();
         }
-        public void Cancel()
+        private void Cancel()
         {
             Result = false;
             FireAlarmWindow.Instance.Close();

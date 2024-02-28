@@ -30,6 +30,7 @@ namespace TimeIsLife.Helper
             {
                 coordinates[i] = new Coordinate(polyline.GetPoint3dAt(i % n).X, polyline.GetPoint3dAt(i % n).Y);
             }
+
             return geometryFactory.CreatePolygon(coordinates);
         }
 
@@ -46,6 +47,7 @@ namespace TimeIsLife.Helper
             {
                 points.Add(polyline.GetPoint3dAt(i));
             }
+
             return points;
         }
 
@@ -62,6 +64,7 @@ namespace TimeIsLife.Helper
             {
                 points.Add(polyline.GetPoint3dAt(i).TransformBy(ucsToWcsMatrix3d.Inverse()));
             }
+
             return points;
         }
 
@@ -78,6 +81,7 @@ namespace TimeIsLife.Helper
             {
                 points.Add(new Point2d(polyline.GetPoint3dAt(i).X, polyline.GetPoint3dAt(i).Y));
             }
+
             return points;
         }
 
@@ -94,6 +98,7 @@ namespace TimeIsLife.Helper
             {
                 point2ds.Add(new Point2d(polyline.GetPoint3dAt(i).X, polyline.GetPoint3dAt(i).Y));
             }
+
             return point2ds;
         }
 
@@ -110,6 +115,7 @@ namespace TimeIsLife.Helper
             {
                 coordinates.Add(new Coordinate(polyline.GetPoint3dAt(i).X, polyline.GetPoint3dAt(i).Y));
             }
+
             return coordinates;
         }
 
@@ -129,55 +135,56 @@ namespace TimeIsLife.Helper
                     bo = false;
                 }
             }
+
             return bo;
         }
 
-        public static string GetXValues(this Polyline polyline, double segmentLength = 300)
+        public static string GetXValues(this Polyline polyline, int numSegments = 10)
         {
             List<double> xValues = new List<double>();
-            ProcessPolyline(polyline, segmentLength, (point) => xValues.Add(point.X));
+            ProcessPolyline(polyline, numSegments, (point) => xValues.Add(point.X));
             return string.Join(",", xValues.ToArray());
         }
 
-        public static string GetYValues(this Polyline polyline, double segmentLength = 300)
+        public static string GetYValues(this Polyline polyline, int numSegments = 10)
         {
             List<double> yValues = new List<double>();
-            ProcessPolyline(polyline, segmentLength, (point) => yValues.Add(point.Y));
+            ProcessPolyline(polyline, numSegments, (point) => yValues.Add(point.Y));
             return string.Join(",", yValues.ToArray());
         }
 
-        public static string GetZValues(this Polyline polyline, double segmentLength = 300)
+        public static string GetZValues(this Polyline polyline, int numSegments = 10)
         {
             List<double> zValues = new List<double>();
-            ProcessPolyline(polyline, segmentLength, (point) => zValues.Add(point.Z));
+            ProcessPolyline(polyline, numSegments, (point) => zValues.Add(point.Z));
             return string.Join(",", zValues.ToArray());
         }
 
         /// <summary>
-        /// 处理多段线内的弧线段为近似直线段
+        /// 处理多段线内的弧线段为近似直线段，基于指定的分段数量
         /// </summary>
-        /// <param name="polyline"></param>
-        /// <param name="segmentLength"></param>
-        /// <param name="processPoint"></param>
-        private static void ProcessPolyline(Polyline polyline, double segmentLength, Action<Point3d> processPoint)
+        /// <param name="polyline">要处理的多段线</param>
+        /// <param name="numSegments">弧线段的分段数量，默认为10</param>
+        /// <param name="processPoint">对每个生成点进行处理的操作</param>
+        private static void ProcessPolyline(Polyline polyline, int numSegments, Action<Point3d> processPoint)
         {
             for (int i = 0; i < polyline.NumberOfVertices; i++)
             {
                 if (polyline.GetSegmentType(i) == SegmentType.Arc)
                 {
                     CircularArc3d arc = polyline.GetArcSegmentAt(i);
-                    double arcLength = arc.GetLength(0, 1, 1e-3);
-                    int numSegments = (int)Math.Ceiling(arcLength / segmentLength);
+                    // 不再基于弧长和分段长度计算分段数，而是直接使用numSegments参数
 
                     for (int j = 0; j <= numSegments; j++)
                     {
-                        double param = j / numSegments;
+                        double param = (double)j / numSegments; // 确保正确的浮点数计算
                         Point3d pointOnArc = arc.EvaluatePoint(param);
                         processPoint(pointOnArc);
                     }
                 }
                 else
                 {
+                    // 对于非弧线段，直接处理该点
                     processPoint(polyline.GetPoint3dAt(i));
                 }
             }

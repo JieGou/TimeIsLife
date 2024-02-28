@@ -79,167 +79,6 @@ namespace TimeIsLife.CADCommand
 {
     partial class TilCommand
     {
-        
-        //#region _FF_SaveAreaFile
-        //[CommandMethod("_FF_SaveAreaFile")]
-        //public void _FF_SaveAreaFile()
-        //{
-        //    Initialize();
-
-        //    const string createFloorTableSql = @"
-        //        CREATE TABLE IF NOT EXISTS Floor (
-        //            ID INTEGER PRIMARY KEY,
-        //            Name TEXT,
-        //            Level REAL,
-        //            X REAL,
-        //            Y REAL,
-        //            Z REAL
-        //        )";
-        //    const string createAreaTableSql = @"
-        //        CREATE TABLE IF NOT EXISTS Area (
-        //            ID INTEGER PRIMARY KEY,
-        //            FloorID INTEGER NOT NULL,
-        //            VertexX TEXT NOT NULL,
-        //            VertexY TEXT NOT NULL,
-        //            VertexZ TEXT NOT NULL,
-        //            Kind INTEGER NOT NULL,
-        //            Note TEXT,
-        //            FOREIGN KEY(FloorID) REFERENCES Floor(ID)
-        //        )";
-        //    const string createBasePointTableSql = @"
-        //        CREATE TABLE IF NOT EXISTS BasePoint (
-        //            ID INTEGER PRIMARY KEY,
-        //            Name TEXT,
-        //            Level REAL NOT NULL,
-        //            X REAL NOT NULL,
-        //            Y REAL NOT NULL,
-        //            Z REAL NOT NULL
-        //        )";
-        //    const string insertBasePointSql = @"
-        //        INSERT INTO BasePoint (Name, Level, X, Y, Z) 
-        //        VALUES (@name, @level, @x, @y, @z)";
-        //    const string insertFloorSql = "INSERT INTO Floor (Name, Level, X, Y, Z) VALUES (@Name, @Level, @X, @Y, @Z)";
-        //    const string insertAreaSql = "INSERT INTO Area (FloorID, VertexX, VertexY, VertexZ, Kind, Note) VALUES (@FloorID, @X, @Y, @Z, @Kind, @Note)";
-
-        //    using (Transaction transaction = database.TransactionManager.StartTransaction())
-        //    {
-        //        //获取块表
-        //        BlockTable blockTable = transaction.GetObject(database.BlockTableId, OpenMode.ForRead) as BlockTable;
-        //        //获取模型空间
-        //        BlockTableRecord modelSpace = transaction.GetObject(blockTable[BlockTableRecord.ModelSpace], OpenMode.ForRead) as BlockTableRecord;
-        //        //获取图纸空间
-        //        BlockTableRecord paperSpace = transaction.GetObject(blockTable[BlockTableRecord.PaperSpace], OpenMode.ForRead) as BlockTableRecord;
-
-        //        try
-        //        {
-        //            if (File.Exists(FireAlarmWindowViewModel.Instance.AreaFileName))
-        //            {
-        //                File.Delete(FireAlarmWindowViewModel.Instance.AreaFileName);
-        //            }
-
-        //            SQLiteConnection.CreateFile(FireAlarmWindowViewModel.Instance.AreaFileName);
-        //            SQLiteHelper sqliteHelper = new SQLiteHelper($"Data Source={FireAlarmWindowViewModel.Instance.AreaFileName};Version=3;");
-        //            sqliteHelper.Execute(createFloorTableSql);
-        //            sqliteHelper.Execute(createAreaTableSql);
-        //            sqliteHelper.Execute(createBasePointTableSql);
-
-        //            sqliteHelper.Insert<int>(insertBasePointSql,
-        //                new
-        //                {
-        //                    FireAlarmWindowViewModel.Instance.SelectedAreaFloor.Name,
-        //                    FireAlarmWindowViewModel.Instance.SelectedAreaFloor.Level,
-        //                    FireAlarmWindowViewModel.Instance.ReferenceBasePoint.X,
-        //                    FireAlarmWindowViewModel.Instance.ReferenceBasePoint.Y,
-        //                    FireAlarmWindowViewModel.Instance.ReferenceBasePoint.Z
-        //                });
-
-        //            foreach (var areaFloor in FireAlarmWindowViewModel.Instance.AreaFloors)
-        //            {
-        //                sqliteHelper.Insert<int>(insertFloorSql, areaFloor);
-        //            }
-
-        //            foreach (var area in FireAlarmWindowViewModel.Instance.Areas)
-        //            {
-        //                // 从Floor表中查询指定标高的ID
-        //                int floorId = sqliteHelper.Query<int>("SELECT ID FROM Floor WHERE Level = @level", new { level = area.Floor.Level }).FirstOrDefault();
-
-        //                if (floorId > 0)
-        //                {
-        //                    // 构建插入语句并插入到Area表中                            
-        //                    sqliteHelper.Execute(insertAreaSql, new { FloorID = floorId, X = area.VertexX, Y = area.VertexY, Z = area.VertexZ, Kind = area.Kind, Note = area.Note });
-        //                }
-
-        //                //过滤器
-        //                TypedValueList typedValues = new TypedValueList();
-        //                typedValues.Add(typeof(Polyline));
-        //                SelectionFilter selectionFilter1 = new SelectionFilter(typedValues);
-        //                Point3dCollection point3DCollection1 = area.Point3dCollection.TransformBy(ucsToWcsMatrix3d.Inverse());
-        //                SelectionSet selectionSet = editor.GetSelectionSet(SelectString.SelectCrossingPolygon, null, selectionFilter1, point3DCollection1);
-
-        //                if (selectionSet.Count == 0) continue;
-        //                foreach (var id in selectionSet.GetObjectIds())
-        //                {
-        //                    Polyline polyline = transaction.GetObject(id, OpenMode.ForRead) as Polyline;
-        //                    if (polyline == null) continue;
-        //                    if (polyline.Layer == FireAlarmWindowViewModel.Instance.FireAreaLayerName || polyline.Layer == FireAlarmWindowViewModel.Instance.RoomAreaLayerName)
-        //                    {
-        //                        TypedValueList dbTextTypedValues = new TypedValueList
-        //                        {
-        //                            { DxfCode.LayerName, polyline.Layer },
-        //                            typeof(DBText)
-        //                        };
-        //                        SelectionFilter selectionFilter2 = new SelectionFilter(dbTextTypedValues);
-        //                        SelectionSet dbTextSelectionSet = editor.GetSelectionSet(SelectString.SelectCrossingPolygon, null, selectionFilter2, polyline.GetPoint3dCollection(ucsToWcsMatrix3d.Inverse()));
-        //                        List<string> notes = new List<string>();
-        //                        foreach (var textId in dbTextSelectionSet.GetObjectIds())
-        //                        {
-        //                            DBText dBText = transaction.GetObject(textId, OpenMode.ForRead) as DBText;
-        //                            if (dBText == null) return;
-        //                            notes.Add(dBText.TextString);
-        //                        }
-
-        //                        Model.Area newArea = null;
-        //                        if (polyline.Layer == FireAlarmWindowViewModel.Instance.FireAreaLayerName)
-        //                        {
-        //                            newArea = new Model.Area
-        //                            {
-        //                                Kind = 1,
-        //                                Note = string.Join(",", notes.ToArray()),
-        //                                VertexX = polyline.GetXValues(),
-        //                                VertexY = polyline.GetYValues(),
-        //                                VertexZ = polyline.GetZValues()
-        //                            };
-        //                        }
-        //                        else if (polyline.Layer == FireAlarmWindowViewModel.Instance.RoomAreaLayerName)
-        //                        {
-        //                            newArea = new Model.Area
-        //                            {
-        //                                Kind = 2,
-        //                                Note = string.Join(",", notes.ToArray()),
-        //                                VertexX = polyline.GetXValues(),
-        //                                VertexY = polyline.GetYValues(),
-        //                                VertexZ = polyline.GetZValues()
-        //                            };
-        //                        }
-        //                        if (newArea != null)
-        //                        {
-        //                            sqliteHelper.Execute(insertAreaSql, new { FloorID = floorId, X = newArea.VertexX, Y = newArea.VertexY, Z = newArea.VertexZ, Kind = newArea.Kind, Note = newArea.Note });
-        //                        }
-        //                    }
-        //                }
-        //            }
-        //            transaction.Commit();
-        //            FireAlarmWindow.Instance.ShowDialog();
-        //        }
-        //        catch
-        //        {
-        //            transaction.Abort();
-        //            FireAlarmWindow.Instance.ShowDialog();
-        //        }
-        //    }
-        //}
-        ////#endregion
-
         #region _FF_LayoutEquipment
 
         [CommandMethod("FF_LayoutEquipment")]
@@ -254,50 +93,11 @@ namespace TimeIsLife.CADCommand
             Editor editor = document.Editor;
             Matrix3d ucsToWcsMatrix3d = editor.CurrentUserCoordinateSystem;
 
-            #region 数据库相关常量
-            //const string createFloorTableSql = @"
-            //    CREATE TABLE IF NOT EXISTS Floor (
-            //        ID INTEGER PRIMARY KEY,
-            //        Name TEXT,
-            //        Level REAL,
-            //        X REAL,
-            //        Y REAL,
-            //        Z REAL
-            //    )";
-            //const string createAreaTableSql = @"
-            //    CREATE TABLE IF NOT EXISTS Area (
-            //        ID INTEGER PRIMARY KEY,
-            //        FloorID INTEGER NOT NULL,
-            //        VertexX TEXT NOT NULL,
-            //        VertexY TEXT NOT NULL,
-            //        VertexZ TEXT NOT NULL,
-            //        Kind INTEGER NOT NULL,
-            //        Note TEXT,
-            //        FOREIGN KEY(FloorID) REFERENCES Floor(ID)
-            //    )";
-            //const string createBasePointTableSql = @"
-            //    CREATE TABLE IF NOT EXISTS BasePoint (
-            //        ID INTEGER PRIMARY KEY,
-            //        Name TEXT,
-            //        Level REAL NOT NULL,
-            //        X REAL NOT NULL,
-            //        Y REAL NOT NULL,
-            //        Z REAL NOT NULL
-            //    )";
-            //const string insertBasePointSql = @"
-            //    INSERT INTO BasePoint (Name, Level, X, Y, Z) 
-            //    VALUES (@name, @level, @x, @y, @z)";
-            //const string insertFloorSql = "INSERT INTO Floor (Name, Level, X, Y, Z) VALUES (@Name, @Level, @X, @Y, @Z)";
-            //const string insertAreaSql = "INSERT INTO Area (FloorID, VertexX, VertexY, VertexZ, Kind, Note) VALUES (@FloorID, @X, @Y, @Z, @Kind, @Note)";
-            #endregion
-
             List<Beam> beams;
             List<Floor> floors;
             List<Slab> slabs;
             List<Wall> walls;
-            
-            ObjectId smokeDetectorID;
-            ObjectId temperatureDetectorID;
+
             BasePoint basePoint;
 
             //初始化NTS的GeometryFactory
@@ -377,161 +177,20 @@ namespace TimeIsLife.CADCommand
                 }
                 #endregion
 
-                #region 保存区域数据
+                var smokeDetectorId = LoadBlockIntoDatabase("FA-08-智能型点型感烟探测器.dwg");
+                var temperatureDetectorId = LoadBlockIntoDatabase("FA-09-智能型点型感温探测器.dwg");
 
-                ////获取块表
-                //BlockTable blockTable = transaction.GetObject(database.BlockTableId, OpenMode.ForRead) as BlockTable;
-                ////获取模型空间
-                //BlockTableRecord modelSpace = transaction.GetObject(blockTable[BlockTableRecord.ModelSpace], OpenMode.ForRead) as BlockTableRecord;
-                ////获取图纸空间
-                //BlockTableRecord paperSpace = transaction.GetObject(blockTable[BlockTableRecord.PaperSpace], OpenMode.ForRead) as BlockTableRecord;
-
-                ////判断区域数据文件是否存在，存在则删除区域数据库
-                //if (File.Exists(FireAlarmWindowViewModel.Instance.AreaFileName))
+                //basePoint = new BasePoint
                 //{
-                //    File.Delete(FireAlarmWindowViewModel.Instance.AreaFileName);
-                //}
+                //    Name = FireAlarmWindowViewModel.Instance.SelectedAreaFloor.Name,
+                //    Level = FireAlarmWindowViewModel.Instance.SelectedAreaFloor.Level,
+                //    X = FireAlarmWindowViewModel.Instance.ReferenceBasePoint.X,
+                //    Y = FireAlarmWindowViewModel.Instance.ReferenceBasePoint.Y,
+                //    Z = FireAlarmWindowViewModel.Instance.ReferenceBasePoint.Z
+                //};
 
-                ////创建区域数据库
-                //SQLiteConnection.CreateFile(FireAlarmWindowViewModel.Instance.AreaFileName);
-                //SQLiteHelper sqliteHelper = new SQLiteHelper($"Data Source={FireAlarmWindowViewModel.Instance.AreaFileName};Version=3;");
-                //sqliteHelper.Execute(createFloorTableSql);
-                //sqliteHelper.Execute(createAreaTableSql);
-                //sqliteHelper.Execute(createBasePointTableSql);
-
-                ////插入基点数据
-                //sqliteHelper.Insert<int>(insertBasePointSql,
-                //    new
-                //    {
-                //        FireAlarmWindowViewModel.Instance.SelectedAreaFloor.Name,
-                //        FireAlarmWindowViewModel.Instance.SelectedAreaFloor.Level,
-                //        FireAlarmWindowViewModel.Instance.ReferenceBasePoint.X,
-                //        FireAlarmWindowViewModel.Instance.ReferenceBasePoint.Y,
-                //        FireAlarmWindowViewModel.Instance.ReferenceBasePoint.Z
-                //    });
-
-                ////插入楼层数据
-                //foreach (var areaFloor in FireAlarmWindowViewModel.Instance.AreaFloors)
-                //{
-                //    sqliteHelper.Insert<int>(insertFloorSql, areaFloor);
-                //}
-
-
-                //foreach (var area in FireAlarmWindowViewModel.Instance.Areas)
-                //{
-                //    // 从Floor表中查询指定标高的ID
-                //    int floorId = sqliteHelper.Query<int>("SELECT ID FROM Floor WHERE Level = @level", new { level = area.Floor.Level }).FirstOrDefault();
-
-                //    if (floorId > 0)
-                //    {
-                //        // 构建插入语句并插入到Area表中                            
-                //        sqliteHelper.Execute(insertAreaSql, new { FloorID = floorId, X = area.VertexX, Y = area.VertexY, Z = area.VertexZ, area.Kind, area.Note });
-                //    }
-
-                //    //过滤器
-                //    TypedValueList typedValues = new TypedValueList
-                //    {
-                //        typeof(Polyline)
-                //    };
-                //    SelectionFilter selectionFilter1 = new SelectionFilter(typedValues);
-                //    Point3dCollection point3DCollection1 = area.Point3dCollection.TransformBy(ucsToWcsMatrix3d.Inverse());
-                //    SelectionSet selectionSet = editor.GetSelectionSet(SelectString.SelectCrossingPolygon, null, selectionFilter1, point3DCollection1);
-
-                //    if (selectionSet.Count == 0) continue;
-                //    foreach (var id in selectionSet.GetObjectIds())
-                //    {
-                //        Polyline polyline = transaction.GetObject(id, OpenMode.ForRead) as Polyline;
-                //        if (polyline == null) continue;
-                //        if (polyline.Layer == FireAlarmWindowViewModel.Instance.FireAreaLayerName || polyline.Layer == FireAlarmWindowViewModel.Instance.RoomAreaLayerName)
-                //        {
-                //            TypedValueList dbTextTypedValues = new TypedValueList
-                //                {
-                //                    { DxfCode.LayerName, polyline.Layer },
-                //                    typeof(DBText)
-                //                };
-                //            SelectionFilter selectionFilter2 = new SelectionFilter(dbTextTypedValues);
-                //            SelectionSet dbTextSelectionSet = editor.GetSelectionSet(SelectString.SelectCrossingPolygon, null, selectionFilter2, polyline.GetPoint3dCollection(ucsToWcsMatrix3d.Inverse()));
-                //            List<string> notes = new List<string>();
-                //            if (dbTextSelectionSet == null || dbTextSelectionSet.Count == 0)
-                //            {
-                //                continue;
-                //            }
-                //            foreach (var textId in dbTextSelectionSet.GetObjectIds())
-                //            {
-                //                DBText dBText = transaction.GetObject(textId, OpenMode.ForRead) as DBText;
-                //                if (dBText == null) continue;
-                //                notes.Add(dBText.TextString);
-                //            }
-
-                //            Model.Area newArea = null;
-                //            if (polyline.Layer == FireAlarmWindowViewModel.Instance.FireAreaLayerName)
-                //            {
-                //                newArea = new Model.Area
-                //                {
-                //                    Kind = 1,
-                //                    Note = string.Join(",", notes.ToArray()),
-                //                    VertexX = polyline.GetXValues(),
-                //                    VertexY = polyline.GetYValues(),
-                //                    VertexZ = polyline.GetZValues()
-                //                };
-                //            }
-                //            else if (polyline.Layer == FireAlarmWindowViewModel.Instance.RoomAreaLayerName)
-                //            {
-                //                newArea = new Model.Area
-                //                {
-                //                    Kind = 2,
-                //                    Note = string.Join(",", notes.ToArray()),
-                //                    VertexX = polyline.GetXValues(),
-                //                    VertexY = polyline.GetYValues(),
-                //                    VertexZ = polyline.GetZValues()
-                //                };
-                //            }
-                //            if (newArea != null)
-                //            {
-                //                sqliteHelper.Execute(insertAreaSql, new { FloorID = floorId, X = newArea.VertexX, Y = newArea.VertexY, Z = newArea.VertexZ, newArea.Kind, newArea.Note });
-                //            }
-                //        }
-                //    }
-                //}
-                #endregion
-
-                #region 区域数据查询
-                //// 区域数据查询            
-                //var areaHelper = new SQLiteHelper($"Data Source={FireAlarmWindowViewModel.Instance.AreaFileName}");
-                //using (var areaConn = areaHelper.GetConnection())
-                //{
-                //    string selectBasePointSql = "SELECT Name, Level, X, Y, Z FROM BasePoint";
-                //    basePoint = areaConn.Query<BasePoint>(selectBasePointSql).ToList().FirstOrDefault();
-
-                //    string sqlFloorArea = "SELECT a.ID,a.FloorID,a.VertexX,a.VertexY,a.VertexZ,a.kind,a.Note,f.ID,f.Name,f.Level,f.X,f.Y,f.Z FROM Area AS a INNER JOIN Floor AS f on f.ID = a.FloorID WHERE kind=0";
-                //    string sqlFireArea = "SELECT a.ID,a.FloorID,a.VertexX,a.VertexY,a.VertexZ,a.kind,a.Note,f.ID,f.Name,f.Level,f.X,f.Y,f.Z FROM Area AS a INNER JOIN Floor AS f on f.ID = a.FloorID WHERE kind=1";
-                //    string sqlRoomArea = "SELECT a.ID,a.FloorID,a.VertexX,a.VertexY,a.VertexZ,a.kind,a.Note,f.ID,f.Name,f.Level,f.X,f.Y,f.Z FROM Area AS a INNER JOIN Floor AS f on f.ID = a.FloorID WHERE kind=2";
-                //    Func<Model.Area, AreaFloor, Model.Area> mappingArea =
-                //        (area, areaFloor) =>
-                //        {
-                //            area.Floor = areaFloor;
-                //            return area;
-                //        };
-                //    floorAreas = areaConn.Query(sqlFloorArea, mappingArea).ToList();
-                //    fireAreas = areaConn.Query(sqlFireArea, mappingArea).ToList();
-                //    roomAreas = areaConn.Query(sqlRoomArea, mappingArea).ToList();
-                //}
-                #endregion
-
-                smokeDetectorID = LoadBlockIntoDatabase("FA-08-智能型点型感烟探测器.dwg");
-                temperatureDetectorID = LoadBlockIntoDatabase("FA-09-智能型点型感温探测器.dwg");
-
-                basePoint = new BasePoint
-                {
-                    Name = FireAlarmWindowViewModel.Instance.SelectedAreaFloor.Name,
-                    Level = FireAlarmWindowViewModel.Instance.SelectedAreaFloor.Level,
-                    X = FireAlarmWindowViewModel.Instance.ReferenceBasePoint.X,
-                    Y = FireAlarmWindowViewModel.Instance.ReferenceBasePoint.Y,
-                    Z = FireAlarmWindowViewModel.Instance.ReferenceBasePoint.Z
-                };
-
-                Model.Area baseArea = FireAlarmWindowViewModel.Instance.Areas.Where(f => f.Level == basePoint.Level).FirstOrDefault();
-                Vector3d baseVector = baseArea.BasePoint.GetVectorTo(basePoint.Point3d);
+                //Model.Area baseArea = FireAlarmWindowViewModel.Instance.Areas.FirstOrDefault(f => Math.Abs(f.Level - basePoint.Level) < 1e-3);
+                //Vector3d baseVector = baseArea.BasePoint.GetVectorTo(basePoint.Point3d);
 
                 #region 根据房间边界及板轮廓生成烟感
 
@@ -584,10 +243,6 @@ namespace TimeIsLife.CADCommand
                                     VertexY = polyline.GetYValues(),
                                     VertexZ = polyline.GetZValues()
                                 };
-                                if (newArea != null)
-                                {
-                                    curFireAreas.Add(newArea);
-                                }
                             }
                             else if (polyline.Layer == FireAlarmWindowViewModel.Instance.RoomAreaLayerName)
                             {
@@ -599,10 +254,33 @@ namespace TimeIsLife.CADCommand
                                     VertexY = polyline.GetYValues(),
                                     VertexZ = polyline.GetZValues()
                                 };
-                                if (newArea != null)
-                                {
-                                    curRoomAreas.Add(newArea);
-                                }
+                            }
+                            Polygon roomPolygon = geometryFactory.CreatePolygon(GetAreaCoordinates(newArea));
+                            var fixedGeometry = NetTopologySuite.Geometries.Utilities.GeometryFixer.Fix(roomPolygon);
+
+                            if (fixedGeometry is Polygon)
+                            {
+                                // 如果修复后的结果是 Polygon，直接使用
+                                Polygon fixedPolygon = (Polygon)fixedGeometry;
+                                // 使用 fixedPolygon 进行后续操作
+                            }
+                            else if (fixedGeometry is MultiPolygon multiPolygon && multiPolygon.NumGeometries == 1)
+                            {
+                                // 如果修复后的结果是 MultiPolygon 且只包含一个 Polygon，取出这个 Polygon
+                                Polygon singlePolygon = (Polygon)multiPolygon.GetGeometryN(0);
+                                // 使用 singlePolygon 进行后续操作
+                            }
+                            else
+                            {
+                                // 如果修复后的结果是包含多个 Polygon 的 MultiPolygon，或者其他情况
+                                // 根据需要处理或抛出异常
+                                polyline.Highlight();
+                                transaction.Abort();
+                                return;
+                            }
+                            if (newArea != null)
+                            {
+                                curRoomAreas.Add(newArea);
                             }
                         }
                     }
@@ -612,7 +290,7 @@ namespace TimeIsLife.CADCommand
                     List<Slab> curFloorSlabs = slabs.Where(slab => slab.Floor.LevelB == curFloorArea.Level).ToList();
                     List<Wall> curFloorWalls = walls.Where(wall => wall.Floor.LevelB == curFloorArea.Level).ToList();
                     List<BlockReference> blockReferences = new List<BlockReference>();
-                    Vector3d vector3D = Point3d.Origin.GetVectorTo(curFloorArea.BasePoint) + baseVector;
+                    Vector3d vector3D = Point3d.Origin.GetVectorTo(curFloorArea.BasePoint) + FireAlarmWindowViewModel.Instance.BaseVector;
 
                     foreach (var roomArea in curRoomAreas)
                     {
@@ -676,14 +354,29 @@ namespace TimeIsLife.CADCommand
                                 //如果相交几何体是非空多边形，并且板的厚度在指定范围内，则将相交几何体和对应的厚度添加到一个字典（IntersectionPolygonDictionary）中。
                                 if (roomPolygon.Intersects(slabPolygon))
                                 {
-                                    if (roomPolygon.IsValid == false)
+                                    if (!roomPolygon.IsValid)
                                     {
-                                        roomPolygon = (Polygon)NetTopologySuite.Geometries.Utilities.GeometryFixer.Fix(roomPolygon);
+                                        var fixedGeometry = NetTopologySuite.Geometries.Utilities.GeometryFixer.Fix(roomPolygon);
+
+                                        if (fixedGeometry is Polygon)
+                                        {
+                                            // 如果修复后的结果是 Polygon，直接使用
+                                            roomPolygon = (Polygon)fixedGeometry;
+                                            // 使用 fixedPolygon 进行后续操作
+                                        }
+                                        else if (fixedGeometry is MultiPolygon multiPolygon && multiPolygon.NumGeometries == 1)
+                                        {
+                                            // 如果修复后的结果是 MultiPolygon 且只包含一个 Polygon，取出这个 Polygon
+                                            roomPolygon = (Polygon)multiPolygon.GetGeometryN(0);
+                                            // 使用 singlePolygon 进行后续操作
+                                        }
                                     }
-                                    if (slabPolygon.IsValid == false)
+
+                                    if (!slabPolygon.IsValid)
                                     {
-                                        slabPolygon = (Polygon)NetTopologySuite.Geometries.Utilities.GeometryFixer.Fix(slabPolygon);
+                                        slabPolygon = NetTopologySuite.Geometries.Utilities.GeometryFixer.Fix(slabPolygon) as Polygon;
                                     }
+
 
                                     //返回结果不正确
                                     var intersectionGeometry = roomPolygon.Intersection(slabPolygon);
@@ -939,11 +632,11 @@ translatedBeamLineString.Distance(geometryFactory.CreatePoint(pt)) < 1e-1))
                             ObjectId id;
                             if (detectorInfo.Radius == 3600 || detectorInfo.Radius == 4400)
                             {
-                                id = temperatureDetectorID;
+                                id = temperatureDetectorId;
                             }
                             else
                             {
-                                id = smokeDetectorID;
+                                id = smokeDetectorId;
                             }
                             foreach (var coordinate in coordinates)
                             {
