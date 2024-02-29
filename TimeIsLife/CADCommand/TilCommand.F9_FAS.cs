@@ -19,9 +19,8 @@ namespace TimeIsLife.CADCommand
 {
     internal partial class TilCommand
     {
-        #region FF_FAS
-        [CommandMethod("FF_FAS")]
-        public void FF_FAS()
+        [CommandMethod("F9_FAS")]
+        public void F9_FAS()
         {
             Initialize();
 
@@ -747,6 +746,5 @@ namespace TimeIsLife.CADCommand
                 }
             }
         }
-        #endregion
     }
 }

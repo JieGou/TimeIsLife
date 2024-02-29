@@ -27,9 +27,8 @@ namespace TimeIsLife.CADCommand
 {
     internal partial class TilCommand
     {
-        #region FF_LoadYdbFile
-        [CommandMethod("FF_LoadYdbFile")]
-        public void FF_LoadYdbFile()
+        [CommandMethod("F6_LoadYdbFile")]
+        public void F6_LoadYdbFile()
         {
             Initialize();
 
@@ -37,8 +36,8 @@ namespace TimeIsLife.CADCommand
             string filename = null;
             OpenFileDialog openFileDialog = new OpenFileDialog
             {
-                Filter = "盈建科数据库(*.ydb)|*.ydb|所有文件|*.*",
-                Title = "选择结构模型数据库文件",
+                Filter = @"盈建科数据库(*.ydb)|*.ydb|所有文件|*.*",
+                Title = @"选择结构模型数据库文件",
                 ValidateNames = true,
                 CheckFileExists = true,
                 CheckPathExists = true,
@@ -155,7 +154,7 @@ namespace TimeIsLife.CADCommand
                                     
                                     if (slab.Floor.LevelB != floor.LevelB) continue;
 
-                                    SetLayer(newDatabase, $"slab-{slab.Thickness.ToString()}mm", 7);
+                                    SetCurrentLayer(newDatabase, $"slab-{slab.Thickness.ToString()}mm", 7);
 
                                     Polyline polyline = new Polyline();
                                     Point2dCollection point2Ds = GetPoint2Ds(slab);
@@ -165,7 +164,7 @@ namespace TimeIsLife.CADCommand
 
                                     if (slab.Thickness == 0) continue;
                                     //在板的重心添加感烟探测器
-                                    SetLayer(newDatabase, $"E-EQUIP-{slab.Thickness.ToString()}", 4);
+                                    SetCurrentLayer(newDatabase, $"E-EQUIP-{slab.Thickness.ToString()}", 4);
 
                                     Point2d gravityPoint = getCenterOfGravityPoint(point2Ds);
                                     BlockTable blockTable = (BlockTable)newTransaction.GetObject(newDatabase.BlockTableId, OpenMode.ForRead);
@@ -201,7 +200,7 @@ namespace TimeIsLife.CADCommand
 
                                             polyline.AddVertexAt(0, p1, 0, startWidth, endWidth);
                                             polyline.AddVertexAt(1, p2, 0, startWidth, endWidth);
-                                            SetLayer(newDatabase, $"beam-concrete-{height.ToString()}mm", 7);
+                                            SetCurrentLayer(newDatabase, $"beam-concrete-{height.ToString()}mm", 7);
                                             break;
                                         case 2:
                                             startWidth = endWidth = double.Parse(beam.BeamSect.ShapeVal.Split(',')[3]);
@@ -209,7 +208,7 @@ namespace TimeIsLife.CADCommand
 
                                             polyline.AddVertexAt(0, p1, 0, startWidth, endWidth);
                                             polyline.AddVertexAt(1, p2, 0, startWidth, endWidth);
-                                            SetLayer(newDatabase, $"beam-steel-{beam.BeamSect.Kind.ToString()}-{height.ToString()}mm", 7);
+                                            SetCurrentLayer(newDatabase, $"beam-steel-{beam.BeamSect.Kind.ToString()}-{height.ToString()}mm", 7);
                                             break;
                                         case 7:
                                             startWidth = endWidth = double.Parse(beam.BeamSect.ShapeVal.Split(',')[1]);
@@ -217,7 +216,7 @@ namespace TimeIsLife.CADCommand
 
                                             polyline.AddVertexAt(0, p1, 0, startWidth, endWidth);
                                             polyline.AddVertexAt(1, p2, 0, startWidth, endWidth);
-                                            SetLayer(newDatabase, $"beam-steel-{beam.BeamSect.Kind.ToString()}-{height.ToString()}mm", 7);
+                                            SetCurrentLayer(newDatabase, $"beam-steel-{beam.BeamSect.Kind.ToString()}-{height.ToString()}mm", 7);
                                             break;
                                         case 13:
                                             startWidth = endWidth = double.Parse(beam.BeamSect.ShapeVal.Split(',')[1]);
@@ -225,7 +224,7 @@ namespace TimeIsLife.CADCommand
 
                                             polyline.AddVertexAt(0, p1, 0, startWidth, endWidth);
                                             polyline.AddVertexAt(1, p2, 0, startWidth, endWidth);
-                                            SetLayer(newDatabase, $"beam-steel-{beam.BeamSect.Kind.ToString()}-{height.ToString()}mm", 7);
+                                            SetCurrentLayer(newDatabase, $"beam-steel-{beam.BeamSect.Kind.ToString()}-{height.ToString()}mm", 7);
                                             break;
                                         case 22:
                                             startWidth = endWidth = double.Parse(beam.BeamSect.ShapeVal.Split(',')[1]);
@@ -233,7 +232,7 @@ namespace TimeIsLife.CADCommand
 
                                             polyline.AddVertexAt(0, p1, 0, startWidth, endWidth);
                                             polyline.AddVertexAt(1, p2, 0, startWidth, endWidth);
-                                            SetLayer(newDatabase, $"beam-steel-{beam.BeamSect.Kind.ToString()}-{height.ToString()}mm", 7);
+                                            SetCurrentLayer(newDatabase, $"beam-steel-{beam.BeamSect.Kind.ToString()}-{height.ToString()}mm", 7);
                                             break;
                                         case 26:
                                             startWidth = endWidth = double.Parse(beam.BeamSect.ShapeVal.Split(',')[5]);
@@ -241,7 +240,7 @@ namespace TimeIsLife.CADCommand
 
                                             polyline.AddVertexAt(0, p1, 0, startWidth, endWidth);
                                             polyline.AddVertexAt(1, p2, 0, startWidth, endWidth);
-                                            SetLayer(newDatabase, $"beam-steel-{beam.BeamSect.Kind.ToString()}-{height.ToString()}mm", 7);
+                                            SetCurrentLayer(newDatabase, $"beam-steel-{beam.BeamSect.Kind.ToString()}-{height.ToString()}mm", 7);
                                             break;
 
                                         default:
@@ -250,7 +249,7 @@ namespace TimeIsLife.CADCommand
 
                                             polyline.AddVertexAt(0, p1, 0, startWidth, endWidth);
                                             polyline.AddVertexAt(1, p2, 0, startWidth, endWidth);
-                                            SetLayer(newDatabase, $"beam-steel-{beam.BeamSect.Kind.ToString()}-{height.ToString()}mm", 7);
+                                            SetCurrentLayer(newDatabase, $"beam-steel-{beam.BeamSect.Kind.ToString()}-{height.ToString()}mm", 7);
                                             break;
                                     }
 
@@ -263,7 +262,7 @@ namespace TimeIsLife.CADCommand
                                 {
                                     if (wall.Floor.LevelB != floor.LevelB) continue;
 
-                                    SetLayer(newDatabase, "wall", 53);
+                                    SetCurrentLayer(newDatabase, "wall", 53);
 
                                     Point2d p1 = new Point2d(wall.Grid.Joint1.X, wall.Grid.Joint1.Y);
                                     Point2d p2 = new Point2d(wall.Grid.Joint2.X, wall.Grid.Joint2.Y);
@@ -371,7 +370,5 @@ namespace TimeIsLife.CADCommand
             }
             return filename;
         }
-
-        #endregion
     }
 }

@@ -23,6 +23,7 @@ using System.Windows.Forms;
 using System.Windows.Forms.Integration;
 
 using TimeIsLife.Helper;
+using TimeIsLife.Model;
 using TimeIsLife.View;
 using TimeIsLife.ViewModel;
 
@@ -521,7 +522,7 @@ namespace TimeIsLife.CADCommand
             }
 
             //绘制楼层线
-            database.AddLineType2("DASHED");
+            database.LoadSysLineType(SystemLinetype.DASHED);
 
             modelSpace.UpgradeOpen();
             for (int i = 0; i <= floors.Count; i++)

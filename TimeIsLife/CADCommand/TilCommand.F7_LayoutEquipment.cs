@@ -77,12 +77,10 @@ using Accord.Collections;
 
 namespace TimeIsLife.CADCommand
 {
-    partial class TilCommand
+    internal partial class TilCommand
     {
-        #region _FF_LayoutEquipment
-
-        [CommandMethod("FF_LayoutEquipment")]
-        public void FF_LayoutEquipment()
+        [CommandMethod("F7_LayoutEquipment")]
+        public void F7_LayoutEquipment()
         {
 
             FireAlarmWindow.Instance.ShowDialog();
@@ -285,7 +283,7 @@ namespace TimeIsLife.CADCommand
                         }
                     }
 
-                    SetLayer(database, $"E-EQUIP", 4);
+                    SetCurrentLayer(database, $"E-EQUIP", 4);
                     List<Beam> curFloorBeams = beams.Where(beam => beam.Floor.LevelB == curFloorArea.Level).ToList();
                     List<Slab> curFloorSlabs = slabs.Where(slab => slab.Floor.LevelB == curFloorArea.Level).ToList();
                     List<Wall> curFloorWalls = walls.Where(wall => wall.Floor.LevelB == curFloorArea.Level).ToList();
@@ -679,7 +677,7 @@ translatedBeamLineString.Distance(geometryFactory.CreatePoint(pt)) < 1e-1))
 
                         polyline.AddVertexAt(0, p1, 0, startWidth, endWidth);
                         polyline.AddVertexAt(1, p2, 0, startWidth, endWidth);
-                        SetLayer(database, layerName, 7);
+                        SetCurrentLayer(database, layerName, 7);
 
                         polyline.TransformBy(Matrix3d.Displacement(vector3D));
                         database.AddToModelSpace(polyline);
@@ -690,7 +688,7 @@ translatedBeamLineString.Distance(geometryFactory.CreatePoint(pt)) < 1e-1))
                     #region 生成墙
                     foreach (var wall in curFloorWalls)
                     {
-                        SetLayer(database, "wall", 53);
+                        SetCurrentLayer(database, "wall", 53);
 
                         Point2d p1 = new Point2d(wall.Grid.Joint1.X, wall.Grid.Joint1.Y);
                         Point2d p2 = new Point2d(wall.Grid.Joint2.X, wall.Grid.Joint2.Y);
@@ -930,11 +928,11 @@ translatedBeamLineString.Distance(geometryFactory.CreatePoint(pt)) < 1e-1))
             return name;
         }
 
-        private void SetLayer(Database database, string layerName, int colorIndex)
+        private void SetCurrentLayer(Database database, string layerName, int colorIndex)
         {
-            using (Transaction tr = database.TransactionManager.StartTransaction())
+            using (Transaction transaction = database.TransactionManager.StartTransaction())
             {
-                LayerTable layerTable = (LayerTable)tr.GetObject(database.LayerTableId, OpenMode.ForRead);
+                LayerTable layerTable = (LayerTable)transaction.GetObject(database.LayerTableId, OpenMode.ForRead);
 
                 // Create new layer if it doesn't exist
                 ObjectId layerId;
@@ -947,7 +945,7 @@ translatedBeamLineString.Distance(geometryFactory.CreatePoint(pt)) < 1e-1))
 
                     layerTable.UpgradeOpen();
                     layerId = layerTable.Add(layerTableRecord);
-                    tr.AddNewlyCreatedDBObject(layerTableRecord, add: true);
+                    transaction.AddNewlyCreatedDBObject(layerTableRecord, add: true);
                     layerTable.DowngradeOpen();
                 }
                 else
@@ -956,13 +954,13 @@ translatedBeamLineString.Distance(geometryFactory.CreatePoint(pt)) < 1e-1))
                 }
 
                 // Set layer color
-                LayerTableRecord layerTableRecordToModify = (LayerTableRecord)tr.GetObject(layerId, OpenMode.ForWrite);
+                LayerTableRecord layerTableRecordToModify = (LayerTableRecord)transaction.GetObject(layerId, OpenMode.ForWrite);
                 layerTableRecordToModify.Color = Color.FromColorIndex(ColorMethod.ByAci, (short)colorIndex);
 
                 // Set current layer
                 database.Clayer = layerId;
 
-                tr.Commit();
+                transaction.Commit();
             }
         }
 
@@ -1539,7 +1537,5 @@ translatedBeamLineString.Distance(geometryFactory.CreatePoint(pt)) < 1e-1))
 
             return geometries;
         }
-
-        #endregion
     }
 }

@@ -16,6 +16,7 @@ using System.Windows;
 
 using TimeIsLife.Helper;
 using TimeIsLife.Jig;
+using TimeIsLife.Model;
 using TimeIsLife.ViewModel;
 using TimeIsLife.ViewModel.LayoutViewModel;
 
@@ -135,7 +136,7 @@ namespace TimeIsLife.CADCommand
                 if (pointResult.Status != PromptStatus.OK) return;
                 Point3d basePoint3d = pointResult.Value;
 
-                database.AddLineType2("DASHED");
+                database.LoadSysLineType(SystemLinetype.DASHED);
 
                 // 初始化矩形
                 Polyline polyLine = new Polyline

@@ -6,24 +6,24 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using TimeIsLife.Model;
 
 namespace TimeIsLife.Helper
 {
     internal static class DatabaseHelper
     {
-        public static void AddLineType2(this Database database, string lineTypeName)
+        public static void LoadSysLineType(this Database database, SystemLinetype lineTypeName)
         {
-            using Transaction transaction = database.TransactionManager.StartTransaction();
-            LinetypeTable linetypeTable = transaction.GetObject(database.LinetypeTableId, OpenMode.ForRead) as LinetypeTable;
-
-            if (!linetypeTable.Has(lineTypeName))
+            using (Transaction transaction = database.TransactionManager.StartTransaction())
             {
-                database.LoadLineTypeFile(lineTypeName, "acad.lin");
+                LinetypeTable linetypeTable =
+                    transaction.GetObject(database.LinetypeTableId, OpenMode.ForRead) as LinetypeTable;
+
+                if (linetypeTable != null && linetypeTable.Has(lineTypeName.ToString())) return;
+                database.LoadLineTypeFile(lineTypeName.ToString(), "acad.lin");
+                transaction.Commit();
             }
-
-            transaction.Commit();
         }
-
 
         public static void NewLayer(this Database database, string layerName, int colorIndex)
         {

@@ -87,10 +87,11 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CADCommand\BaseInfo.cs" />
-    <Compile Include="CADCommand\FF_EquipmentConnectLine.cs" />
-    <Compile Include="CADCommand\FF_FAS.cs" />
-    <Compile Include="CADCommand\FF_LoadYdbFile.cs" />
-    <Compile Include="CADCommand\TilCommand.cs" />
+    <Compile Include="CADCommand\TilCommand.F2_SetCurrentStatus.cs" />
+    <Compile Include="CADCommand\TilCommand.F8_EquipmentConnectLine.cs" />
+    <Compile Include="CADCommand\TilCommand.F9_FAS.cs" />
+    <Compile Include="CADCommand\TilCommand.F6_LoadYdbFile.cs" />
+    <Compile Include="CADCommand\TilCommand.F1_ConnectLine.cs" />
     <Compile Include="Helper\DatabaseHelper.cs" />
     <Compile Include="Model\Beam.cs" />
     <Compile Include="Model\BeamSect.cs" />
@@ -103,6 +104,7 @@
     <Compile Include="Model\Joint.cs" />
     <Compile Include="Model\Kruskal.cs" />
     <Compile Include="Model\Slab.cs" />
+    <Compile Include="Model\SystemLinetype.cs" />
     <Compile Include="Model\Wall.cs" />
     <Compile Include="Model\WallSect.cs" />
     <Compile Include="Helper\BlockReferenceHelper.cs" />
@@ -131,7 +133,7 @@
     <Compile Include="Jig\LightingLayoutJig.cs" />
     <Compile Include="Model\BlockScaleEnum.cs" />
     <Compile Include="CADCommand\ElectricalCommand.cs" />
-    <Compile Include="CADCommand\FF_LayoutEquipment.cs" />
+    <Compile Include="CADCommand\TilCommand.F7_LayoutEquipment.cs" />
     <Compile Include="CADCommand\ToolCommand.cs" />
     <Compile Include="Jig\UcsSelectJig.cs" />
     <Compile Include="Model\PoleEnum.cs" />
@@ -250,6 +252,7 @@
     <None Include="Block\电气火灾监控器.dwg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <Compile Include="CADCommand\TilCommand.F3_ConnectMultiLines.cs" />
     <None Include="ClassDiagram1.cd" />
     <None Include="ElectrialClassDiagram.cd" />
     <None Include="FA\FA-01-接线端子箱.dwg">
