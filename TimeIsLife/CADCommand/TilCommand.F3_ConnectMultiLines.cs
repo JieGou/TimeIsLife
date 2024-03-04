@@ -15,6 +15,7 @@ using NetTopologySuite.Geometries;
 using TimeIsLife.Helper;
 using TimeIsLife.Jig;
 using TimeIsLife.Model;
+using TimeIsLife.ViewModel;
 
 namespace TimeIsLife.CADCommand
 {
@@ -78,7 +79,7 @@ namespace TimeIsLife.CADCommand
                 TypedValueList typedValues = new TypedValueList
                 {
                     typeof(BlockReference),
-                    { DxfCode.LayerName, "E-EQUIP" }
+                    { DxfCode.LayerName,MyPlugin.CurrentUserData.EquipmentLayerName }
                 };
                 List<BlockReference> blockReferences = new List<BlockReference>();
 
@@ -99,7 +100,7 @@ namespace TimeIsLife.CADCommand
 
                 var points = GetNtsPointsFromBlockreference(geometryFactory, blockReferences);
                 List<LineString> tree = Kruskal.FindMinimumSpanningTree(points, geometryFactory);
-                SetCurrentLayer(database, "E-WIRE", 1);
+                SetCurrentLayer(database, MyPlugin.CurrentUserData.WireLayerName, 1);
                 const double tolerance = 1e-3;
                 modelSpace.UpgradeOpen();
                 foreach (var line in tree)

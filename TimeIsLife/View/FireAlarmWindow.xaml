@@ -9,7 +9,7 @@
     xmlns:viewmodel="clr-namespace:TimeIsLife.ViewModel"
     Title="自动布置感烟、感温探测器"
     Width="500"
-    Height="600"
+    Height="800"
     Closing="Window_Closing"
     Loaded="Window_Loaded"
     mc:Ignorable="d">
@@ -28,8 +28,9 @@
         <DockPanel>
             <DockPanel Margin="3" DockPanel.Dock="Top">
                 <Label
-                    Width="90"
+                    Width="120"
                     Content="楼层范围图层"
+                    HorizontalContentAlignment="Center"
                     DockPanel.Dock="Left"
                     Template="{DynamicResource LabelTemplate}" />
                 <Button
@@ -38,11 +39,12 @@
                     Content="选择"
                     DockPanel.Dock="Right"
                     Template="{StaticResource ButtonTemplate}" />
-                <TextBox Template="{DynamicResource TextBoxTemplate}" Text="{Binding FloorAreaLayerName, Mode=OneWay}" />
+                <TextBox Template="{DynamicResource TextBoxTemplate}" Text="{Binding FloorAreaLayerName, Mode=TwoWay}" />
             </DockPanel>
             <DockPanel Margin="3" DockPanel.Dock="Top">
                 <Label
-                    Width="90"
+                    Width="120"
+                    HorizontalContentAlignment="Center"
                     Content="防火分区图层"
                     DockPanel.Dock="Left"
                     Template="{DynamicResource LabelTemplate}" />
@@ -52,11 +54,12 @@
                     Content="选择"
                     DockPanel.Dock="Right"
                     Template="{StaticResource ButtonTemplate}" />
-                <TextBox Template="{DynamicResource TextBoxTemplate}" Text="{Binding FireAreaLayerName, Mode=OneWay}" />
+                <TextBox Template="{DynamicResource TextBoxTemplate}" Text="{Binding FireAreaLayerName, Mode=TwoWay}" />
             </DockPanel>
             <DockPanel Margin="3" DockPanel.Dock="Top">
                 <Label
-                    Width="90"
+                    Width="120"
+                    HorizontalContentAlignment="Center"
                     Content="房间区域图层"
                     DockPanel.Dock="Left"
                     Template="{DynamicResource LabelTemplate}" />
@@ -66,11 +69,57 @@
                     Content="选择"
                     DockPanel.Dock="Right"
                     Template="{StaticResource ButtonTemplate}" />
-                <TextBox Template="{DynamicResource TextBoxTemplate}" Text="{Binding RoomAreaLayerName, Mode=OneWay}" />
+                <TextBox Template="{DynamicResource TextBoxTemplate}" Text="{Binding RoomAreaLayerName, Mode=TwoWay}" />
             </DockPanel>
             <DockPanel Margin="3" DockPanel.Dock="Top">
                 <Label
-                    Width="90"
+                    Width="120"
+                    HorizontalContentAlignment="Center"
+                    Content="禁止布线区域图层"
+                    DockPanel.Dock="Left"
+                    Template="{DynamicResource LabelTemplate}" />
+                <Button
+                    Width="60"
+                    Command="{Binding GetAvoidanceAreaLayerNameCommand}"
+                    Content="选择"
+                    DockPanel.Dock="Right"
+                    Template="{StaticResource ButtonTemplate}" />
+                <TextBox Template="{DynamicResource TextBoxTemplate}" Text="{Binding AvoidanceAreaLayerName, Mode=TwoWay}" />
+            </DockPanel>
+            <DockPanel Margin="3" DockPanel.Dock="Top">
+                <Label
+                    Width="120"
+                    HorizontalContentAlignment="Center"
+                    Content="设备图层"
+                    DockPanel.Dock="Left"
+                    Template="{DynamicResource LabelTemplate}" />
+                <Button
+                    Width="60"
+                    Command="{Binding GetEquipmentLayerNameCommand}"
+                    Content="选择"
+                    DockPanel.Dock="Right"
+                    Template="{StaticResource ButtonTemplate}" />
+                <TextBox Template="{DynamicResource TextBoxTemplate}" Text="{Binding EquipmentLayerName, Mode=TwoWay}" />
+            </DockPanel>
+            <DockPanel Margin="3" DockPanel.Dock="Top">
+                <Label
+                    Width="120"
+                    HorizontalContentAlignment="Center"
+                    Content="线缆图层"
+                    DockPanel.Dock="Left"
+                    Template="{DynamicResource LabelTemplate}" />
+                <Button
+                    Width="60"
+                    Command="{Binding GetWireLayerNameCommand}"
+                    Content="选择"
+                    DockPanel.Dock="Right"
+                    Template="{StaticResource ButtonTemplate}" />
+                <TextBox Template="{DynamicResource TextBoxTemplate}" Text="{Binding WireLayerName, Mode=TwoWay}" />
+            </DockPanel>
+            <DockPanel Margin="3" DockPanel.Dock="Top">
+                <Label
+                    Width="120"
+                    HorizontalAlignment="Center"
                     HorizontalContentAlignment="Center"
                     Content="结构数据库"
                     DockPanel.Dock="Left"
@@ -85,7 +134,8 @@
             </DockPanel>
             <DockPanel Margin="3" DockPanel.Dock="Top">
                 <Label
-                    Width="90"
+                    Width="120"
+                    HorizontalAlignment="Center"
                     HorizontalContentAlignment="Center"
                     Content="结构板厚"
                     DockPanel.Dock="Left"
@@ -115,25 +165,6 @@
                     Visibility="Hidden" />
 
             </StackPanel>
-            <!--<DockPanel
-            Margin="3"
-            DockPanel.Dock="Bottom"
-            LastChildFill="True">
-            <Label
-            Width="90"
-            HorizontalContentAlignment="Center"
-            Content="区域数据库"
-            DockPanel.Dock="Left"
-            Template="{DynamicResource LabelTemplate}" />
-            <Button
-            Width="60"
-            Command="{Binding SaveAreaFileCommand}"
-            Content="另存为..."
-            DockPanel.Dock="Right"
-            Template="{StaticResource ButtonTemplate}" />
-            <TextBox Template="{DynamicResource TextBoxTemplate}" Text="{Binding AreaFileName, Mode=TwoWay}" />
-            </DockPanel>-->
-            
             <DockPanel Margin="3" DockPanel.Dock="Bottom">
                 <Button
                     Width="100"
@@ -147,7 +178,7 @@
                     BorderBrush="{DynamicResource {x:Static SystemColors.HotTrackBrushKey}}"
                     BorderThickness="1"
                     CornerRadius="5">
-                    <StackPanel FlowDirection="LeftToRight" Orientation="Horizontal">
+                    <StackPanel FlowDirection="LeftToRight" Orientation="Horizontal" VerticalAlignment="Center">
                         <TextBlock Text="X: " />
                         <TextBlock Text="{Binding ReferenceBasePoint.X}" />
                         <TextBlock Text="Y: " />
@@ -170,7 +201,7 @@
                     BorderBrush="{DynamicResource {x:Static SystemColors.HotTrackBrushKey}}"
                     BorderThickness="1"
                     CornerRadius="5">
-                    <StackPanel FlowDirection="LeftToRight" Orientation="Horizontal">
+                    <StackPanel FlowDirection="LeftToRight" Orientation="Horizontal" VerticalAlignment="Center">
                         <TextBlock Text="Level: " />
                         <TextBlock Text="{Binding SelectedAreaFloor.Level}" />
                         <TextBlock Text="Name: " />

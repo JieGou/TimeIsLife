@@ -76,7 +76,10 @@ namespace TimeIsLife.CADCommand
             //    transaction.Abort();
             //}
 
-            Initialize();
+            Document document = Application.DocumentManager.MdiActiveDocument;
+            Database database = document.Database;
+            Editor editor = document.Editor;
+            Matrix3d ucsToWcsMatrix3d = editor.CurrentUserCoordinateSystem;
 
             document.SendStringToExecute("UCSICON\nN\n", true, false, false);
             document.SendStringToExecute("UCS\nOB\n", true, false, false);
@@ -149,7 +152,10 @@ namespace TimeIsLife.CADCommand
         [CommandMethod("F4_AlignUcs")]
         public void F4_AlignUcs()
         {
-            Initialize();
+            Document document = Application.DocumentManager.MdiActiveDocument;
+            Database database = document.Database;
+            Editor editor = document.Editor;
+            Matrix3d ucsToWcsMatrix3d = editor.CurrentUserCoordinateSystem;
 
             string s1 = "\n作用：多个对象在ucs坐标系下，沿x轴或者y轴对齐";
             string s2 = "\n操作方法：框选对象，设置对齐方向（默认ucs的x轴），选择基准对齐对象";
@@ -433,7 +439,10 @@ namespace TimeIsLife.CADCommand
         [CommandMethod("FF_ExplodeMInsertBlock")]
         public void FF_ExplodeMInsertBlock()
         {
-            Initialize();
+            Document document = Application.DocumentManager.MdiActiveDocument;
+            Database database = document.Database;
+            Editor editor = document.Editor;
+            Matrix3d ucsToWcsMatrix3d = editor.CurrentUserCoordinateSystem;
 
             using Transaction transaction = database.TransactionManager.StartOpenCloseTransaction();
             try
@@ -478,7 +487,10 @@ namespace TimeIsLife.CADCommand
         [CommandMethod("FF_ModifyTextStyle")]
         public void FF_ModifyTextStyle()
         {
-            Initialize();
+            Document document = Application.DocumentManager.MdiActiveDocument;
+            Database database = document.Database;
+            Editor editor = document.Editor;
+            Matrix3d ucsToWcsMatrix3d = editor.CurrentUserCoordinateSystem;
 
             string sysFontsPath = Environment.GetFolderPath(Environment.SpecialFolder.Fonts);//windows系统字体目录
             DirectoryInfo sysDirInfo = new DirectoryInfo(sysFontsPath);//Windows系统字体文件夹

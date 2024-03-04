@@ -86,17 +86,20 @@
     <Reference Include="WindowsFormsIntegration" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CADCommand\BaseInfo.cs" />
     <Compile Include="CADCommand\TilCommand.F2_SetCurrentStatus.cs" />
     <Compile Include="CADCommand\TilCommand.F8_EquipmentConnectLine.cs" />
     <Compile Include="CADCommand\TilCommand.F9_FAS.cs" />
     <Compile Include="CADCommand\TilCommand.F6_LoadYdbFile.cs" />
     <Compile Include="CADCommand\TilCommand.F1_ConnectLine.cs" />
     <Compile Include="Helper\DatabaseHelper.cs" />
+    <Compile Include="Model\AvoidanceArea.cs" />
     <Compile Include="Model\Beam.cs" />
     <Compile Include="Model\BeamSect.cs" />
     <Compile Include="Model\DetectorInfo.cs" />
     <Compile Include="CADCommand\FireAlarmCommand2.cs" />
+    <Compile Include="Model\Device.cs" />
+    <Compile Include="Model\FireAlarmEquipment.cs" />
+    <Compile Include="Model\FireArea.cs" />
     <Compile Include="Model\Floor.cs" />
     <Compile Include="Model\GiftWrapping.cs" />
     <Compile Include="Model\GrahamScan.cs" />
@@ -105,6 +108,7 @@
     <Compile Include="Model\Kruskal.cs" />
     <Compile Include="Model\Slab.cs" />
     <Compile Include="Model\SystemLinetype.cs" />
+    <Compile Include="Model\UserData.cs" />
     <Compile Include="Model\Wall.cs" />
     <Compile Include="Model\WallSect.cs" />
     <Compile Include="Helper\BlockReferenceHelper.cs" />
@@ -120,7 +124,6 @@
     <Compile Include="Model\AreaFloor.cs" />
     <Compile Include="Model\BasePoint.cs" />
     <Compile Include="Model\DiagramPanel.cs" />
-    <Compile Include="Model\FireAlarmWindowState.cs" />
     <Compile Include="Model\MonitoringSystemPanel.cs" />
     <Compile Include="Model\AirOperatedCircuitBreaker.cs" />
     <Compile Include="CADCommand\LightingCommand.cs" />
@@ -150,6 +153,8 @@
     <Compile Include="NTSHelper\PointHelper.cs" />
     <Compile Include="RibbonCommandHandler.cs" />
     <Compile Include="ViewModel\CalculateCurrentViewModel.cs" />
+    <Compile Include="ViewModel\F8_WindowViewModel.cs" />
+    <Compile Include="ViewModel\F9_WindowViewModel.cs" />
     <Compile Include="ViewModel\FireAlarmViewModel.cs" />
     <Compile Include="ViewModel\FireAlarmWindowViewModel.cs" />
     <Compile Include="ViewModel\LayoutViewModel\LightingCarLayoutViewModel.cs" />
@@ -175,6 +180,12 @@
     <Compile Include="myCommands.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TempMethod.cs" />
+    <Compile Include="View\F8_Window.xaml.cs">
+      <DependentUpon>F8_Window.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="View\F9_Window.xaml.cs">
+      <DependentUpon>F9_Window.xaml</DependentUpon>
+    </Compile>
     <Compile Include="View\FireAlarmView.xaml.cs">
       <DependentUpon>FireAlarmView.xaml</DependentUpon>
     </Compile>
@@ -231,136 +242,265 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <None Include="Block\FA-07-消火栓起泵按钮.dwg">
+    <None Include="Block\FA\FA-01-接线端子箱.dwg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="Block\FA-08-智能型点型感烟探测器.dwg">
+    <None Include="Block\FA\FA-02-带消防电话插孔的手动报警按钮.dwg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="Block\FA-09-智能型点型感温探测器.dwg">
+    <None Include="Block\FA\FA-03-火灾报警电话机.dwg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="Block\多功能表2.dwg">
+    <None Include="Block\FA\FA-04-声光警报器.dwg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="Block\消防电源监控模块.dwg">
+    <None Include="Block\FA\FA-05-3W火灾警报扬声器%28挂墙明装距地2.4m%29.dwg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="Block\电力能量监控系统图.dwg">
+    <None Include="Block\FA\FA-06-3W火灾警报扬声器%28吸顶安装%29.dwg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="Block\电气火灾监控器.dwg">
+    <None Include="Block\FA\FA-07-消火栓起泵按钮.dwg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Block\FA\FA-08-智能型点型感烟探测器.dwg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Block\FA\FA-09-智能型点型感温探测器.dwg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Block\EL\多功能表2.dwg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Block\EL\消防电源监控模块.dwg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Block\EL\电力能量监控系统图.dwg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Block\EL\电气火灾监控器.dwg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <Compile Include="CADCommand\TilCommand.F3_ConnectMultiLines.cs" />
+    <None Include="Block\FA\FA-10-防火阀%2870°C熔断关闭%29.dwg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Block\FA\FA-11-防火阀%28280°C熔断关闭%29.dwg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Block\FA\FA-12-电动排烟阀%28常闭%29.dwg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Block\FA\FA-13-电动排烟阀%28常开%29.dwg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Block\FA\FA-14-常闭正压送风口.dwg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Block\FA\FA-15-防火卷帘控制箱.dwg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Block\FA\FA-16-电动挡烟垂壁控制箱.dwg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Block\FA\FA-17-水流指示器.dwg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Block\FA\FA-18-信号阀.dwg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Block\FA\FA-19-智能线型红外光束感烟探测器（发射端）.dwg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Block\FA\FA-20-智能线型红外光束感烟探测器（接收端）.dwg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Block\FA\FA-21-电动排烟窗控制箱.dwg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Block\FA\FA-22-消防电梯控制箱.dwg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Block\FA\FA-23-电梯控制箱.dwg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Block\FA\FA-24-湿式报警阀组.dwg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Block\FA\FA-25-预作用报警阀组.dwg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Block\FA\FA-26-可燃气体探测控制器.dwg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Block\FA\FA-27-流量开关.dwg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Block\FA\FA-28-非消防配电箱.dwg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Block\FA\FA-29-消防泵控制箱.dwg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Block\FA\FA-30-喷淋泵控制箱.dwg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Block\FA\FA-31-消防稳压泵控制箱.dwg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Block\FA\FA-32-雨淋泵控制箱.dwg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Block\FA\FA-33-水幕泵控制箱.dwg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Block\FA\FA-34-消防风机控制箱.dwg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Block\FA\FA-35-就地液位显示盘.dwg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Block\FA\FA-36-液位计.dwg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Block\FA\FA-37-区域显示器.dwg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Block\FA\FA-38-常闭防火门监控模块.dwg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Block\FA\FA-39-常开防火门监控模块.dwg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Block\FA\FA-40-压力开关.dwg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Block\FA\FA-41-火焰探测器.dwg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Block\FA\FA-42-电磁阀.dwg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="Block\FA\FA-43-门禁控制器.dwg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Include="ClassDiagram1.cd" />
     <None Include="ElectrialClassDiagram.cd" />
-    <None Include="FA\FA-01-接线端子箱.dwg">
+    <None Include="SchematicBlock\FA\Circle\FA-01-接线端子箱.dwg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="FA\FA-02-带消防电话插孔的手动报警按钮.dwg">
+    <None Include="SchematicBlock\FA\FA-43-门禁控制器.dwg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="FA\FA-03-火灾报警电话机.dwg">
+    <None Include="SchematicBlock\FA\Tree\FA-01-接线端子箱.dwg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="FA\FA-04-声光警报器.dwg">
+    <None Include="SchematicBlock\FA\FA-02-带消防电话插孔的手动报警按钮.dwg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="FA\FA-05-3W火灾警报扬声器%28挂墙明装距地2.4m%29.dwg">
+    <None Include="SchematicBlock\FA\FA-03-火灾报警电话机.dwg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="FA\FA-06-3W火灾警报扬声器%28吸顶安装%29.dwg">
+    <None Include="SchematicBlock\FA\FA-04-声光警报器.dwg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="FA\FA-07-消火栓起泵按钮.dwg">
+    <None Include="SchematicBlock\FA\FA-05-3W火灾警报扬声器%28挂墙明装距地2.4m%29.dwg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="FA\FA-08-智能型点型感烟探测器.dwg">
+    <None Include="SchematicBlock\FA\FA-06-3W火灾警报扬声器%28吸顶安装%29.dwg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="FA\FA-09-智能型点型感温探测器.dwg">
+    <None Include="SchematicBlock\FA\FA-07-消火栓起泵按钮.dwg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="FA\FA-10-防火阀%2870°C熔断关闭%29.dwg">
+    <None Include="SchematicBlock\FA\FA-08-智能型点型感烟探测器.dwg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="FA\FA-11-防火阀%28280°C熔断关闭%29.dwg">
+    <None Include="SchematicBlock\FA\FA-09-智能型点型感温探测器.dwg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="FA\FA-12-电动排烟阀%28常闭%29.dwg">
+    <None Include="SchematicBlock\FA\FA-10-防火阀%2870°C熔断关闭%29.dwg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="FA\FA-13-电动排烟阀%28常开%29.dwg">
+    <None Include="SchematicBlock\FA\FA-11-防火阀%28280°C熔断关闭%29.dwg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="FA\FA-14-常闭正压送风口.dwg">
+    <None Include="SchematicBlock\FA\FA-12-电动排烟阀%28常闭%29.dwg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="FA\FA-15-防火卷帘控制箱.dwg">
+    <None Include="SchematicBlock\FA\FA-13-电动排烟阀%28常开%29.dwg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="FA\FA-16-电动挡烟垂壁控制箱.dwg">
+    <None Include="SchematicBlock\FA\FA-14-常闭正压送风口.dwg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="FA\FA-17-水流指示器.dwg">
+    <None Include="SchematicBlock\FA\FA-15-防火卷帘控制箱.dwg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="FA\FA-18-信号阀.dwg">
+    <None Include="SchematicBlock\FA\FA-16-电动挡烟垂壁控制箱.dwg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="FA\FA-19-智能线型红外光束感烟探测器（发射端）.dwg">
+    <None Include="SchematicBlock\FA\FA-17-水流指示器.dwg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="FA\FA-20-智能线型红外光束感烟探测器（接收端）.dwg">
+    <None Include="SchematicBlock\FA\FA-18-信号阀.dwg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="FA\FA-21-电动排烟窗控制箱.dwg">
+    <None Include="SchematicBlock\FA\FA-19-智能线型红外光束感烟探测器（发射端）.dwg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="FA\FA-22-消防电梯控制箱.dwg">
+    <None Include="SchematicBlock\FA\FA-20-智能线型红外光束感烟探测器（接收端）.dwg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="FA\FA-23-电梯控制箱.dwg">
+    <None Include="SchematicBlock\FA\FA-21-电动排烟窗控制箱.dwg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="FA\FA-24-湿式报警阀组.dwg">
+    <None Include="SchematicBlock\FA\FA-22-消防电梯控制箱.dwg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="FA\FA-25-预作用报警阀组.dwg">
+    <None Include="SchematicBlock\FA\FA-23-电梯控制箱.dwg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="FA\FA-26-可燃气体探测控制器.dwg">
+    <None Include="SchematicBlock\FA\FA-24-湿式报警阀组.dwg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="FA\FA-27-流量开关.dwg">
+    <None Include="SchematicBlock\FA\FA-25-预作用报警阀组.dwg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="FA\FA-28-非消防配电箱.dwg">
+    <None Include="SchematicBlock\FA\FA-26-可燃气体探测控制器.dwg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="FA\FA-29-消防泵控制箱.dwg">
+    <None Include="SchematicBlock\FA\FA-27-流量开关.dwg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="FA\FA-30-喷淋泵控制箱.dwg">
+    <None Include="SchematicBlock\FA\FA-28-非消防配电箱.dwg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="FA\FA-31-消防稳压泵控制箱.dwg">
+    <None Include="SchematicBlock\FA\FA-29-消防泵控制箱.dwg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="FA\FA-32-雨淋泵控制箱.dwg">
+    <None Include="SchematicBlock\FA\FA-30-喷淋泵控制箱.dwg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="FA\FA-33-水幕泵控制箱.dwg">
+    <None Include="SchematicBlock\FA\FA-31-消防稳压泵控制箱.dwg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="FA\FA-34-消防风机控制箱.dwg">
+    <None Include="SchematicBlock\FA\FA-32-雨淋泵控制箱.dwg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="FA\FA-35-就地液位显示盘.dwg">
+    <None Include="SchematicBlock\FA\FA-33-水幕泵控制箱.dwg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="FA\FA-37-区域显示器.dwg">
+    <None Include="SchematicBlock\FA\FA-34-消防风机控制箱.dwg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="SchematicBlock\FA\FA-35-就地液位显示盘.dwg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="SchematicBlock\FA\FA-37-区域显示器.dwg">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Include="SchematicBlock\FA\WallAndCeilingMount\FA-06-3W火灾警报扬声器%28吸顶安装%29.dwg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Snippet\TimeIsLife Command.snippet" />
@@ -430,6 +570,14 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="View\F8_Window.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="View\F9_Window.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="View\FireAlarmView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -464,25 +612,25 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <None Include="FA\FA-38-常闭防火门监控模块.dwg">
+    <None Include="SchematicBlock\FA\FA-38-常闭防火门监控模块.dwg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="FA\FA-39-常开防火门监控模块.dwg">
+    <None Include="SchematicBlock\FA\FA-39-常开防火门监控模块.dwg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="FA\FA-40-压力开关.dwg">
+    <None Include="SchematicBlock\FA\FA-40-压力开关.dwg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="FA\FA-41-火焰探测器.dwg">
+    <None Include="SchematicBlock\FA\FA-41-火焰探测器.dwg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="FA\FA-42-电磁阀.dwg">
+    <None Include="SchematicBlock\FA\FA-42-电磁阀.dwg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="FA\弱电-火灾自动报警图例及示例.dwg">
+    <None Include="SchematicBlock\FA\弱电-火灾自动报警图例及示例.dwg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Include="FA\操作说明.txt">
+    <None Include="SchematicBlock\FA\操作说明.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
   </ItemGroup>

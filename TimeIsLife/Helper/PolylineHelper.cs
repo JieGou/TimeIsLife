@@ -120,6 +120,23 @@ namespace TimeIsLife.Helper
         }
 
         /// <summary>
+        /// 获取Polygon二维点集()
+        /// </summary>
+        /// <param name="polyline"></param>
+        /// <returns></returns>
+        public static List<Coordinate> GetPolygonCoordinates(this Polyline polyline)
+        {
+            List<Coordinate> coordinates = new List<Coordinate>();
+            int n = polyline.NumberOfVertices;
+            for (int i = 0; i < n+1; i++)
+            {
+                coordinates.Add(new Coordinate(polyline.GetPoint3dAt(i % n).X, polyline.GetPoint3dAt(i%n).Y));
+            }
+
+            return coordinates;
+        }
+
+        /// <summary>
         /// 判断多边形1是否在多边形2的内部，true为在内部，false为不在内部
         /// </summary>
         /// <param name="roomPolyline">多边形1</param>

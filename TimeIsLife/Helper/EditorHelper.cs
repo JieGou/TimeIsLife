@@ -135,12 +135,10 @@ namespace TimeIsLife.Helper
                 //editor.WriteMessage("Number of objects selected: " + sSet.Count.ToString() + "\n");
                 return sSet;
             }
-            else
-            {
-                // 打印选择对象数量
-                editor.WriteMessage("\n 未选择对象！");
-                return null;
-            }
+
+            // 打印选择对象数量
+            editor.WriteMessage("\n 未选择对象！");
+            return null;
         }
     }
 }

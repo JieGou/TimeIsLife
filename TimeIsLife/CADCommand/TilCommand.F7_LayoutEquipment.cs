@@ -120,6 +120,11 @@ namespace TimeIsLife.CADCommand
 
                 #region YDB数据查询
                 // YDB数据查询
+                if (string.IsNullOrWhiteSpace(FireAlarmWindowViewModel.Instance.YdbFileName))
+                {
+                    MessageBox.Show(@"请选择结构数据库");
+                    return;
+                }
                 var ydbHelper = new SQLiteHelper($"Data Source={FireAlarmWindowViewModel.Instance.YdbFileName}");
                 using (var ydbConn = ydbHelper.GetConnection())
                 {
@@ -177,18 +182,6 @@ namespace TimeIsLife.CADCommand
 
                 var smokeDetectorId = LoadBlockIntoDatabase("FA-08-智能型点型感烟探测器.dwg");
                 var temperatureDetectorId = LoadBlockIntoDatabase("FA-09-智能型点型感温探测器.dwg");
-
-                //basePoint = new BasePoint
-                //{
-                //    Name = FireAlarmWindowViewModel.Instance.SelectedAreaFloor.Name,
-                //    Level = FireAlarmWindowViewModel.Instance.SelectedAreaFloor.Level,
-                //    X = FireAlarmWindowViewModel.Instance.ReferenceBasePoint.X,
-                //    Y = FireAlarmWindowViewModel.Instance.ReferenceBasePoint.Y,
-                //    Z = FireAlarmWindowViewModel.Instance.ReferenceBasePoint.Z
-                //};
-
-                //Model.Area baseArea = FireAlarmWindowViewModel.Instance.Areas.FirstOrDefault(f => Math.Abs(f.Level - basePoint.Level) < 1e-3);
-                //Vector3d baseVector = baseArea.BasePoint.GetVectorTo(basePoint.Point3d);
 
                 #region 根据房间边界及板轮廓生成烟感
 
@@ -283,7 +276,7 @@ namespace TimeIsLife.CADCommand
                         }
                     }
 
-                    SetCurrentLayer(database, $"E-EQUIP", 4);
+                    SetCurrentLayer(database, FireAlarmWindowViewModel.Instance.EquipmentLayerName, 4);
                     List<Beam> curFloorBeams = beams.Where(beam => beam.Floor.LevelB == curFloorArea.Level).ToList();
                     List<Slab> curFloorSlabs = slabs.Where(slab => slab.Floor.LevelB == curFloorArea.Level).ToList();
                     List<Wall> curFloorWalls = walls.Where(wall => wall.Floor.LevelB == curFloorArea.Level).ToList();
@@ -508,8 +501,7 @@ namespace TimeIsLife.CADCommand
                                                 //bool isPointOnLine2 = new DistanceOp(lineString.EndPoint, beamLineString).Distance() <= 1e-3;
 
 
-                                                if (lineString.Coordinates.All(pt =>
-translatedBeamLineString.Distance(geometryFactory.CreatePoint(pt)) < 1e-1))
+                                                if (lineString.Coordinates.All(pt => translatedBeamLineString.Distance(geometryFactory.CreatePoint(pt)) < 1e-1))
                                                 {
                                                     double height = 0;
                                                     if (beam.IsConcrete)

@@ -31,7 +31,6 @@ using TimeIsLife.View;
 
 using static TimeIsLife.CADCommand.FireAlarmCommand1;
 
-using Application = Autodesk.AutoCAD.ApplicationServices.Application;
 using Database = Autodesk.AutoCAD.DatabaseServices.Database;
 
 namespace TimeIsLife.ViewModel
@@ -45,11 +44,12 @@ namespace TimeIsLife.ViewModel
             GetFloorAreaLayerNameCommand = new RelayCommand(GetFloorAreaLayerName);
             GetFireAreaLayerNameCommand = new RelayCommand(GetFireAreaLayerName);
             GetRoomAreaLayerNameCommand = new RelayCommand(GetRoomAreaLayerName);
+            GetAvoidanceAreaLayerNameCommand = new RelayCommand(GetAvoidanceAreaLayerName);
+            GetEquipmentLayerNameCommand = new RelayCommand(GetEquipmentLayerName);
+            GetWireLayerNameCommand = new RelayCommand(GetWireLayerName);
             GetYdbFileNameCommand = new RelayCommand(GetYdbFileName);
             GetBasePointCommand = new RelayCommand(GetBasePoint);
             GetFloorAreaCommand = new RelayCommand(GetFloorArea);
-            //SaveAreaFileCommand = new RelayCommand(SaveAreaFile);
-            //ApplyCommand = new RelayCommand(Apply);
             ConfirmCommand = new RelayCommand(Confirm);
             CancelCommand = new RelayCommand(Cancel);
         }
@@ -63,7 +63,7 @@ namespace TimeIsLife.ViewModel
         #region 属性
         //楼层区域
         private string floorAreaLayerName;
-        public string FloorAreaLayerName
+        public string FloorAreaLayerName 
         {
             get => floorAreaLayerName;
             set => SetProperty(ref floorAreaLayerName, value);
@@ -84,6 +84,30 @@ namespace TimeIsLife.ViewModel
             set => SetProperty(ref roomAreaLayerName, value);
         }
 
+        //禁止布线区域
+        private string avoidanceAreaLayerName;
+        public string AvoidanceAreaLayerName
+        {
+            get => avoidanceAreaLayerName;
+            set => SetProperty(ref avoidanceAreaLayerName, value);
+        }
+
+        //设备图层
+        private string equipmentLayerName;
+        public string EquipmentLayerName
+        {
+            get => equipmentLayerName;
+            set => SetProperty(ref equipmentLayerName, value);
+        }
+
+        //设备图层
+        private string wireLayerName;
+        public string WireLayerName
+        {
+            get => wireLayerName;
+            set => SetProperty(ref wireLayerName, value);
+        }
+
         //YDB数据文件
         private string ydbFileName;
         public string YdbFileName
@@ -91,14 +115,6 @@ namespace TimeIsLife.ViewModel
             get => ydbFileName;
             set => SetProperty(ref ydbFileName, value);
         }
-
-        ////区域数据文件
-        //private string areaFileName;
-        //public string AreaFileName
-        //{
-        //    get => areaFileName;
-        //    set => SetProperty(ref areaFileName, value);
-        //}
 
         private ObservableCollection<AreaFloor> areaFloors;
         public ObservableCollection<AreaFloor> AreaFloors
@@ -128,9 +144,7 @@ namespace TimeIsLife.ViewModel
             get => referenceBasePoint;
             set => SetProperty(ref referenceBasePoint, value);
         }
-
-        public FireAlarmWindowState CurrentState { get; set; } = new FireAlarmWindowState();
-
+        
         private int slabThickness;
         public int SlabThickness
         {
@@ -157,178 +171,96 @@ namespace TimeIsLife.ViewModel
         public IRelayCommand GetFloorAreaLayerNameCommand { get; }
         public IRelayCommand GetFireAreaLayerNameCommand { get; }
         public IRelayCommand GetRoomAreaLayerNameCommand { get; }
+        public IRelayCommand GetAvoidanceAreaLayerNameCommand { get; }
+        public IRelayCommand GetEquipmentLayerNameCommand { get; }
+        public IRelayCommand GetWireLayerNameCommand { get; }
         public IRelayCommand GetYdbFileNameCommand { get; }
-        public IRelayCommand SaveAreaFileCommand { get; }
         public IRelayCommand GetBasePointCommand { get; }
         public IRelayCommand GetFloorAreaCommand { get; }
-        //public IRelayCommand ApplyCommand { get; }
         public IRelayCommand ConfirmCommand { get; }
         public IRelayCommand CancelCommand { get; }
         public bool Result { get; private set; }
         #endregion
 
         #region 方法
-
         private void GetFloorAreaLayerName()
         {
             FireAlarmWindow.Instance.Hide();
-
-            Document document = Autodesk.AutoCAD.ApplicationServices.Core.Application.DocumentManager.CurrentDocument;
-            Database database = document.Database;
-            Editor editor = document.Editor;
-
-            using (Transaction transaction = database.TransactionManager.StartTransaction())
+            string message = @"选择表示楼层区域的闭合多段线";
+            string layerName = GetLayerName(message);
+            if (string.IsNullOrWhiteSpace(layerName))
             {
-                try
-                {
-                    //选择选项
-                    PromptSelectionOptions promptSelectionOptions = new PromptSelectionOptions
-                    {
-                        SingleOnly = true,
-                        RejectObjectsOnLockedLayers = true,
-                        MessageForAdding = $"选择表示楼层区域的闭合多段线"
-                    };
-
-                    //过滤器
-                    TypedValueList typedValues = new TypedValueList()
-                    {
-                        //类型
-                        new TypedValue((int)DxfCode.Start,"LWPOLYLINE"),
-                        //图层名称
-                        //new TypedValue((int)DxfCode.LayerName,""),
-                        //块名
-                        //new TypedValue((int)DxfCode.BlockName,"")
-                    };
-
-                    SelectionSet selectionSet = editor.GetSelectionSet(SelectString.GetSelection, promptSelectionOptions, typedValues, null);
-                    Polyline polyline = transaction.GetObject(selectionSet.GetObjectIds().FirstOrDefault(), OpenMode.ForRead) as Polyline;
-                    if (polyline == null)
-                    {
-                        MessageBox.Show(@"选择的对象不是多段线！");
-                        FireAlarmWindow.Instance.ShowDialog();
-                        return;
-                    }
-                    Instance.FloorAreaLayerName = polyline.Layer;
-                    transaction.Commit();
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(@"发生错误: " + ex.Message); // 提供详细的错误信息
-                    transaction.Abort();
-                }
+                FireAlarmWindow.Instance.ShowDialog();
+                return;
             }
+            Instance.FloorAreaLayerName = layerName;
             FireAlarmWindow.Instance.ShowDialog();
         }
-
         private void GetFireAreaLayerName()
         {
             FireAlarmWindow.Instance.Hide();
-
-            Document document = Autodesk.AutoCAD.ApplicationServices.Core.Application.DocumentManager.CurrentDocument;
-            Database database = document.Database;
-            Editor editor = document.Editor;
-
-            using (Transaction transaction = database.TransactionManager.StartTransaction())
+            string message = @"选择表示防火分区的闭合多段线";
+            string layerName = GetLayerName(message);
+            if (string.IsNullOrWhiteSpace(layerName))
             {
-                try
-                {
-                    //选择选项
-                    PromptSelectionOptions promptSelectionOptions = new PromptSelectionOptions
-                    {
-                        SingleOnly = true,
-                        RejectObjectsOnLockedLayers = true,
-                        MessageForAdding = $"选择表示防火分区的闭合多段线"
-                    };
-
-                    //过滤器
-                    TypedValueList typedValues = new TypedValueList()
-                {
-                    //类型
-                    new TypedValue((int)DxfCode.Start,"LWPOLYLINE"),
-                    //图层名称
-                    //new TypedValue((int)DxfCode.LayerName,""),
-                    //块名
-                    //new TypedValue((int)DxfCode.BlockName,"")
-                };
-
-                    SelectionSet selectionSet = editor.GetSelectionSet(SelectString.GetSelection, promptSelectionOptions, typedValues, null);
-                    Polyline polyline = transaction.GetObject(selectionSet.GetObjectIds().FirstOrDefault(), OpenMode.ForRead) as Polyline;
-                    if (polyline == null)
-                    {
-                        MessageBox.Show(@"选择的对象不是多段线！");
-                        FireAlarmWindow.Instance.ShowDialog();
-                        return;
-                    }
-                    Instance.FireAreaLayerName = polyline.Layer;
-                    transaction.Commit();
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(@"发生错误: " + ex.Message); // 提供详细的错误信息
-                    transaction.Abort();
-                }
+                FireAlarmWindow.Instance.ShowDialog();
+                return;
             }
+            Instance.FireAreaLayerName = layerName;
             FireAlarmWindow.Instance.ShowDialog();
-
         }
-
         private void GetRoomAreaLayerName()
         {
             FireAlarmWindow.Instance.Hide();
-            Document document = Autodesk.AutoCAD.ApplicationServices.Core.Application.DocumentManager.CurrentDocument;
-            Database database = document.Database;
-            Editor editor = document.Editor;
-
-            using (Transaction transaction = database.TransactionManager.StartTransaction())
+            string message = @"选择表示房间区域的闭合多段线";
+            string layerName = GetLayerName(message);
+            if (string.IsNullOrWhiteSpace(layerName))
             {
-                try
-                {
-                    //获取块表
-                    BlockTable blockTable = transaction.GetObject(database.BlockTableId, OpenMode.ForRead) as BlockTable;
-                    //获取模型空间
-                    BlockTableRecord modelSpace = transaction.GetObject(blockTable[BlockTableRecord.ModelSpace], OpenMode.ForRead) as BlockTableRecord;
-                    //获取图纸空间
-                    BlockTableRecord paperSpace = transaction.GetObject(blockTable[BlockTableRecord.PaperSpace], OpenMode.ForRead) as BlockTableRecord;
-
-                    //选择选项
-                    PromptSelectionOptions promptSelectionOptions = new PromptSelectionOptions
-                    {
-                        SingleOnly = true,
-                        RejectObjectsOnLockedLayers = true,
-                        MessageForAdding = $"选择表示房间区域的闭合多段线"
-                    };
-
-                    //过滤器
-                    TypedValueList typedValues = new TypedValueList()
-                {
-                    //类型
-                    new TypedValue((int)DxfCode.Start,"LWPOLYLINE"),
-                    //图层名称
-                    //new TypedValue((int)DxfCode.LayerName,""),
-                    //块名
-                    //new TypedValue((int)DxfCode.BlockName,"")
-                };
-
-                    SelectionSet selectionSet = editor.GetSelectionSet(SelectString.GetSelection, promptSelectionOptions, typedValues, null);
-                    Polyline polyline = transaction.GetObject(selectionSet.GetObjectIds().FirstOrDefault(), OpenMode.ForRead) as Polyline;
-                    if (polyline == null)
-                    {
-                        MessageBox.Show("选择的对象不是多段线！");
-                        FireAlarmWindow.Instance.ShowDialog();
-                        return;
-                    }
-                    Instance.RoomAreaLayerName = polyline.Layer;
-                    transaction.Commit();
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show("发生错误: " + ex.Message); // 提供详细的错误信息
-                    transaction.Abort();
-                }
+                FireAlarmWindow.Instance.ShowDialog();
+                return;
             }
+            Instance.RoomAreaLayerName = layerName;
             FireAlarmWindow.Instance.ShowDialog();
         }
-
+        private void GetAvoidanceAreaLayerName()
+        {
+            FireAlarmWindow.Instance.Hide();
+            string message = @"选择表示禁止布线区域的闭合多段线";
+            string layerName = GetLayerName(message);
+            if (string.IsNullOrWhiteSpace(layerName))
+            {
+                FireAlarmWindow.Instance.ShowDialog();
+                return;
+            }
+            Instance.AvoidanceAreaLayerName = layerName;
+            FireAlarmWindow.Instance.ShowDialog();
+        }
+        private void GetEquipmentLayerName()
+        {
+            FireAlarmWindow.Instance.Hide();
+            string message = @"选择设备图层";
+            string layerName = GetLayerName(message);
+            if (string.IsNullOrWhiteSpace(layerName))
+            {
+                FireAlarmWindow.Instance.ShowDialog();
+                return;
+            }
+            Instance.EquipmentLayerName = layerName;
+            FireAlarmWindow.Instance.ShowDialog();
+        }
+        private void GetWireLayerName()
+        {
+            FireAlarmWindow.Instance.Hide();
+            string message = @"选择线缆图层";
+            string layerName = GetLayerName(message);
+            if (string.IsNullOrWhiteSpace(layerName))
+            {
+                FireAlarmWindow.Instance.ShowDialog();
+                return;
+            }
+            Instance.WireLayerName = layerName;
+            FireAlarmWindow.Instance.ShowDialog();
+        }
         private void GetYdbFileName()
         {
             FireAlarmWindow.Instance.Hide();
@@ -691,42 +623,52 @@ namespace TimeIsLife.ViewModel
         }
         public void SaveState()
         {
-            CurrentState.FloorLayerName = this.FloorAreaLayerName;
-            CurrentState.FireAlarmLayerName = this.FireAreaLayerName;
-            CurrentState.RoomLayerName = this.RoomAreaLayerName;
-            CurrentState.YdbFileName = this.YdbFileName;
-            //CurrentState.AreaFileName = this.AreaFileName;
-            CurrentState.SlabThickness = this.SlabThickness;
-            // 将CurrentState对象序列化为JSON字符串
-            string json = JsonConvert.SerializeObject(CurrentState);
 
-            // 将JSON字符串写入到本地文件中
-            string appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-            string directory = Path.Combine(appDataPath, "TimeIsLife", "UserData");
-            if (!Directory.Exists(directory))
-            {
-                Directory.CreateDirectory(directory);
-            }
-            string filePath = Path.Combine(directory, "FireAlarmWindowState.json");
-            File.WriteAllText(filePath, json);
+            MyPlugin.CurrentUserData.FloorLayerName = this.FloorAreaLayerName;
+            MyPlugin.CurrentUserData.FireAreaLayerName = this.FireAreaLayerName;
+            MyPlugin.CurrentUserData.RoomLayerName = this.RoomAreaLayerName;
+            MyPlugin.CurrentUserData.AvoidanceAreaLayerName = this.AvoidanceAreaLayerName;
+            MyPlugin.CurrentUserData.EquipmentLayerName = this.EquipmentLayerName;
+            MyPlugin.CurrentUserData.WireLayerName = WireLayerName;
+            MyPlugin.CurrentUserData.YdbFileName = this.YdbFileName;
+            MyPlugin.CurrentUserData.SlabThickness = this.SlabThickness;
         }
         public void LoadState()
         {
-            // 读取本地文件中的JSON字符串
-            string appDataPath = Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData);
-            string directory = Path.Combine(appDataPath, "TimeIsLife", "UserData");
-            string filePath = Path.Combine(directory, "FireAlarmWindowState.json");
-            if (!File.Exists(filePath)) return;
-            string json = File.ReadAllText(filePath);
+            FloorAreaLayerName = MyPlugin.CurrentUserData.FloorLayerName;
+            FireAreaLayerName = MyPlugin.CurrentUserData.FireAreaLayerName;
+            RoomAreaLayerName = MyPlugin.CurrentUserData.RoomLayerName;
+            AvoidanceAreaLayerName = MyPlugin.CurrentUserData.AvoidanceAreaLayerName;
+            EquipmentLayerName = MyPlugin.CurrentUserData.EquipmentLayerName;
+            WireLayerName = MyPlugin.CurrentUserData.WireLayerName;
+            YdbFileName = MyPlugin.CurrentUserData.YdbFileName;
+            SlabThickness = MyPlugin.CurrentUserData.SlabThickness;
+        }
+        private string GetLayerName(string message)
+        {
+            Document document = Autodesk.AutoCAD.ApplicationServices.Core.Application.DocumentManager.MdiActiveDocument;
+            Database database = document.Database;
+            Editor editor = document.Editor;
+            using (Transaction transaction = database.TransactionManager.StartTransaction())
+            {
+                //选择选项
+                PromptSelectionOptions promptSelectionOptions = new PromptSelectionOptions
+                {
+                    SingleOnly = true,
+                    RejectObjectsOnLockedLayers = true,
+                    MessageForAdding = message
+                };
 
-            // 将JSON字符串反序列化为State对象
-            CurrentState = JsonConvert.DeserializeObject<FireAlarmWindowState>(json);
-            FloorAreaLayerName = CurrentState.FloorLayerName;
-            FireAreaLayerName = CurrentState.FireAlarmLayerName;
-            RoomAreaLayerName = CurrentState.RoomLayerName;
-            YdbFileName = CurrentState.YdbFileName;
-            //this.AreaFileName = CurrentState.AreaFileName;
-            SlabThickness = CurrentState.SlabThickness;
+                SelectionSet selectionSet = editor.GetSelectionSet(SelectString.GetSelection, promptSelectionOptions, null, null);
+                if (selectionSet == null) return null;
+                Entity entity = transaction.GetObject(selectionSet.GetObjectIds().FirstOrDefault(), OpenMode.ForRead) as Entity;
+                if (entity == null)
+                {
+                    MessageBox.Show(@"对象图层锁定！");
+                    return null;
+                }
+                return entity.Layer;
+            }
         }
         #endregion
     }

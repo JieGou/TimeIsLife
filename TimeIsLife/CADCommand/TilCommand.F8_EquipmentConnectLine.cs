@@ -16,6 +16,7 @@ using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Windows.Documents;
 using System.Windows.Media.Media3D;
 using Google.OrTools.ConstraintSolver;
 
@@ -24,6 +25,7 @@ using TimeIsLife.Model;
 using TimeIsLife.ViewModel;
 using Google.Protobuf.WellKnownTypes;
 using TimeIsLife.Helper;
+using TimeIsLife.View;
 
 namespace TimeIsLife.CADCommand
 {
@@ -36,7 +38,6 @@ namespace TimeIsLife.CADCommand
             Database database = document.Database;
             Editor editor = document.Editor;
             Matrix3d ucsToWcsMatrix3d = editor.CurrentUserCoordinateSystem;
-            GeometryFactory geometryFactory = CreateGeometryFactory();
 
             string message = "\n作用：选择连线形式对设备进行连线" +
                                   "\n操作方法：根据命令提示，选择连线形式" +
@@ -47,13 +48,12 @@ namespace TimeIsLife.CADCommand
             PromptKeywordOptions keywordOptions = new PromptKeywordOptions("\n选择连线类型 [环形(Circle)/树形(Tree)]: ");
             keywordOptions.Keywords.Add("Circle");
             keywordOptions.Keywords.Add("Tree");
-            keywordOptions.Keywords.Default = "Tree";
+            keywordOptions.Keywords.Default = MyPlugin.CurrentUserData.TreeOrCircle;
             keywordOptions.AllowNone = false;
 
             PromptResult keywordResult = editor.GetKeywords(keywordOptions);
             if (keywordResult.Status != PromptStatus.OK) return;
-
-            bool isCircle = keywordResult.StringResult == "Circle";
+            MyPlugin.CurrentUserData.TreeOrCircle = keywordResult.StringResult == "Circle" ? "Circle" : "Tree";
 
             using (Transaction transaction = database.TransactionManager.StartTransaction())
             {
@@ -67,54 +67,65 @@ namespace TimeIsLife.CADCommand
                     BlockTableRecord paperSpace = transaction.GetObject(blockTable[BlockTableRecord.PaperSpace], OpenMode.ForRead) as BlockTableRecord;
                     Point3d endPoint3D;
 
-                    //选取防火分区多段线
-                    TypedValueList typedValues = new TypedValueList
+                    string[] layerNames1 = new string[]
                     {
+                        MyPlugin.CurrentUserData.FireAreaLayerName,
+                        MyPlugin.CurrentUserData.AvoidanceAreaLayerName,
+                        MyPlugin.CurrentUserData.EquipmentLayerName,
+                        //MyPlugin.CurrentUserData.WireLayerName
+                    };
+
+                    LayerTable layerTable = transaction.GetObject(database.LayerTableId,OpenMode.ForRead) as LayerTable;
+                    if (layerTable == null) return;
+                    if (!CheckAllLayers(layerTable,layerNames1))
+                    {
+                        F8_Window.Instance.ShowDialog();
+                        if (F8_WindowViewModel.Instance.Result)
+                        {
+                            string[] layerNames2= new string[]
+                            {
+                                MyPlugin.CurrentUserData.FireAreaLayerName,
+                                MyPlugin.CurrentUserData.AvoidanceAreaLayerName,
+                                MyPlugin.CurrentUserData.EquipmentLayerName,
+                                //MyPlugin.CurrentUserData.WireLayerName
+                            };
+                            if (!CheckAllLayers(layerTable, layerNames2))
+                            {
+                                editor.WriteMessage(@"图层设置有误！");
+                                return;
+                            }
+                        }
+                        else
+                        {
+                            return;
+                        }
+                    }
+                    //选择选定图层上的所有多段线
+                    TypedValueList fireAreaTypedValues = new TypedValueList
+                    {
+                        { DxfCode.LayerName, MyPlugin.CurrentUserData.FireAreaLayerName },
                         typeof(Polyline)
                     };
-                    SelectionFilter selectionFilter = new SelectionFilter(typedValues);
-                    PromptSelectionOptions promptSelectionOptions = new PromptSelectionOptions()
-                    {
-                        SingleOnly = true,
-                        RejectObjectsOnLockedLayers = true,
-                        MessageForAdding = "\n请选择防火分区："
-                    };
-
-                    PromptSelectionResult promptSelectionResult =
-                        editor.GetSelection(promptSelectionOptions, selectionFilter);
-                    if (promptSelectionResult.Status != PromptStatus.OK) return;
-
-                    Polyline polyline =
-                        transaction.GetObject(promptSelectionResult.Value.GetObjectIds().First(), OpenMode.ForRead) as Polyline;
-                    if (polyline == null) return;
-
-                    //选择选定图上的所有多段线
-                    TypedValueList fireAreaTypedValues = new TypedValueList
-                        {
-                            { DxfCode.LayerName, polyline.Layer },
-                            typeof(Polyline)
-                        };
                     SelectionFilter fireAreaSelectionFilter = new SelectionFilter(fireAreaTypedValues);
-                    PromptSelectionResult fireAreaSelection = editor.SelectAll(fireAreaSelectionFilter);
+                    PromptSelectionResult fireAreaSelectionResult = editor.SelectAll(fireAreaSelectionFilter);
+                    if (fireAreaSelectionResult.Status != PromptStatus.OK) return;
 
-                    SetCurrentLayer(database, "E-WIRE", 3);
-
-                    if (fireAreaSelection.Status != PromptStatus.OK) return;
+                    SetCurrentLayer(database, MyPlugin.CurrentUserData.WireLayerName, 1);
 
                     //迭代防火分区
-                    foreach (var id in fireAreaSelection.Value.GetObjectIds())
+                    foreach (var id in fireAreaSelectionResult.Value.GetObjectIds())
                     {
                         List<BlockReference> blockReferences = new List<BlockReference>();
 
-                        Polyline fireArea =
+                        Polyline fireAreaPolyline =
                             transaction.GetObject(id, OpenMode.ForRead) as Polyline;
-                        if (fireArea == null) continue;
-                        Point3dCollection point3DCollection = fireArea.GetPoint3dCollection();
+                        if (fireAreaPolyline == null) continue;
+                        Point3dCollection point3DCollection = fireAreaPolyline.GetPoint3dCollection();
 
                         TypedValueList blockReferenceTypedValues = new TypedValueList
                                 {
                                     typeof(BlockReference),
-                                    { DxfCode.LayerName, "E-EQUIP" }
+                                    { DxfCode.LayerName, MyPlugin.CurrentUserData.EquipmentLayerName }
                                 };
                         SelectionFilter blockReferenceSelectionFilter =
                             new SelectionFilter(blockReferenceTypedValues);
@@ -134,18 +145,39 @@ namespace TimeIsLife.CADCommand
                             if (blockReference.GetConnectionPoints().Count == 0) continue;
                             blockReferences.Add(blockReference);
                         }
+                        List<Coordinate> coordinates = blockReferences.Select(br => new Coordinate(br.Position.X, br.Position.Y)).ToList();
+                        List<AvoidanceArea> avoidanceAreas = new List<AvoidanceArea>();
+                        TypedValueList avoidanceAreaTypedValues = new TypedValueList
+                        {
+                            { DxfCode.LayerName, MyPlugin.CurrentUserData.AvoidanceAreaLayerName },
+                            typeof(Polyline)
+                        };
+                        SelectionFilter avoidanceAreaSelectionFilter = new SelectionFilter(avoidanceAreaTypedValues);
+                        PromptSelectionResult avoidanceAreaSelectionResult =
+                            editor.SelectCrossingPolygon(point3DCollection, avoidanceAreaSelectionFilter);
+                        if (avoidanceAreaSelectionResult.Status == PromptStatus.OK)
+                        {
+                            foreach (var objectId in avoidanceAreaSelectionResult.Value.GetObjectIds())
+                            {
+                                Polyline avoidanceAreaPolyline = transaction.GetObject(objectId, OpenMode.ForRead) as Polyline;
+                                if (avoidanceAreaPolyline == null) continue;
+                                avoidanceAreas.Add(new AvoidanceArea(avoidanceAreaPolyline.GetPolygonCoordinates()));
+                            }
+                        }
 
                         List<LineString> lineStrings;
                         const double tolerance = 1e-3;
 
-                        if (isCircle)
+                        if (MyPlugin.CurrentUserData.TreeOrCircle == "Circle")
                         {
-                            lineStrings = CreateOptimalRingConnections(blockReferences);
+                            lineStrings = avoidanceAreas.Count == 0 ?
+                                CreateOptimalRingConnections(coordinates) :
+                                CreateOptimalRingConnections(coordinates, avoidanceAreas);
                         }
                         else
                         {
                             lineStrings =
-                                CreateMinimumSpanningTreeConnections(blockReferences, geometryFactory);
+                                CreateMinimumSpanningTreeConnections(coordinates);
                         }
 
                         foreach (var lineString in lineStrings)
@@ -168,7 +200,6 @@ namespace TimeIsLife.CADCommand
                             modelSpace.AppendEntity(connectline);
                             transaction.AddNewlyCreatedDBObject(connectline, true);
                         }
-                        
                     }
                     transaction.Commit();
                 }
@@ -179,16 +210,16 @@ namespace TimeIsLife.CADCommand
             }
         }
 
-        private List<LineString> CreateOptimalRingConnections(List<BlockReference> blocks)
+        private List<LineString> CreateOptimalRingConnections(List<Coordinate> coordinates)
         {
-            if (blocks.Count < 3)
+            if (coordinates.Count < 3)
                 throw new ArgumentException("至少需要3个块来形成环形连线。");
 
             // 将blocks转换为坐标点集
-            var points = blocks.Select(b => new Coordinate(b.Position.X, b.Position.Y)).ToList();
+            var geometryFactory = new GeometryFactory();
 
             // OR-Tools 求解器的初始化
-            RoutingIndexManager manager = new RoutingIndexManager(points.Count, 1, 0);
+            RoutingIndexManager manager = new RoutingIndexManager(coordinates.Count, 1, 0);
             RoutingModel routing = new RoutingModel(manager);
 
             // 距离计算回调
@@ -197,8 +228,8 @@ namespace TimeIsLife.CADCommand
                 // 转换索引为用户定义的点索引
                 var fromNode = manager.IndexToNode(fromIndex);
                 var toNode = manager.IndexToNode(toIndex);
-                Coordinate p1 = points[fromNode];
-                Coordinate p2 = points[toNode];
+                Coordinate p1 = coordinates[fromNode];
+                Coordinate p2 = coordinates[toNode];
                 return (long)Math.Round(Math.Sqrt(Math.Pow(p1.X - p2.X, 2) + Math.Pow(p1.Y - p2.Y, 2)));
             });
 
@@ -216,7 +247,7 @@ namespace TimeIsLife.CADCommand
             long index = routing.Start(0);
             while (routing.IsEnd(index) == false)
             {
-                sortedPoints.Add(points[manager.IndexToNode(index)]);
+                sortedPoints.Add(coordinates[manager.IndexToNode(index)]);
                 index = solution.Value(routing.NextVar(index));
             }
             sortedPoints.Add(sortedPoints[0]); // 闭合环路
@@ -226,22 +257,97 @@ namespace TimeIsLife.CADCommand
             {
                 Coordinate start = sortedPoints[i];
                 Coordinate end = sortedPoints[i + 1];
-                connections.Add(new LineString(new[] { start, end }));
+                connections.Add(geometryFactory.CreateLineString(new[] { sortedPoints[i], sortedPoints[i + 1] }));
             }
 
             return connections;
         }
 
-
-        private List<LineString> CreateMinimumSpanningTreeConnections(List<BlockReference> blocks, GeometryFactory geometryFactory)
+        private List<LineString> CreateOptimalRingConnections(List<Coordinate> coordinates, List<AvoidanceArea> avoidanceAreas)
         {
-            if (blocks.Count < 2)
-                throw new ArgumentException("至少需要2个块来形成树形连线。");
+            if (coordinates.Count < 3)
+                throw new ArgumentException(@"至少需要3个块来形成环形连线。");
 
-            var points = blocks.Select(b => geometryFactory.CreatePoint(new Coordinate(b.Position.X, b.Position.Y))).ToList();
+            // 将blocks转换为坐标点集
+            var geometryFactory = new GeometryFactory();
+
+            // OR-Tools 求解器的初始化
+            RoutingIndexManager manager = new RoutingIndexManager(coordinates.Count, 1, 0);
+            RoutingModel routing = new RoutingModel(manager);
+
+            // 创建距离回调
+            int transitCallbackIndex = routing.RegisterTransitCallback((long fromIndex, long toIndex) =>
+            {
+                var fromNode = manager.IndexToNode(fromIndex);
+                var toNode = manager.IndexToNode(toIndex);
+                var line = geometryFactory.CreateLineString(new[] { coordinates[fromNode], coordinates[toNode] });
+
+                // 检查路径是否穿过任何避开区域
+                foreach (var area in avoidanceAreas)
+                {
+                    if (area.Area.Intersects(line))
+                    {
+                        return long.MaxValue; // 通过设定非常高的成本来避开这个区域
+                    }
+                }
+
+                // 计算并返回两点之间的距离
+                return (long)coordinates[fromNode].Distance(coordinates[toNode]) * 1000; // 距离转换为整数
+            });
+
+            routing.SetArcCostEvaluatorOfAllVehicles(transitCallbackIndex);
+
+            // 设置搜索参数
+            RoutingSearchParameters searchParameters = operations_research_constraint_solver.DefaultRoutingSearchParameters();
+            searchParameters.FirstSolutionStrategy = FirstSolutionStrategy.Types.Value.ParallelCheapestInsertion;
+
+            // 解决问题
+            Assignment solution = routing.SolveWithParameters(searchParameters);
+            if (solution == null)
+            {
+                throw new InvalidOperationException("无法找到解决方案。");
+            }
+
+            // 获取解决方案并创建LineString连接
+            List<Coordinate> sortedPoints = new List<Coordinate>();
+            long currentIndex = routing.Start(0);
+            while (!routing.IsEnd(currentIndex))
+            {
+                sortedPoints.Add(coordinates[manager.IndexToNode(currentIndex)]);
+                currentIndex = solution.Value(routing.NextVar(currentIndex));
+            }
+            sortedPoints.Add(sortedPoints[0]); // 闭合环路
+
+            var connections = new List<LineString>();
+            for (int i = 0; i < sortedPoints.Count - 1; i++)
+            {
+                connections.Add(geometryFactory.CreateLineString(new[] { sortedPoints[i], sortedPoints[i + 1] }));
+            }
+
+            return connections;
+        }
+
+        private List<LineString> CreateMinimumSpanningTreeConnections(List<Coordinate> coordinates)
+        {
+            if (coordinates.Count < 2)
+                throw new ArgumentException("至少需要2个坐标点来形成树形连线。");
+
+            GeometryFactory geometryFactory = new GeometryFactory();
+            var points = coordinates.Select(coordinate => geometryFactory.CreatePoint(coordinate)).ToList();
 
             return Kruskal.FindMinimumSpanningTree(points, geometryFactory);
         }
 
+        private bool CheckAllLayers(LayerTable layerTable, string[] names)
+        {
+            foreach (var name in names)
+            {
+                if (!layerTable.Has(name))
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
     }
 }

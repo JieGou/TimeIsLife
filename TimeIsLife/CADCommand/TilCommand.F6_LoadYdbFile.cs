@@ -20,7 +20,9 @@ using static TimeIsLife.CADCommand.FireAlarmCommand1;
 using Color = Autodesk.AutoCAD.Colors.Color;
 using Polyline = Autodesk.AutoCAD.DatabaseServices.Polyline;
 using Database = Autodesk.AutoCAD.DatabaseServices.Database;
-
+using Autodesk.AutoCAD.ApplicationServices;
+using Autodesk.AutoCAD.EditorInput;
+using Application = Autodesk.AutoCAD.ApplicationServices.Application;
 
 
 namespace TimeIsLife.CADCommand
@@ -30,7 +32,10 @@ namespace TimeIsLife.CADCommand
         [CommandMethod("F6_LoadYdbFile")]
         public void F6_LoadYdbFile()
         {
-            Initialize();
+            Document document = Application.DocumentManager.MdiActiveDocument;
+            Database database = document.Database;
+            Editor editor = document.Editor;
+            Matrix3d ucsToWcsMatrix3d = editor.CurrentUserCoordinateSystem;
 
             #region 选择盈建科文件
             string filename = null;
@@ -130,14 +135,6 @@ namespace TimeIsLife.CADCommand
                     UriBuilder uri = new UriBuilder(codeBase);
                     string path = Uri.UnescapeDataString(uri.Path);
 
-                    //载入感烟探测器块
-                    string blockPath = Path.Combine(Path.GetDirectoryName(path), "Block", "FA-08-智能型点型感烟探测器.dwg");
-                    string blockName = SymbolUtilityServices.GetSymbolNameFromPathName(blockPath, "dwg");
-
-                    ObjectId blockId = ObjectId.Null;
-                    blcokDatabase.ReadDwgFile(blockPath, FileOpenMode.OpenForReadAndReadShare, allowCPConversion: true, null);
-                    blcokDatabase.CloseInput(true);
-
                     //根据标高生成梁图
                     foreach (var floor in floors)
                     {
@@ -148,7 +145,6 @@ namespace TimeIsLife.CADCommand
                             {
 
                                 #region 生成板及烟感
-                                blockId = newDatabase.Insert(blockName, blcokDatabase, true);
                                 foreach (var slab in slabs)
                                 {
                                     
@@ -159,21 +155,9 @@ namespace TimeIsLife.CADCommand
                                     Polyline polyline = new Polyline();
                                     Point2dCollection point2Ds = GetPoint2Ds(slab);
                                     if (point2Ds != null)
-                                    polyline.CreatePolyline(point2Ds);
+                                        if (polyline != null)
+                                            polyline.CreatePolyline(point2Ds);
                                     newDatabase.AddToModelSpace(polyline);
-
-                                    if (slab.Thickness == 0) continue;
-                                    //在板的重心添加感烟探测器
-                                    SetCurrentLayer(newDatabase, $"E-EQUIP-{slab.Thickness.ToString()}", 4);
-
-                                    Point2d gravityPoint = getCenterOfGravityPoint(point2Ds);
-                                    BlockTable blockTable = (BlockTable)newTransaction.GetObject(newDatabase.BlockTableId, OpenMode.ForRead);
-                                    BlockReference blockReference = new BlockReference(gravityPoint.ToPoint3d(), blockId);
-                                    blockReference.ScaleFactors = new Scale3d(100);
-                                    newDatabase.AddToModelSpace(blockReference);
-
-                                    //设置块参照图层错误
-                                    //blockReference.Layer = layerName;
                                 }
 
 
