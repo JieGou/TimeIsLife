@@ -126,6 +126,7 @@ namespace TimeIsLife
                 CurrentUserData.SlabThickness = 120;
                 CurrentUserData.TreeOrCircle = "Tree";
                 CurrentUserData.FireAlarmEquipments = GetFireAlarmEquipments(blockDirectory, schematicBlockDirectory);
+                CurrentUserData.DeviceType = "JXX";
                 return;
             }
 
@@ -141,8 +142,8 @@ namespace TimeIsLife
                 new FireAlarmEquipment(FireAlarmEquipmentType.Fa02, "带消防电话插孔的手动报警按钮",Path.Combine(blockDirectory,"FA-02-带消防电话插孔的手动报警按钮.dwg"),Path.Combine(schematicBlockDirectory,"FA-02-带消防电话插孔的手动报警按钮.dwg"),true,true,700),
                 new FireAlarmEquipment(FireAlarmEquipmentType.Fa03, "火灾报警电话机",Path.Combine(blockDirectory,"FA-03-火灾报警电话机.dwg"),Path.Combine(schematicBlockDirectory,"FA-03-火灾报警电话机.dwg"),true,true,700),
                 new FireAlarmEquipment(FireAlarmEquipmentType.Fa04, "声光警报器", Path.Combine(blockDirectory, "FA-04-声光警报器.dwg"), Path.Combine(schematicBlockDirectory, "FA-04-声光警报器.dwg"), true, true, 900),
-                new FireAlarmEquipment(FireAlarmEquipmentType.Fa05, "3W火灾警报扬声器(挂墙明装,距地2.4m)", Path.Combine(blockDirectory, "FA-05-3W火灾警报扬声器(挂墙明装距地2.4m).dwg"), Path.Combine(schematicBlockDirectory, "FA-05-3W火灾警报扬声器(挂墙明装距地2.4m).dwg"), true, true, 1600),
-                new FireAlarmEquipment(FireAlarmEquipmentType.Fa06, "3W火灾警报扬声器(吸顶安装)", Path.Combine(blockDirectory, "FA-06-3W火灾警报扬声器(吸顶安装).dwg"), Path.Combine(schematicBlockDirectory, "FA-06-3W火灾警报扬声器(吸顶安装).dwg"), true, true, 1600),
+                new FireAlarmEquipment(FireAlarmEquipmentType.Fa05, "3W火灾警报扬声器(挂墙明装,距地2.4m)", Path.Combine(blockDirectory, "FA-05-3W火灾警报扬声器(挂墙明装距地2.4m).dwg"), Path.Combine(schematicBlockDirectory, "FA-05-3W火灾警报扬声器(挂墙明装距地2.4m).dwg"), true, false, 1600),
+                new FireAlarmEquipment(FireAlarmEquipmentType.Fa06, "3W火灾警报扬声器(吸顶安装)", Path.Combine(blockDirectory, "FA-06-3W火灾警报扬声器(吸顶安装).dwg"), Path.Combine(schematicBlockDirectory, "FA-06-3W火灾警报扬声器(吸顶安装).dwg"), true, true, 700),
                 new FireAlarmEquipment(FireAlarmEquipmentType.Fa07, "消火栓起泵按钮", Path.Combine(blockDirectory, "FA-07-消火栓起泵按钮.dwg"), Path.Combine(schematicBlockDirectory, "FA-07-消火栓起泵按钮.dwg"), true, true, 900),
                 new FireAlarmEquipment(FireAlarmEquipmentType.Fa08, "智能型点型感烟探测器", Path.Combine(blockDirectory, "FA-08-智能型点型感烟探测器.dwg"), Path.Combine(schematicBlockDirectory, "FA-08-智能型点型感烟探测器.dwg"), true, true, 900),
                 new FireAlarmEquipment(FireAlarmEquipmentType.Fa09, "智能型点型感温探测器", Path.Combine(blockDirectory, "FA-09-智能型点型感温探测器.dwg"), Path.Combine(schematicBlockDirectory, "FA-09-智能型点型感温探测器.dwg"), true, true, 900),

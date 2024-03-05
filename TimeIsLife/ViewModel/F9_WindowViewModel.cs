@@ -59,6 +59,14 @@ namespace TimeIsLife.ViewModel
             set => SetProperty(ref fireAreaLayerName, value);
         }
 
+        //防火分区
+        private string deviceType;
+        public string DeviceType
+        {
+            get => deviceType;
+            set => SetProperty(ref deviceType, value);
+        }
+
         private ObservableCollection<FireAlarmEquipment> fireAlarmEquipments;
         public ObservableCollection<FireAlarmEquipment> FireAlarmEquipments
         {
@@ -95,11 +103,13 @@ namespace TimeIsLife.ViewModel
 
             MyPlugin.CurrentUserData.FireAreaLayerName = FireAreaLayerName;
             MyPlugin.CurrentUserData.FireAlarmEquipments = FireAlarmEquipments;
+            MyPlugin.CurrentUserData.DeviceType = DeviceType;
         }
         public void LoadState()
         {
             FireAreaLayerName = MyPlugin.CurrentUserData.FireAreaLayerName;
             FireAlarmEquipments = MyPlugin.CurrentUserData.FireAlarmEquipments;
+            DeviceType = MyPlugin.CurrentUserData.DeviceType;
         }
 
         private void OpenFileDialog1(object obj)

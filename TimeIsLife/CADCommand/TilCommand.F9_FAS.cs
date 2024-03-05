@@ -1,4 +1,6 @@
-﻿using Autodesk.AutoCAD.ApplicationServices;
+﻿using Accord.MachineLearning.Boosting;
+
+using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Geometry;
@@ -16,12 +18,14 @@ using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 using System.Windows.Media.Media3D;
 
 using TimeIsLife.Helper;
 using TimeIsLife.Model;
 using TimeIsLife.View;
 using TimeIsLife.ViewModel;
+using Application = Autodesk.AutoCAD.ApplicationServices.Application;
 
 namespace TimeIsLife.CADCommand
 {
@@ -49,13 +53,14 @@ namespace TimeIsLife.CADCommand
                 if (layerTable == null) return;
                 if (!CheckAllLayers(layerTable, layerNames1))
                 {
+                    MessageBox.Show(@"请选择防火分区图层！");
                     F9_Window.Instance.ShowDialog();
                     if (F9_WindowViewModel.Instance.Result)
                     {
                         string[] layerNames2 = { MyPlugin.CurrentUserData.FireAreaLayerName };
                         if (!CheckAllLayers(layerTable, layerNames2))
                         {
-                            editor.WriteMessage(@"图层设置有误！");
+                            MessageBox.Show(@"防火分区图层设置错误！");
                             return;
                         }
                     }
@@ -154,25 +159,52 @@ namespace TimeIsLife.CADCommand
                         editor.WriteMessage(@"缺少防火分区编号！");
                         return;
                     }
-
-                    fireAreas.Add(new FireArea() { Name = dBText.TextString, Polyline = fireAreaPolyline });
+                    fireAreas.Add(new FireArea() { Name = dBText.TextString, Polyline = fireAreaPolyline,DeviceType = MyPlugin.CurrentUserData.DeviceType});
                 }
 
+                // 计算所有分区中的最低和最高楼层权重
+                int minFloorWeight = fireAreas.Min(fa => FloorToInt(fa.Device.Floor));
+                int maxFloorWeight = fireAreas.Max(fa => FloorToInt(fa.Device.Floor));
+
+                // 分区分组，填充缺少的楼层，并尝试找到每个分组中第一个非占位符的 FireArea 进行排序
                 var groupedSortedAreas = fireAreas
                     .Select(fa =>
                     {
-                        var device = fa.Device; // 假设FireArea类有一个Device属性
                         return new
                         {
                             FireArea = fa,
-                            Partition = device.Partition,
-                            FloorWeight = FloorWeight(device.Floor)
+                            Partition = fa.Device.Partition,
+                            FloorWeight = FloorToInt(fa.Device.Floor),
+                            IsPlaceholder = fa.Name == "Placeholder" // 标记是否为占位符
                         };
                     })
                     .GroupBy(fa => fa.Partition)
-                    .Select(g => g.OrderBy(fa => fa.FloorWeight).Select(fa => fa.FireArea).ToList())
-                    .OrderBy(g => g.First().Device.Partition)
+                    .Select(g =>
+                    {
+                        var fullRangeFloors = Enumerable.Range(minFloorWeight, maxFloorWeight - minFloorWeight + 1)
+                            .Select(weight => g.FirstOrDefault(fa => fa.FloorWeight == weight)?.FireArea)
+                            .ToList();
+
+                        // 替换null值为占位符FireArea
+                        for (int i = 0; i < fullRangeFloors.Count; i++)
+                        {
+                            if (fullRangeFloors[i] == null)
+                            {
+                                fullRangeFloors[i] = new FireArea() { Name = "Placeholder" };
+                            }
+                        }
+
+                        return fullRangeFloors;
+                    })
+                    .OrderBy(g =>
+                    {
+                        // 尝试找到每个分组中第一个非占位符的 FireArea，用于排序
+                        var firstNonPlaceholder = g.FirstOrDefault(fa => fa.Name != "Placeholder");
+                        return firstNonPlaceholder.Device.Partition;
+                    })
                     .ToList();
+
+
 
 
                 //循环防火分区
@@ -184,10 +216,12 @@ namespace TimeIsLife.CADCommand
                     for (int j = 0; j < groupedSortedAreas[i].Count; j++)
                     {
                         FireArea fireArea = groupedSortedAreas[i][j];
+                        if (fireArea.Name == "Placeholder") continue;
                         if (tempFireAreas.Contains(fireArea)) continue;
                         tempFireAreas.Add(fireArea);
                         List<BlockReference> blockReferences = new List<BlockReference>();
                         Point3d layoutPoint3d = basePoint3d + new Vector3d(50000 * i, 2500 * j, 0);
+
                         Matrix3d displacement = Matrix3d.Displacement(Point3d.Origin.GetVectorTo(layoutPoint3d));
                         TypedValueList typedValues3 = new TypedValueList
                         {
@@ -243,7 +277,7 @@ namespace TimeIsLife.CADCommand
                             switch (fireAlarmEquipmentType)
                             {
                                 case FireAlarmEquipmentType.Fa01:
-
+                                    if (int.Parse(n) == 0) break;
                                     int n1 = 0, n2 = 0;
                                     //获取短路隔离器数量n1
                                     //获取接线端子箱数量n2
@@ -363,6 +397,7 @@ namespace TimeIsLife.CADCommand
                                     AddFireAlarmEquipment(database, fireAlarmEquipment, displacement, n);
                                     break;
                                 case FireAlarmEquipmentType.Fa05:
+                                    if (int.Parse(n) == 0) break;
                                     string file2 = fireAlarmEquipment.SchematicBlockPath;
                                     if (File.Exists(file2))
                                     {
@@ -394,6 +429,7 @@ namespace TimeIsLife.CADCommand
                                     }
                                     break;
                                 case FireAlarmEquipmentType.Fa06:
+                                    if (int.Parse(n) == 0) break;
                                     bool b1 = uniqueSortedEquipments.Any(e => e.EquipmentType == FireAlarmEquipmentType.Fa05);
                                     if (!b1)
                                     {
@@ -426,6 +462,12 @@ namespace TimeIsLife.CADCommand
 
                                             database.Insert(displacement, db, false);
                                         }
+                                        Vector3d schematicWidthAdjustment =
+                                            new Vector3d(1600, 0, 0);
+                                        Matrix3d adjustmentDisplacement = Matrix3d.Displacement(schematicWidthAdjustment);
+
+                                        // 合并位移矩阵，并更新displacement变量
+                                        displacement *= adjustmentDisplacement;
                                     }
                                     else
                                     {
@@ -487,6 +529,7 @@ namespace TimeIsLife.CADCommand
                                     AddFireAlarmEquipment(database, fireAlarmEquipment, displacement, n);
                                     break;
                                 case FireAlarmEquipmentType.Fa15:
+                                    if (int.Parse(n) == 0) break;
                                     string file5 = fireAlarmEquipment.SchematicBlockPath;
                                     if (File.Exists(file5))
                                     {
@@ -557,6 +600,7 @@ namespace TimeIsLife.CADCommand
                                     AddFireAlarmEquipment(database, fireAlarmEquipment, displacement, n);
                                     break;
                                 case FireAlarmEquipmentType.Fa28:
+                                    if (int.Parse(n) == 0) break;
                                     int n3 = 0;
                                     string name3 = string.Empty;
                                     foreach (var equipment in MyPlugin.CurrentUserData.FireAlarmEquipments)
@@ -627,6 +671,7 @@ namespace TimeIsLife.CADCommand
                                     AddFireAlarmEquipment(database, fireAlarmEquipment, displacement, n);
                                     break;
                                 case FireAlarmEquipmentType.Fa34:
+                                    if (int.Parse(n) == 0) break;
                                     //获取消防风机控制箱数量n4，消防风机数量n5
                                     int n4 = 0, n5 = 0;
                                     string name4 = string.Empty;
@@ -687,6 +732,7 @@ namespace TimeIsLife.CADCommand
                                     }
                                     break;
                                 case FireAlarmEquipmentType.Fa35:
+                                    if (int.Parse(n) == 0) break;
                                     Matrix3d matrix3D1 =
                                         Matrix3d.Displacement(Point3d.Origin.GetVectorTo(layoutPoint3d))* Matrix3d.Displacement(-GetFireAlarmEquipmentVector3d(FireAlarmEquipmentType.Fa35))* Matrix3d.Displacement(-GetFireAlarmEquipmentVector3d(FireAlarmEquipmentType.Fa37))* Matrix3d.Displacement(-GetFireAlarmEquipmentVector3d(FireAlarmEquipmentType.Fa38));
                                     string file8 = fireAlarmEquipment.SchematicBlockPath;
@@ -701,16 +747,19 @@ namespace TimeIsLife.CADCommand
                                     }
                                     break;
                                 case FireAlarmEquipmentType.Fa37:
+                                    if (int.Parse(n) == 0) break;
                                     Matrix3d matrix3D2 =
                                         Matrix3d.Displacement(Point3d.Origin.GetVectorTo(layoutPoint3d)) * Matrix3d.Displacement(-GetFireAlarmEquipmentVector3d(FireAlarmEquipmentType.Fa37));
                                     AddFireAlarmEquipment(database, fireAlarmEquipment, matrix3D2, n);
                                     break;
                                 case FireAlarmEquipmentType.Fa38:
+                                    if (int.Parse(n) == 0) break;
                                     Matrix3d matrix3D3 =
                                         Matrix3d.Displacement(Point3d.Origin.GetVectorTo(layoutPoint3d)) * Matrix3d.Displacement(-GetFireAlarmEquipmentVector3d(FireAlarmEquipmentType.Fa37)) * Matrix3d.Displacement(-GetFireAlarmEquipmentVector3d(FireAlarmEquipmentType.Fa38));
                                     AddFireAlarmEquipment(database, fireAlarmEquipment, matrix3D3, n);
                                     break;
                                 case FireAlarmEquipmentType.Fa39:
+                                    if (int.Parse(n) == 0) break;
                                     Matrix3d matrix3D4 =
                                         Matrix3d.Displacement(Point3d.Origin.GetVectorTo(layoutPoint3d)) * Matrix3d.Displacement(-GetFireAlarmEquipmentVector3d(FireAlarmEquipmentType.Fa37)) * Matrix3d.Displacement(-GetFireAlarmEquipmentVector3d(FireAlarmEquipmentType.Fa38));
                                     AddFireAlarmEquipment(database, fireAlarmEquipment, matrix3D4, n);
@@ -776,6 +825,7 @@ namespace TimeIsLife.CADCommand
         private void AddFireAlarmEquipment(Database database, FireAlarmEquipment fireAlarmEquipment,
             Matrix3d displacement, string n)
         {
+            if (int.Parse(n) == 0) return;
             string file = fireAlarmEquipment.SchematicBlockPath;
             if (File.Exists(file))
             {
@@ -810,7 +860,14 @@ namespace TimeIsLife.CADCommand
             }
         }
 
-        private int FloorWeight(string floor)
+        private string IntToFloor(int weight)
+        {
+            if (weight == int.MaxValue) return "R";
+            if (weight == 0) return "BJ";
+            if (weight < 0) return "B" + (-weight).ToString();
+            return weight.ToString();
+        }
+        private int FloorToInt(string floor)
         {
             // 这里复用之前定义的楼层权重逻辑
             if (floor.StartsWith("B"))

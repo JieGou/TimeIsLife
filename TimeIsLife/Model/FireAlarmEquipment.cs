@@ -24,9 +24,6 @@ namespace TimeIsLife.Model
         // 在系统图上位置是否固定
         public bool IsPositionFixedOnSchematic { get; set; }
 
-        // 系统类型是环形还是树形
-        public SystemType SystemConfiguration { get; set; }
-
         // 系统图上占位宽度
         public double SchematicWidth { get; set; }
 
@@ -41,14 +38,6 @@ namespace TimeIsLife.Model
             IsPositionFixedOnSchematic = isPositionFixedOnSchematic;
             SchematicWidth = schematicWidth;
         }
-    }
-
-    // 系统类型枚举
-    public enum SystemType
-    {
-        None,
-        Ring, // 环形
-        Tree // 树形
     }
 
     public enum FireAlarmEquipmentType

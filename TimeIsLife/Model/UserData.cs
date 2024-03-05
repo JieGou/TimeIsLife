@@ -23,5 +23,7 @@ namespace TimeIsLife.Model
         public string TreeOrCircle { get; set; }
         // 集合属性示例
         public ObservableCollection<FireAlarmEquipment> FireAlarmEquipments { get; set; }
+
+        public string DeviceType { get; set; }
     }
 }

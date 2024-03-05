@@ -6,8 +6,7 @@
     xmlns:local="clr-namespace:TimeIsLife.View"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     Title="F9_Window"
-    MinWidth="600"
-    MaxHeight="800"
+    MinWidth="400"
     Closing="Window_Closing"
     Loaded="Window_Loaded"
     mc:Ignorable="d">
@@ -22,87 +21,36 @@
             </ResourceDictionary.MergedDictionaries>
         </ResourceDictionary>
     </Window.Resources>
-    <StackPanel>
-        <DockPanel Margin="3">
-            <Label
-                Width="120"
-                HorizontalContentAlignment="Center"
-                Content="防火分区图层"
-                DockPanel.Dock="Left"
-                Template="{DynamicResource LabelTemplate}" />
-            <Button
-                Width="60"
-                Command="{Binding GetFireAreaLayerNameCommand}"
-                Content="选择"
-                DockPanel.Dock="Right"
-                Template="{StaticResource ButtonTemplate}" />
-            <TextBox Template="{DynamicResource TextBoxTemplate}" Text="{Binding FireAreaLayerName, Mode=TwoWay}" />
-        </DockPanel>
-        <ScrollViewer Height="400">
-            <DataGrid AutoGenerateColumns="False" ItemsSource="{Binding FireAlarmEquipments}">
-                <DataGrid.Columns>
-
-                    <!--  设备块名称，可编辑  -->
-                    <DataGridTextColumn
-                        Binding="{Binding BlockName, Mode=TwoWay}"
-                        Header="设备块名称"
-                        IsReadOnly="False" />
-
-                    <!--  块路径，可编辑，包含编辑按钮  -->
-                    <DataGridTemplateColumn Header="块路径">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <DockPanel>
-                                    <Button
-                                        Width="20"
-                                        Command="{Binding DataContext.OpenFileDialogCommand1, RelativeSource={RelativeSource AncestorType=Window}}"
-                                        CommandParameter="{Binding}"
-                                        Content="..."
-                                        DockPanel.Dock="Right" />
-                                    <TextBox IsReadOnly="False" Text="{Binding BlockPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                                </DockPanel>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
-
-                    <!--  系统图块路径，可编辑，包含编辑按钮  -->
-                    <DataGridTemplateColumn Header="系统图块路径">
-                        <DataGridTemplateColumn.CellTemplate>
-                            <DataTemplate>
-                                <DockPanel>
-                                    <Button
-                                        Width="20"
-                                        Command="{Binding DataContext.OpenFileDialogCommand2, RelativeSource={RelativeSource AncestorType=Window}}"
-                                        CommandParameter="{Binding}"
-                                        Content="..."
-                                        DockPanel.Dock="Right" />
-                                    <TextBox IsReadOnly="False" Text="{Binding SchematicBlockPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
-                                </DockPanel>
-                            </DataTemplate>
-                        </DataGridTemplateColumn.CellTemplate>
-                    </DataGridTemplateColumn>
-
-                    <!--  是否在系统图上表示，使用复选框  -->
-                    <DataGridCheckBoxColumn Binding="{Binding IsRepresentedOnSchematic, Mode=TwoWay}" Header="是否在系统图上表示" />
-
-                    <!--  在系统图上位置是否固定，使用复选框  -->
-                    <DataGridCheckBoxColumn Binding="{Binding IsPositionFixedOnSchematic, Mode=TwoWay}" Header="位置是否固定" />
-
-                    <!--  系统类型是环形还是树形，使用下拉菜单选择  -->
-                    <DataGridComboBoxColumn
-                        DisplayMemberPath="Name"
-                        Header="系统类型"
-                        SelectedItemBinding="{Binding SystemConfiguration, Mode=TwoWay}"
-                        SelectedValuePath="Value" />
-
-                    <!--  系统图上占位宽度，可编辑  -->
-                    <DataGridTextColumn
-                        Binding="{Binding SchematicWidth, Mode=TwoWay}"
-                        Header="系统图上占位宽度"
-                        IsReadOnly="False" />
-                </DataGrid.Columns>
-            </DataGrid>
-        </ScrollViewer>
+    <DockPanel>
+        <StackPanel DockPanel.Dock="Top">
+            <DockPanel Margin="3" DockPanel.Dock="Top">
+                <Label
+                    Width="120"
+                    HorizontalContentAlignment="Center"
+                    Content="防火分区图层"
+                    DockPanel.Dock="Left"
+                    Template="{DynamicResource LabelTemplate}" />
+                <Button
+                    Width="60"
+                    Command="{Binding GetFireAreaLayerNameCommand}"
+                    Content="选择"
+                    DockPanel.Dock="Right"
+                    Template="{StaticResource ButtonTemplate}" />
+                <TextBox Template="{DynamicResource TextBoxTemplate}" Text="{Binding FireAreaLayerName, Mode=TwoWay}" />
+            </DockPanel>
+            <Label Margin="3" DockPanel.Dock="Top">
+                <TextBlock Text="防火分区编号命名规则：区号+设备类型+楼层，比如：1JXX1 表示1区接线箱1层" />
+            </Label>
+            <DockPanel Margin="3" DockPanel.Dock="Top">
+                <Label
+                    Width="120"
+                    HorizontalContentAlignment="Center"
+                    Content="设备类型"
+                    DockPanel.Dock="Left"
+                    Template="{DynamicResource LabelTemplate}" />
+                <TextBox Template="{DynamicResource TextBoxTemplate}" Text="{Binding DeviceType, Mode=TwoWay}" />
+            </DockPanel>
+        </StackPanel>
         <StackPanel
             Margin="3"
             DockPanel.Dock="Bottom"
@@ -119,5 +67,83 @@
                 Content="确定"
                 Template="{StaticResource ButtonTemplate}" />
         </StackPanel>
-    </StackPanel>
+        <ScrollViewer
+            Margin="3"
+            HorizontalScrollBarVisibility="Auto"
+            PanningMode="Both"
+            VerticalScrollBarVisibility="Auto">
+            <DataGrid AutoGenerateColumns="False" ItemsSource="{Binding FireAlarmEquipments}">
+                <DataGrid.Columns>
+                    <!--  设备块名称，可编辑  -->
+                    <DataGridTextColumn
+                        Binding="{Binding BlockName, Mode=TwoWay}"
+                        Header="设备块名称"
+                        IsReadOnly="False">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+
+                                <Setter Property="VerticalAlignment" Value="Center" />
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                        <DataGridTextColumn.EditingElementStyle>
+                            <Style TargetType="TextBox">
+
+                                <Setter Property="VerticalContentAlignment" Value="Center" />
+                            </Style>
+                        </DataGridTextColumn.EditingElementStyle>
+                    </DataGridTextColumn>
+                    <!--  块路径，可编辑，包含编辑按钮  -->
+                    <DataGridTemplateColumn Header="块路径">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <DockPanel>
+                                    <Button
+                                        Width="20"
+                                        Command="{Binding DataContext.OpenFileDialogCommand1, RelativeSource={RelativeSource AncestorType=Window}}"
+                                        CommandParameter="{Binding}"
+                                        Content="..."
+                                        DockPanel.Dock="Right" />
+                                    <TextBox IsReadOnly="False" Text="{Binding BlockPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                </DockPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <!--  系统图块路径，可编辑，包含编辑按钮  -->
+                    <DataGridTemplateColumn Header="系统图块路径">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <DockPanel>
+                                    <Button
+                                        Width="20"
+                                        Command="{Binding DataContext.OpenFileDialogCommand2, RelativeSource={RelativeSource AncestorType=Window}}"
+                                        CommandParameter="{Binding}"
+                                        Content="..."
+                                        DockPanel.Dock="Right" />
+                                    <TextBox IsReadOnly="False" Text="{Binding SchematicBlockPath, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                </DockPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <!--  系统图上占位宽度，可编辑  -->
+                    <DataGridTextColumn
+                        Binding="{Binding SchematicWidth, Mode=TwoWay}"
+                        Header="系统图上占位宽度"
+                        IsReadOnly="False">
+                        <DataGridTextColumn.ElementStyle>
+                            <Style TargetType="TextBlock">
+
+                                <Setter Property="VerticalAlignment" Value="Center" />
+                            </Style>
+                        </DataGridTextColumn.ElementStyle>
+                        <DataGridTextColumn.EditingElementStyle>
+                            <Style TargetType="TextBox">
+
+                                <Setter Property="VerticalContentAlignment" Value="Center" />
+                            </Style>
+                        </DataGridTextColumn.EditingElementStyle>
+                    </DataGridTextColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+        </ScrollViewer>
+    </DockPanel>
 </Window>

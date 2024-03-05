@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         Closing="Window_Closing"
         Loaded="Window_Loaded"
-        Title="F8_Window"  MinWidth="400" Height="auto">
+        Title="F8_Window" Width="400" Height="220">
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
@@ -20,7 +20,7 @@
         </ResourceDictionary>
     </Window.Resources>
     <Grid>
-        <StackPanel>
+        <UniformGrid Rows="5">
             <DockPanel Margin="3">
                 <Label
                     Width="120"
@@ -97,6 +97,6 @@
                     Content="确定"
                     Template="{StaticResource ButtonTemplate}"  />
             </StackPanel>
-        </StackPanel>
+        </UniformGrid>
     </Grid>
 </Window>

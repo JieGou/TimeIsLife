@@ -17,6 +17,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Documents;
+using System.Windows.Forms;
 using System.Windows.Media.Media3D;
 using Google.OrTools.ConstraintSolver;
 
@@ -26,6 +27,7 @@ using TimeIsLife.ViewModel;
 using Google.Protobuf.WellKnownTypes;
 using TimeIsLife.Helper;
 using TimeIsLife.View;
+using Application = Autodesk.AutoCAD.ApplicationServices.Application;
 
 namespace TimeIsLife.CADCommand
 {
@@ -44,16 +46,7 @@ namespace TimeIsLife.CADCommand
                                   "\n注意事项：防火分区多段线需要单独图层，防火分区多段线内需要文字标注防火分区编号，文字和多段线需要同一个图层";
             editor.WriteMessage(message);
 
-            // 添加用户输入来选择连线类型
-            PromptKeywordOptions keywordOptions = new PromptKeywordOptions("\n选择连线类型 [环形(Circle)/树形(Tree)]: ");
-            keywordOptions.Keywords.Add("Circle");
-            keywordOptions.Keywords.Add("Tree");
-            keywordOptions.Keywords.Default = MyPlugin.CurrentUserData.TreeOrCircle;
-            keywordOptions.AllowNone = false;
 
-            PromptResult keywordResult = editor.GetKeywords(keywordOptions);
-            if (keywordResult.Status != PromptStatus.OK) return;
-            MyPlugin.CurrentUserData.TreeOrCircle = keywordResult.StringResult == "Circle" ? "Circle" : "Tree";
 
             using (Transaction transaction = database.TransactionManager.StartTransaction())
             {
@@ -74,15 +67,15 @@ namespace TimeIsLife.CADCommand
                         MyPlugin.CurrentUserData.EquipmentLayerName,
                         //MyPlugin.CurrentUserData.WireLayerName
                     };
-
-                    LayerTable layerTable = transaction.GetObject(database.LayerTableId,OpenMode.ForRead) as LayerTable;
+                    LayerTable layerTable = transaction.GetObject(database.LayerTableId, OpenMode.ForRead) as LayerTable;
                     if (layerTable == null) return;
-                    if (!CheckAllLayers(layerTable,layerNames1))
+                    if (!CheckAllLayers(layerTable, layerNames1))
                     {
+                        MessageBox.Show(@"请选择防火分区图层！");
                         F8_Window.Instance.ShowDialog();
                         if (F8_WindowViewModel.Instance.Result)
                         {
-                            string[] layerNames2= new string[]
+                            string[] layerNames2 = new string[]
                             {
                                 MyPlugin.CurrentUserData.FireAreaLayerName,
                                 MyPlugin.CurrentUserData.AvoidanceAreaLayerName,
@@ -91,13 +84,60 @@ namespace TimeIsLife.CADCommand
                             };
                             if (!CheckAllLayers(layerTable, layerNames2))
                             {
-                                editor.WriteMessage(@"图层设置有误！");
+                                MessageBox.Show(@"防火分区图层设置错误！");
                                 return;
                             }
                         }
                         else
                         {
                             return;
+                        }
+                    }
+
+                    bool bo = true;
+                    while (bo)
+                    {
+                        // 添加用户输入来选择连线类型
+                        PromptKeywordOptions keywordOptions = new PromptKeywordOptions("\n选择连线类型 [环形(Circle)/树形(Tree)/选项(Options)]: ");
+                        keywordOptions.Keywords.Add("Circle");
+                        keywordOptions.Keywords.Add("Tree");
+                        keywordOptions.Keywords.Add("Options");
+                        keywordOptions.Keywords.Default = MyPlugin.CurrentUserData.TreeOrCircle;
+
+                        PromptResult keywordResult = editor.GetKeywords(keywordOptions);
+                        if (keywordResult.Status != PromptStatus.OK) return;
+                        switch (keywordResult.StringResult)
+                        {
+                            case "Circle":
+                                MyPlugin.CurrentUserData.TreeOrCircle = keywordResult.StringResult;
+                                bo = false;
+                                break;
+                            case "Tree":
+                                MyPlugin.CurrentUserData.TreeOrCircle = keywordResult.StringResult;
+                                bo = false;
+                                break;
+                            case "Options":
+                                F8_Window.Instance.ShowDialog();
+                                if (F8_WindowViewModel.Instance.Result)
+                                {
+                                    string[] layerNames3 = new string[]
+                                    {
+                                        MyPlugin.CurrentUserData.FireAreaLayerName,
+                                        MyPlugin.CurrentUserData.AvoidanceAreaLayerName,
+                                        MyPlugin.CurrentUserData.EquipmentLayerName,
+                                        //MyPlugin.CurrentUserData.WireLayerName
+                                    };
+                                    if (!CheckAllLayers(layerTable, layerNames3))
+                                    {
+                                        editor.WriteMessage(@"图层设置有误！");
+                                        return;
+                                    }
+                                }
+                                else
+                                {
+                                    return;
+                                }
+                                break;
                         }
                     }
                     //选择选定图层上的所有多段线

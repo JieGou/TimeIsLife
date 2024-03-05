@@ -10,11 +10,11 @@ none
 false
 DEBUG;TRACE
 
-18299543142
-11297726763
-971238106468
-55680743415
+18239987071
+12139355213
+971533109980
+55578143590
 Resources\Button.xaml;Resources\ComboBox.xaml;Resources\RibbonDictionary.xaml;Resources\TextBox.xaml;View\CalculateCurrentView.xaml;View\ElectricaView.xaml;Resources\Shared.xaml;Resources\Expander.xaml;View\F8_Window.xaml;View\F9_Window.xaml;View\FireAlarmView.xaml;View\FireAlarmWindow.xaml;View\LayoutView\LightingCarLayoutView.xaml;View\LayoutView\LightingLayoutSetting.xaml;View\LayoutView\LightingLineLayoutView.xaml;View\LightingLayoutView.xaml;View\LayoutView\LightingRecLayoutView.xaml;View\ToolsView.xaml;
 
-False
+True
 

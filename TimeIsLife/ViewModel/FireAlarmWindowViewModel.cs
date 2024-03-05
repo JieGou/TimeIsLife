@@ -331,19 +331,17 @@ namespace TimeIsLife.ViewModel
             try
             {
                 //选择选项
-                PromptEntityOptions promptEntityOptions = new PromptEntityOptions("\n选择楼层");
+                PromptEntityOptions promptEntityOptions = new PromptEntityOptions("\n选择表示楼层闭合多段线");
                 PromptEntityResult result = editor.GetEntity(promptEntityOptions);
                 if (result.Status != PromptStatus.OK)
                 {
                     MessageBox.Show(@"重新选择楼层！");
-                    FireAlarmWindow.Instance.ShowDialog();
                     return;
                 }
                 Polyline polyline = transaction.GetObject(result.ObjectId, OpenMode.ForRead) as Polyline;
                 if (polyline == null)
                 {
                     MessageBox.Show(@"选择对象不是多段线！");
-                    FireAlarmWindow.Instance.ShowDialog();
                     return;
                 }
                 Instance.SelectedAreaFloor.X = polyline.GeometricExtents.MinPoint.X;
@@ -363,13 +361,11 @@ namespace TimeIsLife.ViewModel
                 if (selectionSet == null)
                 {
                     MessageBox.Show(@"缺少楼层名称！");
-                    FireAlarmWindow.Instance.ShowDialog();
                     return;
                 }
                 else if (selectionSet.Count != 1)
                 {
                     MessageBox.Show(@"包含多个楼层名称！");
-                    FireAlarmWindow.Instance.ShowDialog();
                     return;
                 }
 
@@ -390,7 +386,6 @@ namespace TimeIsLife.ViewModel
                 else
                 {
                     MessageBox.Show(@"未包含楼层名称！");
-                    FireAlarmWindow.Instance.ShowDialog();
                     return;
                 }
                 Area area = new Model.Area

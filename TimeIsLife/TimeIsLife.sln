@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TimeIsLifeInstallerClass", 
 EndProject
 Project("{54435603-DBB4-11D2-8724-00A0C9A8B90C}") = "TimeIsLifeInstaller", "..\TimeIsLifeInstaller\TimeIsLifeInstaller.vdproj", "{1EA79BE9-A5C7-4A0F-92E4-0E023D8F93A3}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TimeIsLifeRegister", "..\TimeIsLifeRegister\TimeIsLifeRegister.csproj", "{8296271B-6F4F-42AC-8A42-B04CCC95775B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -105,6 +107,26 @@ Global
 		{1EA79BE9-A5C7-4A0F-92E4-0E023D8F93A3}.Release|x64.Build.0 = Release
 		{1EA79BE9-A5C7-4A0F-92E4-0E023D8F93A3}.Release|x86.ActiveCfg = Release
 		{1EA79BE9-A5C7-4A0F-92E4-0E023D8F93A3}.Release|x86.Build.0 = Release
+		{8296271B-6F4F-42AC-8A42-B04CCC95775B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8296271B-6F4F-42AC-8A42-B04CCC95775B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8296271B-6F4F-42AC-8A42-B04CCC95775B}.Debug|ARM.ActiveCfg = Debug|Any CPU
+		{8296271B-6F4F-42AC-8A42-B04CCC95775B}.Debug|ARM.Build.0 = Debug|Any CPU
+		{8296271B-6F4F-42AC-8A42-B04CCC95775B}.Debug|ARM64.ActiveCfg = Debug|Any CPU
+		{8296271B-6F4F-42AC-8A42-B04CCC95775B}.Debug|ARM64.Build.0 = Debug|Any CPU
+		{8296271B-6F4F-42AC-8A42-B04CCC95775B}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{8296271B-6F4F-42AC-8A42-B04CCC95775B}.Debug|x64.Build.0 = Debug|Any CPU
+		{8296271B-6F4F-42AC-8A42-B04CCC95775B}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{8296271B-6F4F-42AC-8A42-B04CCC95775B}.Debug|x86.Build.0 = Debug|Any CPU
+		{8296271B-6F4F-42AC-8A42-B04CCC95775B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8296271B-6F4F-42AC-8A42-B04CCC95775B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8296271B-6F4F-42AC-8A42-B04CCC95775B}.Release|ARM.ActiveCfg = Release|Any CPU
+		{8296271B-6F4F-42AC-8A42-B04CCC95775B}.Release|ARM.Build.0 = Release|Any CPU
+		{8296271B-6F4F-42AC-8A42-B04CCC95775B}.Release|ARM64.ActiveCfg = Release|Any CPU
+		{8296271B-6F4F-42AC-8A42-B04CCC95775B}.Release|ARM64.Build.0 = Release|Any CPU
+		{8296271B-6F4F-42AC-8A42-B04CCC95775B}.Release|x64.ActiveCfg = Release|Any CPU
+		{8296271B-6F4F-42AC-8A42-B04CCC95775B}.Release|x64.Build.0 = Release|Any CPU
+		{8296271B-6F4F-42AC-8A42-B04CCC95775B}.Release|x86.ActiveCfg = Release|Any CPU
+		{8296271B-6F4F-42AC-8A42-B04CCC95775B}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
