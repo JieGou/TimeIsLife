@@ -25,7 +25,7 @@ namespace TimeIsLife.View
         public FireAlarmView()
         {
             InitializeComponent();
-            this.DataContext = new FireAlarmViewModel();
+            this.DataContext = new FireAlarmSystemViewModel();
         }
     }
 }

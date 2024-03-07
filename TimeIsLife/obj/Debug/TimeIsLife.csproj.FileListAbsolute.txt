@@ -282,8 +282,6 @@ D:\GitHub\TimeIsLife\obj\Debug\View\CalculateCurrentView.g.cs
 D:\GitHub\TimeIsLife\obj\Debug\View\ElectricaView.g.cs
 D:\GitHub\TimeIsLife\obj\Debug\View\F8_Window.g.cs
 D:\GitHub\TimeIsLife\obj\Debug\View\F9_Window.g.cs
-D:\GitHub\TimeIsLife\obj\Debug\View\FireAlarmView.g.cs
-D:\GitHub\TimeIsLife\obj\Debug\View\FireAlarmWindow.g.cs
 D:\GitHub\TimeIsLife\obj\Debug\View\LayoutView\LightingCarLayoutView.g.cs
 D:\GitHub\TimeIsLife\obj\Debug\View\LayoutView\LightingLayoutSetting.g.cs
 D:\GitHub\TimeIsLife\obj\Debug\View\LayoutView\LightingLineLayoutView.g.cs
@@ -299,8 +297,6 @@ D:\GitHub\TimeIsLife\obj\Debug\View\ElectricaView.baml
 D:\GitHub\TimeIsLife\obj\Debug\Resources\Shared.baml
 D:\GitHub\TimeIsLife\obj\Debug\View\F8_Window.baml
 D:\GitHub\TimeIsLife\obj\Debug\View\F9_Window.baml
-D:\GitHub\TimeIsLife\obj\Debug\View\FireAlarmView.baml
-D:\GitHub\TimeIsLife\obj\Debug\View\FireAlarmWindow.baml
 D:\GitHub\TimeIsLife\obj\Debug\View\LayoutView\LightingCarLayoutView.baml
 D:\GitHub\TimeIsLife\obj\Debug\View\LayoutView\LightingLayoutSetting.baml
 D:\GitHub\TimeIsLife\obj\Debug\View\LayoutView\LightingLineLayoutView.baml
@@ -313,3 +309,7 @@ D:\GitHub\TimeIsLife\obj\Debug\TimeIsLife.csproj.CoreCompileInputs.cache
 D:\GitHub\TimeIsLife\obj\Debug\TimeIsLife.csproj.Up2Date
 D:\GitHub\TimeIsLife\obj\Debug\TimeIsLife.dll
 D:\GitHub\TimeIsLife\obj\Debug\TimeIsLife.pdb
+D:\GitHub\TimeIsLife\obj\Debug\View\F7_Window.g.cs
+D:\GitHub\TimeIsLife\obj\Debug\View\F7_Window.baml
+D:\GitHub\TimeIsLife\obj\Debug\View\FireAlarmSystemView.g.cs
+D:\GitHub\TimeIsLife\obj\Debug\View\FireAlarmSystemView.baml

@@ -83,8 +83,8 @@ namespace TimeIsLife.CADCommand
         public void F7_LayoutEquipment()
         {
 
-            FireAlarmWindow.Instance.ShowDialog();
-            if (FireAlarmWindowViewModel.Instance.Result != true) return;
+            F7_Window.Instance.ShowDialog();
+            if (F7_WindowViewModel.Instance.Result != true) return;
 
             Document document = Application.DocumentManager.CurrentDocument;
             Database database = document.Database;
@@ -123,12 +123,12 @@ namespace TimeIsLife.CADCommand
 
                     #region YDB数据查询
                     // YDB数据查询
-                    if (string.IsNullOrWhiteSpace(FireAlarmWindowViewModel.Instance.YdbFileName))
+                    if (string.IsNullOrWhiteSpace(F7_WindowViewModel.Instance.YdbFileName))
                     {
                         MessageBox.Show(@"请选择结构数据库");
                         return;
                     }
-                    var ydbHelper = new SQLiteHelper($"Data Source={FireAlarmWindowViewModel.Instance.YdbFileName}");
+                    var ydbHelper = new SQLiteHelper($"Data Source={F7_WindowViewModel.Instance.YdbFileName}");
                     using (var ydbConn = ydbHelper.GetConnection())
                     {
                         string sqlFloor = "SELECT f.ID,f.Name,f.LevelB,f.Height FROM tblFloor AS f WHERE f.Height != 0";
@@ -192,7 +192,7 @@ namespace TimeIsLife.CADCommand
 
                     #region 根据房间边界及板轮廓生成烟感
 
-                    foreach (var curFloorArea in FireAlarmWindowViewModel.Instance.Areas)
+                    foreach (var curFloorArea in F7_WindowViewModel.Instance.Areas)
                     {
                         List<Model.Area> curFireAreas = new List<Model.Area>();
                         List<Model.Area> curRoomAreas = new List<Model.Area>();
@@ -212,7 +212,7 @@ namespace TimeIsLife.CADCommand
                         {
                             Polyline polyline = transaction.GetObject(id, OpenMode.ForRead) as Polyline;
                             if (polyline == null) continue;
-                            if (polyline.Layer == FireAlarmWindowViewModel.Instance.FireAreaLayerName || polyline.Layer == FireAlarmWindowViewModel.Instance.RoomAreaLayerName)
+                            if (polyline.Layer == F7_WindowViewModel.Instance.FireAreaLayerName || polyline.Layer == F7_WindowViewModel.Instance.RoomAreaLayerName)
                             {
                                 TypedValueList dbTextTypedValues = new TypedValueList
                                 {
@@ -231,7 +231,7 @@ namespace TimeIsLife.CADCommand
                                 }
 
                                 Model.Area newArea = null;
-                                if (polyline.Layer == FireAlarmWindowViewModel.Instance.FireAreaLayerName)
+                                if (polyline.Layer == F7_WindowViewModel.Instance.FireAreaLayerName)
                                 {
                                     newArea = new Model.Area
                                     {
@@ -242,7 +242,7 @@ namespace TimeIsLife.CADCommand
                                         VertexZ = polyline.GetZValues()
                                     };
                                 }
-                                else if (polyline.Layer == FireAlarmWindowViewModel.Instance.RoomAreaLayerName)
+                                else if (polyline.Layer == F7_WindowViewModel.Instance.RoomAreaLayerName)
                                 {
                                     newArea = new Model.Area
                                     {
@@ -283,12 +283,12 @@ namespace TimeIsLife.CADCommand
                             }
                         }
 
-                        SetCurrentLayer(database, FireAlarmWindowViewModel.Instance.EquipmentLayerName, 4);
+                        SetCurrentLayer(database, F7_WindowViewModel.Instance.EquipmentLayerName, 4);
                         List<Beam> curFloorBeams = beams.Where(beam => beam.Floor.LevelB == curFloorArea.Level).ToList();
                         List<Slab> curFloorSlabs = slabs.Where(slab => slab.Floor.LevelB == curFloorArea.Level).ToList();
                         List<Wall> curFloorWalls = walls.Where(wall => wall.Floor.LevelB == curFloorArea.Level).ToList();
                         List<BlockReference> blockReferences = new List<BlockReference>();
-                        Vector3d vector3D = Point3d.Origin.GetVectorTo(curFloorArea.BasePoint) + FireAlarmWindowViewModel.Instance.BaseVector;
+                        Vector3d vector3D = Point3d.Origin.GetVectorTo(curFloorArea.BasePoint) + F7_WindowViewModel.Instance.BaseVector;
 
                         foreach (var roomArea in curRoomAreas)
                         {
@@ -390,7 +390,7 @@ namespace TimeIsLife.CADCommand
                                             }
                                             else
                                             {
-                                                intersectionPolygonDictionary.Add(intersectionGeometry, FireAlarmWindowViewModel.Instance.SlabThickness);
+                                                intersectionPolygonDictionary.Add(intersectionGeometry, F7_WindowViewModel.Instance.SlabThickness);
                                             }
                                         }
                                     }

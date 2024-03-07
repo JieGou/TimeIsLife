@@ -34,9 +34,7 @@ namespace TimeIsLife.ViewModel
         {
             Instance = this;
         }
-
-
-
+        
         #region 工具
         public IRelayCommand QuickUcsCommand { get; }
         void QuickUcs()
@@ -85,9 +83,6 @@ namespace TimeIsLife.ViewModel
         {
             Application.DocumentManager.MdiActiveDocument.SendStringToExecute("FF_ModifyTextStyle\n", true, false, true);
         }
-
-
-
         #endregion
     }
 }

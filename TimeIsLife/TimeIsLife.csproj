@@ -155,8 +155,8 @@
     <Compile Include="ViewModel\CalculateCurrentViewModel.cs" />
     <Compile Include="ViewModel\F8_WindowViewModel.cs" />
     <Compile Include="ViewModel\F9_WindowViewModel.cs" />
-    <Compile Include="ViewModel\FireAlarmViewModel.cs" />
-    <Compile Include="ViewModel\FireAlarmWindowViewModel.cs" />
+    <Compile Include="ViewModel\FireAlarmSystemViewModel.cs" />
+    <Compile Include="ViewModel\F7_WindowViewModel.cs" />
     <Compile Include="ViewModel\LayoutViewModel\LightingCarLayoutViewModel.cs" />
     <Compile Include="ViewModel\LayoutViewModel\LightingLayoutSettingViewModel.cs" />
     <Compile Include="ViewModel\LayoutViewModel\LightingLineLayoutViewModel.cs" />
@@ -186,11 +186,11 @@
     <Compile Include="View\F9_Window.xaml.cs">
       <DependentUpon>F9_Window.xaml</DependentUpon>
     </Compile>
-    <Compile Include="View\FireAlarmView.xaml.cs">
-      <DependentUpon>FireAlarmView.xaml</DependentUpon>
+    <Compile Include="View\FireAlarmSystemView.xaml.cs">
+      <DependentUpon>FireAlarmSystemView.xaml</DependentUpon>
     </Compile>
-    <Compile Include="View\FireAlarmWindow.xaml.cs">
-      <DependentUpon>FireAlarmWindow.xaml</DependentUpon>
+    <Compile Include="View\F7_Window.xaml.cs">
+      <DependentUpon>F7_Window.xaml</DependentUpon>
     </Compile>
     <Compile Include="View\LayoutView\LightingCarLayoutView.xaml.cs">
       <DependentUpon>LightingCarLayoutView.xaml</DependentUpon>
@@ -578,11 +578,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="View\FireAlarmView.xaml">
+    <Page Include="View\FireAlarmSystemView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="View\FireAlarmWindow.xaml">
+    <Page Include="View\F7_Window.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

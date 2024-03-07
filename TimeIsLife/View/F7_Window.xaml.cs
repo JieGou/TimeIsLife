@@ -22,26 +22,26 @@ using static TimeIsLife.CADCommand.FireAlarmCommand1;
 namespace TimeIsLife.View
 {
     /// <summary>
-    /// FireAlarmWindow.xaml 的交互逻辑
+    /// F7_Window.xaml 的交互逻辑
     /// </summary>
-    public partial class FireAlarmWindow : Window
+    public partial class F7_Window : Window
     {        
-        private readonly FireAlarmWindowViewModel viewModel;
-        public FireAlarmWindow()
+        private readonly F7_WindowViewModel viewModel;
+        public F7_Window()
         {
             InitializeComponent();
-            viewModel = new FireAlarmWindowViewModel();
+            viewModel = new F7_WindowViewModel();
             DataContext = viewModel;
         }
 
-        private static FireAlarmWindow _instance;
+        private static F7_Window _instance;
 
-        public static FireAlarmWindow Instance
+        public static F7_Window Instance
         {
             get
             {
                 if (_instance == null || !_instance.IsLoaded)
-                    _instance = new FireAlarmWindow();
+                    _instance = new F7_Window();
                 return _instance;
             }
         }

@@ -21,24 +21,20 @@
     </UserControl.Resources>
     <StackPanel>
         <Button
-            Command="{Binding OpenFireAlarmWindowCommand}"
-            Content="设备布置"
+            Command="{Binding F6_Command}"
+            Content="F6 LoadYdbFile"
             Template="{StaticResource ButtonTemplate}" />
         <Button
-            Command="{Binding FireAlarmCeilingCommand}"
-            Content="设备连线"
+            Command="{Binding F7_Command}"
+            Content="F7 LayoutEquipment"
             Template="{StaticResource ButtonTemplate}" />
         <Button
-            Command="{Binding FasCommand}"
-            Content="系统图生成"
+            Command="{Binding F8_Command}"
+            Content="F8 EquipmentConnectLine"
             Template="{StaticResource ButtonTemplate}" />
         <Button
-            Command="{Binding ToHydrantAlarmButtonCommand}"
-            Content="消防栓转消防栓报警按钮"
-            Template="{StaticResource ButtonTemplate}" />
-        <Button
-            Command="{Binding LoadYdbFileCommand}"
-            Content="YDB to DWG"
+            Command="{Binding F9_Command}"
+            Content="F9 FAS"
             Template="{StaticResource ButtonTemplate}" />
     </StackPanel>
 </UserControl>

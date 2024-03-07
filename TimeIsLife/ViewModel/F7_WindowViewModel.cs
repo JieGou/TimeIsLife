@@ -35,10 +35,10 @@ using Database = Autodesk.AutoCAD.DatabaseServices.Database;
 
 namespace TimeIsLife.ViewModel
 {
-    internal class FireAlarmWindowViewModel : ObservableObject
+    internal class F7_WindowViewModel : ObservableObject
     {
-        public static FireAlarmWindowViewModel Instance { get; set; }
-        public FireAlarmWindowViewModel()
+        public static F7_WindowViewModel Instance { get; set; }
+        public F7_WindowViewModel()
         {
             Initialize();
             GetFloorAreaLayerNameCommand = new RelayCommand(GetFloorAreaLayerName);
@@ -185,85 +185,85 @@ namespace TimeIsLife.ViewModel
         #region 方法
         private void GetFloorAreaLayerName()
         {
-            FireAlarmWindow.Instance.Hide();
+            F7_Window.Instance.Hide();
             string message = @"选择表示楼层区域的闭合多段线";
             string layerName = GetLayerName(message);
             if (string.IsNullOrWhiteSpace(layerName))
             {
-                FireAlarmWindow.Instance.ShowDialog();
+                F7_Window.Instance.ShowDialog();
                 return;
             }
             Instance.FloorAreaLayerName = layerName;
-            FireAlarmWindow.Instance.ShowDialog();
+            F7_Window.Instance.ShowDialog();
         }
         private void GetFireAreaLayerName()
         {
-            FireAlarmWindow.Instance.Hide();
+            F7_Window.Instance.Hide();
             string message = @"选择表示防火分区的闭合多段线";
             string layerName = GetLayerName(message);
             if (string.IsNullOrWhiteSpace(layerName))
             {
-                FireAlarmWindow.Instance.ShowDialog();
+                F7_Window.Instance.ShowDialog();
                 return;
             }
             Instance.FireAreaLayerName = layerName;
-            FireAlarmWindow.Instance.ShowDialog();
+            F7_Window.Instance.ShowDialog();
         }
         private void GetRoomAreaLayerName()
         {
-            FireAlarmWindow.Instance.Hide();
+            F7_Window.Instance.Hide();
             string message = @"选择表示房间区域的闭合多段线";
             string layerName = GetLayerName(message);
             if (string.IsNullOrWhiteSpace(layerName))
             {
-                FireAlarmWindow.Instance.ShowDialog();
+                F7_Window.Instance.ShowDialog();
                 return;
             }
             Instance.RoomAreaLayerName = layerName;
-            FireAlarmWindow.Instance.ShowDialog();
+            F7_Window.Instance.ShowDialog();
         }
         private void GetAvoidanceAreaLayerName()
         {
-            FireAlarmWindow.Instance.Hide();
+            F7_Window.Instance.Hide();
             string message = @"选择表示禁止布线区域的闭合多段线";
             string layerName = GetLayerName(message);
             if (string.IsNullOrWhiteSpace(layerName))
             {
-                FireAlarmWindow.Instance.ShowDialog();
+                F7_Window.Instance.ShowDialog();
                 return;
             }
             Instance.AvoidanceAreaLayerName = layerName;
-            FireAlarmWindow.Instance.ShowDialog();
+            F7_Window.Instance.ShowDialog();
         }
         private void GetEquipmentLayerName()
         {
-            FireAlarmWindow.Instance.Hide();
+            F7_Window.Instance.Hide();
             string message = @"选择设备图层";
             string layerName = GetLayerName(message);
             if (string.IsNullOrWhiteSpace(layerName))
             {
-                FireAlarmWindow.Instance.ShowDialog();
+                F7_Window.Instance.ShowDialog();
                 return;
             }
             Instance.EquipmentLayerName = layerName;
-            FireAlarmWindow.Instance.ShowDialog();
+            F7_Window.Instance.ShowDialog();
         }
         private void GetWireLayerName()
         {
-            FireAlarmWindow.Instance.Hide();
+            F7_Window.Instance.Hide();
             string message = @"选择线缆图层";
             string layerName = GetLayerName(message);
             if (string.IsNullOrWhiteSpace(layerName))
             {
-                FireAlarmWindow.Instance.ShowDialog();
+                F7_Window.Instance.ShowDialog();
                 return;
             }
             Instance.WireLayerName = layerName;
-            FireAlarmWindow.Instance.ShowDialog();
+            F7_Window.Instance.ShowDialog();
         }
         private void GetYdbFileName()
         {
-            FireAlarmWindow.Instance.Hide();
+            F7_Window.Instance.Hide();
             AreaFloors.Clear();
 
             OpenFileDialog openFileDialog = new OpenFileDialog
@@ -280,12 +280,12 @@ namespace TimeIsLife.ViewModel
             {
                 YdbFileName = openFileDialog.FileName;
                 LoadYdbDatabase();
-                FireAlarmWindow.Instance.ShowDialog(); 
+                F7_Window.Instance.ShowDialog(); 
             }
             else
             {
                 MessageBox.Show(@"请重新选择YDB文件！");
-                FireAlarmWindow.Instance.ShowDialog();
+                F7_Window.Instance.ShowDialog();
             }         
 
             
@@ -320,7 +320,7 @@ namespace TimeIsLife.ViewModel
                 return;
             }
 
-            FireAlarmWindow.Instance.Hide();
+            F7_Window.Instance.Hide();
 
             Document document = Autodesk.AutoCAD.ApplicationServices.Core.Application.DocumentManager.CurrentDocument;
             Database database = document.Database;
@@ -347,8 +347,8 @@ namespace TimeIsLife.ViewModel
                 Instance.SelectedAreaFloor.X = polyline.GeometricExtents.MinPoint.X;
                 Instance.SelectedAreaFloor.Y = polyline.GeometricExtents.MinPoint.Y;
                 Instance.SelectedAreaFloor.Z = polyline.GeometricExtents.MinPoint.Z;
-                //FireAlarmWindowViewModel.instance.SelectedAreaFloor.MinPoint3d = polyline.GeometricExtents.MinPoint;
-                //FireAlarmWindowViewModel.instance.SelectedAreaFloor.MaxPoint3d = polyline.GeometricExtents.MaxPoint;
+                //F7_WindowViewModel.instance.SelectedAreaFloor.MinPoint3d = polyline.GeometricExtents.MinPoint;
+                //F7_WindowViewModel.instance.SelectedAreaFloor.MaxPoint3d = polyline.GeometricExtents.MaxPoint;
 
                 //过滤器
                 var typedValues = new TypedValueList
@@ -406,7 +406,7 @@ namespace TimeIsLife.ViewModel
             }
             finally
             {
-                FireAlarmWindow.Instance.ShowDialog();
+                F7_Window.Instance.ShowDialog();
             }
         }
         private void GetBasePoint()
@@ -417,7 +417,7 @@ namespace TimeIsLife.ViewModel
                 return;
             }
 
-            FireAlarmWindow.Instance.Hide();
+            F7_Window.Instance.Hide();
 
             Document document = Autodesk.AutoCAD.ApplicationServices.Core.Application.DocumentManager.CurrentDocument;
             Database database = document.Database;
@@ -464,7 +464,7 @@ namespace TimeIsLife.ViewModel
                     transaction.Abort();
                 }
             }
-            FireAlarmWindow.Instance.ShowDialog();
+            F7_Window.Instance.ShowDialog();
         }
         private List<Beam> QueryBeams(SQLiteConnection ydbConn, double level)
         {
@@ -609,12 +609,12 @@ namespace TimeIsLife.ViewModel
         private void Confirm()
         {
             Result = true;
-            FireAlarmWindow.Instance.Close();
+            F7_Window.Instance.Close();
         }
         private void Cancel()
         {
             Result = false;
-            FireAlarmWindow.Instance.Close();
+            F7_Window.Instance.Close();
         }
         public void SaveState()
         {

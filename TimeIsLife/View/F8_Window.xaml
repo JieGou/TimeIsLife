@@ -7,7 +7,7 @@
         mc:Ignorable="d"
         Closing="Window_Closing"
         Loaded="Window_Loaded"
-        Title="F8_Window" Width="400" Height="220">
+        Title="F8_Window" Width="400" Height="250">
     <Window.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
