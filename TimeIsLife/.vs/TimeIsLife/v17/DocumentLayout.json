@@ -3,112 +3,36 @@
   "WorkspaceRootPath": "D:\\GitHub\\TimeIsLife\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{2A4598CE-38F6-4771-9690-673A4158FFC3}|TimeIsLife.csproj|d:\\github\\timeislife\\cadcommand\\tilcommand.f3_connectmultilines.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{2A4598CE-38F6-4771-9690-673A4158FFC3}|TimeIsLife.csproj|solutionrelative:cadcommand\\tilcommand.f3_connectmultilines.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{2A4598CE-38F6-4771-9690-673A4158FFC3}|TimeIsLife.csproj|d:\\github\\timeislife\\view\\f8_window.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "RelativeMoniker": "D:0:0:{2A4598CE-38F6-4771-9690-673A4158FFC3}|TimeIsLife.csproj|solutionrelative:view\\f8_window.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{2A4598CE-38F6-4771-9690-673A4158FFC3}|TimeIsLife.csproj|d:\\github\\timeislife\\cadcommand\\tilcommand.f2_setcurrentstatus.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{2A4598CE-38F6-4771-9690-673A4158FFC3}|TimeIsLife.csproj|solutionrelative:cadcommand\\tilcommand.f2_setcurrentstatus.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{2A4598CE-38F6-4771-9690-673A4158FFC3}|TimeIsLife.csproj|d:\\github\\timeislife\\cadcommand\\tilcommand.f8_equipmentconnectline.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2A4598CE-38F6-4771-9690-673A4158FFC3}|TimeIsLife.csproj|solutionrelative:cadcommand\\tilcommand.f8_equipmentconnectline.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2A4598CE-38F6-4771-9690-673A4158FFC3}|TimeIsLife.csproj|d:\\github\\timeislife\\cadcommand\\tilcommand.f9_fas.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2A4598CE-38F6-4771-9690-673A4158FFC3}|TimeIsLife.csproj|solutionrelative:cadcommand\\tilcommand.f9_fas.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2A4598CE-38F6-4771-9690-673A4158FFC3}|TimeIsLife.csproj|d:\\github\\timeislife\\viewmodel\\f8_windowviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2A4598CE-38F6-4771-9690-673A4158FFC3}|TimeIsLife.csproj|solutionrelative:viewmodel\\f8_windowviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{2A4598CE-38F6-4771-9690-673A4158FFC3}|TimeIsLife.csproj|d:\\github\\timeislife\\myplugin.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2A4598CE-38F6-4771-9690-673A4158FFC3}|TimeIsLife.csproj|solutionrelative:myplugin.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{2A4598CE-38F6-4771-9690-673A4158FFC3}|TimeIsLife.csproj|d:\\github\\timeislife\\cadcommand\\tilcommand.f1_connectline.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{2A4598CE-38F6-4771-9690-673A4158FFC3}|TimeIsLife.csproj|solutionrelative:cadcommand\\tilcommand.f1_connectline.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{2A4598CE-38F6-4771-9690-673A4158FFC3}|TimeIsLife.csproj|d:\\github\\timeislife\\view\\firealarmsystemview.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
-      "RelativeMoniker": "D:0:0:{2A4598CE-38F6-4771-9690-673A4158FFC3}|TimeIsLife.csproj|solutionrelative:view\\firealarmsystemview.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{2A4598CE-38F6-4771-9690-673A4158FFC3}|TimeIsLife.csproj|D:\\GitHub\\TimeIsLife\\view\\f9_window.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
-      "RelativeMoniker": "D:0:0:{2A4598CE-38F6-4771-9690-673A4158FFC3}|TimeIsLife.csproj|solutionrelative:view\\f9_window.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{2A4598CE-38F6-4771-9690-673A4158FFC3}|TimeIsLife.csproj|D:\\GitHub\\TimeIsLife\\view\\f8_window.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
-      "RelativeMoniker": "D:0:0:{2A4598CE-38F6-4771-9690-673A4158FFC3}|TimeIsLife.csproj|solutionrelative:view\\f8_window.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{2A4598CE-38F6-4771-9690-673A4158FFC3}|TimeIsLife.csproj|D:\\GitHub\\TimeIsLife\\view\\f7_window.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
-      "RelativeMoniker": "D:0:0:{2A4598CE-38F6-4771-9690-673A4158FFC3}|TimeIsLife.csproj|solutionrelative:view\\f7_window.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{2A4598CE-38F6-4771-9690-673A4158FFC3}|TimeIsLife.csproj|D:\\GitHub\\TimeIsLife\\view\\lightinglayoutview.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
-      "RelativeMoniker": "D:0:0:{2A4598CE-38F6-4771-9690-673A4158FFC3}|TimeIsLife.csproj|solutionrelative:view\\lightinglayoutview.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{2A4598CE-38F6-4771-9690-673A4158FFC3}|TimeIsLife.csproj|D:\\GitHub\\TimeIsLife\\view\\toolsview.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
-      "RelativeMoniker": "D:0:0:{2A4598CE-38F6-4771-9690-673A4158FFC3}|TimeIsLife.csproj|solutionrelative:view\\toolsview.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{2A4598CE-38F6-4771-9690-673A4158FFC3}|TimeIsLife.csproj|D:\\GitHub\\TimeIsLife\\view\\electricaview.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
-      "RelativeMoniker": "D:0:0:{2A4598CE-38F6-4771-9690-673A4158FFC3}|TimeIsLife.csproj|solutionrelative:view\\electricaview.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{2A4598CE-38F6-4771-9690-673A4158FFC3}|TimeIsLife.csproj|D:\\GitHub\\TimeIsLife\\viewmodel\\firealarmsystemviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{2A4598CE-38F6-4771-9690-673A4158FFC3}|TimeIsLife.csproj|solutionrelative:viewmodel\\firealarmsystemviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{2A4598CE-38F6-4771-9690-673A4158FFC3}|TimeIsLife.csproj|D:\\GitHub\\TimeIsLife\\app.config||{FA3CD31E-987B-443A-9B81-186104E8DAC1}",
-      "RelativeMoniker": "D:0:0:{2A4598CE-38F6-4771-9690-673A4158FFC3}|TimeIsLife.csproj|solutionrelative:app.config||{FA3CD31E-987B-443A-9B81-186104E8DAC1}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{2A4598CE-38F6-4771-9690-673A4158FFC3}|TimeIsLife.csproj|D:\\GitHub\\TimeIsLife\\viewmodel\\lightinglayoutviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{2A4598CE-38F6-4771-9690-673A4158FFC3}|TimeIsLife.csproj|solutionrelative:viewmodel\\lightinglayoutviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{2A4598CE-38F6-4771-9690-673A4158FFC3}|TimeIsLife.csproj|D:\\GitHub\\TimeIsLife\\viewmodel\\toolsviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{2A4598CE-38F6-4771-9690-673A4158FFC3}|TimeIsLife.csproj|solutionrelative:viewmodel\\toolsviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{2A4598CE-38F6-4771-9690-673A4158FFC3}|TimeIsLife.csproj|D:\\GitHub\\TimeIsLife\\cadcommand\\firealarmcommand2.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{2A4598CE-38F6-4771-9690-673A4158FFC3}|TimeIsLife.csproj|solutionrelative:cadcommand\\firealarmcommand2.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{2A4598CE-38F6-4771-9690-673A4158FFC3}|TimeIsLife.csproj|D:\\GitHub\\TimeIsLife\\cadcommand\\tilcommand.f9_fas.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{2A4598CE-38F6-4771-9690-673A4158FFC3}|TimeIsLife.csproj|solutionrelative:cadcommand\\tilcommand.f9_fas.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{2A4598CE-38F6-4771-9690-673A4158FFC3}|TimeIsLife.csproj|D:\\GitHub\\TimeIsLife\\cadcommand\\tilcommand.f8_equipmentconnectline.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{2A4598CE-38F6-4771-9690-673A4158FFC3}|TimeIsLife.csproj|solutionrelative:cadcommand\\tilcommand.f8_equipmentconnectline.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{2A4598CE-38F6-4771-9690-673A4158FFC3}|TimeIsLife.csproj|D:\\GitHub\\TimeIsLife\\cadcommand\\tilcommand.f7_layoutequipment.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{2A4598CE-38F6-4771-9690-673A4158FFC3}|TimeIsLife.csproj|d:\\github\\timeislife\\cadcommand\\tilcommand.f7_layoutequipment.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{2A4598CE-38F6-4771-9690-673A4158FFC3}|TimeIsLife.csproj|solutionrelative:cadcommand\\tilcommand.f7_layoutequipment.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{2A4598CE-38F6-4771-9690-673A4158FFC3}|TimeIsLife.csproj|D:\\GitHub\\TimeIsLife\\cadcommand\\tilcommand.f6_loadydbfile.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{2A4598CE-38F6-4771-9690-673A4158FFC3}|TimeIsLife.csproj|solutionrelative:cadcommand\\tilcommand.f6_loadydbfile.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{2A4598CE-38F6-4771-9690-673A4158FFC3}|TimeIsLife.csproj|D:\\GitHub\\TimeIsLife\\model\\userdata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{2A4598CE-38F6-4771-9690-673A4158FFC3}|TimeIsLife.csproj|solutionrelative:model\\userdata.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{2A4598CE-38F6-4771-9690-673A4158FFC3}|TimeIsLife.csproj|D:\\GitHub\\TimeIsLife\\myplugin.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{2A4598CE-38F6-4771-9690-673A4158FFC3}|TimeIsLife.csproj|solutionrelative:myplugin.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{2A4598CE-38F6-4771-9690-673A4158FFC3}|TimeIsLife.csproj|D:\\GitHub\\TimeIsLife\\viewmodel\\f7_windowviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{2A4598CE-38F6-4771-9690-673A4158FFC3}|TimeIsLife.csproj|solutionrelative:viewmodel\\f7_windowviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{2A4598CE-38F6-4771-9690-673A4158FFC3}|TimeIsLife.csproj|D:\\GitHub\\TimeIsLife\\view\\f7_window.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{2A4598CE-38F6-4771-9690-673A4158FFC3}|TimeIsLife.csproj|solutionrelative:view\\f7_window.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\GitHub\\TimeIsLife\\ViewModel\\FireAlarmWindowViewModel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:ViewModel\\FireAlarmWindowViewModel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{2A4598CE-38F6-4771-9690-673A4158FFC3}|TimeIsLife.csproj|D:\\GitHub\\TimeIsLife\\viewmodel\\f8_windowviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{2A4598CE-38F6-4771-9690-673A4158FFC3}|TimeIsLife.csproj|solutionrelative:viewmodel\\f8_windowviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{2A4598CE-38F6-4771-9690-673A4158FFC3}|TimeIsLife.csproj|D:\\GitHub\\TimeIsLife\\viewmodel\\electricalviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{2A4598CE-38F6-4771-9690-673A4158FFC3}|TimeIsLife.csproj|solutionrelative:viewmodel\\electricalviewmodel.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\GitHub\\TimeIsLife\\View\\FireAlarmWindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
-      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:View\\FireAlarmWindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+      "AbsoluteMoniker": "D:0:0:{2A4598CE-38F6-4771-9690-673A4158FFC3}|TimeIsLife.csproj|d:\\github\\timeislife\\model\\userdata.cs||{8B382828-6202-11D1-8870-0000F87579D2}",
+      "RelativeMoniker": "D:0:0:{2A4598CE-38F6-4771-9690-673A4158FFC3}|TimeIsLife.csproj|solutionrelative:model\\userdata.cs||{8B382828-6202-11D1-8870-0000F87579D2}"
     }
   ],
   "DocumentGroupContainers": [
@@ -118,7 +42,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 1,
+          "SelectedChildIndex": 2,
           "Children": [
             {
               "$type": "Bookmark",
@@ -126,322 +50,106 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "TilCommand.F3_ConnectMultiLines.cs",
-              "DocumentMoniker": "D:\\GitHub\\TimeIsLife\\CADCommand\\TilCommand.F3_ConnectMultiLines.cs",
-              "RelativeDocumentMoniker": "CADCommand\\TilCommand.F3_ConnectMultiLines.cs",
-              "ToolTip": "D:\\GitHub\\TimeIsLife\\CADCommand\\TilCommand.F3_ConnectMultiLines.cs",
-              "RelativeToolTip": "CADCommand\\TilCommand.F3_ConnectMultiLines.cs",
-              "ViewState": "AQIAAEEAAAAAAAAAAAAkwAAAAAAAAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-03-07T15:23:43.375Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "TilCommand.F2_SetCurrentStatus.cs",
-              "DocumentMoniker": "D:\\GitHub\\TimeIsLife\\CADCommand\\TilCommand.F2_SetCurrentStatus.cs",
-              "RelativeDocumentMoniker": "CADCommand\\TilCommand.F2_SetCurrentStatus.cs",
-              "ToolTip": "D:\\GitHub\\TimeIsLife\\CADCommand\\TilCommand.F2_SetCurrentStatus.cs",
-              "RelativeToolTip": "CADCommand\\TilCommand.F2_SetCurrentStatus.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-03-07T15:23:38.298Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 2,
-              "Title": "TilCommand.F1_ConnectLine.cs",
-              "DocumentMoniker": "D:\\GitHub\\TimeIsLife\\CADCommand\\TilCommand.F1_ConnectLine.cs",
-              "RelativeDocumentMoniker": "CADCommand\\TilCommand.F1_ConnectLine.cs",
-              "ToolTip": "D:\\GitHub\\TimeIsLife\\CADCommand\\TilCommand.F1_ConnectLine.cs",
-              "RelativeToolTip": "CADCommand\\TilCommand.F1_ConnectLine.cs",
-              "ViewState": "AQIAAAYAAAAAAAAAAAAAABkAAAAqAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-03-07T15:23:02.007Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "FireAlarmSystemView.xaml",
-              "DocumentMoniker": "D:\\GitHub\\TimeIsLife\\View\\FireAlarmSystemView.xaml",
-              "RelativeDocumentMoniker": "View\\FireAlarmSystemView.xaml",
-              "ToolTip": "D:\\GitHub\\TimeIsLife\\View\\FireAlarmSystemView.xaml",
-              "RelativeToolTip": "View\\FireAlarmSystemView.xaml",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2024-03-07T14:53:06.788Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 26,
-              "Title": "FireAlarmWindow.xaml",
-              "DocumentMoniker": "D:\\GitHub\\TimeIsLife\\View\\FireAlarmWindow.xaml",
-              "RelativeDocumentMoniker": "View\\FireAlarmWindow.xaml",
-              "ToolTip": "D:\\GitHub\\TimeIsLife\\View\\FireAlarmWindow.xaml",
-              "RelativeToolTip": "View\\FireAlarmWindow.xaml",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2024-03-05T13:33:42.347Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 23,
-              "Title": "FireAlarmWindowViewModel.cs",
-              "DocumentMoniker": "D:\\GitHub\\TimeIsLife\\ViewModel\\FireAlarmWindowViewModel.cs",
-              "RelativeDocumentMoniker": "ViewModel\\FireAlarmWindowViewModel.cs",
-              "ToolTip": "D:\\GitHub\\TimeIsLife\\ViewModel\\FireAlarmWindowViewModel.cs",
-              "RelativeToolTip": "ViewModel\\FireAlarmWindowViewModel.cs",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-03-05T06:28:50.833Z"
-            },
-            {
-              "$type": "Document",
               "DocumentIndex": 7,
-              "Title": "LightingLayoutView.xaml",
-              "DocumentMoniker": "D:\\GitHub\\TimeIsLife\\View\\LightingLayoutView.xaml",
-              "RelativeDocumentMoniker": "View\\LightingLayoutView.xaml",
-              "ToolTip": "D:\\GitHub\\TimeIsLife\\View\\LightingLayoutView.xaml",
-              "RelativeToolTip": "View\\LightingLayoutView.xaml",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2024-03-07T15:18:54.53Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 9,
-              "Title": "ElectricaView.xaml",
-              "DocumentMoniker": "D:\\GitHub\\TimeIsLife\\View\\ElectricaView.xaml",
-              "RelativeDocumentMoniker": "View\\ElectricaView.xaml",
-              "ToolTip": "D:\\GitHub\\TimeIsLife\\View\\ElectricaView.xaml",
-              "RelativeToolTip": "View\\ElectricaView.xaml",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2024-03-07T15:18:34.528Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 11,
-              "Title": "app.config",
-              "DocumentMoniker": "D:\\GitHub\\TimeIsLife\\app.config",
-              "RelativeDocumentMoniker": "app.config",
-              "ToolTip": "D:\\GitHub\\TimeIsLife\\app.config",
-              "RelativeToolTip": "app.config",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000601|",
-              "WhenOpened": "2024-03-07T15:17:07.681Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 13,
-              "Title": "ToolsViewModel.cs",
-              "DocumentMoniker": "D:\\GitHub\\TimeIsLife\\ViewModel\\ToolsViewModel.cs",
-              "RelativeDocumentMoniker": "ViewModel\\ToolsViewModel.cs",
-              "ToolTip": "D:\\GitHub\\TimeIsLife\\ViewModel\\ToolsViewModel.cs",
-              "RelativeToolTip": "ViewModel\\ToolsViewModel.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAACUAAAAIAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-03-07T15:14:39.439Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 12,
-              "Title": "LightingLayoutViewModel.cs",
-              "DocumentMoniker": "D:\\GitHub\\TimeIsLife\\ViewModel\\LightingLayoutViewModel.cs",
-              "RelativeDocumentMoniker": "ViewModel\\LightingLayoutViewModel.cs",
-              "ToolTip": "D:\\GitHub\\TimeIsLife\\ViewModel\\LightingLayoutViewModel.cs",
-              "RelativeToolTip": "ViewModel\\LightingLayoutViewModel.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-03-07T15:14:32.974Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 14,
-              "Title": "FireAlarmCommand2.cs",
-              "DocumentMoniker": "D:\\GitHub\\TimeIsLife\\CADCommand\\FireAlarmCommand2.cs",
-              "RelativeDocumentMoniker": "CADCommand\\FireAlarmCommand2.cs",
-              "ToolTip": "D:\\GitHub\\TimeIsLife\\CADCommand\\FireAlarmCommand2.cs",
-              "RelativeToolTip": "CADCommand\\FireAlarmCommand2.cs",
-              "ViewState": "AQIAALUAAAAAAAAAAAAawNkAAAAiAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-03-07T15:10:12.775Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 10,
-              "Title": "FireAlarmSystemViewModel.cs",
-              "DocumentMoniker": "D:\\GitHub\\TimeIsLife\\ViewModel\\FireAlarmSystemViewModel.cs",
-              "RelativeDocumentMoniker": "ViewModel\\FireAlarmSystemViewModel.cs",
-              "ToolTip": "D:\\GitHub\\TimeIsLife\\ViewModel\\FireAlarmSystemViewModel.cs",
-              "RelativeToolTip": "ViewModel\\FireAlarmSystemViewModel.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAABYAAAAUAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-03-07T14:53:41.294Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 8,
-              "Title": "ToolsView.xaml",
-              "DocumentMoniker": "D:\\GitHub\\TimeIsLife\\View\\ToolsView.xaml",
-              "RelativeDocumentMoniker": "View\\ToolsView.xaml",
-              "ToolTip": "D:\\GitHub\\TimeIsLife\\View\\ToolsView.xaml",
-              "RelativeToolTip": "View\\ToolsView.xaml",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2024-03-07T14:52:58.921Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 18,
-              "Title": "TilCommand.F6_LoadYdbFile.cs",
-              "DocumentMoniker": "D:\\GitHub\\TimeIsLife\\CADCommand\\TilCommand.F6_LoadYdbFile.cs",
-              "RelativeDocumentMoniker": "CADCommand\\TilCommand.F6_LoadYdbFile.cs",
-              "ToolTip": "D:\\GitHub\\TimeIsLife\\CADCommand\\TilCommand.F6_LoadYdbFile.cs",
-              "RelativeToolTip": "CADCommand\\TilCommand.F6_LoadYdbFile.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAB8AAAAmAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-03-07T14:52:33.172Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 19,
               "Title": "UserData.cs",
               "DocumentMoniker": "D:\\GitHub\\TimeIsLife\\Model\\UserData.cs",
               "RelativeDocumentMoniker": "Model\\UserData.cs",
               "ToolTip": "D:\\GitHub\\TimeIsLife\\Model\\UserData.cs",
               "RelativeToolTip": "Model\\UserData.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAABoAAAAuAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-03-07T14:47:55.255Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 21,
-              "Title": "F7_WindowViewModel.cs",
-              "DocumentMoniker": "D:\\GitHub\\TimeIsLife\\ViewModel\\F7_WindowViewModel.cs",
-              "RelativeDocumentMoniker": "ViewModel\\F7_WindowViewModel.cs",
-              "ToolTip": "D:\\GitHub\\TimeIsLife\\ViewModel\\F7_WindowViewModel.cs",
-              "RelativeToolTip": "ViewModel\\F7_WindowViewModel.cs",
-              "ViewState": "AQIAAIMBAAAAAAAAAAAAAG0CAAAuAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-03-07T14:46:42.878Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 22,
-              "Title": "F7_Window.xaml.cs",
-              "DocumentMoniker": "D:\\GitHub\\TimeIsLife\\View\\F7_Window.xaml.cs",
-              "RelativeDocumentMoniker": "View\\F7_Window.xaml.cs",
-              "ToolTip": "D:\\GitHub\\TimeIsLife\\View\\F7_Window.xaml.cs",
-              "RelativeToolTip": "View\\F7_Window.xaml.cs",
               "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-03-07T14:11:23.682Z"
+              "WhenOpened": "2024-03-11T15:45:13.559Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
-              "Title": "F7_Window.xaml",
-              "DocumentMoniker": "D:\\GitHub\\TimeIsLife\\View\\F7_Window.xaml",
-              "RelativeDocumentMoniker": "View\\F7_Window.xaml",
-              "ToolTip": "D:\\GitHub\\TimeIsLife\\View\\F7_Window.xaml",
-              "RelativeToolTip": "View\\F7_Window.xaml",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2024-03-07T14:11:18.925Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "F9_Window.xaml",
-              "DocumentMoniker": "D:\\GitHub\\TimeIsLife\\View\\F9_Window.xaml",
-              "RelativeDocumentMoniker": "View\\F9_Window.xaml",
-              "ToolTip": "D:\\GitHub\\TimeIsLife\\View\\F9_Window.xaml",
-              "RelativeToolTip": "View\\F9_Window.xaml",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2024-03-05T13:31:21.925Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 0,
               "Title": "F8_Window.xaml",
               "DocumentMoniker": "D:\\GitHub\\TimeIsLife\\View\\F8_Window.xaml",
               "RelativeDocumentMoniker": "View\\F8_Window.xaml",
               "ToolTip": "D:\\GitHub\\TimeIsLife\\View\\F8_Window.xaml",
               "RelativeToolTip": "View\\F8_Window.xaml",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003549|",
-              "WhenOpened": "2024-03-05T13:26:24.495Z"
+              "WhenOpened": "2024-03-11T15:41:10.692Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 24,
+              "DocumentIndex": 3,
               "Title": "F8_WindowViewModel.cs",
               "DocumentMoniker": "D:\\GitHub\\TimeIsLife\\ViewModel\\F8_WindowViewModel.cs",
               "RelativeDocumentMoniker": "ViewModel\\F8_WindowViewModel.cs",
               "ToolTip": "D:\\GitHub\\TimeIsLife\\ViewModel\\F8_WindowViewModel.cs",
               "RelativeToolTip": "ViewModel\\F8_WindowViewModel.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "ViewState": "AQIAAGoAAAAAAAAAAAAuwJkAAABNAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-03-05T13:26:22.704Z"
+              "WhenOpened": "2024-03-11T14:33:20.015Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 25,
-              "Title": "ElectricalViewModel.cs",
-              "DocumentMoniker": "D:\\GitHub\\TimeIsLife\\ViewModel\\ElectricalViewModel.cs",
-              "RelativeDocumentMoniker": "ViewModel\\ElectricalViewModel.cs",
-              "ToolTip": "D:\\GitHub\\TimeIsLife\\ViewModel\\ElectricalViewModel.cs",
-              "RelativeToolTip": "ViewModel\\ElectricalViewModel.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-03-05T13:26:21.7Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 20,
-              "Title": "myPlugin.cs",
-              "DocumentMoniker": "D:\\GitHub\\TimeIsLife\\myPlugin.cs",
-              "RelativeDocumentMoniker": "myPlugin.cs",
-              "ToolTip": "D:\\GitHub\\TimeIsLife\\myPlugin.cs",
-              "RelativeToolTip": "myPlugin.cs",
-              "ViewState": "AQIAADsAAAAAAAAAAAAAAGoAAAAaAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-03-05T13:08:30.5Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 17,
-              "Title": "TilCommand.F7_LayoutEquipment.cs",
-              "DocumentMoniker": "D:\\GitHub\\TimeIsLife\\CADCommand\\TilCommand.F7_LayoutEquipment.cs",
-              "RelativeDocumentMoniker": "CADCommand\\TilCommand.F7_LayoutEquipment.cs",
-              "ToolTip": "D:\\GitHub\\TimeIsLife\\CADCommand\\TilCommand.F7_LayoutEquipment.cs",
-              "RelativeToolTip": "CADCommand\\TilCommand.F7_LayoutEquipment.cs",
-              "ViewState": "AQIAAEUAAAAAAAAAAAAAAFEAAAAqAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-03-05T06:34:39.526Z"
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 16,
+              "DocumentIndex": 1,
               "Title": "TilCommand.F8_EquipmentConnectLine.cs",
               "DocumentMoniker": "D:\\GitHub\\TimeIsLife\\CADCommand\\TilCommand.F8_EquipmentConnectLine.cs",
               "RelativeDocumentMoniker": "CADCommand\\TilCommand.F8_EquipmentConnectLine.cs",
               "ToolTip": "D:\\GitHub\\TimeIsLife\\CADCommand\\TilCommand.F8_EquipmentConnectLine.cs",
               "RelativeToolTip": "CADCommand\\TilCommand.F8_EquipmentConnectLine.cs",
-              "ViewState": "AQIAABQAAAAAAAAAAAAkwCMAAAAvAAAA",
+              "ViewState": "AQIAADAAAAAAAAAAAAAqwIIAAAAmAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-03-05T06:11:44.212Z"
+              "WhenOpened": "2024-03-11T14:33:13.281Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 15,
+              "DocumentIndex": 6,
+              "Title": "TilCommand.F7_LayoutEquipment.cs",
+              "DocumentMoniker": "D:\\GitHub\\TimeIsLife\\CADCommand\\TilCommand.F7_LayoutEquipment.cs",
+              "RelativeDocumentMoniker": "CADCommand\\TilCommand.F7_LayoutEquipment.cs",
+              "ToolTip": "D:\\GitHub\\TimeIsLife\\CADCommand\\TilCommand.F7_LayoutEquipment.cs",
+              "RelativeToolTip": "CADCommand\\TilCommand.F7_LayoutEquipment.cs",
+              "ViewState": "AQIAAJICAAAAAAAAAAAgwMwCAAATAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-03-11T14:33:04.134Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "TilCommand.F1_ConnectLine.cs",
+              "DocumentMoniker": "D:\\GitHub\\TimeIsLife\\CADCommand\\TilCommand.F1_ConnectLine.cs",
+              "RelativeDocumentMoniker": "CADCommand\\TilCommand.F1_ConnectLine.cs",
+              "ToolTip": "D:\\GitHub\\TimeIsLife\\CADCommand\\TilCommand.F1_ConnectLine.cs",
+              "RelativeToolTip": "CADCommand\\TilCommand.F1_ConnectLine.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAACYAAAANAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-03-11T14:30:59.039Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "myPlugin.cs",
+              "DocumentMoniker": "D:\\GitHub\\TimeIsLife\\myPlugin.cs",
+              "RelativeDocumentMoniker": "myPlugin.cs",
+              "ToolTip": "D:\\GitHub\\TimeIsLife\\myPlugin.cs",
+              "RelativeToolTip": "myPlugin.cs",
+              "ViewState": "AQIAADcAAAAAAAAAAAAUwIEAAAA7AAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-03-11T14:28:54.302Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
               "Title": "TilCommand.F9_FAS.cs",
               "DocumentMoniker": "D:\\GitHub\\TimeIsLife\\CADCommand\\TilCommand.F9_FAS.cs",
               "RelativeDocumentMoniker": "CADCommand\\TilCommand.F9_FAS.cs",
               "ToolTip": "D:\\GitHub\\TimeIsLife\\CADCommand\\TilCommand.F9_FAS.cs",
               "RelativeToolTip": "CADCommand\\TilCommand.F9_FAS.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAACEAAAAeAAAA",
+              "ViewState": "AQIAAC8AAAAAAAAAAAAqwE0AAAA6AAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-03-02T09:59:35.634Z"
+              "WhenOpened": "2024-03-02T09:59:35.634Z",
+              "EditorCaption": ""
             }
           ]
         }

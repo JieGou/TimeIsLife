@@ -384,6 +384,9 @@
     <None Include="Block\FA\FA-43-门禁控制器.dwg">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+    <None Include="Block\FA\FA-总线短路隔离器.dwg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="ClassDiagram1.cd" />
     <None Include="ElectrialClassDiagram.cd" />
     <None Include="SchematicBlock\FA\Circle\FA-01-接线端子箱.dwg">

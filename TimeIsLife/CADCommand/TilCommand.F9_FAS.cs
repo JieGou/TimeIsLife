@@ -48,7 +48,7 @@ namespace TimeIsLife.CADCommand
 
             using (Transaction transaction = database.TransactionManager.StartTransaction())
             {
-                string[] layerNames1 = { MyPlugin.CurrentUserData.FireAreaLayerName };
+                List<string> layerNames1 = new List<string>() { MyPlugin.CurrentUserData.FireAreaLayerName };
                 LayerTable layerTable = transaction.GetObject(database.LayerTableId, OpenMode.ForRead) as LayerTable;
                 if (layerTable == null) return;
                 if (!CheckAllLayers(layerTable, layerNames1))
@@ -57,7 +57,7 @@ namespace TimeIsLife.CADCommand
                     F9_Window.Instance.ShowDialog();
                     if (F9_WindowViewModel.Instance.Result)
                     {
-                        string[] layerNames2 = { MyPlugin.CurrentUserData.FireAreaLayerName };
+                        List<string> layerNames2 = new List<string>() { MyPlugin.CurrentUserData.FireAreaLayerName };
                         if (!CheckAllLayers(layerTable, layerNames2))
                         {
                             MessageBox.Show(@"防火分区图层设置错误！");
@@ -96,7 +96,7 @@ namespace TimeIsLife.CADCommand
                             F9_Window.Instance.ShowDialog();
                             if (F9_WindowViewModel.Instance.Result)
                             {
-                                string[] layerNames3 = { MyPlugin.CurrentUserData.FireAreaLayerName };
+                                List<string> layerNames3 = new List<string>() { MyPlugin.CurrentUserData.FireAreaLayerName };
                                 if (!CheckAllLayers(layerTable, layerNames3))
                                 {
                                     editor.WriteMessage(@"图层设置有误！");
@@ -290,7 +290,7 @@ namespace TimeIsLife.CADCommand
                                             name1 = Path.GetFileNameWithoutExtension(equipment.BlockPath);
                                         }
 
-                                        if (equipment.EquipmentType == FireAlarmEquipmentType.Fa51)
+                                        if (equipment.EquipmentType == FireAlarmEquipmentType.Fa69)
                                         {
                                             name2 = Path.GetFileNameWithoutExtension(equipment.BlockPath);
                                         }
@@ -776,8 +776,6 @@ namespace TimeIsLife.CADCommand
                                 case FireAlarmEquipmentType.Fa43:
                                     AddFireAlarmEquipment(database, fireAlarmEquipment, displacement, n);
                                     break;
-                                default:
-                                    throw new ArgumentOutOfRangeException();
                             }
 
                             if (fireAlarmEquipment.EquipmentType == FireAlarmEquipmentType.Fa35 || fireAlarmEquipment.EquipmentType == FireAlarmEquipmentType.Fa36 || fireAlarmEquipment.EquipmentType== FireAlarmEquipmentType.Fa37|| fireAlarmEquipment.EquipmentType == FireAlarmEquipmentType.Fa38 || fireAlarmEquipment.EquipmentType == FireAlarmEquipmentType.Fa39)

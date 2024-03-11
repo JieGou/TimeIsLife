@@ -1,33 +1,12 @@
 ﻿using Autodesk.AutoCAD.ApplicationServices;
 using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
-using Autodesk.AutoCAD.Geometry;
-
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-
-using Dapper;
-
-using DotNetARX;
-
-using Newtonsoft.Json;
-
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Data.SQLite;
-using System.IO;
 using System.Linq;
-using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 using TimeIsLife.Helper;
-using TimeIsLife.Jig;
-using TimeIsLife.Model;
-using TimeIsLife.View;
-
 using TimeIsLife.View;
 
 namespace TimeIsLife.ViewModel
@@ -77,6 +56,14 @@ namespace TimeIsLife.ViewModel
         {
             get => avoidanceAreaLayerName;
             set => SetProperty(ref avoidanceAreaLayerName, value);
+        }
+
+        //禁止布线区域
+        private bool isUseAvoidanceArea;
+        public bool IsUseAvoidanceArea
+        {
+            get => isUseAvoidanceArea;
+            set => SetProperty(ref isUseAvoidanceArea, value);
         }
 
         //设备图层
@@ -164,6 +151,7 @@ namespace TimeIsLife.ViewModel
             MyPlugin.CurrentUserData.AvoidanceAreaLayerName = AvoidanceAreaLayerName;
             MyPlugin.CurrentUserData.EquipmentLayerName = EquipmentLayerName;
             MyPlugin.CurrentUserData.WireLayerName = WireLayerName;
+            MyPlugin.CurrentUserData.IsUseAvoidanceArea = IsUseAvoidanceArea;
         }
         public void LoadState()
         {
@@ -171,6 +159,7 @@ namespace TimeIsLife.ViewModel
             AvoidanceAreaLayerName = MyPlugin.CurrentUserData.AvoidanceAreaLayerName;
             EquipmentLayerName = MyPlugin.CurrentUserData.EquipmentLayerName;
             WireLayerName = MyPlugin.CurrentUserData.WireLayerName;
+            IsUseAvoidanceArea = MyPlugin.CurrentUserData.IsUseAvoidanceArea;
         }
         private string GetLayerName(string message)
         {

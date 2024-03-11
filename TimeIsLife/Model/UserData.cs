@@ -21,6 +21,11 @@ namespace TimeIsLife.Model
         public int SlabThickness { get; set; }
 
         public string TreeOrCircle { get; set; }
+        public bool IsUseAvoidanceArea
+        {
+            get;
+            set;
+        }
         // 集合属性示例
         public ObservableCollection<FireAlarmEquipment> FireAlarmEquipments { get; set; }
 

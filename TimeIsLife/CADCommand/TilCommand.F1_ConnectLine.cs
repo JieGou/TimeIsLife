@@ -35,24 +35,26 @@ namespace TimeIsLife.CADCommand
             const string s2 = "\n操作方法：运行命令，依次点选两个块，块最近的连接点之间连线。";
             const string s3 = "\n注意事项：块内需要用点表示连接点。";
             editor.WriteMessage(s1 + s2 + s3);
+            while (true)
+            {
+                BlockReference firstBlockReference = PromptForBlockReference("选择第一个块", editor, database);
+                if (firstBlockReference == null) return;
+                firstBlockReference.Highlight();
+                BlockReference secondBlockReference = PromptForBlockReference("选择第二个块", editor, database);
+                firstBlockReference.Unhighlight();
+                if (secondBlockReference == null) return;
 
-            BlockReference firstBlockReference = PromptForBlockReference("选择第一个块", editor, database);
-            if (firstBlockReference == null) return;
-            firstBlockReference.Highlight();
-            BlockReference secondBlockReference = PromptForBlockReference("选择第二个块", editor, database);
-            firstBlockReference.Unhighlight();
-            if (secondBlockReference == null) return;
+                var connectline = GetBlockreferenceConnectline(firstBlockReference, secondBlockReference);
 
-            var connectline = GetBlockreferenceConnectline(firstBlockReference, secondBlockReference);
-
-            // 使用事务将线添加到模型空间
-            using Transaction transaction = database.TransactionManager.StartTransaction();
-            BlockTableRecord modelSpace =
-                transaction.GetObject(database.CurrentSpaceId, OpenMode.ForWrite) as BlockTableRecord;
-            if (modelSpace == null) throw new ArgumentNullException(nameof(modelSpace));
-            modelSpace.AppendEntity(connectline);
-            transaction.AddNewlyCreatedDBObject(connectline, true);
-            transaction.Commit();
+                // 使用事务将线添加到模型空间
+                using Transaction transaction = database.TransactionManager.StartTransaction();
+                BlockTableRecord modelSpace =
+                    transaction.GetObject(database.CurrentSpaceId, OpenMode.ForWrite) as BlockTableRecord;
+                if (modelSpace == null) throw new ArgumentNullException(nameof(modelSpace));
+                modelSpace.AppendEntity(connectline);
+                transaction.AddNewlyCreatedDBObject(connectline, true);
+                transaction.Commit();
+            }
         }
 
         // 辅助方法：提示用户选择一个块并返回 BlockReference

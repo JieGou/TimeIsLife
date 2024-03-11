@@ -127,6 +127,7 @@ namespace TimeIsLife
                 CurrentUserData.TreeOrCircle = "Tree";
                 CurrentUserData.FireAlarmEquipments = GetFireAlarmEquipments(blockDirectory, schematicBlockDirectory);
                 CurrentUserData.DeviceType = "JXX";
+                CurrentUserData.IsUseAvoidanceArea = false;
                 return;
             }
 
@@ -181,6 +182,7 @@ namespace TimeIsLife
     new FireAlarmEquipment(FireAlarmEquipmentType.Fa41, "火焰探测器", Path.Combine(blockDirectory, "FA-41-火焰探测器.dwg"), Path.Combine(schematicBlockDirectory, "FA-41-火焰探测器.dwg"), true, false, 900),
     new FireAlarmEquipment(FireAlarmEquipmentType.Fa42, "电磁阀", Path.Combine(blockDirectory, "FA-42-电磁阀.dwg"), Path.Combine(schematicBlockDirectory, "FA-42-电磁阀.dwg"), true, false, 900),
     new FireAlarmEquipment(FireAlarmEquipmentType.Fa43, "门禁控制器", Path.Combine(blockDirectory, "FA-43-门禁控制器.dwg"), Path.Combine(schematicBlockDirectory, "FA-43-门禁控制器.dwg"), true, false, 900),
+    new FireAlarmEquipment(FireAlarmEquipmentType.Fa69, "总线短路隔离器", Path.Combine(blockDirectory, "FA-总线短路隔离器.dwg"), string.Empty, false, false, 900),
             };
         }
 

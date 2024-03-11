@@ -58,33 +58,35 @@ namespace TimeIsLife.CADCommand
                     BlockTableRecord modelSpace = transaction.GetObject(blockTable[BlockTableRecord.ModelSpace], OpenMode.ForWrite) as BlockTableRecord;
                     //获取图纸空间
                     BlockTableRecord paperSpace = transaction.GetObject(blockTable[BlockTableRecord.PaperSpace], OpenMode.ForRead) as BlockTableRecord;
-                    Point3d endPoint3D;
 
-                    string[] layerNames1 = new string[]
-                    {
+                    List<string> layerNames1 = new List<string>() {
                         MyPlugin.CurrentUserData.FireAreaLayerName,
-                        MyPlugin.CurrentUserData.AvoidanceAreaLayerName,
                         MyPlugin.CurrentUserData.EquipmentLayerName,
                         //MyPlugin.CurrentUserData.WireLayerName
                     };
+                    if (MyPlugin.CurrentUserData.IsUseAvoidanceArea)
+                    {
+                        layerNames1.Add(MyPlugin.CurrentUserData.AvoidanceAreaLayerName);
+                    }
+                    
                     LayerTable layerTable = transaction.GetObject(database.LayerTableId, OpenMode.ForRead) as LayerTable;
                     if (layerTable == null) return;
                     if (!CheckAllLayers(layerTable, layerNames1))
                     {
-                        MessageBox.Show(@"请选择防火分区图层！");
                         F8_Window.Instance.ShowDialog();
                         if (F8_WindowViewModel.Instance.Result)
                         {
-                            string[] layerNames2 = new string[]
-                            {
+                            List<string> layerNames2 = new List<string>() {
                                 MyPlugin.CurrentUserData.FireAreaLayerName,
-                                MyPlugin.CurrentUserData.AvoidanceAreaLayerName,
                                 MyPlugin.CurrentUserData.EquipmentLayerName,
                                 //MyPlugin.CurrentUserData.WireLayerName
                             };
+                            if (MyPlugin.CurrentUserData.IsUseAvoidanceArea)
+                            {
+                                layerNames1.Add(MyPlugin.CurrentUserData.AvoidanceAreaLayerName);
+                            }
                             if (!CheckAllLayers(layerTable, layerNames2))
                             {
-                                MessageBox.Show(@"防火分区图层设置错误！");
                                 return;
                             }
                         }
@@ -120,7 +122,7 @@ namespace TimeIsLife.CADCommand
                                 F8_Window.Instance.ShowDialog();
                                 if (F8_WindowViewModel.Instance.Result)
                                 {
-                                    string[] layerNames3 = new string[]
+                                    List<string> layerNames3 = new List<string>
                                     {
                                         MyPlugin.CurrentUserData.FireAreaLayerName,
                                         MyPlugin.CurrentUserData.AvoidanceAreaLayerName,
@@ -129,7 +131,6 @@ namespace TimeIsLife.CADCommand
                                     };
                                     if (!CheckAllLayers(layerTable, layerNames3))
                                     {
-                                        editor.WriteMessage(@"图层设置有误！");
                                         return;
                                     }
                                 }
@@ -378,12 +379,13 @@ namespace TimeIsLife.CADCommand
             return Kruskal.FindMinimumSpanningTree(points, geometryFactory);
         }
 
-        private bool CheckAllLayers(LayerTable layerTable, string[] names)
+        private bool CheckAllLayers(LayerTable layerTable, List<string> names)
         {
             foreach (var name in names)
             {
                 if (!layerTable.Has(name))
                 {
+                    MessageBox.Show($@"缺失 {name} 图层!");
                     return false;
                 }
             }

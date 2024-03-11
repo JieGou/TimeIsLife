@@ -96,8 +96,6 @@ namespace TimeIsLife.CADCommand
             List<Slab> slabs;
             List<Wall> walls;
 
-            BasePoint basePoint;
-
             //初始化NTS的GeometryFactory
             PrecisionModel precisionModel = new PrecisionModel(1000d);
             GeometryPrecisionReducer precisionReducer = new GeometryPrecisionReducer(precisionModel);
