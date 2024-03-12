@@ -46,7 +46,6 @@ namespace TimeIsLife.CADCommand
                 BlockTableRecord modelSpace = transaction.GetObject(blockTable[BlockTableRecord.ModelSpace], OpenMode.ForRead) as BlockTableRecord;
                 //获取图纸空间
                 BlockTableRecord paperSpace = transaction.GetObject(blockTable[BlockTableRecord.PaperSpace], OpenMode.ForRead) as BlockTableRecord;
-				Point3d endPoint3D;
 
                 PromptPointResult ppr = editor.GetPoint(new PromptPointOptions("\n 请选择第一个角点："));
 
@@ -73,13 +72,12 @@ namespace TimeIsLife.CADCommand
                 PromptResult promptResult = editor.Drag(ucsSelectJig);
                 if (promptResult.Status != PromptStatus.OK) return;
 
-                endPoint3D = ucsSelectJig.endPoint3d.TransformBy(ucsToWcsMatrix3d.Inverse());
+                var endPoint3D = ucsSelectJig.endPoint3d.TransformBy(ucsToWcsMatrix3d.Inverse());
 
 				Point3dCollection point3DCollection = GetPoint3DCollection(startPoint3D, endPoint3D, ucsToWcsMatrix3d);
                 TypedValueList typedValues = new TypedValueList
                 {
                     typeof(BlockReference),
-                    { DxfCode.LayerName,MyPlugin.CurrentUserData.EquipmentLayerName }
                 };
                 List<BlockReference> blockReferences = new List<BlockReference>();
 
@@ -134,5 +132,62 @@ namespace TimeIsLife.CADCommand
             }
             return points;
         }
+
+
+        private Point3dCollection GetPoint3DCollection(Point3d up1, Point3d up2, Matrix3d matrix3D)
+        {
+            //    Point3d p1 = up1.TransformBy(matrix3D.Inverse());
+            //    Point3d p2 = up2.TransformBy(matrix3D.Inverse());
+            Point3dCollection point3DCollection = new Point3dCollection();
+            if (up1.X < up2.X && up1.Y < up2.Y)
+            {
+                var leftDownPoint = up1;
+                var leftUpPoint = new Point3d(up1.X, up2.Y, 0);
+                var rightUpPoint = up2;
+                var rightDownPoint = new Point3d(up2.X, up1.Y, 0);
+                point3DCollection = GetPoint3DCollection(point3DCollection, leftDownPoint, rightDownPoint, rightUpPoint, leftUpPoint, matrix3D);
+            }
+            else if (up1.X < up2.X && up1.Y > up2.Y)
+            {
+                var leftDownPoint = new Point3d(up1.X, up2.Y, 0);
+                var leftUpPoint = up1;
+                var rightUpPoint = new Point3d(up2.X, up1.Y, 0);
+                var rightDownPoint = up2;
+                point3DCollection = GetPoint3DCollection(point3DCollection, leftDownPoint, rightDownPoint, rightUpPoint, leftUpPoint, matrix3D);
+            }
+            else if (up1.X > up2.X && up1.Y > up2.Y)
+            {
+                var leftDownPoint = up2;
+                var leftUpPoint = new Point3d(up2.X, up1.Y, 0);
+                var rightUpPoint = up1;
+                var rightDownPoint = new Point3d(up1.X, up2.Y, 0);
+                point3DCollection = GetPoint3DCollection(point3DCollection, leftDownPoint, rightDownPoint, rightUpPoint, leftUpPoint, matrix3D);
+            }
+            else
+            {
+                var leftDownPoint = new Point3d(up2.X, up1.Y, 0);
+                var leftUpPoint = up2;
+                var rightUpPoint = new Point3d(up1.X, up2.Y, 0);
+                var rightDownPoint = up1;
+                point3DCollection = GetPoint3DCollection(point3DCollection, leftDownPoint, rightDownPoint, rightUpPoint, leftUpPoint, matrix3D);
+            }
+            return point3DCollection;
+        }
+
+        private Point3dCollection GetPoint3DCollection(Point3dCollection point3DCollection, Point3d leftDownPoint, Point3d rightDownPoint, Point3d rightUpPoint, Point3d leftUpPoint, Matrix3d matrix3D)
+        {
+            //    point3DCollection.Add(leftDownPoint.TransformBy(matrix3D.Inverse()));
+            //    point3DCollection.Add(rightDownPoint.TransformBy(matrix3D.Inverse()));
+            //    point3DCollection.Add(rightUpPoint.TransformBy(matrix3D.Inverse()));
+            //    point3DCollection.Add(leftUpPoint.TransformBy(matrix3D.Inverse()));
+
+            point3DCollection.Add(leftDownPoint);
+            point3DCollection.Add(rightDownPoint);
+            point3DCollection.Add(rightUpPoint);
+            point3DCollection.Add(leftUpPoint);
+
+            return point3DCollection;
+        }
+
     }
 }

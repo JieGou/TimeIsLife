@@ -30,5 +30,9 @@ namespace TimeIsLife.Model
         public ObservableCollection<FireAlarmEquipment> FireAlarmEquipments { get; set; }
 
         public string DeviceType { get; set; }
+
+        public string AlignXY { get; set; }
+
+        public string EntityOrNestedEntity { get; set; }
     }
 }

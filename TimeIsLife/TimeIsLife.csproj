@@ -87,11 +87,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CADCommand\TilCommand.F2_SetCurrentStatus.cs" />
+    <Compile Include="CADCommand\TilCommand.F5_EquipmentAngle.cs" />
     <Compile Include="CADCommand\TilCommand.F8_EquipmentConnectLine.cs" />
     <Compile Include="CADCommand\TilCommand.F9_FAS.cs" />
     <Compile Include="CADCommand\TilCommand.F6_LoadYdbFile.cs" />
     <Compile Include="CADCommand\TilCommand.F1_ConnectLine.cs" />
+    <Compile Include="CADCommand\TilCommand.FF_QuickUcs.cs" />
     <Compile Include="Helper\DatabaseHelper.cs" />
+    <Compile Include="Jig\QuickUcsJig.cs" />
     <Compile Include="Model\AvoidanceArea.cs" />
     <Compile Include="Model\Beam.cs" />
     <Compile Include="Model\BeamSect.cs" />
@@ -387,6 +390,7 @@
     <None Include="Block\FA\FA-总线短路隔离器.dwg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <Compile Include="CADCommand\TilCommand.F4_AlignUcs.cs" />
     <None Include="ClassDiagram1.cd" />
     <None Include="ElectrialClassDiagram.cd" />
     <None Include="SchematicBlock\FA\Circle\FA-01-接线端子箱.dwg">

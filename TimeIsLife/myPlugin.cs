@@ -128,6 +128,8 @@ namespace TimeIsLife
                 CurrentUserData.FireAlarmEquipments = GetFireAlarmEquipments(blockDirectory, schematicBlockDirectory);
                 CurrentUserData.DeviceType = "JXX";
                 CurrentUserData.IsUseAvoidanceArea = false;
+                CurrentUserData.AlignXY = "X";
+                CurrentUserData.EntityOrNestedEntity = "Entity";
                 return;
             }
 
