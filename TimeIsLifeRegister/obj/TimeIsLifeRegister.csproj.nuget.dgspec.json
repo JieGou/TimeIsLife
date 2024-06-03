@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\GitHub\\TimeIsLifeRegister\\TimeIsLifeRegister.csproj": {}
+    "D:\\GitHub\\TimeIsLife\\TimeIsLifeRegister\\TimeIsLifeRegister.csproj": {}
   },
   "projects": {
-    "D:\\GitHub\\TimeIsLifeRegister\\TimeIsLifeRegister.csproj": {
+    "D:\\GitHub\\TimeIsLife\\TimeIsLifeRegister\\TimeIsLifeRegister.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\GitHub\\TimeIsLifeRegister\\TimeIsLifeRegister.csproj",
+        "projectUniqueName": "D:\\GitHub\\TimeIsLife\\TimeIsLifeRegister\\TimeIsLifeRegister.csproj",
         "projectName": "TimeIsLifeRegister",
-        "projectPath": "D:\\GitHub\\TimeIsLifeRegister\\TimeIsLifeRegister.csproj",
+        "projectPath": "D:\\GitHub\\TimeIsLife\\TimeIsLifeRegister\\TimeIsLifeRegister.csproj",
         "packagesPath": "C:\\Users\\liu18\\.nuget\\packages\\",
-        "outputPath": "D:\\GitHub\\TimeIsLifeRegister\\obj\\",
+        "outputPath": "D:\\GitHub\\TimeIsLife\\TimeIsLifeRegister\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -77,7 +77,7 @@
               "privateAssets": "none"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.200\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.300\\RuntimeIdentifierGraph.json"
         }
       }
     }

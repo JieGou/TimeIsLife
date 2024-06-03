@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "fESs38Qz1XgpWRgBjmfqIC6GL0VcgY1+VSJxqz+Xvt8H4aWHbYEUsOPNQSxAHiWZg7W5u99ZHxihB2URJeAgtA==",
+  "dgSpecHash": "4cjJV9ApVi8=",
   "success": true,
-  "projectFilePath": "D:\\GitHub\\TimeIsLifeRegister\\TimeIsLifeRegister.csproj",
+  "projectFilePath": "D:\\GitHub\\TimeIsLife\\TimeIsLifeRegister\\TimeIsLifeRegister.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\liu18\\.nuget\\packages\\communitytoolkit.mvvm\\8.0.0\\communitytoolkit.mvvm.8.0.0.nupkg.sha512",
     "C:\\Users\\liu18\\.nuget\\packages\\microsoft.xaml.behaviors.wpf\\1.1.39\\microsoft.xaml.behaviors.wpf.1.1.39.nupkg.sha512"

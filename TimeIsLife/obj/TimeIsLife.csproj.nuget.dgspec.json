@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\GitHub\\TimeIsLife\\TimeIsLife.csproj": {}
+    "D:\\GitHub\\TimeIsLife\\TimeIsLife\\TimeIsLife.csproj": {}
   },
   "projects": {
-    "D:\\GitHub\\TimeIsLife\\TimeIsLife.csproj": {
+    "D:\\GitHub\\TimeIsLife\\TimeIsLife\\TimeIsLife.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\GitHub\\TimeIsLife\\TimeIsLife.csproj",
+        "projectUniqueName": "D:\\GitHub\\TimeIsLife\\TimeIsLife\\TimeIsLife.csproj",
         "projectName": "TimeIsLife",
-        "projectPath": "D:\\GitHub\\TimeIsLife\\TimeIsLife.csproj",
+        "projectPath": "D:\\GitHub\\TimeIsLife\\TimeIsLife\\TimeIsLife.csproj",
         "packagesPath": "C:\\Users\\liu18\\.nuget\\packages\\",
-        "outputPath": "D:\\GitHub\\TimeIsLife\\obj\\",
+        "outputPath": "D:\\GitHub\\TimeIsLife\\TimeIsLife\\obj\\",
         "projectStyle": "PackageReference",
         "skipContentFileWrite": true,
         "fallbackFolders": [
@@ -57,11 +57,11 @@
             },
             "Dapper": {
               "target": "Package",
-              "version": "[2.1.28, )"
+              "version": "[2.1.35, )"
             },
             "Google.OrTools": {
               "target": "Package",
-              "version": "[9.8.3296, )"
+              "version": "[9.10.4067, )"
             },
             "Microsoft.Xaml.Behaviors.Wpf": {
               "target": "Package",
@@ -81,7 +81,7 @@
             },
             "System.Memory": {
               "target": "Package",
-              "version": "[4.5.4, )"
+              "version": "[4.5.5, )"
             }
           }
         }

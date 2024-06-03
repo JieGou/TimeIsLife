@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "mD5QI3sIo54cLCX2kvSwHd3r8wVXX11TanoMnIsQIo+n+WmjqPgQW7eRS+V0qmPPnG5KfTsX17pPF9Zo/TFKuA==",
+  "dgSpecHash": "SD1ZtgzDWbA=",
   "success": true,
-  "projectFilePath": "D:\\GitHub\\TimeIsLife\\TimeIsLife.csproj",
+  "projectFilePath": "D:\\GitHub\\TimeIsLife\\TimeIsLife\\TimeIsLife.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\liu18\\.nuget\\packages\\accord\\3.8.0\\accord.3.8.0.nupkg.sha512",
     "C:\\Users\\liu18\\.nuget\\packages\\accord.machinelearning\\3.8.0\\accord.machinelearning.3.8.0.nupkg.sha512",
@@ -12,15 +12,15 @@
     "C:\\Users\\liu18\\.nuget\\packages\\autocad.net.core\\24.3.0\\autocad.net.core.24.3.0.nupkg.sha512",
     "C:\\Users\\liu18\\.nuget\\packages\\autocad.net.model\\24.3.0\\autocad.net.model.24.3.0.nupkg.sha512",
     "C:\\Users\\liu18\\.nuget\\packages\\communitytoolkit.mvvm\\8.2.2\\communitytoolkit.mvvm.8.2.2.nupkg.sha512",
-    "C:\\Users\\liu18\\.nuget\\packages\\dapper\\2.1.28\\dapper.2.1.28.nupkg.sha512",
+    "C:\\Users\\liu18\\.nuget\\packages\\dapper\\2.1.35\\dapper.2.1.35.nupkg.sha512",
     "C:\\Users\\liu18\\.nuget\\packages\\entityframework\\6.4.4\\entityframework.6.4.4.nupkg.sha512",
-    "C:\\Users\\liu18\\.nuget\\packages\\google.ortools\\9.8.3296\\google.ortools.9.8.3296.nupkg.sha512",
-    "C:\\Users\\liu18\\.nuget\\packages\\google.ortools.runtime.linux-arm64\\9.8.3296\\google.ortools.runtime.linux-arm64.9.8.3296.nupkg.sha512",
-    "C:\\Users\\liu18\\.nuget\\packages\\google.ortools.runtime.linux-x64\\9.8.3296\\google.ortools.runtime.linux-x64.9.8.3296.nupkg.sha512",
-    "C:\\Users\\liu18\\.nuget\\packages\\google.ortools.runtime.osx-arm64\\9.8.3296\\google.ortools.runtime.osx-arm64.9.8.3296.nupkg.sha512",
-    "C:\\Users\\liu18\\.nuget\\packages\\google.ortools.runtime.osx-x64\\9.8.3296\\google.ortools.runtime.osx-x64.9.8.3296.nupkg.sha512",
-    "C:\\Users\\liu18\\.nuget\\packages\\google.ortools.runtime.win-x64\\9.8.3296\\google.ortools.runtime.win-x64.9.8.3296.nupkg.sha512",
-    "C:\\Users\\liu18\\.nuget\\packages\\google.protobuf\\3.25.0\\google.protobuf.3.25.0.nupkg.sha512",
+    "C:\\Users\\liu18\\.nuget\\packages\\google.ortools\\9.10.4067\\google.ortools.9.10.4067.nupkg.sha512",
+    "C:\\Users\\liu18\\.nuget\\packages\\google.ortools.runtime.linux-arm64\\9.10.4067\\google.ortools.runtime.linux-arm64.9.10.4067.nupkg.sha512",
+    "C:\\Users\\liu18\\.nuget\\packages\\google.ortools.runtime.linux-x64\\9.10.4067\\google.ortools.runtime.linux-x64.9.10.4067.nupkg.sha512",
+    "C:\\Users\\liu18\\.nuget\\packages\\google.ortools.runtime.osx-arm64\\9.10.4067\\google.ortools.runtime.osx-arm64.9.10.4067.nupkg.sha512",
+    "C:\\Users\\liu18\\.nuget\\packages\\google.ortools.runtime.osx-x64\\9.10.4067\\google.ortools.runtime.osx-x64.9.10.4067.nupkg.sha512",
+    "C:\\Users\\liu18\\.nuget\\packages\\google.ortools.runtime.win-x64\\9.10.4067\\google.ortools.runtime.win-x64.9.10.4067.nupkg.sha512",
+    "C:\\Users\\liu18\\.nuget\\packages\\google.protobuf\\3.26.1\\google.protobuf.3.26.1.nupkg.sha512",
     "C:\\Users\\liu18\\.nuget\\packages\\microsoft.bcl.asyncinterfaces\\7.0.0\\microsoft.bcl.asyncinterfaces.7.0.0.nupkg.sha512",
     "C:\\Users\\liu18\\.nuget\\packages\\microsoft.xaml.behaviors.wpf\\1.1.77\\microsoft.xaml.behaviors.wpf.1.1.77.nupkg.sha512",
     "C:\\Users\\liu18\\.nuget\\packages\\nettopologysuite\\2.5.0\\nettopologysuite.2.5.0.nupkg.sha512",
@@ -32,25 +32,10 @@
     "C:\\Users\\liu18\\.nuget\\packages\\system.data.sqlite.core\\1.0.118\\system.data.sqlite.core.1.0.118.nupkg.sha512",
     "C:\\Users\\liu18\\.nuget\\packages\\system.data.sqlite.ef6\\1.0.118\\system.data.sqlite.ef6.1.0.118.nupkg.sha512",
     "C:\\Users\\liu18\\.nuget\\packages\\system.data.sqlite.linq\\1.0.118\\system.data.sqlite.linq.1.0.118.nupkg.sha512",
-    "C:\\Users\\liu18\\.nuget\\packages\\system.memory\\4.5.4\\system.memory.4.5.4.nupkg.sha512",
+    "C:\\Users\\liu18\\.nuget\\packages\\system.memory\\4.5.5\\system.memory.4.5.5.nupkg.sha512",
     "C:\\Users\\liu18\\.nuget\\packages\\system.numerics.vectors\\4.5.0\\system.numerics.vectors.4.5.0.nupkg.sha512",
     "C:\\Users\\liu18\\.nuget\\packages\\system.runtime.compilerservices.unsafe\\6.0.0\\system.runtime.compilerservices.unsafe.6.0.0.nupkg.sha512",
     "C:\\Users\\liu18\\.nuget\\packages\\system.threading.tasks.extensions\\4.5.4\\system.threading.tasks.extensions.4.5.4.nupkg.sha512"
   ],
-  "logs": [
-    {
-      "code": "NU1605",
-      "level": "Warning",
-      "warningLevel": 1,
-      "message": "检测到包降级: System.Memory 从 4.5.5 降级到 4.5.4。直接从项目引用包以选择不同版本。 \r\n TimeIsLife -> CommunityToolkit.Mvvm 8.2.2 -> System.Memory (>= 4.5.5) \r\n TimeIsLife -> System.Memory (>= 4.5.4)",
-      "libraryId": "System.Memory",
-      "targetGraphs": [
-        ".NETFramework,Version=v4.8",
-        ".NETFramework,Version=v4.8/win",
-        ".NETFramework,Version=v4.8/win-arm64",
-        ".NETFramework,Version=v4.8/win-x64",
-        ".NETFramework,Version=v4.8/win-x86"
-      ]
-    }
-  ]
+  "logs": []
 }

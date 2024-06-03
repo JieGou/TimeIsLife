@@ -23,66 +23,89 @@ namespace TimeIsLife.CADCommand
             Editor editor = document.Editor;
             Matrix3d ucsToWcsMatrix3d = editor.CurrentUserCoordinateSystem;
 
-            // 提供关键字选项给用户
-            PromptKeywordOptions promptKeywordOptions = new PromptKeywordOptions("\n选择选项 [实体(Entity)/嵌套实体(NestedEntity)]");
-            promptKeywordOptions.Keywords.Add("Entity");
-            promptKeywordOptions.Keywords.Add("NestedEntity");
-            promptKeywordOptions.Keywords.Default = MyPlugin.CurrentUserData.EntityOrNestedEntity;
-            PromptResult keywords = editor.GetKeywords(promptKeywordOptions);
-            if (keywords.Status != PromptStatus.OK) return; // 用户取消或输入无效
-            MyPlugin.CurrentUserData.EntityOrNestedEntity = keywords.StringResult;
-            switch (keywords.StringResult)
+            bool bo = true;
+            while (bo) 
             {
-                case "Entity":
-                    // 选择整体实体的逻辑
-                    PromptEntityOptions promptEntityOptions = new PromptEntityOptions("\n选择一个实体：")
-                    {
-                        AllowNone = false 
-                    };
-                    PromptEntityResult promptEntityResult = editor.GetEntity(promptEntityOptions);
+                switch (MyPlugin.CurrentUserData.EntityOrNestedEntity)
+                {
+                    case "E":
+                        // 选择整体实体的逻辑
+                        PromptEntityOptions promptEntityOptions = new PromptEntityOptions("\n选择一个实体或[嵌套实体(N)/世界(W)]：");
+                        promptEntityOptions.Keywords.Add("N");
+                        promptEntityOptions.Keywords.Add("W");
+                        promptEntityOptions.AppendKeywordsToMessage = false;
+                        PromptEntityResult promptEntityResult = editor.GetEntity(promptEntityOptions);
 
-                    if (promptEntityResult.Status != PromptStatus.OK) return;
-                    SetUcsBasedOnEntity(promptEntityResult.ObjectId, document);
-                    break;
-                case "NestedEntity":
-                    // 提示用户选择一个嵌套实体
-                    PromptNestedEntityOptions promptNestedEntityOptions = new PromptNestedEntityOptions("\n选择一个嵌套实体：")
-                    {
-                        AppendKeywordsToMessage = false,
-                        UseNonInteractivePickPoint = false,
-                        NonInteractivePickPoint = default,
-                        AllowNone = false
-                    };
-                    PromptNestedEntityResult promptNestedEntityResult = editor.GetNestedEntity(promptNestedEntityOptions);
+                        if (promptEntityResult.Status == PromptStatus.OK)
+                        {
+                            SetUcsBasedOnEntity(promptEntityResult.ObjectId, document);
+                            bo = false;
+                        }
+                        else if (promptEntityResult.Status == PromptStatus.Keyword)
+                        {
+                            switch (promptEntityResult.StringResult)
+                            {
+                                case "N":
+                                    MyPlugin.CurrentUserData.EntityOrNestedEntity = promptEntityResult.StringResult;
+                                    break;
+                                case "W":
+                                    SetUcsToWcs();
+                                    bo = false;
+                                    break;
+                            }
+                        }
+                        else
+                        {
+                            bo = false;
+                        }
+                        break;
+                    case "N":
+                        // 提示用户选择一个嵌套实体
+                        PromptNestedEntityOptions promptNestedEntityOptions = new PromptNestedEntityOptions("\n选择一个嵌套实体[实体(E)/世界(W)]：")
+                        {
+                            AppendKeywordsToMessage = false,
+                            UseNonInteractivePickPoint = false,
+                            NonInteractivePickPoint = default,
+                            AllowNone = false
+                        };
+                        promptNestedEntityOptions.Keywords.Add("E");
+                        promptNestedEntityOptions.Keywords.Add("W");
+                        promptNestedEntityOptions.AppendKeywordsToMessage = false;
+                        PromptNestedEntityResult promptNestedEntityResult = editor.GetNestedEntity(promptNestedEntityOptions);
 
-                    if (promptNestedEntityResult.Status != PromptStatus.OK) return;
-                    SetUcsBasedOnEntity(promptNestedEntityResult.ObjectId, document, promptNestedEntityResult.PickedPoint);
-                    break;
-            }
+                        if (promptNestedEntityResult.Status == PromptStatus.OK)
+                        {
+                            SetUcsBasedOnEntity(promptNestedEntityResult.ObjectId, document, promptNestedEntityResult.PickedPoint);
+                            bo = false;
+                        }
+                        else if (promptNestedEntityResult.Status == PromptStatus.Keyword)
+                        {
+                            switch (promptNestedEntityResult.StringResult)
+                            {
+                                case "E":
+                                    MyPlugin.CurrentUserData.EntityOrNestedEntity = promptNestedEntityResult.StringResult;
+                                    break;
+                                case "W":
+                                    SetUcsToWcs();
+                                    bo = false;
+                                    break;
+                            }
+                        }
+                        else
+                        {
+                            bo = false;
+                        }
+                        break;
+                }
+            };            
         }
 
         private void SetUcsBasedOnEntity(ObjectId entityId, Document document, Point3d? pickedPoint = null)
         {
             Editor editor = document.Editor;
             using Transaction transaction = document.Database.TransactionManager.StartTransaction();
-            Entity entity;
-            if (pickedPoint.HasValue)
-            {
-                entity = transaction.GetObject(entityId, OpenMode.ForRead) as Entity;
-            }
-            else
-            {
-                // 直接从ObjectId获取实体
-                entity = transaction.GetObject(entityId, OpenMode.ForRead) as Entity;
-            }
+            Entity entity = transaction.GetObject(entityId, OpenMode.ForRead) as Entity;
 
-            // 在这里根据选择的实体或子实体设置UCS
-            // 示例：根据直线实体设置UCS
-            if (entity is Line line)
-            {
-                // 根据直线设置UCS的逻辑
-            }
-            // 其他实体类型处理...
             if (entity is BlockReference br)
             {
                 Point3d origin = br.Position;
@@ -93,17 +116,82 @@ namespace TimeIsLife.CADCommand
 
                 Matrix3d ucs = Matrix3d.AlignCoordinateSystem(Point3d.Origin, Vector3d.XAxis, Vector3d.YAxis, Vector3d.ZAxis, origin, xAxis, yAxis, Vector3d.ZAxis);
                 editor.CurrentUserCoordinateSystem = ucs;
-            }
-            if (entity is Curve curve)
-            {
-                Point3d origin = curve.StartPoint;
-                Vector3d xAxis = curve.GetFirstDerivative(origin);
-                Vector3d yAxis = Vector3d.ZAxis.CrossProduct(xAxis).GetNormal();
 
-                Matrix3d ucs = Matrix3d.AlignCoordinateSystem(Point3d.Origin, Vector3d.XAxis, Vector3d.YAxis, Vector3d.ZAxis, origin, xAxis, yAxis, Vector3d.ZAxis);
-                editor.CurrentUserCoordinateSystem = ucs;
+                // 处理嵌套块引用
+                BlockTableRecord blockTableRecord = transaction.GetObject(br.BlockTableRecord, OpenMode.ForRead) as BlockTableRecord;
+                if (blockTableRecord != null)
+                {
+                    foreach (ObjectId nestedId in blockTableRecord)
+                    {
+                        Entity nestedEntity = transaction.GetObject(nestedId, OpenMode.ForRead) as Entity;
+                        if (nestedEntity is BlockReference nestedBlockReference)
+                        {
+                            SetUcsBasedOnEntity(nestedBlockReference.ObjectId, document, pickedPoint);
+                        }
+                    }
+                }
             }
-            if (entity is DBText text)
+            else if (entity is Curve curve)
+            {
+                if (curve is Polyline polyline && pickedPoint.HasValue)
+                {
+                    int segmentIndex = -1;
+                    double minDistance = double.MaxValue;
+
+                    for (int i = 0; i < polyline.NumberOfVertices - 1; i++)
+                    {
+                        SegmentType segmentType = polyline.GetSegmentType(i);
+                        Curve segmentCurve = null;
+
+                        if (segmentType == SegmentType.Line)
+                        {
+                            segmentCurve = new Line(polyline.GetPoint3dAt(i), polyline.GetPoint3dAt(i + 1));
+                        }
+
+                        if (segmentCurve != null)
+                        {
+                            Point3d closestPoint = segmentCurve.GetClosestPointTo(pickedPoint.Value, false);
+                            double distance = closestPoint.DistanceTo(pickedPoint.Value);
+                            if (distance < minDistance)
+                            {
+                                minDistance = distance;
+                                segmentIndex = i;
+                            }
+                        }
+                    }
+
+                    if (segmentIndex != -1)
+                    {
+                        Curve selectedSegment = null;
+                        SegmentType segmentType = polyline.GetSegmentType(segmentIndex);
+
+                        if (segmentType == SegmentType.Line)
+                        {
+                            selectedSegment = new Line(polyline.GetPoint3dAt(segmentIndex), polyline.GetPoint3dAt(segmentIndex + 1));
+                        }
+
+                        if (selectedSegment != null)
+                        {
+                            Point3d origin = pickedPoint.Value;
+                            Vector3d xAxis = selectedSegment.GetFirstDerivative(origin).GetNormal();
+                            Vector3d yAxis = Vector3d.ZAxis.CrossProduct(xAxis).GetNormal();
+
+                            Matrix3d ucs = Matrix3d.AlignCoordinateSystem(Point3d.Origin, Vector3d.XAxis, Vector3d.YAxis, Vector3d.ZAxis, origin, xAxis, yAxis, Vector3d.ZAxis);
+                            editor.CurrentUserCoordinateSystem = ucs;
+                        }
+                    }
+                }
+                else
+                {
+                    Point3d origin = curve.StartPoint;
+                    Vector3d xAxis = curve.GetFirstDerivative(origin).GetNormal();
+                    Vector3d yAxis = Vector3d.ZAxis.CrossProduct(xAxis).GetNormal();
+
+                    Matrix3d ucs = Matrix3d.AlignCoordinateSystem(Point3d.Origin, Vector3d.XAxis, Vector3d.YAxis, Vector3d.ZAxis, origin, xAxis, yAxis, Vector3d.ZAxis);
+                    editor.CurrentUserCoordinateSystem = ucs;
+                }
+            }
+            else if (entity is DBText text)
             {
                 Point3d origin = text.Position;
                 double angle = text.Rotation;
@@ -129,5 +217,17 @@ namespace TimeIsLife.CADCommand
             transaction.Commit();
         }
 
+
+
+        private void SetUcsToWcs()
+        {
+            Document document = Application.DocumentManager.MdiActiveDocument;
+            Editor editor = document.Editor;
+
+            // 重置UCS为WCS
+            Matrix3d ucsToWcsMatrix = Matrix3d.Identity;
+            editor.CurrentUserCoordinateSystem = ucsToWcsMatrix;
+            editor.Command("_.UCSICON", "N");
+        }
     }
 }

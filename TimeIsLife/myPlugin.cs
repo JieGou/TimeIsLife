@@ -129,7 +129,7 @@ namespace TimeIsLife
                 CurrentUserData.DeviceType = "JXX";
                 CurrentUserData.IsUseAvoidanceArea = false;
                 CurrentUserData.AlignXY = "X";
-                CurrentUserData.EntityOrNestedEntity = "Entity";
+                CurrentUserData.EntityOrNestedEntity = "E";
                 return;
             }
 

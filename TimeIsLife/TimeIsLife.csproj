@@ -523,10 +523,10 @@
       <Version>8.2.2</Version>
     </PackageReference>
     <PackageReference Include="Dapper">
-      <Version>2.1.28</Version>
+      <Version>2.1.35</Version>
     </PackageReference>
     <PackageReference Include="Google.OrTools">
-      <Version>9.8.3296</Version>
+      <Version>9.10.4067</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf">
       <Version>1.1.77</Version>
@@ -541,7 +541,7 @@
       <Version>1.0.118</Version>
     </PackageReference>
     <PackageReference Include="System.Memory">
-      <Version>4.5.4</Version>
+      <Version>4.5.5</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
