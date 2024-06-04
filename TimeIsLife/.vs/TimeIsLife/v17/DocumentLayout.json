@@ -1,13 +1,13 @@
 {
   "Version": 1,
-  "WorkspaceRootPath": "D:\\GitHub\\TimeIsLife\\TimeIsLife\\",
+  "WorkspaceRootPath": "D:\\github\\TimeIsLife\\TimeIsLife\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{2A4598CE-38F6-4771-9690-673A4158FFC3}|TimeIsLife.csproj|d:\\github\\timeislife\\timeislife\\cadcommand\\tilcommand.ff_quickucs.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{2A4598CE-38F6-4771-9690-673A4158FFC3}|TimeIsLife.csproj|D:\\github\\TimeIsLife\\TimeIsLife\\cadcommand\\tilcommand.ff_quickucs.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{2A4598CE-38F6-4771-9690-673A4158FFC3}|TimeIsLife.csproj|solutionrelative:cadcommand\\tilcommand.ff_quickucs.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{2A4598CE-38F6-4771-9690-673A4158FFC3}|TimeIsLife.csproj|D:\\GitHub\\TimeIsLife\\TimeIsLife\\myplugin.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "AbsoluteMoniker": "D:0:0:{2A4598CE-38F6-4771-9690-673A4158FFC3}|TimeIsLife.csproj|d:\\github\\timeislife\\timeislife\\myplugin.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{2A4598CE-38F6-4771-9690-673A4158FFC3}|TimeIsLife.csproj|solutionrelative:myplugin.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
@@ -18,7 +18,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 2,
+          "SelectedChildIndex": 3,
           "Children": [
             {
               "$type": "Bookmark",
@@ -28,23 +28,28 @@
               "$type": "Document",
               "DocumentIndex": 1,
               "Title": "myPlugin.cs",
-              "DocumentMoniker": "D:\\GitHub\\TimeIsLife\\TimeIsLife\\myPlugin.cs",
+              "DocumentMoniker": "D:\\github\\TimeIsLife\\TimeIsLife\\myPlugin.cs",
               "RelativeDocumentMoniker": "myPlugin.cs",
-              "ToolTip": "D:\\GitHub\\TimeIsLife\\TimeIsLife\\myPlugin.cs",
+              "ToolTip": "D:\\github\\TimeIsLife\\TimeIsLife\\myPlugin.cs",
               "RelativeToolTip": "myPlugin.cs",
-              "ViewState": "AQIAAF0AAAAAAAAAAAAAwGkAAACgAAAA",
+              "ViewState": "AQIAAGMAAAAAAAAAAAAAwHUAAAAAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-06-03T12:45:13.822Z"
+              "WhenOpened": "2024-06-03T12:45:13.822Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{cce594b6-0c39-4442-ba28-10c64ac7e89f}"
             },
             {
               "$type": "Document",
               "DocumentIndex": 0,
               "Title": "TilCommand.FF_QuickUcs.cs",
-              "DocumentMoniker": "D:\\GitHub\\TimeIsLife\\TimeIsLife\\CADCommand\\TilCommand.FF_QuickUcs.cs",
+              "DocumentMoniker": "D:\\github\\TimeIsLife\\TimeIsLife\\CADCommand\\TilCommand.FF_QuickUcs.cs",
               "RelativeDocumentMoniker": "CADCommand\\TilCommand.FF_QuickUcs.cs",
-              "ToolTip": "D:\\GitHub\\TimeIsLife\\TimeIsLife\\CADCommand\\TilCommand.FF_QuickUcs.cs",
+              "ToolTip": "D:\\github\\TimeIsLife\\TimeIsLife\\CADCommand\\TilCommand.FF_QuickUcs.cs",
               "RelativeToolTip": "CADCommand\\TilCommand.FF_QuickUcs.cs",
-              "ViewState": "AQIAAJYAAAAAAAAAAIAzwGYAAABrAAAA",
+              "ViewState": "AQIAAJYAAAAAAAAAAAAAAG4AAAAXAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2024-03-12T14:14:43.974Z",
               "EditorCaption": ""
