@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("TimeIsLifeRegister")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+769903796aedf161c9ac6e34bd9d19c8477f1299")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+857e8fa25dfb1b3dc348a836aae67e6e228eb0e6")]
 [assembly: System.Reflection.AssemblyProductAttribute("TimeIsLifeRegister")]
 [assembly: System.Reflection.AssemblyTitleAttribute("TimeIsLifeRegister")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

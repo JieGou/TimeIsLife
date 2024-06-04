@@ -1,15 +1,11 @@
 {
   "version": 2,
-  "dgSpecHash": "q0EN9cQ5pWw=",
+  "dgSpecHash": "4cjJV9ApVi8=",
   "success": true,
-  "projectFilePath": "D:\\github\\TimeIsLife\\TimeIsLifeRegister\\TimeIsLifeRegister.csproj",
+  "projectFilePath": "D:\\GitHub\\TimeIsLife\\TimeIsLifeRegister\\TimeIsLifeRegister.csproj",
   "expectedPackageFiles": [
-    "C:\\Users\\53-liu-yq\\.nuget\\packages\\communitytoolkit.mvvm\\8.0.0\\communitytoolkit.mvvm.8.0.0.nupkg.sha512",
-    "C:\\Users\\53-liu-yq\\.nuget\\packages\\microsoft.xaml.behaviors.wpf\\1.1.39\\microsoft.xaml.behaviors.wpf.1.1.39.nupkg.sha512",
-    "C:\\Users\\53-liu-yq\\.nuget\\packages\\microsoft.windowsdesktop.app.ref\\6.0.30\\microsoft.windowsdesktop.app.ref.6.0.30.nupkg.sha512",
-    "C:\\Users\\53-liu-yq\\.nuget\\packages\\microsoft.netcore.app.ref\\6.0.30\\microsoft.netcore.app.ref.6.0.30.nupkg.sha512",
-    "C:\\Users\\53-liu-yq\\.nuget\\packages\\microsoft.aspnetcore.app.ref\\6.0.30\\microsoft.aspnetcore.app.ref.6.0.30.nupkg.sha512",
-    "C:\\Users\\53-liu-yq\\.nuget\\packages\\microsoft.netcore.app.host.win-x64\\6.0.30\\microsoft.netcore.app.host.win-x64.6.0.30.nupkg.sha512"
+    "C:\\Users\\liu18\\.nuget\\packages\\communitytoolkit.mvvm\\8.0.0\\communitytoolkit.mvvm.8.0.0.nupkg.sha512",
+    "C:\\Users\\liu18\\.nuget\\packages\\microsoft.xaml.behaviors.wpf\\1.1.39\\microsoft.xaml.behaviors.wpf.1.1.39.nupkg.sha512"
   ],
   "logs": []
 }
