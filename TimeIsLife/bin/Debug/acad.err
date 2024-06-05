@@ -1,6 +1,8 @@
 
 
-内部错误:  !dbentapi.cpp@719: eNullObjectId
+致命错误:  Unhandled Access Violation Reading 0x0000 Exception at F626A9DEh
 
-03/05/2024 at 15:26:46.000  图形: E:\OneDrive\00 工作\00 项目\22-AD-029 浦东新区梅园社区2E8-19地块项目\03 施工图\00 设计文件\T1\T1火灾自动报警平面图 - 副本.dwg
+06/05/2024 at 20:57:19.000  图形: C:\Users\liu18\Desktop\Drawing1.dwg
+-------------
+计文件\T1\T1火灾自动报警平面图 - 副本.dwg
 -------------

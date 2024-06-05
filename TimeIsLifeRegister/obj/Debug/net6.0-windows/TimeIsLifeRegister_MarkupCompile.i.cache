@@ -4,17 +4,17 @@
 winexe
 C#
 .cs
-D:\github\TimeIsLife\TimeIsLifeRegister\obj\Debug\net6.0-windows\
+D:\GitHub\TimeIsLife\TimeIsLifeRegister\obj\Debug\net6.0-windows\
 TimeIsLifeRegister
 none
 false
 TRACE;DEBUG;NET;NET6_0;NETCOREAPP
-D:\github\TimeIsLife\TimeIsLifeRegister\App.xaml
+D:\GitHub\TimeIsLife\TimeIsLifeRegister\App.xaml
 6-948320637
 
 81373470682
-196-1465349479
+1962011892102
 MainWindow.xaml;Resources\Button.xaml;Resources\Expander.xaml;Resources\ListBox.xaml;Resources\Shared.xaml;Resources\TextBox.xaml;
 
-False
+True
 

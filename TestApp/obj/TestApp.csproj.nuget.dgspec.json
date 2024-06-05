@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "D:\\GitHub\\TestApp\\TestApp.csproj": {}
+    "D:\\GitHub\\TimeIsLife\\TestApp\\TestApp.csproj": {}
   },
   "projects": {
-    "D:\\GitHub\\TestApp\\TestApp.csproj": {
+    "D:\\GitHub\\TimeIsLife\\TestApp\\TestApp.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "D:\\GitHub\\TestApp\\TestApp.csproj",
+        "projectUniqueName": "D:\\GitHub\\TimeIsLife\\TestApp\\TestApp.csproj",
         "projectName": "TestApp",
-        "projectPath": "D:\\GitHub\\TestApp\\TestApp.csproj",
+        "projectPath": "D:\\GitHub\\TimeIsLife\\TestApp\\TestApp.csproj",
         "packagesPath": "C:\\Users\\liu18\\.nuget\\packages\\",
-        "outputPath": "D:\\GitHub\\TestApp\\obj\\",
+        "outputPath": "D:\\GitHub\\TimeIsLife\\TestApp\\obj\\",
         "projectStyle": "PackageReference",
         "skipContentFileWrite": true,
         "fallbackFolders": [
@@ -33,6 +33,11 @@
           "net472": {
             "projectReferences": {}
           }
+        },
+        "restoreAuditProperties": {
+          "enableAudit": "true",
+          "auditLevel": "low",
+          "auditMode": "direct"
         }
       },
       "frameworks": {
@@ -47,20 +52,6 @@
               "version": "[1.1.39, )"
             }
           }
-        }
-      },
-      "runtimes": {
-        "win": {
-          "#import": []
-        },
-        "win-arm64": {
-          "#import": []
-        },
-        "win-x64": {
-          "#import": []
-        },
-        "win-x86": {
-          "#import": []
         }
       }
     }

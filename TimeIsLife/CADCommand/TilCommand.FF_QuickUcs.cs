@@ -5,6 +5,8 @@ using Autodesk.AutoCAD.Runtime;
 using Autodesk.AutoCAD.Geometry;
 using System;
 using System.Windows.Documents;
+using System.Windows.Forms;
+using Application = Autodesk.AutoCAD.ApplicationServices.Application;
 
 namespace TimeIsLife.CADCommand
 {
@@ -133,22 +135,45 @@ namespace TimeIsLife.CADCommand
             Vector3d xAxis = new Vector3d(Math.Cos(angle), Math.Sin(angle), 0);
             SetUcs(editor, origin, xAxis);
         }
-
         private void SetUcsForCurve(Curve curve, Editor editor, Point3d pickedPoint)
         {
-            int pickBoxSize = Application.GetSystemVariable("PICKBOX") as int? ?? 3;
-            double pickBoxLength = pickBoxSize * 25;
+            // 获取当前视图
+            var screenWidth = Screen.PrimaryScreen.Bounds.Width;
+            var screenHeight = Screen.PrimaryScreen.Bounds.Height;
+            // 获取拾取框大小
+            int pickBoxSize = System.Convert.ToInt32(Application.GetSystemVariable("PICKBOX"));
+            // 获取当前视图
+            ViewTableRecord currentView = editor.GetCurrentView();
 
-            Point3d pickBoxPoint1 = new Point3d(pickedPoint.X - pickBoxLength / 2, pickedPoint.Y - pickBoxLength / 2, 0);
-            Point3d pickBoxPoint2 = new Point3d(pickedPoint.X + pickBoxLength / 2, pickedPoint.Y - pickBoxLength / 2, 0);
-            Point3d pickBoxPoint3 = new Point3d(pickedPoint.X +pickBoxLength / 2, pickedPoint.Y + pickBoxLength / 2, 0);
-            Point3d pickBoxPoint4 = new Point3d(pickedPoint.X - pickBoxLength / 2, pickedPoint.Y + pickBoxLength / 2, 0);
+            // 获取视点宽高（单位是图形文件的单位）
+            double viewWidth = currentView.Width;
+            double viewHeight = currentView.Height;
 
+            // 获取视角扭转角度（弧度）
+            double viewTwistAngle = currentView.ViewTwist;
+
+            // 计算视点在屏幕上的有效宽高像素数（考虑视角扭转角度）
+            double cosAngle = Math.Cos(viewTwistAngle);
+            double sinAngle = Math.Sin(viewTwistAngle);
+            // 有效视点宽高像素数
+            double effectiveViewWidthInPixels = Math.Abs(cosAngle * screenWidth) + Math.Abs(sinAngle * screenHeight);
+            double effectiveViewHeightInPixels = Math.Abs(cosAngle * screenHeight) + Math.Abs(sinAngle * screenWidth);
+
+            // 计算屏幕一个像素在图形文件中的长度
+            double lengthPerPixelX = viewWidth / effectiveViewWidthInPixels* pickBoxSize;
+            double lengthPerPixelY = viewHeight / effectiveViewHeightInPixels* pickBoxSize;
+
+            // 计算拾取框四个角点
+            Point3d pickBoxPoint1 = new Point3d(pickedPoint.X - lengthPerPixelX / 2, pickedPoint.Y - lengthPerPixelY / 2, 0);
+            Point3d pickBoxPoint2 = new Point3d(pickedPoint.X + lengthPerPixelX / 2, pickedPoint.Y - lengthPerPixelY / 2, 0);
+            Point3d pickBoxPoint3 = new Point3d(pickedPoint.X + lengthPerPixelX / 2, pickedPoint.Y + lengthPerPixelY / 2, 0);
+            Point3d pickBoxPoint4 = new Point3d(pickedPoint.X - lengthPerPixelX / 2, pickedPoint.Y + lengthPerPixelY / 2, 0);
+
+            // 拾取框四条边
             LineSegment3d lineSegment1 = new LineSegment3d(pickBoxPoint1, pickBoxPoint2);
             LineSegment3d lineSegment2 = new LineSegment3d(pickBoxPoint2, pickBoxPoint3);
             LineSegment3d lineSegment3 = new LineSegment3d(pickBoxPoint3, pickBoxPoint4);
             LineSegment3d lineSegment4 = new LineSegment3d(pickBoxPoint4, pickBoxPoint1);
-
 
             if (curve is Polyline polyline)
             {
@@ -195,7 +220,7 @@ namespace TimeIsLife.CADCommand
                 SetUcs(editor, origin, xAxis);
             }
         }
-
+        
         private void SetUcsForText(DBText text, Editor editor)
         {
             Point3d origin = text.Position;
@@ -209,8 +234,16 @@ namespace TimeIsLife.CADCommand
         {
             Point3d origin = mtext.Location;
             double angle = mtext.Rotation;
-            //需要添加上当前UCS的选择角度
-            Vector3d xAxis = new Vector3d(Math.Cos(angle), Math.Sin(angle), 0);
+
+            // 获取当前UCS
+            Matrix3d currentUcs = editor.CurrentUserCoordinateSystem;
+            CoordinateSystem3d ucs = currentUcs.CoordinateSystem3d;
+
+            // 计算MText的x轴方向，加入当前UCS的旋转角度
+            double currentUcsAngle = ucs.Xaxis.GetAngleTo(Vector3d.XAxis);
+            double totalAngle = angle + currentUcsAngle;
+            Vector3d xAxis = new Vector3d(Math.Cos(totalAngle), Math.Sin(totalAngle), 0);
+
             SetUcs(editor, origin, xAxis);
         }
 
