@@ -3,6 +3,7 @@ using Autodesk.AutoCAD.DatabaseServices;
 using Autodesk.AutoCAD.EditorInput;
 using Autodesk.AutoCAD.Runtime;
 using Autodesk.AutoCAD.Geometry;
+using Autodesk.AutoCAD.GraphicsSystem;
 using System;
 using System.Windows.Documents;
 using System.Windows.Forms;
@@ -113,7 +114,7 @@ namespace TimeIsLife.CADCommand
             }
             else if (entity is Curve curve)
             {
-                SetUcsForCurve(curve, editor, pickedPoint);
+                SetUcsForCurve(curve, document, pickedPoint);
             }
             else if (entity is DBText text)
             {
@@ -135,45 +136,10 @@ namespace TimeIsLife.CADCommand
             Vector3d xAxis = new Vector3d(Math.Cos(angle), Math.Sin(angle), 0);
             SetUcs(editor, origin, xAxis);
         }
-        private void SetUcsForCurve(Curve curve, Editor editor, Point3d pickedPoint)
+
+        private void SetUcsForCurve(Curve curve, Document document, Point3d pickedPoint)
         {
-            // 获取当前视图
-            var screenWidth = Screen.PrimaryScreen.Bounds.Width;
-            var screenHeight = Screen.PrimaryScreen.Bounds.Height;
-            // 获取拾取框大小
-            int pickBoxSize = System.Convert.ToInt32(Application.GetSystemVariable("PICKBOX"));
-            // 获取当前视图
-            ViewTableRecord currentView = editor.GetCurrentView();
-
-            // 获取视点宽高（单位是图形文件的单位）
-            double viewWidth = currentView.Width;
-            double viewHeight = currentView.Height;
-
-            // 获取视角扭转角度（弧度）
-            double viewTwistAngle = currentView.ViewTwist;
-
-            // 计算视点在屏幕上的有效宽高像素数（考虑视角扭转角度）
-            double cosAngle = Math.Cos(viewTwistAngle);
-            double sinAngle = Math.Sin(viewTwistAngle);
-            // 有效视点宽高像素数
-            double effectiveViewWidthInPixels = Math.Abs(cosAngle * screenWidth) + Math.Abs(sinAngle * screenHeight);
-            double effectiveViewHeightInPixels = Math.Abs(cosAngle * screenHeight) + Math.Abs(sinAngle * screenWidth);
-
-            // 计算屏幕一个像素在图形文件中的长度
-            double lengthPerPixelX = viewWidth / effectiveViewWidthInPixels* pickBoxSize;
-            double lengthPerPixelY = viewHeight / effectiveViewHeightInPixels* pickBoxSize;
-
-            // 计算拾取框四个角点
-            Point3d pickBoxPoint1 = new Point3d(pickedPoint.X - lengthPerPixelX / 2, pickedPoint.Y - lengthPerPixelY / 2, 0);
-            Point3d pickBoxPoint2 = new Point3d(pickedPoint.X + lengthPerPixelX / 2, pickedPoint.Y - lengthPerPixelY / 2, 0);
-            Point3d pickBoxPoint3 = new Point3d(pickedPoint.X + lengthPerPixelX / 2, pickedPoint.Y + lengthPerPixelY / 2, 0);
-            Point3d pickBoxPoint4 = new Point3d(pickedPoint.X - lengthPerPixelX / 2, pickedPoint.Y + lengthPerPixelY / 2, 0);
-
-            // 拾取框四条边
-            LineSegment3d lineSegment1 = new LineSegment3d(pickBoxPoint1, pickBoxPoint2);
-            LineSegment3d lineSegment2 = new LineSegment3d(pickBoxPoint2, pickBoxPoint3);
-            LineSegment3d lineSegment3 = new LineSegment3d(pickBoxPoint3, pickBoxPoint4);
-            LineSegment3d lineSegment4 = new LineSegment3d(pickBoxPoint4, pickBoxPoint1);
+            LineSegment3d[] lineSegments = GetPickBoxLineSegments(pickedPoint);
 
             if (curve is Polyline polyline)
             {
@@ -184,7 +150,7 @@ namespace TimeIsLife.CADCommand
                     {
                         LineSegment3d segment = polyline.GetLineSegmentAt(i);
                         //外部参照中的多段线碰撞检测不成功，有可能是拾取框像素转换为实际长度太小导致
-                        if (lineSegment1.IntersectWith(segment) != null || lineSegment2.IntersectWith(segment) != null || lineSegment3.IntersectWith(segment) != null || lineSegment4.IntersectWith(segment) != null)
+                        if (lineSegments[0].IntersectWith(segment) != null || lineSegments[1].IntersectWith(segment) != null || lineSegments[2].IntersectWith(segment) != null || lineSegments[3].IntersectWith(segment) != null)
                         {
                             Point3d startPoint = segment.StartPoint;
                             Point3d endPoint = segment.EndPoint;
@@ -197,7 +163,7 @@ namespace TimeIsLife.CADCommand
                                 xAxis = -xAxis;
                             }
 
-                            SetUcs(editor, origin, xAxis);
+                            SetUcs(document.Editor, origin, xAxis);
                             return;
                         }
                     }
@@ -217,7 +183,7 @@ namespace TimeIsLife.CADCommand
                     xAxis = -xAxis;
                 }
 
-                SetUcs(editor, origin, xAxis);
+                SetUcs(document.Editor, origin, xAxis);
             }
         }
         
@@ -266,6 +232,42 @@ namespace TimeIsLife.CADCommand
                 origin, xAxis, yAxis, Vector3d.ZAxis);
 
             editor.CurrentUserCoordinateSystem = ucs;
+        }
+
+        //方法：根据点获取拾取框四条边的集合
+        private LineSegment3d[] GetPickBoxLineSegments(Point3d pickedPoint)
+        {
+            // 获取拾取框大小
+            int pickBoxSize = System.Convert.ToInt32(Application.GetSystemVariable("PICKBOX"));
+            // 获取当前视图
+            ViewTableRecord currentView = Application.DocumentManager.MdiActiveDocument.Editor.GetCurrentView();
+
+            // 获取视点宽高（单位是图形文件的单位）
+            double viewWidth = currentView.Width;
+            double viewHeight = currentView.Height;
+
+            // 获取当前视图的像素大小
+            //优化：使用Manager获取设备独立显示大小
+            double pixelWidth, pixelHeight;
+            Manager manager = Application.DocumentManager.MdiActiveDocument.GraphicsManager;
+            pixelWidth = manager.DeviceIndependentDisplaySize.Width;
+            pixelHeight = manager.DeviceIndependentDisplaySize.Height;
+
+            // 计算屏幕一个像素在图形文件中的长度
+            double lengthPerPixelX = viewWidth / pixelWidth * pickBoxSize * 2;
+            double lengthPerPixelY = viewHeight / pixelHeight * pickBoxSize * 2;
+
+            // 计算拾取框四个角点
+            Point3d pickBoxPoint1 = new Point3d(pickedPoint.X - lengthPerPixelX / 2, pickedPoint.Y - lengthPerPixelY / 2, 0);
+            Point3d pickBoxPoint2 = new Point3d(pickedPoint.X + lengthPerPixelX / 2, pickedPoint.Y - lengthPerPixelY / 2, 0);
+            Point3d pickBoxPoint3 = new Point3d(pickedPoint.X + lengthPerPixelX / 2, pickedPoint.Y + lengthPerPixelY / 2, 0);
+            Point3d pickBoxPoint4 = new Point3d(pickedPoint.X - lengthPerPixelX / 2, pickedPoint.Y + lengthPerPixelY / 2, 0);
+
+            LineSegment3d lineSegment1 = new LineSegment3d(pickBoxPoint1, pickBoxPoint2);
+            LineSegment3d lineSegment2 = new LineSegment3d(pickBoxPoint2, pickBoxPoint3);
+            LineSegment3d lineSegment3 = new LineSegment3d(pickBoxPoint3, pickBoxPoint4);
+            LineSegment3d lineSegment4 = new LineSegment3d(pickBoxPoint4, pickBoxPoint1);
+            return new LineSegment3d[] { lineSegment1, lineSegment2, lineSegment3, lineSegment4 };
         }
     }
 }

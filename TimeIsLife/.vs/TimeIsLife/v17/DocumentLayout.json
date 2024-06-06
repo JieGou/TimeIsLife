@@ -7,12 +7,12 @@
       "RelativeMoniker": "D:0:0:{2A4598CE-38F6-4771-9690-673A4158FFC3}|TimeIsLife.csproj|solutionrelative:cadcommand\\tilcommand.ff_quickucs.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{2A4598CE-38F6-4771-9690-673A4158FFC3}|TimeIsLife.csproj|D:\\GitHub\\TimeIsLife\\TimeIsLife\\cadcommand\\tilcommand.ff_tools.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{2A4598CE-38F6-4771-9690-673A4158FFC3}|TimeIsLife.csproj|solutionrelative:cadcommand\\tilcommand.ff_tools.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{2A4598CE-38F6-4771-9690-673A4158FFC3}|TimeIsLife.csproj|D:\\GitHub\\TimeIsLife\\TimeIsLife\\jig\\quickucsjig.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2A4598CE-38F6-4771-9690-673A4158FFC3}|TimeIsLife.csproj|solutionrelative:jig\\quickucsjig.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{2A4598CE-38F6-4771-9690-673A4158FFC3}|TimeIsLife.csproj|D:\\GitHub\\TimeIsLife\\TimeIsLife\\cadcommand\\electricalcommand.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{2A4598CE-38F6-4771-9690-673A4158FFC3}|TimeIsLife.csproj|solutionrelative:cadcommand\\electricalcommand.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{2A4598CE-38F6-4771-9690-673A4158FFC3}|TimeIsLife.csproj|d:\\github\\timeislife\\timeislife\\helper\\sqlitehelper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{2A4598CE-38F6-4771-9690-673A4158FFC3}|TimeIsLife.csproj|solutionrelative:helper\\sqlitehelper.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -22,7 +22,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 3,
+          "SelectedChildIndex": 2,
           "Children": [
             {
               "$type": "Bookmark",
@@ -30,27 +30,16 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
-              "Title": "TilCommand.FF_Tools.cs",
-              "DocumentMoniker": "D:\\GitHub\\TimeIsLife\\TimeIsLife\\CADCommand\\TilCommand.FF_Tools.cs",
-              "RelativeDocumentMoniker": "CADCommand\\TilCommand.FF_Tools.cs",
-              "ToolTip": "D:\\GitHub\\TimeIsLife\\TimeIsLife\\CADCommand\\TilCommand.FF_Tools.cs",
-              "RelativeToolTip": "CADCommand\\TilCommand.FF_Tools.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAB4AAABRAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-06-05T14:45:47.91Z"
-            },
-            {
-              "$type": "Document",
               "DocumentIndex": 2,
-              "Title": "ElectricalCommand.cs",
-              "DocumentMoniker": "D:\\GitHub\\TimeIsLife\\TimeIsLife\\CADCommand\\ElectricalCommand.cs",
-              "RelativeDocumentMoniker": "CADCommand\\ElectricalCommand.cs",
-              "ToolTip": "D:\\GitHub\\TimeIsLife\\TimeIsLife\\CADCommand\\ElectricalCommand.cs",
-              "RelativeToolTip": "CADCommand\\ElectricalCommand.cs",
-              "ViewState": "AQIAACYAAAAAAAAAAAAUwDEAAAAJAAAA",
+              "Title": "SQLiteHelper.cs",
+              "DocumentMoniker": "D:\\GitHub\\TimeIsLife\\TimeIsLife\\Helper\\SQLiteHelper.cs",
+              "RelativeDocumentMoniker": "Helper\\SQLiteHelper.cs",
+              "ToolTip": "D:\\GitHub\\TimeIsLife\\TimeIsLife\\Helper\\SQLiteHelper.cs",
+              "RelativeToolTip": "Helper\\SQLiteHelper.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-06-05T14:44:59.613Z"
+              "WhenOpened": "2024-06-06T14:01:30.114Z",
+              "EditorCaption": ""
             },
             {
               "$type": "Document",
@@ -60,9 +49,22 @@
               "RelativeDocumentMoniker": "CADCommand\\TilCommand.FF_QuickUcs.cs",
               "ToolTip": "D:\\GitHub\\TimeIsLife\\TimeIsLife\\CADCommand\\TilCommand.FF_QuickUcs.cs",
               "RelativeToolTip": "CADCommand\\TilCommand.FF_QuickUcs.cs",
-              "ViewState": "AQIAAA4AAAAAAAAAAAAUwJYAAAAAAAAA",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAADoAAAAeAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2024-03-12T14:14:43.974Z",
+              "WhenOpened": "2024-06-06T13:57:28.598Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "QuickUcsJig.cs",
+              "DocumentMoniker": "D:\\GitHub\\TimeIsLife\\TimeIsLife\\Jig\\QuickUcsJig.cs",
+              "RelativeDocumentMoniker": "Jig\\QuickUcsJig.cs",
+              "ToolTip": "D:\\GitHub\\TimeIsLife\\TimeIsLife\\Jig\\QuickUcsJig.cs",
+              "RelativeToolTip": "Jig\\QuickUcsJig.cs",
+              "ViewState": "AQIAACIAAAAAAAAAAAAuwHMAAAAuAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-06-06T12:27:52.395Z",
               "EditorCaption": ""
             }
           ]
