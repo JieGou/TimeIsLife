@@ -163,7 +163,6 @@ namespace TimeIsLife.CADCommand
                 transaction.Commit();
             }
         }
-
         private static ObjectId InsertBlock(Database database, Database tempDatabase, string blockFullName)
         {
             string codeBase = Assembly.GetExecutingAssembly().CodeBase;

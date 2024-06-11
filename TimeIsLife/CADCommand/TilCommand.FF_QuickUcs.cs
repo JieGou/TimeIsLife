@@ -62,6 +62,10 @@ namespace TimeIsLife.CADCommand
                         return false;
                 }
             }
+            else
+            {
+                return false;
+            }
 
             return true;
         }
@@ -98,7 +102,10 @@ namespace TimeIsLife.CADCommand
                         return false;
                 }
             }
-
+            else
+            {
+                return false;
+            }
             return true;
         }
 
@@ -269,5 +276,8 @@ namespace TimeIsLife.CADCommand
             LineSegment3d lineSegment4 = new LineSegment3d(pickBoxPoint4, pickBoxPoint1);
             return new LineSegment3d[] { lineSegment1, lineSegment2, lineSegment3, lineSegment4 };
         }
+
+        //后续：补充QuickUcsJig的其他功能
+
     }
 }

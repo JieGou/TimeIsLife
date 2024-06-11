@@ -94,7 +94,10 @@
     <Compile Include="CADCommand\TilCommand.F9_FAS.cs" />
     <Compile Include="CADCommand\TilCommand.F6_LoadYdbFile.cs" />
     <Compile Include="CADCommand\TilCommand.F1_ConnectLine.cs" />
+    <Compile Include="CADCommand\TilCommand.FF_FireAlarmCeiling.cs" />
+    <Compile Include="CADCommand\TilCommand.FF_GenerateMonitorSystem.cs" />
     <Compile Include="CADCommand\TilCommand.FF_QuickUcs.cs" />
+    <Compile Include="CADCommand\TilCommand.FF_SumPower.cs" />
     <Compile Include="CADCommand\TilCommand.FF_Tools.cs" />
     <Compile Include="Helper\DatabaseHelper.cs" />
     <Compile Include="Jig\QuickUcsJig.cs" />

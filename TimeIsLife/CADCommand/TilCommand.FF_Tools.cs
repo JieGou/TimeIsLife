@@ -29,6 +29,7 @@ namespace TimeIsLife.CADCommand
                 {
                     DockEnabled = DockSides.Left, // 设置PaletteSet的DockEnabled属性为DockSides.Left，使其可以停靠在窗口的左侧
                     TitleBarLocation = PaletteSetTitleBarLocation.Left // 设置标题栏位置
+
                 };
                 ElementHost host = new ElementHost // 创建一个ElementHost实例
                 {
