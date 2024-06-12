@@ -426,7 +426,7 @@ namespace TimeIsLife.CADCommand
                                         // 最大迭代次数，用于控制循环次数
                                         const int maxIterations = 10;
 
-                                        if (IsProtected(geometryFactory, orderedItem.Key, detectorInfo.Radius, curFloorBeams))
+                                        if (IsProtected(orderedItem.Key, detectorInfo.Radius))
                                         {
                                             coordinates.Add(orderedItem.Key.Centroid.Coordinate);
                                         }
@@ -444,7 +444,7 @@ namespace TimeIsLife.CADCommand
                                                 // 检查每个分割后的部分是否都被保护
                                                 foreach (var item in splitGeometries)
                                                 {
-                                                    if (!IsProtected(geometryFactory, item, detectorInfo.Radius, curFloorBeams))
+                                                    if (!IsProtected(item, detectorInfo.Radius))
                                                     {
                                                         isAllProtected = false;
                                                         break;
@@ -468,7 +468,7 @@ namespace TimeIsLife.CADCommand
                                     else
                                     {
                                         // 检查是否在保护范围内，如果是，则不需要切分
-                                        if (IsProtected(geometryFactory, orderedItem.Key, detectorInfo.Radius, curFloorBeams))
+                                        if (IsProtected(orderedItem.Key, detectorInfo.Radius))
                                         {
                                             List<Geometry> beam600Geometries = new List<Geometry>();
                                             List<Geometry> beam200Geometries = new List<Geometry>();
@@ -594,7 +594,7 @@ namespace TimeIsLife.CADCommand
                                                 // 检查每个切分后的部分是否都被保护
                                                 foreach (var item in splitGeometries)
                                                 {
-                                                    if (!IsProtected(geometryFactory, item, detectorInfo.Radius, curFloorBeams))
+                                                    if (!IsProtected(item, detectorInfo.Radius))
                                                     {
                                                         b = false;
                                                         break;
@@ -918,6 +918,7 @@ namespace TimeIsLife.CADCommand
         {
             using (Transaction transaction = database.TransactionManager.StartTransaction())
             {
+                
                 LayerTable layerTable = (LayerTable)transaction.GetObject(database.LayerTableId, OpenMode.ForRead);
 
                 // Create new layer if it doesn't exist
@@ -957,7 +958,7 @@ namespace TimeIsLife.CADCommand
         /// <param name="geometry">几何</param>
         /// <param name="radius">半径</param>
         /// <returns>true：在保护范围内；false:不在保护范围内</returns>
-        private bool IsProtected(GeometryFactory geometryFactory, Geometry geometry, double radius, List<Beam> beams)
+        private bool IsProtected(Geometry geometry, double radius)
         {
             MinimumBoundingCircle mbc = new MinimumBoundingCircle(geometry);
             Geometry circlePolygon = mbc.GetCircle();
@@ -1468,7 +1469,7 @@ namespace TimeIsLife.CADCommand
             return geometries;
         }
 
-        List<Geometry> SplitPolygonOptimized(GeometryFactory geometryFactory, Geometry geometry, int count, double interval)
+        private List<Geometry> SplitPolygonOptimized(GeometryFactory geometryFactory, Geometry geometry, int count, double interval)
         {
             // 计算几何图形的外包围盒（Envelope）
             Envelope envelope = geometry.EnvelopeInternal;
@@ -1508,8 +1509,10 @@ namespace TimeIsLife.CADCommand
             double[][] centerPoints = clusters.Centroids;
 
             // 构建泰森多边形
-            VoronoiDiagramBuilder voronoiDiagramBuilder = new VoronoiDiagramBuilder();
-            voronoiDiagramBuilder.ClipEnvelope = envelope;
+            VoronoiDiagramBuilder voronoiDiagramBuilder = new VoronoiDiagramBuilder
+            {
+                ClipEnvelope = envelope
+            };
             voronoiDiagramBuilder.SetSites(centerPoints.Select(c => new Coordinate(c[0], c[1])).ToList());
             GeometryCollection geometryCollection = voronoiDiagramBuilder.GetDiagram(geometryFactory);
 
@@ -1518,10 +1521,16 @@ namespace TimeIsLife.CADCommand
             for (int i = 0; i < geometryCollection.NumGeometries; i++)
             {
                 Geometry vorGeometry = geometryCollection.GetGeometryN(i);
-                geometries.Add(vorGeometry.Intersection(geometry));
+                Geometry intersection = vorGeometry.Intersection(geometry);
+                if (!intersection.IsEmpty)
+                {
+                    geometries.Add(intersection);
+                }
             }
 
             return geometries;
         }
+
+
     }
 }
