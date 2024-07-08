@@ -518,6 +518,12 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
     <None Include="Snippet\TimeIsLife Command.snippet" />
+    <None Include="TestDwg\20221231图书馆（消防审查后修改）_t3.dwg" />
+    <None Include="TestDwg\AreaDwg.dwg" />
+    <None Include="TestDwg\Drawing1.dwg" />
+    <None Include="TestDwg\T2.dwg" />
+    <None Include="TestDwg\test-line.dwg" />
+    <None Include="TestDwg\test.dwg" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Accord.MachineLearning">
@@ -666,9 +672,7 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="TestDwg\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <None Include="Snippet\TimeIsLife.snippet" />
   </ItemGroup>
